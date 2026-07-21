@@ -3,10 +3,9 @@
   "name": "dmeim",
   "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2026-07-21",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "binding": "ASSETS",
-  },
+  // nodejs_compat: Node APIs in the Worker
+  // global_fetch_strictly_public: allow same-zone fetches used by the Astro adapter / assets path
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "observability": {
     "enabled": true,
   },
