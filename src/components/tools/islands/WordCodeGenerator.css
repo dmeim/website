@@ -23,7 +23,7 @@
       var(--color-spot),
       transparent 55%
     ),
-    color-mix(in srgb, var(--color-ground-elevated) 88%, transparent);
+    color-mix(in srgb, var(--color-surface) 88%, transparent);
 }
 
 .wc-panel h2 {
@@ -42,11 +42,11 @@
 .wc-status {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
 }
 
 .wc-status--success {
-  color: var(--color-accent);
+  color: var(--color-gold);
 }
 
 .wc-status--error {
@@ -65,7 +65,7 @@
   flex: 1 1 12rem;
   font-size: 0.8125rem;
   line-height: 1.45;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
 }
 
 .wc-category-wrap {
@@ -87,7 +87,7 @@
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-gold);
   border-bottom: 1px solid var(--color-border);
   white-space: nowrap;
 }
@@ -117,7 +117,7 @@
 
 .wc-category-name input {
   margin-top: 0.2em;
-  accent-color: var(--color-accent);
+  accent-color: var(--color-gold);
 }
 
 .wc-count-pill {
@@ -127,7 +127,7 @@
   border-radius: var(--radius);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
 }
 
 .wc-category-description,
@@ -137,7 +137,7 @@
   max-width: none;
   font-size: 0.8125rem;
   line-height: 1.5;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
 }
 
 .wc-word-preview {
@@ -164,7 +164,7 @@
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-gold);
   list-style: none;
 }
 
@@ -194,7 +194,7 @@
 
 .wc-details textarea:focus {
   outline: none;
-  border-bottom-color: var(--color-accent);
+  border-bottom-color: var(--color-gold);
   background: color-mix(in srgb, var(--color-spot) 35%, transparent);
 }
 
@@ -219,7 +219,7 @@
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-gold);
 }
 
 .wc-field input[type="number"],
@@ -246,13 +246,13 @@
 
 .wc-field input:hover,
 .wc-field select:hover {
-  border-bottom-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  border-bottom-color: color-mix(in srgb, var(--color-gold) 40%, var(--color-border));
 }
 
 .wc-field input:focus,
 .wc-field select:focus {
   outline: none;
-  border-bottom-color: var(--color-accent);
+  border-bottom-color: var(--color-gold);
   background: color-mix(in srgb, var(--color-spot) 35%, transparent);
   padding-inline: 0.5rem;
 }
@@ -272,14 +272,14 @@
 
 .wc-length-value {
   font-size: 0.8125rem;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
 }
 
 .wc-length-reset {
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--color-accent);
+  color: var(--color-gold);
   font-size: 0.9rem;
   cursor: pointer;
   line-height: 1;
@@ -307,7 +307,7 @@
 }
 
 .wc-range-fill {
-  background: var(--color-accent);
+  background: var(--color-gold);
 }
 
 .wc-range-slider input[type="range"] {
@@ -326,7 +326,7 @@
   appearance: none;
   width: 0.85rem;
   height: 0.85rem;
-  border: 1px solid var(--color-accent);
+  border: 1px solid var(--color-gold);
   border-radius: var(--radius);
   background: var(--color-ground);
   pointer-events: auto;
@@ -336,7 +336,7 @@
 .wc-range-slider input[type="range"]::-moz-range-thumb {
   width: 0.85rem;
   height: 0.85rem;
-  border: 1px solid var(--color-accent);
+  border: 1px solid var(--color-gold);
   border-radius: var(--radius);
   background: var(--color-ground);
   pointer-events: auto;
@@ -347,7 +347,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
 }
 
 .wc-checks {
@@ -367,7 +367,7 @@
 
 .wc-check-row input,
 .wc-radio-row input {
-  accent-color: var(--color-accent);
+  accent-color: var(--color-gold);
 }
 
 .wc-actions {
@@ -378,7 +378,7 @@
 
 .wc-btn {
   padding: 0.85rem 1.5rem;
-  border: 1px solid var(--color-accent);
+  border: 1px solid var(--color-gold);
   border-radius: var(--radius);
   font-family: var(--font-sans);
   font-size: 0.8125rem;
@@ -394,18 +394,18 @@
 }
 
 .wc-btn--primary {
-  background: var(--color-accent);
-  color: var(--color-ground);
+  background: var(--color-gold);
+  color: var(--color-night);
 }
 
 .wc-btn--primary:hover:not(:disabled) {
   background: transparent;
-  color: var(--color-accent);
+  color: var(--color-gold);
 }
 
 .wc-btn--secondary {
   background: transparent;
-  color: var(--color-accent);
+  color: var(--color-gold);
 }
 
 .wc-btn--secondary:hover:not(:disabled) {
@@ -437,7 +437,7 @@
 .wc-meta {
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
 }
 
 .wc-output-area {
@@ -447,7 +447,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--color-ground) 70%, transparent);
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.8125rem;
   line-height: 1.55;

@@ -1,16 +1,49 @@
-/* dmeim.com — Midnight Concert Hall */
+/* dmeim.com — Gold, rich, old-money */
 
 :root {
-  /* Cool stage night — dark default */
-  --color-ground: #050607;
-  --color-ground-elevated: #0e1014;
-  --color-ink: #eceae6;
-  --color-ink-muted: #9aa0a8;
-  --color-accent: #d4bc8a;
-  --color-accent-soft: #8fa3b0;
-  --color-border: rgba(236, 234, 230, 0.1);
-  --color-overlay: rgba(5, 6, 7, 0.75);
-  --color-spot: rgba(212, 188, 138, 0.12);
+  /* Raw palette — always present */
+  --color-gold-light: #d4bc8a;
+  --color-gold-dark: #8a7349;
+  --color-cream-light: #f3eee6;
+  --color-cream-dark: #eceae6;
+  --color-night-dark: #050607;
+  --color-night-light: #0e1014;
+  --color-black-dark: #000000;
+  --color-black-light: #0c0e12;
+  --color-mist-light: #e6e8ec;
+  --color-mist-dark: #dfe3e8;
+  --color-stone-light: #9aa0a8;
+  --color-stone-dark: #4a5160;
+  --color-teal-light: #8fa3b0;
+  --color-teal-dark: #5c7385;
+  --color-blue-light: #476f95;
+  --color-blue-dark: #194a7a;
+
+  /* Theme-active aliases — dark default */
+  --color-gold: var(--color-gold-light);
+  --color-cream: var(--color-cream-dark);
+  --color-night: var(--color-night-dark);
+  --color-night-elevated: var(--color-night-light);
+  --color-surface: var(--color-night-light);
+  --color-black: var(--color-black-light);
+  --color-mist: var(--color-mist-light);
+  --color-mist-elevated: var(--color-mist-dark);
+  --color-stone: var(--color-stone-light);
+  --color-teal: var(--color-teal-light);
+  --color-blue: var(--color-blue-light);
+
+  /* Compatibility aliases (migration) */
+  --color-ground: var(--color-night);
+  --color-ground-elevated: var(--color-night-light);
+  --color-ink: var(--color-cream-dark);
+  --color-ink-muted: var(--color-stone-light);
+  --color-accent: var(--color-gold-light);
+  --color-accent-soft: var(--color-teal-light);
+
+  /* Derivatives from active tokens */
+  --color-border: color-mix(in srgb, var(--color-cream) 10%, transparent);
+  --color-overlay: color-mix(in srgb, var(--color-night) 75%, transparent);
+  --color-spot: color-mix(in srgb, var(--color-gold) 12%, transparent);
 
   --font-display: "Syne", system-ui, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;
@@ -41,30 +74,81 @@
 
   --he-frame-radius: 1.15rem;
   --he-frame-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-ink) 6%, transparent),
-    0 4px 12px color-mix(in srgb, var(--color-ink) 6%, transparent),
-    0 18px 40px color-mix(in srgb, var(--color-ink) 12%, transparent),
-    0 36px 72px color-mix(in srgb, var(--color-ink) 8%, transparent);
+    0 0 0 1px color-mix(in srgb, var(--color-cream) 6%, transparent),
+    0 4px 12px color-mix(in srgb, var(--color-cream) 6%, transparent),
+    0 18px 40px color-mix(in srgb, var(--color-cream) 12%, transparent),
+    0 36px 72px color-mix(in srgb, var(--color-cream) 8%, transparent);
 
   color-scheme: dark;
 }
 
 [data-theme="light"] {
-  /* Cooler parchment — not warm cream */
-  --color-ground: #e6e8ec;
-  --color-ground-elevated: #dfe3e8;
-  --color-ink: #0c0e12;
-  --color-ink-muted: #4a5160;
-  --color-accent: #8a7349;
-  --color-accent-soft: #5c7385;
-  --color-border: rgba(12, 14, 18, 0.12);
-  --color-overlay: rgba(230, 232, 236, 0.85);
-  --color-spot: rgba(138, 115, 73, 0.1);
+  /* Theme-active aliases — light */
+  --color-gold: var(--color-gold-dark);
+  --color-cream: var(--color-cream-light);
+  --color-night: var(--color-night-dark);
+  --color-night-elevated: var(--color-night-light);
+  --color-surface: var(--color-mist-dark);
+  --color-black: var(--color-black-light);
+  --color-mist: var(--color-mist-light);
+  --color-mist-elevated: var(--color-mist-dark);
+  --color-stone: var(--color-stone-dark);
+  --color-teal: var(--color-teal-dark);
+  --color-blue: var(--color-blue-dark);
+
+  /* Compatibility aliases (migration) */
+  --color-ground: var(--color-mist-light);
+  --color-ground-elevated: var(--color-mist-dark);
+  --color-ink: var(--color-black-light);
+  --color-ink-muted: var(--color-stone-dark);
+  --color-accent: var(--color-gold-dark);
+  --color-accent-soft: var(--color-teal-dark);
+
+  /* Derivatives from active tokens */
+  --color-border: color-mix(in srgb, var(--color-black) 12%, transparent);
+  --color-overlay: color-mix(in srgb, var(--color-mist) 85%, transparent);
+  --color-spot: color-mix(in srgb, var(--color-gold) 10%, transparent);
+
+  --he-frame-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-black) 6%, transparent),
+    0 4px 12px color-mix(in srgb, var(--color-black) 6%, transparent),
+    0 18px 40px color-mix(in srgb, var(--color-black) 12%, transparent),
+    0 36px 72px color-mix(in srgb, var(--color-black) 8%, transparent);
 
   color-scheme: light;
 }
 
 [data-theme="dark"] {
+  /* Theme-active aliases — explicit dark (mirrors :root) */
+  --color-gold: var(--color-gold-light);
+  --color-cream: var(--color-cream-dark);
+  --color-night: var(--color-night-dark);
+  --color-night-elevated: var(--color-night-light);
+  --color-surface: var(--color-night-light);
+  --color-black: var(--color-black-light);
+  --color-mist: var(--color-mist-light);
+  --color-mist-elevated: var(--color-mist-dark);
+  --color-stone: var(--color-stone-light);
+  --color-teal: var(--color-teal-light);
+  --color-blue: var(--color-blue-light);
+
+  --color-ground: var(--color-night);
+  --color-ground-elevated: var(--color-night-light);
+  --color-ink: var(--color-cream-dark);
+  --color-ink-muted: var(--color-stone-light);
+  --color-accent: var(--color-gold-light);
+  --color-accent-soft: var(--color-teal-light);
+
+  --color-border: color-mix(in srgb, var(--color-cream) 10%, transparent);
+  --color-overlay: color-mix(in srgb, var(--color-night) 75%, transparent);
+  --color-spot: color-mix(in srgb, var(--color-gold) 12%, transparent);
+
+  --he-frame-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-cream) 6%, transparent),
+    0 4px 12px color-mix(in srgb, var(--color-cream) 6%, transparent),
+    0 18px 40px color-mix(in srgb, var(--color-cream) 12%, transparent),
+    0 36px 72px color-mix(in srgb, var(--color-cream) 8%, transparent);
+
   color-scheme: dark;
 }
 
@@ -99,12 +183,12 @@ html {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--color-gold) 55%, transparent);
   color: var(--color-ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-gold);
   outline-offset: 3px;
 }
 
@@ -589,15 +673,16 @@ p {
 }
 
 .btn--primary {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-ground);
+  background: var(--color-gold);
+  border-color: var(--color-gold);
+  /* Night stays dark in both themes — contrast on gold */
+  color: var(--color-night);
 }
 
 .btn--primary:hover {
-  background: color-mix(in srgb, var(--color-accent) 88%, var(--color-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 88%, var(--color-ink));
-  color: var(--color-ground);
+  background: color-mix(in srgb, var(--color-gold) 88%, var(--color-cream));
+  border-color: color-mix(in srgb, var(--color-gold) 88%, var(--color-cream));
+  color: var(--color-night);
 }
 
 .btn--ghost {

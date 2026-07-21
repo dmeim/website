@@ -26,7 +26,7 @@
       var(--color-spot),
       transparent 55%
     ),
-    color-mix(in srgb, var(--color-ground-elevated) 88%, transparent);
+    color-mix(in srgb, var(--color-surface) 88%, transparent);
 }
 
 .tool-section-heading {
@@ -63,7 +63,7 @@
   max-width: none;
   font-size: 0.9375rem;
   line-height: 1.55;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
 }
 
 .tool-nested {
@@ -99,7 +99,7 @@
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-gold);
 }
 
 .tool-field input,
@@ -135,7 +135,7 @@
 .tool-field select:hover,
 .tool-field textarea:hover,
 .tool-code:hover {
-  border-bottom-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  border-bottom-color: color-mix(in srgb, var(--color-gold) 40%, var(--color-border));
 }
 
 .tool-field input:focus,
@@ -143,7 +143,7 @@
 .tool-field textarea:focus,
 .tool-code:focus {
   outline: none;
-  border-bottom-color: var(--color-accent);
+  border-bottom-color: var(--color-gold);
   background: color-mix(in srgb, var(--color-spot) 35%, transparent);
   padding-inline: 0.5rem;
 }
@@ -181,7 +181,7 @@
 }
 
 .tool-check input {
-  accent-color: var(--color-accent);
+  accent-color: var(--color-gold);
 }
 
 .tool-actions {
@@ -211,7 +211,7 @@
   max-width: none;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
 }
 
 .tool-status--success {
@@ -226,7 +226,7 @@
   margin: 0;
   padding: var(--space-xl);
   text-align: center;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
   font-size: 0.9375rem;
 }
 

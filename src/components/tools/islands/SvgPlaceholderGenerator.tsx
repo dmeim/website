@@ -10,8 +10,8 @@ import {
 
 import "./SvgPlaceholderGenerator.css";
 
-/** Midnight Concert Hall defaults — elevated ground + champagne ink */
-const DEFAULT_BACKGROUND = "#1a1d24";
+/** Locked palette defaults — night elevated + gold */
+const DEFAULT_BACKGROUND = "#0e1014";
 const DEFAULT_TEXT = "#d4bc8a";
 
 export default function SvgPlaceholderGenerator() {

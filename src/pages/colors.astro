@@ -1,0 +1,176 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageIntro from "../components/react/PageIntro";
+
+/** Locked palette — each family light then dark (lighter → deeper step). */
+const families = [
+  {
+    name: "gold",
+    swatches: [
+      { token: "--color-gold-light", hex: "#d4bc8a" },
+      { token: "--color-gold-dark", hex: "#8a7349" },
+    ],
+  },
+  {
+    name: "cream",
+    swatches: [
+      { token: "--color-cream-light", hex: "#f3eee6" },
+      { token: "--color-cream-dark", hex: "#eceae6" },
+    ],
+  },
+  {
+    name: "night",
+    swatches: [
+      { token: "--color-night-light", hex: "#0e1014" },
+      { token: "--color-night-dark", hex: "#050607" },
+    ],
+  },
+  {
+    name: "black",
+    swatches: [
+      { token: "--color-black-light", hex: "#0c0e12" },
+      { token: "--color-black-dark", hex: "#000000" },
+    ],
+  },
+  {
+    name: "mist",
+    swatches: [
+      { token: "--color-mist-light", hex: "#e6e8ec" },
+      { token: "--color-mist-dark", hex: "#dfe3e8" },
+    ],
+  },
+  {
+    name: "stone",
+    swatches: [
+      { token: "--color-stone-light", hex: "#9aa0a8" },
+      { token: "--color-stone-dark", hex: "#4a5160" },
+    ],
+  },
+  {
+    name: "teal",
+    swatches: [
+      { token: "--color-teal-light", hex: "#8fa3b0" },
+      { token: "--color-teal-dark", hex: "#5c7385" },
+    ],
+  },
+  {
+    name: "blue",
+    swatches: [
+      { token: "--color-blue-light", hex: "#476f95" },
+      { token: "--color-blue-dark", hex: "#194a7a" },
+    ],
+  },
+] as const;
+---
+
+<BaseLayout
+  title="Colors"
+  description="Locked dmeim.com palette — gold primary, blue secondary, light/dark steps per family."
+>
+  <section class="colors-page">
+    <PageIntro
+      client:visible
+      title="Colors"
+      lede="Locked palette by family. Light then dark is the lighter vs deeper step of that hue — theme picks the contrasting step automatically."
+    />
+
+    <div class="colors-families">
+      {
+        families.map((family) => (
+          <section class="colors-family" aria-labelledby={`family-${family.name}`}>
+            <h2 class="colors-family__title" id={`family-${family.name}`}>
+              {family.name}
+            </h2>
+            <ul class="colors-grid" role="list">
+              {family.swatches.map((swatch) => (
+                <li class="color-swatch">
+                  <div
+                    class="color-swatch__frame"
+                    style={`background-color: ${swatch.hex}`}
+                    aria-hidden="true"
+                  />
+                  <p class="color-swatch__caption">
+                    <code>{swatch.token}</code>
+                    <span class="color-swatch__hex">{swatch.hex}</span>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .colors-page {
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  .colors-page :global(.page-intro) {
+    margin-bottom: 0;
+  }
+
+  .colors-families {
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  .colors-family {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .colors-family__title {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+
+  .colors-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .color-swatch {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .color-swatch__frame {
+    aspect-ratio: 16 / 10;
+    border-radius: var(--he-frame-radius, 1.15rem);
+    box-shadow: var(--he-frame-shadow);
+  }
+
+  .color-swatch__caption {
+    margin: 0;
+    display: grid;
+    gap: var(--space-3xs);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--color-stone);
+  }
+
+  .color-swatch__caption code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: inherit;
+    color: var(--color-ink);
+  }
+
+  .color-swatch__hex {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    color: var(--color-stone);
+  }
+</style>

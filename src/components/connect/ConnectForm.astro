@@ -195,7 +195,7 @@ const { fields, submitLabel } = connect.form;
         var(--color-spot),
         transparent 55%
       ),
-      color-mix(in srgb, var(--color-ground-elevated) 88%, transparent);
+      color-mix(in srgb, var(--color-surface) 88%, transparent);
   }
 
   .connect-form {
@@ -215,7 +215,7 @@ const { fields, submitLabel } = connect.form;
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--color-accent);
+    color: var(--color-gold);
   }
 
   .form-group input,
@@ -237,19 +237,19 @@ const { fields, submitLabel } = connect.form;
 
   .form-group input::placeholder,
   .form-group textarea::placeholder {
-    color: var(--color-ink-muted);
+    color: var(--color-stone);
     opacity: 0.65;
   }
 
   .form-group input:hover,
   .form-group textarea:hover {
-    border-bottom-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+    border-bottom-color: color-mix(in srgb, var(--color-gold) 40%, var(--color-border));
   }
 
   .form-group input:focus,
   .form-group textarea:focus {
     outline: none;
-    border-bottom-color: var(--color-accent);
+    border-bottom-color: var(--color-gold);
     background: color-mix(in srgb, var(--color-spot) 35%, transparent);
     padding-inline: 0.5rem;
   }
@@ -263,9 +263,9 @@ const { fields, submitLabel } = connect.form;
     align-self: flex-start;
     margin-top: var(--space-sm);
     padding: 0.9rem 1.85rem;
-    border: 1px solid var(--color-accent);
-    background: var(--color-accent);
-    color: var(--color-ground);
+    border: 1px solid var(--color-gold);
+    background: var(--color-gold);
+    color: var(--color-night);
     font-family: var(--font-sans);
     font-size: 0.8125rem;
     font-weight: 600;
@@ -281,7 +281,7 @@ const { fields, submitLabel } = connect.form;
 
   .btn-primary:hover:not(:disabled) {
     background: transparent;
-    color: var(--color-accent);
+    color: var(--color-gold);
   }
 
   .btn-primary:disabled {
@@ -300,11 +300,11 @@ const { fields, submitLabel } = connect.form;
   }
 
   .form-status--loading {
-    color: var(--color-ink-muted);
+    color: var(--color-stone);
   }
 
   .form-status--success {
-    border-top-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+    border-top-color: color-mix(in srgb, var(--color-gold) 55%, var(--color-border));
     color: var(--color-ink);
   }
 

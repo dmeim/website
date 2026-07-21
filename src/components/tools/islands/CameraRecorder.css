@@ -21,7 +21,7 @@
   height: auto;
   max-height: 32rem;
   display: block;
-  background: #000;
+  background: var(--color-black-dark);
   object-fit: contain;
 }
 
@@ -61,7 +61,7 @@
   width: 100%;
   aspect-ratio: 16 / 10;
   object-fit: cover;
-  background: #000;
+  background: var(--color-black-dark);
   display: block;
 }
 
@@ -84,12 +84,12 @@
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-gold);
 }
 
 .capture-meta span {
   font-size: 0.8125rem;
-  color: var(--color-ink-muted);
+  color: var(--color-stone);
   word-break: break-all;
 }
 

@@ -94,9 +94,9 @@ export default function GameOfLifeSimulation() {
     canvas.style.height = `${cssH}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const elevated = readCssColor("--color-ground-elevated", "#0e1014");
-    const accent = readCssColor("--color-accent", "#d4bc8a");
-    const border = readCssColor("--color-border", "#2a2e36");
+    const elevated = readCssColor("--color-surface", "#0e1014");
+    const accent = readCssColor("--color-gold", "#d4bc8a");
+    const border = readCssColor("--color-border", "#0e1014");
 
     ctx.fillStyle = elevated;
     ctx.fillRect(0, 0, cssW, cssH);

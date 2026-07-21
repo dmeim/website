@@ -13,15 +13,22 @@ type FieldPoint = {
 const SPACING = 12;
 const DPR_CAP = 2;
 
+function isLightTheme(): boolean {
+  return document.documentElement.getAttribute("data-theme") === "light";
+}
+
 function readInkRgb(): string {
-  const raw = getComputedStyle(document.documentElement)
-    .getPropertyValue("--color-ink")
-    .trim();
+  const styles = getComputedStyle(document.documentElement);
+  const preferred = isLightTheme() ? "--color-black" : "--color-cream";
+  const raw =
+    styles.getPropertyValue(preferred).trim() ||
+    styles.getPropertyValue("--color-ink").trim();
   if (/^#[0-9a-fA-F]{6}$/.test(raw)) {
     const n = parseInt(raw.slice(1), 16);
     return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
   }
-  return "236, 234, 230";
+  // Prefer dark ink fallback so light theme never gets invisible pale dots.
+  return isLightTheme() ? "12, 14, 18" : "243, 238, 230";
 }
 
 function prefersReducedMotion(): boolean {
