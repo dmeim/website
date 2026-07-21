@@ -1,0 +1,99 @@
+---
+import type { Tool } from "../../content/tools";
+import { toolRoute } from "../../content/tools";
+
+interface Props {
+  tool: Tool;
+}
+
+const { tool } = Astro.props;
+const href = toolRoute(tool);
+const isAvailable = Boolean(href);
+---
+
+{
+  isAvailable && href ? (
+    <a class="tool-catalog-item is-available" href={href}>
+      <span class="tool-catalog-item__title">{tool.title}</span>
+      <span class="tool-catalog-item__desc">{tool.description}</span>
+    </a>
+  ) : (
+    <div
+      class="tool-catalog-item is-wip"
+      aria-label={`${tool.title} is work in progress`}
+    >
+      <span class="tool-catalog-item__row">
+        <span class="tool-catalog-item__title">{tool.title}</span>
+        <span class="tool-catalog-item__badge">WIP</span>
+      </span>
+      <span class="tool-catalog-item__desc">{tool.description}</span>
+    </div>
+  )
+}
+
+<style>
+  .tool-catalog-item {
+    display: grid;
+    gap: var(--space-2xs);
+    padding-block: var(--space-sm);
+    padding-inline: 0;
+    border-bottom: 1px solid var(--color-border);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      color var(--duration) var(--ease-out),
+      border-color var(--duration) var(--ease-out);
+  }
+
+  .tool-catalog-item:last-child {
+    border-bottom: 0;
+  }
+
+  .tool-catalog-item__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+
+  .tool-catalog-item__title {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .tool-catalog-item__desc {
+    color: var(--color-ink-muted);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    max-width: 62ch;
+  }
+
+  .tool-catalog-item__badge {
+    flex: 0 0 auto;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+  }
+
+  .tool-catalog-item.is-available:hover {
+    border-bottom-color: color-mix(
+      in srgb,
+      var(--color-accent) 45%,
+      var(--color-border)
+    );
+  }
+
+  .tool-catalog-item.is-available:hover .tool-catalog-item__title {
+    color: var(--color-accent);
+  }
+
+  .tool-catalog-item.is-wip {
+    opacity: 0.68;
+    cursor: default;
+    pointer-events: none;
+  }
+</style>

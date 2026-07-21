@@ -1,0 +1,32 @@
+{
+  "id": "reading",
+  "name": "Reading",
+  "description": "Books, Stories, And Writing Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "story",
+    "comic",
+    "poem",
+    "reader",
+    "title"
+  ],
+  "words": [
+    "author",
+    "chapter",
+    "comic",
+    "cover",
+    "diary",
+    "ending",
+    "hero",
+    "journal",
+    "letter",
+    "novel",
+    "poem",
+    "reader",
+    "reading",
+    "rhyme",
+    "story",
+    "tale",
+    "title"
+  ]
+}

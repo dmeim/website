@@ -1,0 +1,40 @@
+{
+  "id": "kitchen",
+  "name": "Kitchen",
+  "description": "Kitchen Tools, Dishes, And Appliances.",
+  "defaultSelected": true,
+  "previewWords": [
+    "cup",
+    "fork",
+    "plate",
+    "spoon",
+    "bowl"
+  ],
+  "words": [
+    "blender",
+    "bowl",
+    "cup",
+    "dish",
+    "fork",
+    "fridge",
+    "glass",
+    "jar",
+    "kettle",
+    "mixer",
+    "mug",
+    "napkin",
+    "oven",
+    "pan",
+    "pitcher",
+    "plate",
+    "pot",
+    "sink",
+    "spoon",
+    "stove",
+    "straw",
+    "teapot",
+    "toaster",
+    "tray",
+    "whisk"
+  ]
+}

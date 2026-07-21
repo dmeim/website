@@ -1,0 +1,35 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageIntro from "../../components/react/PageIntro";
+import ToolsShell from "../../components/tools/ToolsShell.astro";
+import ToolCatalog from "../../components/tools/ToolCatalog.astro";
+---
+
+<BaseLayout
+  title="Tools"
+  description="Private, local-first utilities — a growing catalogue of browser tools."
+>
+  <section class="tools-page" aria-labelledby="tools-heading">
+    <PageIntro
+      client:visible
+      title="Tools"
+      titleId="tools-heading"
+      lede="A local-first shelf of small utilities. Ready tools run in your browser; the rest of the catalogue stays visible as WIP."
+    />
+
+    <ToolsShell>
+      <ToolCatalog />
+    </ToolsShell>
+  </section>
+</BaseLayout>
+
+<style>
+  .tools-page {
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  .tools-page :global(.page-intro) {
+    margin-bottom: 0;
+  }
+</style>

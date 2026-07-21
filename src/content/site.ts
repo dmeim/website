@@ -160,7 +160,7 @@ export const appointments: Appointment[] = [
     bullets: [
       "Selected builds and case studies",
       "Lorem placeholder for deeper write-ups",
-      "Tools landing soon under /tools",
+      "Local-first tools under /tools",
     ],
   },
   {

@@ -15,7 +15,7 @@ Compact reference for any collaborator or AI assistant. Keep this up to date whe
 - Adapter: @astrojs/cloudflare
 - App root: repository root (not a nested `site/` app)
 - Package manager: npm
-- Pages: `/` (Home), `/projects`, `/tools`, `/keys`, `/connect`
+- Pages: `/` (Home), `/projects`, `/tools` (catalogue + 4 ready tools), `/keys`, `/connect`
 - Assets root: `assets/` → keys, images, logos, vcards, downloads
 - Design reference: `reference/georgios-zerdalis` (branch `pre-retro-pop`, gitignored)
 - Accent palette (Midnight Concert Hall): champagne `#d4bc8a`, steel `#8fa3b0`, ground `#050607`

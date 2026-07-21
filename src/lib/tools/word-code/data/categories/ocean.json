@@ -1,0 +1,40 @@
+{
+  "id": "ocean",
+  "name": "Ocean",
+  "description": "Sea, Beach, And Ocean Animal Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "wave",
+    "crab",
+    "dolphin",
+    "shell",
+    "shark"
+  ],
+  "words": [
+    "anchor",
+    "beach",
+    "clam",
+    "coral",
+    "crab",
+    "dolphin",
+    "fin",
+    "fish",
+    "lagoon",
+    "lobster",
+    "octopus",
+    "reef",
+    "sail",
+    "sailor",
+    "sand",
+    "seagull",
+    "seahorse",
+    "seal",
+    "shark",
+    "shell",
+    "starfish",
+    "tide",
+    "turtle",
+    "wave",
+    "whale"
+  ]
+}

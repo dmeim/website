@@ -1,0 +1,42 @@
+{
+  "id": "toys-and-games",
+  "name": "Toys & Games",
+  "description": "Toys, Games, And Playground Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "blocks",
+    "doll",
+    "kite",
+    "puzzle",
+    "robot"
+  ],
+  "words": [
+    "beanbag",
+    "blocks",
+    "boardgame",
+    "bubbles",
+    "checkers",
+    "doll",
+    "domino",
+    "drone",
+    "kite",
+    "marble",
+    "pinwheel",
+    "playhouse",
+    "playmat",
+    "puppet",
+    "puzzle",
+    "robot",
+    "sandbox",
+    "seesaw",
+    "slide",
+    "swing",
+    "teddybear",
+    "top",
+    "toybox",
+    "trainset",
+    "trampoline",
+    "windmill",
+    "yoyo"
+  ]
+}

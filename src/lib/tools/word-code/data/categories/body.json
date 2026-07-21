@@ -1,0 +1,40 @@
+{
+  "id": "body",
+  "name": "Body",
+  "description": "Body Parts And Face Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "hand",
+    "foot",
+    "nose",
+    "smile",
+    "hair"
+  ],
+  "words": [
+    "arm",
+    "back",
+    "belly",
+    "cheek",
+    "chin",
+    "ear",
+    "elbow",
+    "eye",
+    "face",
+    "finger",
+    "foot",
+    "hair",
+    "hand",
+    "head",
+    "knee",
+    "leg",
+    "mouth",
+    "neck",
+    "nose",
+    "shoulder",
+    "smile",
+    "toe",
+    "tooth",
+    "tummy",
+    "wrist"
+  ]
+}

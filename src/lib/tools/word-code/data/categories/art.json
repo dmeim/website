@@ -1,0 +1,38 @@
+{
+  "id": "art",
+  "name": "Art",
+  "description": "Art Supplies, Crafts, And Creative Projects.",
+  "defaultSelected": true,
+  "previewWords": [
+    "paint",
+    "brush",
+    "clay",
+    "sticker",
+    "doodle"
+  ],
+  "words": [
+    "art",
+    "bead",
+    "brush",
+    "canvas",
+    "clay",
+    "color",
+    "craft",
+    "doodle",
+    "easel",
+    "frame",
+    "glitter",
+    "mosaic",
+    "mural",
+    "paint",
+    "painter",
+    "pastel",
+    "picture",
+    "ribbon",
+    "sketch",
+    "sparkle",
+    "stamp",
+    "sticker",
+    "yarn"
+  ]
+}

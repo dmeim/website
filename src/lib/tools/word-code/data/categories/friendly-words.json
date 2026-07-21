@@ -1,0 +1,40 @@
+{
+  "id": "friendly-words",
+  "name": "Friendly Words",
+  "description": "Positive Traits And Cheerful Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "happy",
+    "kind",
+    "brave",
+    "funny",
+    "smart"
+  ],
+  "words": [
+    "brave",
+    "bright",
+    "calm",
+    "clever",
+    "cool",
+    "friendly",
+    "funny",
+    "gentle",
+    "happy",
+    "helpful",
+    "honest",
+    "joyful",
+    "kind",
+    "lucky",
+    "neat",
+    "peaceful",
+    "proud",
+    "quick",
+    "safe",
+    "silly",
+    "smart",
+    "super",
+    "sweet",
+    "thankful",
+    "tidy"
+  ]
+}

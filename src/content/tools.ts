@@ -1,0 +1,848 @@
+/**
+ * Tools catalogue — ported from handy-dandy, adapted for dmeim.com Astro routes.
+ * Available tools resolve under `/tools/[slug]`; planned/WIP stay catalogue-only.
+ */
+
+export type ToolStatus = 'available' | 'planned';
+
+export interface Tool {
+  id: string;
+  title: string;
+  description: string;
+  status: ToolStatus;
+  /** Astro path when available, e.g. `/tools/word-code-generator`. */
+  route?: string;
+  tags?: string[];
+  sourcePath?: string;
+  sourceUrl?: string;
+}
+
+export interface ToolCategory {
+  id: string;
+  name: string;
+  description: string;
+  source?: string;
+  tools: Tool[];
+}
+
+export interface ToolsCatalogue {
+  tagline: string;
+  categories: ToolCategory[];
+}
+
+export const toolsCatalogue: ToolsCatalogue = {
+  tagline: "Private, local-first utilities that run in your browser.",
+  categories: [
+    {
+      id: "personal",
+      name: "Custom",
+      description: "Purpose-built utilities for recurring local workflows.",
+      tools: [
+        {
+          id: "word-code-generator",
+          title: "WordCode Generator",
+          description: "Generate friendly word + number codes from JSON-backed word categories.",
+          status: "available",
+          route: "/tools/word-code-generator",
+          tags: ["passwords", "students", "word lists"],
+        },
+      ],
+    },
+    {
+      id: "images-and-videos",
+      name: "Images & video",
+      description: "Inspect, transform, compress, generate, and capture image and video assets locally.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "qrcode-generator",
+          title: "QR Code generator",
+          description: "Generate and download QR codes from presets for text, websites, social profiles, contacts, WiFi networks, messages, and locations.",
+          status: "available",
+          route: "/tools/qrcode-generator",
+          tags: ["QR", "SVG", "PNG"],
+          sourcePath: "/qrcode-generator",
+          sourceUrl: "https://it-tools.tech/qrcode-generator",
+        },
+        {
+          id: "svg-placeholder-generator",
+          title: "SVG placeholder generator",
+          description: "Generate svg images to use as a placeholder in your applications.",
+          status: "available",
+          route: "/tools/svg-placeholder-generator",
+          tags: ["SVG", "mockups", "images"],
+          sourcePath: "/svg-placeholder-generator",
+          sourceUrl: "https://it-tools.tech/svg-placeholder-generator",
+        },
+        {
+          id: "camera-recorder",
+          title: "Camera recorder",
+          description: "Take a picture or record a video from your webcam or camera.",
+          status: "available",
+          route: "/tools/camera-recorder",
+          tags: ["camera", "photos", "video"],
+          sourcePath: "/camera-recorder",
+          sourceUrl: "https://it-tools.tech/camera-recorder",
+        },
+      ],
+    },
+    {
+      id: "crypto",
+      name: "Cryptography",
+      description: "Create, inspect, hash, encrypt, and validate security-focused strings, keys, passwords, and files.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "token-generator",
+          title: "Token generator",
+          description: "Generate random string with the chars you want, uppercase or lowercase letters, numbers and/or symbols.",
+          status: "planned",
+          sourcePath: "/token-generator",
+          sourceUrl: "https://it-tools.tech/token-generator",
+        },
+        {
+          id: "hash-text",
+          title: "Hash text",
+          description: "Hash a text string using the function you need : MD5, SHA1, SHA256, SHA224, SHA512, SHA384, SHA3 or RIPEMD160",
+          status: "planned",
+          sourcePath: "/hash-text",
+          sourceUrl: "https://it-tools.tech/hash-text",
+        },
+        {
+          id: "bcrypt",
+          title: "Bcrypt",
+          description: "Hash and compare text string using bcrypt. Bcrypt is a password-hashing function based on the Blowfish cipher.",
+          status: "planned",
+          sourcePath: "/bcrypt",
+          sourceUrl: "https://it-tools.tech/bcrypt",
+        },
+        {
+          id: "uuid-generator",
+          title: "UUIDs generator",
+          description: "A Universally Unique Identifier (UUID) is a 128-bit number used to identify information in computer systems. The number of possible UUIDs is 16^32, which is 2^128 or about 3.4x10^38 (which is a lot!).",
+          status: "planned",
+          sourcePath: "/uuid-generator",
+          sourceUrl: "https://it-tools.tech/uuid-generator",
+        },
+        {
+          id: "ulid-generator",
+          title: "ULID generator",
+          description: "Generate random Universally Unique Lexicographically Sortable Identifier (ULID).",
+          status: "planned",
+          sourcePath: "/ulid-generator",
+          sourceUrl: "https://it-tools.tech/ulid-generator",
+        },
+        {
+          id: "encryption",
+          title: "Encrypt / decrypt text",
+          description: "Encrypt clear text and decrypt ciphertext using crypto algorithms like AES, TripleDES, Rabbit or RC4.",
+          status: "planned",
+          sourcePath: "/encryption",
+          sourceUrl: "https://it-tools.tech/encryption",
+        },
+        {
+          id: "bip39-generator",
+          title: "BIP39 passphrase generator",
+          description: "Generate a BIP39 passphrase from an existing or random mnemonic, or get the mnemonic from the passphrase.",
+          status: "planned",
+          sourcePath: "/bip39-generator",
+          sourceUrl: "https://it-tools.tech/bip39-generator",
+        },
+        {
+          id: "hmac-generator",
+          title: "Hmac generator",
+          description: "Computes a hash-based message authentication code (HMAC) using a secret key and your favorite hashing function.",
+          status: "planned",
+          sourcePath: "/hmac-generator",
+          sourceUrl: "https://it-tools.tech/hmac-generator",
+        },
+        {
+          id: "rsa-key-pair-generator",
+          title: "RSA key pair generator",
+          description: "Generate a new random RSA private and public pem certificate key pair.",
+          status: "planned",
+          sourcePath: "/rsa-key-pair-generator",
+          sourceUrl: "https://it-tools.tech/rsa-key-pair-generator",
+        },
+        {
+          id: "password-strength-analyser",
+          title: "Password strength analyser",
+          description: "Discover the strength of your password with this client-side-only password strength analyser and crack time estimation tool.",
+          status: "planned",
+          sourcePath: "/password-strength-analyser",
+          sourceUrl: "https://it-tools.tech/password-strength-analyser",
+        },
+        {
+          id: "pdf-signature-checker",
+          title: "PDF signature checker",
+          description: "Verify the signatures of a PDF file. A signed PDF file contains one or more signatures that may be used to determine whether the contents of the file have been altered since the file was signed.",
+          status: "planned",
+          sourcePath: "/pdf-signature-checker",
+          sourceUrl: "https://it-tools.tech/pdf-signature-checker",
+        },
+      ],
+    },
+    {
+      id: "converter",
+      name: "Converter",
+      description: "Convert text, numbers, colors, dates, and structured formats between practical representations.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "date-converter",
+          title: "Date-time converter",
+          description: "Convert date and time into the various different formats",
+          status: "planned",
+          sourcePath: "/date-converter",
+          sourceUrl: "https://it-tools.tech/date-converter",
+        },
+        {
+          id: "base-converter",
+          title: "Integer base converter",
+          description: "Convert a number between different bases (decimal, hexadecimal, binary, octal, base64, ...)",
+          status: "planned",
+          sourcePath: "/base-converter",
+          sourceUrl: "https://it-tools.tech/base-converter",
+        },
+        {
+          id: "roman-numeral-converter",
+          title: "Roman numeral converter",
+          description: "Convert Roman numerals to numbers and convert numbers to Roman numerals.",
+          status: "planned",
+          sourcePath: "/roman-numeral-converter",
+          sourceUrl: "https://it-tools.tech/roman-numeral-converter",
+        },
+        {
+          id: "base64-string-converter",
+          title: "Base64 string encoder/decoder",
+          description: "Simply encode and decode strings into their base64 representation.",
+          status: "planned",
+          sourcePath: "/base64-string-converter",
+          sourceUrl: "https://it-tools.tech/base64-string-converter",
+        },
+        {
+          id: "base64-file-converter",
+          title: "Base64 file converter",
+          description: "Convert a string, file, or image into its base64 representation.",
+          status: "planned",
+          sourcePath: "/base64-file-converter",
+          sourceUrl: "https://it-tools.tech/base64-file-converter",
+        },
+        {
+          id: "color-converter",
+          title: "Color converter",
+          description: "Convert color between the different formats (hex, rgb, hsl and css name)",
+          status: "planned",
+          sourcePath: "/color-converter",
+          sourceUrl: "https://it-tools.tech/color-converter",
+        },
+        {
+          id: "case-converter",
+          title: "Case converter",
+          description: "Transform the case of a string and choose between different formats",
+          status: "planned",
+          sourcePath: "/case-converter",
+          sourceUrl: "https://it-tools.tech/case-converter",
+        },
+        {
+          id: "text-to-nato-alphabet",
+          title: "Text to NATO alphabet",
+          description: "Transform text into the NATO phonetic alphabet for oral transmission.",
+          status: "planned",
+          sourcePath: "/text-to-nato-alphabet",
+          sourceUrl: "https://it-tools.tech/text-to-nato-alphabet",
+        },
+        {
+          id: "text-to-binary",
+          title: "Text to ASCII binary",
+          description: "Convert text to its ASCII binary representation and vice-versa.",
+          status: "planned",
+          sourcePath: "/text-to-binary",
+          sourceUrl: "https://it-tools.tech/text-to-binary",
+        },
+        {
+          id: "text-to-unicode",
+          title: "Text to Unicode",
+          description: "Parse and convert text to unicode and vice-versa",
+          status: "planned",
+          sourcePath: "/text-to-unicode",
+          sourceUrl: "https://it-tools.tech/text-to-unicode",
+        },
+        {
+          id: "yaml-to-json-converter",
+          title: "YAML to JSON converter",
+          description: "Simply convert YAML to JSON with this online live converter.",
+          status: "planned",
+          sourcePath: "/yaml-to-json-converter",
+          sourceUrl: "https://it-tools.tech/yaml-to-json-converter",
+        },
+        {
+          id: "yaml-to-toml",
+          title: "YAML to TOML",
+          description: "Parse and convert YAML to TOML.",
+          status: "planned",
+          sourcePath: "/yaml-to-toml",
+          sourceUrl: "https://it-tools.tech/yaml-to-toml",
+        },
+        {
+          id: "json-to-yaml-converter",
+          title: "JSON to YAML converter",
+          description: "Simply convert JSON to YAML with this online live converter.",
+          status: "planned",
+          sourcePath: "/json-to-yaml-converter",
+          sourceUrl: "https://it-tools.tech/json-to-yaml-converter",
+        },
+        {
+          id: "json-to-toml",
+          title: "JSON to TOML",
+          description: "Parse and convert JSON to TOML.",
+          status: "planned",
+          sourcePath: "/json-to-toml",
+          sourceUrl: "https://it-tools.tech/json-to-toml",
+        },
+        {
+          id: "list-converter",
+          title: "List converter",
+          description: "This tool can process column-based data and apply various changes (transpose, add prefix and suffix, reverse list, sort list, lowercase values, truncate values) to each row.",
+          status: "planned",
+          sourcePath: "/list-converter",
+          sourceUrl: "https://it-tools.tech/list-converter",
+        },
+        {
+          id: "toml-to-json",
+          title: "TOML to JSON",
+          description: "Parse and convert TOML to JSON.",
+          status: "planned",
+          sourcePath: "/toml-to-json",
+          sourceUrl: "https://it-tools.tech/toml-to-json",
+        },
+        {
+          id: "toml-to-yaml",
+          title: "TOML to YAML",
+          description: "Parse and convert TOML to YAML.",
+          status: "planned",
+          sourcePath: "/toml-to-yaml",
+          sourceUrl: "https://it-tools.tech/toml-to-yaml",
+        },
+        {
+          id: "xml-to-json",
+          title: "XML to JSON",
+          description: "Convert XML to JSON",
+          status: "planned",
+          sourcePath: "/xml-to-json",
+          sourceUrl: "https://it-tools.tech/xml-to-json",
+        },
+        {
+          id: "json-to-xml",
+          title: "JSON to XML",
+          description: "Convert JSON to XML",
+          status: "planned",
+          sourcePath: "/json-to-xml",
+          sourceUrl: "https://it-tools.tech/json-to-xml",
+        },
+        {
+          id: "markdown-to-html",
+          title: "Markdown to HTML",
+          description: "Convert Markdown to Html and allow to print (as PDF)",
+          status: "planned",
+          sourcePath: "/markdown-to-html",
+          sourceUrl: "https://it-tools.tech/markdown-to-html",
+        },
+      ],
+    },
+    {
+      id: "web",
+      name: "Web",
+      description: "Work with browser, URL, HTTP, HTML, CSS, and web-platform data in quick local utilities.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "url-encoder",
+          title: "Encode/decode URL-formatted strings",
+          description: "Encode text to URL-encoded format (also known as \"percent-encoded\"), or decode from it.",
+          status: "planned",
+          sourcePath: "/url-encoder",
+          sourceUrl: "https://it-tools.tech/url-encoder",
+        },
+        {
+          id: "html-entities",
+          title: "Escape HTML entities",
+          description: "Escape or unescape HTML entities (replace characters like <,>, &, \" and ' with their HTML version)",
+          status: "planned",
+          sourcePath: "/html-entities",
+          sourceUrl: "https://it-tools.tech/html-entities",
+        },
+        {
+          id: "url-parser",
+          title: "URL parser",
+          description: "Parse a URL into its separate constituent parts (protocol, origin, params, port, username-password, ...)",
+          status: "planned",
+          sourcePath: "/url-parser",
+          sourceUrl: "https://it-tools.tech/url-parser",
+        },
+        {
+          id: "device-information",
+          title: "Device information",
+          description: "Get information about your current device (screen size, pixel-ratio, user agent, ...)",
+          status: "planned",
+          sourcePath: "/device-information",
+          sourceUrl: "https://it-tools.tech/device-information",
+        },
+        {
+          id: "basic-auth-generator",
+          title: "Basic auth generator",
+          description: "Generate a base64 basic auth header from a username and password.",
+          status: "planned",
+          sourcePath: "/basic-auth-generator",
+          sourceUrl: "https://it-tools.tech/basic-auth-generator",
+        },
+        {
+          id: "og-meta-generator",
+          title: "Open graph meta generator",
+          description: "Generate open-graph and socials HTML meta tags for your website.",
+          status: "planned",
+          sourcePath: "/og-meta-generator",
+          sourceUrl: "https://it-tools.tech/og-meta-generator",
+        },
+        {
+          id: "otp-generator",
+          title: "OTP code generator",
+          description: "Generate and validate time-based OTP (one time password) for multi-factor authentication.",
+          status: "planned",
+          sourcePath: "/otp-generator",
+          sourceUrl: "https://it-tools.tech/otp-generator",
+        },
+        {
+          id: "mime-types",
+          title: "MIME types",
+          description: "Convert MIME types to file extensions and vice-versa.",
+          status: "planned",
+          sourcePath: "/mime-types",
+          sourceUrl: "https://it-tools.tech/mime-types",
+        },
+        {
+          id: "jwt-parser",
+          title: "JWT parser",
+          description: "Parse and decode your JSON Web Token (jwt) and display its content.",
+          status: "planned",
+          sourcePath: "/jwt-parser",
+          sourceUrl: "https://it-tools.tech/jwt-parser",
+        },
+        {
+          id: "keycode-info",
+          title: "Keycode info",
+          description: "Find the javascript keycode, code, location and modifiers of any pressed key.",
+          status: "planned",
+          sourcePath: "/keycode-info",
+          sourceUrl: "https://it-tools.tech/keycode-info",
+        },
+        {
+          id: "slugify-string",
+          title: "Slugify string",
+          description: "Make a string url, filename and id safe.",
+          status: "planned",
+          sourcePath: "/slugify-string",
+          sourceUrl: "https://it-tools.tech/slugify-string",
+        },
+        {
+          id: "html-wysiwyg-editor",
+          title: "HTML WYSIWYG editor",
+          description: "Online, feature-rich WYSIWYG HTML editor which generates the source code of the content immediately.",
+          status: "planned",
+          sourcePath: "/html-wysiwyg-editor",
+          sourceUrl: "https://it-tools.tech/html-wysiwyg-editor",
+        },
+        {
+          id: "user-agent-parser",
+          title: "User-agent parser",
+          description: "Detect and parse Browser, Engine, OS, CPU, and Device type/model from an user-agent string.",
+          status: "planned",
+          sourcePath: "/user-agent-parser",
+          sourceUrl: "https://it-tools.tech/user-agent-parser",
+        },
+        {
+          id: "http-status-codes",
+          title: "HTTP status codes",
+          description: "The list of all HTTP status codes, their name, and their meaning.",
+          status: "planned",
+          sourcePath: "/http-status-codes",
+          sourceUrl: "https://it-tools.tech/http-status-codes",
+        },
+        {
+          id: "json-diff",
+          title: "JSON diff",
+          description: "Compare two JSON objects and get the differences between them.",
+          status: "planned",
+          sourcePath: "/json-diff",
+          sourceUrl: "https://it-tools.tech/json-diff",
+        },
+        {
+          id: "safelink-decoder",
+          title: "Outlook Safelink decoder",
+          description: "Decode Outlook SafeLink links",
+          status: "planned",
+          sourcePath: "/safelink-decoder",
+          sourceUrl: "https://it-tools.tech/safelink-decoder",
+        },
+      ],
+    },
+    {
+      id: "development",
+      name: "Development",
+      description: "Format, generate, inspect, and troubleshoot developer data, code snippets, and project artifacts.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "git-memo",
+          title: "Git cheatsheet",
+          description: "Git is a decentralized version management software. With this cheatsheet, you will have quick access to the most common git commands.",
+          status: "planned",
+          sourcePath: "/git-memo",
+          sourceUrl: "https://it-tools.tech/git-memo",
+        },
+        {
+          id: "random-port-generator",
+          title: "Random port generator",
+          description: "Generate random port numbers outside of the range of \"known\" ports (0-1023).",
+          status: "planned",
+          sourcePath: "/random-port-generator",
+          sourceUrl: "https://it-tools.tech/random-port-generator",
+        },
+        {
+          id: "crontab-generator",
+          title: "Crontab generator",
+          description: "Validate and generate crontab and get the human-readable description of the cron schedule.",
+          status: "planned",
+          sourcePath: "/crontab-generator",
+          sourceUrl: "https://it-tools.tech/crontab-generator",
+        },
+        {
+          id: "json-prettify",
+          title: "JSON prettify and format",
+          description: "Prettify your JSON string into a friendly, human-readable format.",
+          status: "planned",
+          sourcePath: "/json-prettify",
+          sourceUrl: "https://it-tools.tech/json-prettify",
+        },
+        {
+          id: "json-minify",
+          title: "JSON minify",
+          description: "Minify and compress your JSON by removing unnecessary whitespace.",
+          status: "planned",
+          sourcePath: "/json-minify",
+          sourceUrl: "https://it-tools.tech/json-minify",
+        },
+        {
+          id: "json-to-csv",
+          title: "JSON to CSV",
+          description: "Convert JSON to CSV with automatic header detection.",
+          status: "planned",
+          sourcePath: "/json-to-csv",
+          sourceUrl: "https://it-tools.tech/json-to-csv",
+        },
+        {
+          id: "sql-prettify",
+          title: "SQL prettify and format",
+          description: "Format and prettify your SQL queries online (it supports various SQL dialects).",
+          status: "planned",
+          sourcePath: "/sql-prettify",
+          sourceUrl: "https://it-tools.tech/sql-prettify",
+        },
+        {
+          id: "chmod-calculator",
+          title: "Chmod calculator",
+          description: "Compute your chmod permissions and commands with this online chmod calculator.",
+          status: "planned",
+          sourcePath: "/chmod-calculator",
+          sourceUrl: "https://it-tools.tech/chmod-calculator",
+        },
+        {
+          id: "docker-run-to-docker-compose-converter",
+          title: "Docker run to Docker compose converter",
+          description: "Transforms \"docker run\" commands into docker-compose files!",
+          status: "planned",
+          sourcePath: "/docker-run-to-docker-compose-converter",
+          sourceUrl: "https://it-tools.tech/docker-run-to-docker-compose-converter",
+        },
+        {
+          id: "xml-formatter",
+          title: "XML formatter",
+          description: "Prettify your XML string into a friendly, human-readable format.",
+          status: "planned",
+          sourcePath: "/xml-formatter",
+          sourceUrl: "https://it-tools.tech/xml-formatter",
+        },
+        {
+          id: "yaml-prettify",
+          title: "YAML prettify and format",
+          description: "Prettify your YAML string into a friendly, human-readable format.",
+          status: "planned",
+          sourcePath: "/yaml-prettify",
+          sourceUrl: "https://it-tools.tech/yaml-prettify",
+        },
+        {
+          id: "email-normalizer",
+          title: "Email normalizer",
+          description: "Normalize email addresses to a standard format for easier comparison. Useful for deduplication and data cleaning.",
+          status: "planned",
+          sourcePath: "/email-normalizer",
+          sourceUrl: "https://it-tools.tech/email-normalizer",
+        },
+        {
+          id: "regex-tester",
+          title: "Regex Tester",
+          description: "Test your regular expressions with sample text.",
+          status: "planned",
+          sourcePath: "/regex-tester",
+          sourceUrl: "https://it-tools.tech/regex-tester",
+        },
+        {
+          id: "regex-memo",
+          title: "Regex cheatsheet",
+          description: "Javascript Regex/Regular Expression cheatsheet",
+          status: "planned",
+          sourcePath: "/regex-memo",
+          sourceUrl: "https://it-tools.tech/regex-memo",
+        },
+      ],
+    },
+    {
+      id: "network",
+      name: "Network",
+      description: "Analyze, convert, generate, and inspect network addresses, protocols, devices, and connection data.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "ipv4-subnet-calculator",
+          title: "IPv4 subnet calculator",
+          description: "Parse your IPv4 CIDR blocks and get all the info you need about your subnet.",
+          status: "planned",
+          sourcePath: "/ipv4-subnet-calculator",
+          sourceUrl: "https://it-tools.tech/ipv4-subnet-calculator",
+        },
+        {
+          id: "ipv4-address-converter",
+          title: "IPv4 address converter",
+          description: "Convert an IP address into decimal, binary, hexadecimal, or even an IPv6 representation of it.",
+          status: "planned",
+          sourcePath: "/ipv4-address-converter",
+          sourceUrl: "https://it-tools.tech/ipv4-address-converter",
+        },
+        {
+          id: "ipv4-range-expander",
+          title: "IPv4 range expander",
+          description: "Given a start and an end IPv4 address, this tool calculates a valid IPv4 subnet along with its CIDR notation.",
+          status: "planned",
+          sourcePath: "/ipv4-range-expander",
+          sourceUrl: "https://it-tools.tech/ipv4-range-expander",
+        },
+        {
+          id: "mac-address-lookup",
+          title: "MAC address lookup",
+          description: "Find the vendor and manufacturer of a device by its MAC address.",
+          status: "planned",
+          sourcePath: "/mac-address-lookup",
+          sourceUrl: "https://it-tools.tech/mac-address-lookup",
+        },
+        {
+          id: "mac-address-generator",
+          title: "MAC address generator",
+          description: "Enter the quantity and prefix. MAC addresses will be generated in your chosen case (uppercase or lowercase)",
+          status: "planned",
+          sourcePath: "/mac-address-generator",
+          sourceUrl: "https://it-tools.tech/mac-address-generator",
+        },
+        {
+          id: "ipv6-ula-generator",
+          title: "IPv6 ULA generator",
+          description: "Generate your own local, non-routable IP addresses for your network according to RFC4193.",
+          status: "planned",
+          sourcePath: "/ipv6-ula-generator",
+          sourceUrl: "https://it-tools.tech/ipv6-ula-generator",
+        },
+      ],
+    },
+    {
+      id: "math",
+      name: "Math",
+      description: "Calculate values, compare measurements, and solve everyday numeric problems quickly.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "math-evaluator",
+          title: "Math evaluator",
+          description: "A calculator for evaluating mathematical expressions. You can use functions like sqrt, cos, sin, abs, etc.",
+          status: "planned",
+          sourcePath: "/math-evaluator",
+          sourceUrl: "https://it-tools.tech/math-evaluator",
+        },
+        {
+          id: "eta-calculator",
+          title: "ETA calculator",
+          description: "An ETA (Estimated Time of Arrival) calculator to determine the approximate end time of a task, for example, the end time and duration of a file download.",
+          status: "planned",
+          sourcePath: "/eta-calculator",
+          sourceUrl: "https://it-tools.tech/eta-calculator",
+        },
+        {
+          id: "percentage-calculator",
+          title: "Percentage calculator",
+          description: "Easily calculate percentages from a value to another value, or from a percentage to a value.",
+          status: "planned",
+          sourcePath: "/percentage-calculator",
+          sourceUrl: "https://it-tools.tech/percentage-calculator",
+        },
+      ],
+    },
+    {
+      id: "measurement",
+      name: "Measurement",
+      description: "Convert units and compare measurements for common temperature, distance, volume, and weight workflows.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "chronometer",
+          title: "Chronometer",
+          description: "Monitor the duration of a thing. Basically a chronometer with simple chronometer features.",
+          status: "planned",
+          sourcePath: "/chronometer",
+          sourceUrl: "https://it-tools.tech/chronometer",
+        },
+        {
+          id: "temperature-converter",
+          title: "Temperature converter",
+          description: "Degrees temperature conversions for Kelvin, Celsius, Fahrenheit, Rankine, Delisle, Newton, Réaumur, and Rømer.",
+          status: "planned",
+          sourcePath: "/temperature-converter",
+          sourceUrl: "https://it-tools.tech/temperature-converter",
+        },
+        {
+          id: "benchmark-builder",
+          title: "Benchmark builder",
+          description: "Easily compare execution time of tasks with this very simple online benchmark builder.",
+          status: "planned",
+          sourcePath: "/benchmark-builder",
+          sourceUrl: "https://it-tools.tech/benchmark-builder",
+        },
+      ],
+    },
+    {
+      id: "text",
+      name: "Text",
+      description: "Transform, analyze, compare, escape, encode, and generate text for writing and development tasks.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "lorem-ipsum-generator",
+          title: "Lorem ipsum generator",
+          description: "Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content",
+          status: "planned",
+          sourcePath: "/lorem-ipsum-generator",
+          sourceUrl: "https://it-tools.tech/lorem-ipsum-generator",
+        },
+        {
+          id: "text-statistics",
+          title: "Text statistics",
+          description: "Get information about a text, the number of characters, the number of words, its size in bytes, ...",
+          status: "planned",
+          sourcePath: "/text-statistics",
+          sourceUrl: "https://it-tools.tech/text-statistics",
+        },
+        {
+          id: "emoji-picker",
+          title: "Emoji picker",
+          description: "Copy and paste emojis easily and get the unicode and code points value of each emoji.",
+          status: "planned",
+          sourcePath: "/emoji-picker",
+          sourceUrl: "https://it-tools.tech/emoji-picker",
+        },
+        {
+          id: "string-obfuscator",
+          title: "String obfuscator",
+          description: "Obfuscate a string (like a secret, an IBAN, or a token) to make it shareable and identifiable without revealing its content.",
+          status: "planned",
+          sourcePath: "/string-obfuscator",
+          sourceUrl: "https://it-tools.tech/string-obfuscator",
+        },
+        {
+          id: "text-diff",
+          title: "Text diff",
+          description: "Compare two texts and see the differences between them.",
+          status: "planned",
+          sourcePath: "/text-diff",
+          sourceUrl: "https://it-tools.tech/text-diff",
+        },
+        {
+          id: "numeronym-generator",
+          title: "Numeronym generator",
+          description: "A numeronym is a word where a number is used to form an abbreviation. For example, \"i18n\" is a numeronym of \"internationalization\" where 18 stands for the number of letters between the first i and the last n in the word.",
+          status: "planned",
+          sourcePath: "/numeronym-generator",
+          sourceUrl: "https://it-tools.tech/numeronym-generator",
+        },
+        {
+          id: "ascii-text-drawer",
+          title: "ASCII Art Text Generator",
+          description: "Create ASCII art text with many fonts and styles.",
+          status: "planned",
+          sourcePath: "/ascii-text-drawer",
+          sourceUrl: "https://it-tools.tech/ascii-text-drawer",
+        },
+      ],
+    },
+    {
+      id: "data",
+      name: "Data",
+      description: "View, validate, format, diff, query, and convert structured data formats such as JSON, YAML, XML, and CSV.",
+      source: "IT-Tools.tech",
+      tools: [
+        {
+          id: "phone-parser-and-formatter",
+          title: "Phone parser and formatter",
+          description: "Parse, validate and format phone numbers. Get information about the phone number, like the country code, type, etc.",
+          status: "planned",
+          sourcePath: "/phone-parser-and-formatter",
+          sourceUrl: "https://it-tools.tech/phone-parser-and-formatter",
+        },
+        {
+          id: "iban-validator-and-parser",
+          title: "IBAN validator and parser",
+          description: "Validate and parse IBAN numbers. Check if an IBAN is valid and get the country, BBAN, if it is a QR-IBAN and the IBAN friendly format.",
+          status: "planned",
+          sourcePath: "/iban-validator-and-parser",
+          sourceUrl: "https://it-tools.tech/iban-validator-and-parser",
+        },
+      ],
+    },
+  ],
+};
+
+export const toolCategories = toolsCatalogue.categories;
+
+export function allTools(): Tool[] {
+  return toolCategories.flatMap((category) => category.tools);
+}
+
+export function availableTools(): Tool[] {
+  return allTools().filter((tool) => tool.status === 'available' && Boolean(tool.route));
+}
+
+export function plannedTools(): Tool[] {
+  return allTools().filter((tool) => tool.status === 'planned' || !tool.route);
+}
+
+export function toolRoute(tool: Tool): string | undefined {
+  if (tool.status !== 'available') return undefined;
+  return tool.route;
+}
+
+export function getToolById(id: string): Tool | undefined {
+  return allTools().find((tool) => tool.id === id);
+}
+
+export function getCategoryForTool(toolId: string): ToolCategory | undefined {
+  return toolCategories.find((category) =>
+    category.tools.some((tool) => tool.id === toolId),
+  );
+}
+

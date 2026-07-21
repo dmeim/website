@@ -1,0 +1,151 @@
+---
+import ToolCatalogItem from "./ToolCatalogItem.astro";
+import { allTools, toolCategories } from "../../content/tools";
+
+const total = allTools().length;
+---
+
+<section class="tool-catalog" aria-labelledby="tool-catalog-heading">
+  <header class="tool-catalog__head">
+    <div>
+      <p class="tool-catalog__eyebrow">Browse</p>
+      <h2 id="tool-catalog-heading" class="tool-catalog__title">All tools</h2>
+      <p class="tool-catalog__lede">
+        Local-first utilities. Ready tools open here; everything else stays
+        visible as WIP until it ships.
+      </p>
+    </div>
+    <p class="tool-catalog__count">{total} total</p>
+  </header>
+
+  <div class="tool-catalog__stack">
+    {
+      toolCategories.map((category) => (
+        <details
+          class="tool-catalog__category"
+          id={`category-${category.id}`}
+        >
+          <summary>
+            <span class="tool-catalog__category-title">
+              <strong>{category.name}</strong>
+              <span>{category.description}</span>
+            </span>
+          </summary>
+          <div class="tool-catalog__items">
+            {category.tools.map((tool) => (
+              <ToolCatalogItem tool={tool} />
+            ))}
+          </div>
+        </details>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .tool-catalog {
+    display: grid;
+    gap: var(--space-xl);
+  }
+
+  .tool-catalog__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tool-catalog__eyebrow {
+    margin: 0 0 var(--space-2xs);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .tool-catalog__title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+    letter-spacing: -0.01em;
+  }
+
+  .tool-catalog__lede {
+    margin: var(--space-xs) 0 0;
+    max-width: 48ch;
+    color: var(--color-ink-muted);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .tool-catalog__count {
+    margin: 0;
+    color: var(--color-ink-muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .tool-catalog__stack {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .tool-catalog__category {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tool-catalog__category summary {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding-block: var(--space-md);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .tool-catalog__category summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .tool-catalog__category summary::after {
+    content: "▸";
+    margin-left: auto;
+    color: var(--color-accent);
+    font-size: 0.75rem;
+    line-height: 1.6;
+  }
+
+  .tool-catalog__category[open] summary::after {
+    content: "▾";
+  }
+
+  .tool-catalog__category-title {
+    display: grid;
+    gap: var(--space-2xs);
+    min-width: 0;
+  }
+
+  .tool-catalog__category-title strong {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 400;
+  }
+
+  .tool-catalog__category-title span {
+    color: var(--color-ink-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .tool-catalog__items {
+    display: grid;
+    padding-bottom: var(--space-md);
+  }
+</style>

@@ -1,0 +1,38 @@
+{
+  "id": "space",
+  "name": "Space",
+  "description": "Planets, Rockets, Stars, And Space Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "moon",
+    "planet",
+    "rocket",
+    "comet",
+    "space"
+  ],
+  "words": [
+    "alien",
+    "asteroid",
+    "astronaut",
+    "comet",
+    "earth",
+    "galaxy",
+    "jupiter",
+    "lunar",
+    "mars",
+    "meteor",
+    "moon",
+    "orbit",
+    "planet",
+    "pluto",
+    "rocket",
+    "satellite",
+    "saturn",
+    "spaceship",
+    "space",
+    "star",
+    "sun",
+    "telescope",
+    "venus"
+  ]
+}

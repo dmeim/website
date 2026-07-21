@@ -1,0 +1,43 @@
+{
+  "id": "vehicles",
+  "name": "Vehicles",
+  "description": "Transportation And Vehicle Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "car",
+    "bus",
+    "train",
+    "truck",
+    "boat"
+  ],
+  "words": [
+    "airplane",
+    "ambulance",
+    "bike",
+    "boat",
+    "bus",
+    "cab",
+    "canoe",
+    "car",
+    "ferry",
+    "firetruck",
+    "helicopter",
+    "jeep",
+    "minivan",
+    "motorbike",
+    "plane",
+    "sailboat",
+    "scooter",
+    "ship",
+    "skateboard",
+    "sled",
+    "subway",
+    "taxi",
+    "tractor",
+    "train",
+    "tram",
+    "truck",
+    "van",
+    "wagon"
+  ]
+}

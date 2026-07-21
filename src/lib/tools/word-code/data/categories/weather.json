@@ -1,0 +1,42 @@
+{
+  "id": "weather",
+  "name": "Weather",
+  "description": "Weather, Sky, And Temperature Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "sun",
+    "rain",
+    "snow",
+    "cloud",
+    "rainbow"
+  ],
+  "words": [
+    "breeze",
+    "cloud",
+    "cloudy",
+    "cold",
+    "drizzle",
+    "fog",
+    "foggy",
+    "frost",
+    "hail",
+    "lightning",
+    "mist",
+    "misty",
+    "rain",
+    "rainbow",
+    "rainy",
+    "snow",
+    "snowflake",
+    "snowman",
+    "snowy",
+    "storm",
+    "sun",
+    "sunny",
+    "thunder",
+    "umbrella",
+    "warm",
+    "wind",
+    "windy"
+  ]
+}

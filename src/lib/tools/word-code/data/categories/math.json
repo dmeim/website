@@ -1,0 +1,34 @@
+{
+  "id": "math",
+  "name": "Math",
+  "description": "Math, Counting, And Classroom Number Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "number",
+    "plus",
+    "equal",
+    "count",
+    "zero"
+  ],
+  "words": [
+    "add",
+    "chart",
+    "count",
+    "digit",
+    "divide",
+    "equal",
+    "graph",
+    "math",
+    "measure",
+    "minus",
+    "number",
+    "one",
+    "plus",
+    "sum",
+    "ten",
+    "times",
+    "total",
+    "two",
+    "zero"
+  ]
+}

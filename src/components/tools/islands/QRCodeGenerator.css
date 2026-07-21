@@ -1,0 +1,27 @@
+@import "./toolIsland.css";
+
+.qr-preview {
+  display: grid;
+  place-items: center;
+  min-height: 18rem;
+  border: 1px solid var(--color-border);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 25%,
+      transparent 25%,
+      transparent 50%,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 50%,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 75%,
+      transparent 75%,
+      transparent
+    );
+  background-size: 16px 16px;
+  background-color: var(--color-ground);
+}
+
+.qr-preview img {
+  max-width: min(100%, 22rem);
+  height: auto;
+  display: block;
+}

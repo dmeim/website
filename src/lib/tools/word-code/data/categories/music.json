@@ -1,0 +1,38 @@
+{
+  "id": "music",
+  "name": "Music",
+  "description": "Music, Songs, And Instruments.",
+  "defaultSelected": true,
+  "previewWords": [
+    "song",
+    "drum",
+    "piano",
+    "guitar",
+    "music"
+  ],
+  "words": [
+    "band",
+    "banjo",
+    "beat",
+    "bell",
+    "dance",
+    "drum",
+    "flute",
+    "guitar",
+    "harp",
+    "horn",
+    "kazoo",
+    "melody",
+    "music",
+    "note",
+    "piano",
+    "recorder",
+    "singer",
+    "song",
+    "stage",
+    "trumpet",
+    "tune",
+    "violin",
+    "whistle"
+  ]
+}

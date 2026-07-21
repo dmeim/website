@@ -1,0 +1,37 @@
+{
+  "id": "places",
+  "name": "Places",
+  "description": "Places Around School, Town, And Trips.",
+  "defaultSelected": true,
+  "previewWords": [
+    "park",
+    "library",
+    "zoo",
+    "farm",
+    "museum"
+  ],
+  "words": [
+    "airport",
+    "bakery",
+    "bank",
+    "barn",
+    "bridge",
+    "cafe",
+    "camp",
+    "city",
+    "classroom",
+    "farm",
+    "hotel",
+    "library",
+    "market",
+    "museum",
+    "park",
+    "playground",
+    "station",
+    "store",
+    "theater",
+    "town",
+    "village",
+    "zoo"
+  ]
+}

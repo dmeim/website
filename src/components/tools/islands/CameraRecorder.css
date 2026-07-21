@@ -1,0 +1,111 @@
+@import "./toolIsland.css";
+
+/* Camera recorder island — extends shared tool surface patterns */
+
+.camera-island .tool-workspace {
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+}
+
+.camera-preview-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 20rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-ground);
+}
+
+.camera-preview-frame video {
+  width: 100%;
+  height: auto;
+  max-height: 32rem;
+  display: block;
+  background: #000;
+  object-fit: contain;
+}
+
+.camera-control-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.camera-capture-controls,
+.camera-orientation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.capture-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-md);
+}
+
+.capture-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-ground) 70%, transparent);
+  overflow: hidden;
+}
+
+.capture-card img,
+.capture-card video {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: #000;
+  display: block;
+}
+
+.capture-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.capture-meta > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.capture-meta strong {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.capture-meta span {
+  font-size: 0.8125rem;
+  color: var(--color-ink-muted);
+  word-break: break-all;
+}
+
+.capture-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+@media (max-width: 900px) {
+  .camera-island .tool-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-control-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "id": "fruits",
+  "name": "Fruits",
+  "description": "Fruit And Berry Names.",
+  "defaultSelected": true,
+  "previewWords": [
+    "apple",
+    "banana",
+    "grape",
+    "orange",
+    "peach"
+  ],
+  "words": [
+    "apple",
+    "apricot",
+    "banana",
+    "berry",
+    "blackberry",
+    "blueberry",
+    "cherry",
+    "coconut",
+    "cranberry",
+    "date",
+    "fig",
+    "grape",
+    "grapefruit",
+    "kiwi",
+    "lemon",
+    "lime",
+    "mango",
+    "melon",
+    "orange",
+    "papaya",
+    "peach",
+    "pear",
+    "pineapple",
+    "plum",
+    "raisin",
+    "strawberry",
+    "tangerine",
+    "watermelon"
+  ]
+}

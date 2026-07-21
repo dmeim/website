@@ -1,0 +1,246 @@
+/* Shared tool island surface — Midnight Concert Hall tokens */
+
+.tool-island {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  width: 100%;
+}
+
+.tool-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.tool-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+  border: 1px solid var(--color-border);
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 0% 0%,
+      var(--color-spot),
+      transparent 55%
+    ),
+    color-mix(in srgb, var(--color-ground-elevated) 88%, transparent);
+}
+
+.tool-section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.tool-section-heading--row {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.tool-section-heading h2,
+.tool-nested h3,
+.tool-panel > h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+
+.tool-nested h3 {
+  font-size: 1.25rem;
+  margin-bottom: var(--space-sm);
+}
+
+.tool-hint {
+  margin: 0;
+  max-width: none;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-ink-muted);
+}
+
+.tool-nested {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.tool-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.tool-form-grid--export {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.tool-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.tool-field--full {
+  grid-column: 1 / -1;
+}
+
+.tool-field label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.tool-field input,
+.tool-field select,
+.tool-field textarea,
+.tool-code {
+  width: 100%;
+  padding: 0.85rem 0;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+  transition:
+    border-color var(--duration) var(--ease-out),
+    background-color var(--duration) var(--ease-out);
+}
+
+.tool-field select {
+  cursor: pointer;
+}
+
+.tool-field input[type="color"] {
+  padding: 0.35rem 0;
+  height: 2.75rem;
+  cursor: pointer;
+}
+
+.tool-field input:hover,
+.tool-field select:hover,
+.tool-field textarea:hover,
+.tool-code:hover {
+  border-bottom-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+}
+
+.tool-field input:focus,
+.tool-field select:focus,
+.tool-field textarea:focus,
+.tool-code:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-spot) 35%, transparent);
+  padding-inline: 0.5rem;
+}
+
+.tool-field input:disabled,
+.tool-field select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tool-field textarea,
+.tool-code {
+  resize: vertical;
+  min-height: 6rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+}
+
+.tool-field textarea:not(.tool-code) {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+}
+
+.tool-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.9375rem;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.tool-check--full {
+  grid-column: 1 / -1;
+}
+
+.tool-check input {
+  accent-color: var(--color-accent);
+}
+
+.tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.tool-actions .btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tool-btn--danger {
+  border-color: color-mix(in srgb, #c45c4a 55%, var(--color-border));
+  color: color-mix(in srgb, #c45c4a 85%, var(--color-ink));
+}
+
+.tool-btn--danger:hover:not(:disabled) {
+  border-color: #c45c4a;
+  color: #c45c4a;
+  background: color-mix(in srgb, #c45c4a 10%, transparent);
+}
+
+.tool-status {
+  margin: 0;
+  max-width: none;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-ink-muted);
+}
+
+.tool-status--success {
+  color: var(--color-ink);
+}
+
+.tool-status--error {
+  color: color-mix(in srgb, #c45c4a 80%, var(--color-ink));
+}
+
+.tool-empty {
+  margin: 0;
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 900px) {
+  .tool-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-form-grid,
+  .tool-form-grid--export {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-panel {
+    padding: var(--space-lg);
+  }
+}

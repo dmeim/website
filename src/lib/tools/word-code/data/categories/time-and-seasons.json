@@ -1,0 +1,39 @@
+{
+  "id": "time-and-seasons",
+  "name": "Time & Seasons",
+  "description": "Days, Seasons, And Time Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "day",
+    "night",
+    "summer",
+    "winter",
+    "birthday"
+  ],
+  "words": [
+    "autumn",
+    "birthday",
+    "day",
+    "evening",
+    "fall",
+    "friday",
+    "holiday",
+    "hour",
+    "minute",
+    "monday",
+    "month",
+    "morning",
+    "night",
+    "noon",
+    "season",
+    "spring",
+    "summer",
+    "sunday",
+    "today",
+    "tomorrow",
+    "week",
+    "weekend",
+    "winter",
+    "year"
+  ]
+}

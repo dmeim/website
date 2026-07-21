@@ -1,0 +1,35 @@
+{
+  "id": "fantasy",
+  "name": "Fantasy",
+  "description": "Storybook Castles, Magic, And Royal Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "dragon",
+    "unicorn",
+    "magic",
+    "castle",
+    "fairy"
+  ],
+  "words": [
+    "castle",
+    "crown",
+    "dragon",
+    "elf",
+    "fairy",
+    "giant",
+    "jewel",
+    "king",
+    "knight",
+    "magic",
+    "mermaid",
+    "pixie",
+    "princess",
+    "queen",
+    "royal",
+    "spell",
+    "treasure",
+    "unicorn",
+    "wand",
+    "wizard"
+  ]
+}

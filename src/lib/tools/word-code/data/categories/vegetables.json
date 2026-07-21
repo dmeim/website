@@ -1,0 +1,42 @@
+{
+  "id": "vegetables",
+  "name": "Vegetables",
+  "description": "Vegetable And Garden Food Names.",
+  "defaultSelected": true,
+  "previewWords": [
+    "carrot",
+    "corn",
+    "pea",
+    "potato",
+    "tomato"
+  ],
+  "words": [
+    "bean",
+    "beet",
+    "broccoli",
+    "cabbage",
+    "carrot",
+    "celery",
+    "corn",
+    "cucumber",
+    "eggplant",
+    "garlic",
+    "kale",
+    "lettuce",
+    "mushroom",
+    "olive",
+    "onion",
+    "pea",
+    "pepper",
+    "pickle",
+    "potato",
+    "pumpkin",
+    "radish",
+    "salad",
+    "spinach",
+    "squash",
+    "tomato",
+    "turnip",
+    "yam"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "id": "shapes",
+  "name": "Shapes",
+  "description": "Shapes, Lines, And Patterns.",
+  "defaultSelected": true,
+  "previewWords": [
+    "circle",
+    "square",
+    "star",
+    "heart",
+    "oval"
+  ],
+  "words": [
+    "angle",
+    "arrow",
+    "circle",
+    "cone",
+    "cube",
+    "curve",
+    "diamond",
+    "dot",
+    "heart",
+    "hexagon",
+    "line",
+    "octagon",
+    "oval",
+    "pattern",
+    "rectangle",
+    "ring",
+    "sphere",
+    "spiral",
+    "square",
+    "star",
+    "triangle"
+  ]
+}

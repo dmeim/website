@@ -1,0 +1,42 @@
+{
+  "id": "colors",
+  "name": "Colors",
+  "description": "Colors And Color-Like Words.",
+  "defaultSelected": true,
+  "previewWords": [
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "purple"
+  ],
+  "words": [
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "purple",
+    "pink",
+    "black",
+    "white",
+    "brown",
+    "gray",
+    "orange",
+    "gold",
+    "silver",
+    "violet",
+    "indigo",
+    "teal",
+    "tan",
+    "aqua",
+    "navy",
+    "coral",
+    "cream",
+    "bronze",
+    "ruby",
+    "mint",
+    "lime",
+    "peach",
+    "lavender"
+  ]
+}
