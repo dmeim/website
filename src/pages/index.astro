@@ -1,10 +1,80 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import HomeExperience from "../components/react/HomeExperience";
+import {
+  meta,
+  hero,
+  currentChapter,
+  appointments,
+  shortBio,
+  mentorQuote,
+  pedagogy,
+  endorsement,
+  venues,
+} from "../content/site";
+
+const heroPortrait = {
+  src: "/images/hero-atmosphere.svg",
+  width: 853,
+  height: 1280,
+};
+
+const aboutPortrait = {
+  src: "/images/about-atmosphere.svg",
+  width: 1440,
+  height: 1920,
+};
+
+const chapterImage = {
+  src: "/images/chapter-atmosphere.svg",
+  width: 1200,
+  height: 630,
+};
 ---
 
-<BaseLayout>
-  <main>
-    <h1>dmeim.com</h1>
-    <p>Scaffold ready.</p>
-  </main>
+<BaseLayout title="dmeim.com" description={meta.description}>
+  <HomeExperience
+    client:load
+    portraitSrc={heroPortrait.src}
+    portraitWidth={heroPortrait.width}
+    portraitHeight={heroPortrait.height}
+    aboutPortraitSrc={aboutPortrait.src}
+    aboutPortraitWidth={aboutPortrait.width}
+    aboutPortraitHeight={aboutPortrait.height}
+    hero={hero}
+    chapter={currentChapter}
+    chapterImageSrc={chapterImage.src}
+    chapterImageWidth={chapterImage.width}
+    chapterImageHeight={chapterImage.height}
+    appointments={appointments}
+    bio={shortBio}
+    quote={mentorQuote}
+    pedagogy={pedagogy}
+    endorsement={endorsement}
+    venues={venues}
+  />
 </BaseLayout>
+
+<style is:global>
+  .site-main:has(.he) {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+    padding-block: 0;
+  }
+
+  @media (min-width: 900px) {
+    body:has(.he) .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+    }
+
+    body:has(.he) .he-hero {
+      min-height: 100dvh;
+      min-height: 100svh;
+    }
+  }
+</style>

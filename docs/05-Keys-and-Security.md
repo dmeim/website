@@ -18,7 +18,7 @@
 
 - Host at `/.well-known/security.txt`
 - Include:
-  - `Contact: mailto:me@dmeim.com`
+  - `Contact: mailto:hello@dmeim.com`
   - `Encryption: https://dmeim.com/keys/pgp.asc`
   - `Preferred-Languages: en`
   - Optional `Expires:`

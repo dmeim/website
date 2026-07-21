@@ -1,4 +1,6 @@
 ---
+import { ClientRouter } from "astro:transitions";
+import SiteEffects from "../components/react/SiteEffects";
 import "../styles/global.css";
 
 interface Props {
@@ -10,6 +12,25 @@ const {
   title = "dmeim.com",
   description = "Personal site for Dimitri — projects, keys, and tools.",
 } = Astro.props;
+
+const pageTitle = title === "dmeim.com" ? title : `${title} · dmeim.com`;
+
+const pathname = Astro.url.pathname;
+
+const nav = [
+  { href: "/", label: "Home" },
+  { href: "/projects", label: "Projects" },
+  { href: "/tools", label: "Tools" },
+  { href: "/keys", label: "Keys" },
+  { href: "/connect", label: "Connect" },
+] as const;
+
+function isCurrent(href: string): boolean {
+  if (href === "/") return pathname === "/" || pathname === "";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+const year = new Date().getFullYear();
 ---
 
 <!doctype html>
@@ -18,9 +39,230 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <title>{title}</title>
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>{pageTitle}</title>
+    <!-- FOUC-safe theme: apply before paint -->
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var pref =
+            stored === "light" || stored === "system" || stored === "dark"
+              ? stored
+              : "system";
+          var prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+          var theme =
+            pref === "light" || pref === "dark"
+              ? pref
+              : prefersDark
+                ? "dark"
+                : "light";
+          document.documentElement.setAttribute("data-theme-pref", pref);
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (_) {
+          document.documentElement.setAttribute("data-theme-pref", "system");
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+    <ClientRouter />
   </head>
   <body>
-    <slot />
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="/">dmeim</a>
+
+        <nav class="site-nav" aria-label="Primary">
+          {
+            nav.map(({ href, label }) => (
+              <a
+                href={href}
+                aria-current={isCurrent(href) ? "page" : undefined}
+              >
+                {label}
+              </a>
+            ))
+          }
+        </nav>
+
+        <div class="site-header__actions">
+          <div id="theme-toggle-host" class="theme-toggle-host"></div>
+
+          <button
+            type="button"
+            class="nav-toggle"
+            id="nav-toggle"
+            aria-label="Open menu"
+            aria-controls="mobile-nav"
+            aria-expanded="false"
+          >
+            <span class="nav-toggle__bars" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <nav
+      class="mobile-nav"
+      id="mobile-nav"
+      aria-label="Mobile"
+      data-open="false"
+    >
+      {
+        nav.map(({ href, label }) => (
+          <a href={href} aria-current={isCurrent(href) ? "page" : undefined}>
+            {label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <main class="site-main" id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <p class="site-footer__line">
+        &copy; {year} dmeim — Dimitri · hello@dmeim.com
+      </p>
+    </footer>
+
+    <SiteEffects client:load />
+
+    <script>
+      import "../scripts/theme-toggle";
+    </script>
+
+    <script is:inline>
+      (function () {
+        function bindMobileNav() {
+          var toggle = document.getElementById("nav-toggle");
+          var drawer = document.getElementById("mobile-nav");
+          if (!toggle || !drawer) return;
+
+          var lastFocus = null;
+
+          function focusables() {
+            return Array.prototype.slice.call(
+              drawer.querySelectorAll(
+                'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+              ),
+            );
+          }
+
+          function isOpen() {
+            return drawer.getAttribute("data-open") === "true";
+          }
+
+          function openNav() {
+            lastFocus = document.activeElement;
+            drawer.setAttribute("data-open", "true");
+            drawer.classList.add("is-open");
+            toggle.setAttribute("aria-expanded", "true");
+            toggle.setAttribute("aria-label", "Close menu");
+            document.body.style.overflow = "hidden";
+            var items = focusables();
+            if (items.length) items[0].focus();
+          }
+
+          function closeNav() {
+            drawer.setAttribute("data-open", "false");
+            drawer.classList.remove("is-open");
+            toggle.setAttribute("aria-expanded", "false");
+            toggle.setAttribute("aria-label", "Open menu");
+            document.body.style.overflow = "";
+            if (lastFocus && typeof lastFocus.focus === "function") {
+              try {
+                lastFocus.focus();
+              } catch (_) {}
+            }
+          }
+
+          closeNav();
+
+          if (toggle.dataset.bound === "1") return;
+          toggle.dataset.bound = "1";
+
+          toggle.addEventListener("click", function () {
+            if (isOpen()) closeNav();
+            else openNav();
+          });
+
+          drawer.addEventListener("click", function (e) {
+            if (e.target.tagName === "A") closeNav();
+          });
+
+          if (!window.__dmeimNavListeners) {
+            window.__dmeimNavListeners = true;
+
+            document.addEventListener("keydown", function (e) {
+              var t = document.getElementById("nav-toggle");
+              var d = document.getElementById("mobile-nav");
+              if (!t || !d || d.getAttribute("data-open") !== "true") return;
+
+              if (e.key === "Escape") {
+                e.preventDefault();
+                d.setAttribute("data-open", "false");
+                d.classList.remove("is-open");
+                t.setAttribute("aria-expanded", "false");
+                t.setAttribute("aria-label", "Open menu");
+                document.body.style.overflow = "";
+                t.focus();
+                return;
+              }
+
+              if (e.key !== "Tab") return;
+
+              var items = Array.prototype.slice.call(
+                d.querySelectorAll(
+                  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+                ),
+              );
+              if (!items.length) return;
+
+              var first = items[0];
+              var last = items[items.length - 1];
+              var active = document.activeElement;
+
+              if (e.shiftKey && (active === first || active === t)) {
+                e.preventDefault();
+                last.focus();
+              } else if (!e.shiftKey && active === last) {
+                e.preventDefault();
+                first.focus();
+              }
+            });
+
+            window.addEventListener("resize", function () {
+              if (!window.matchMedia("(min-width: 769px)").matches) return;
+              var t = document.getElementById("nav-toggle");
+              var d = document.getElementById("mobile-nav");
+              if (!t || !d || d.getAttribute("data-open") !== "true") return;
+              d.setAttribute("data-open", "false");
+              d.classList.remove("is-open");
+              t.setAttribute("aria-expanded", "false");
+              t.setAttribute("aria-label", "Open menu");
+              document.body.style.overflow = "";
+            });
+          }
+        }
+
+        bindMobileNav();
+        document.addEventListener("astro:page-load", bindMobileNav);
+      })();
+    </script>
   </body>
 </html>

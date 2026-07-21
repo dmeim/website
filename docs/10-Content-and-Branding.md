@@ -8,7 +8,7 @@
 
 ## Content Seed
 
-- Contact: `me@dmeim.com`
+- Contact: `hello@dmeim.com`
 - Social: to be added (cards or list later)
 - Resume: dedicated `/resume` page with detailed sections
 

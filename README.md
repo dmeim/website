@@ -2,7 +2,9 @@
 
 Personal website for dmeim.com — portfolios, public keys, verification tools, and more.
 
-**Stack:** Astro 7 · TypeScript · plain CSS · Lucide · Cloudflare Workers Assets · Wrangler (`dmeim`) · Node ≥ 22
+**Stack:** Astro 7 · TypeScript · React islands · Framer Motion · plain CSS · Lucide · Cloudflare Workers Assets · Wrangler (`dmeim`) · Node ≥ 22
+
+**Design:** Midnight Concert Hall (Syne / Instrument Serif / Manrope, champagne + steel accents) — adapted from the `pre-retro-pop` branch of [georgios-zerdalis](https://github.com/dmeim/georgios-zerdalis) (local clone under `reference/`, gitignored).
 
 ## Quick start
 
@@ -15,6 +17,16 @@ npm run dev
 npm run build
 npm run deploy   # requires Wrangler auth
 ```
+
+## Routes
+
+| Path | Page |
+| --- | --- |
+| `/` | Home |
+| `/projects` | Project portfolio |
+| `/tools` | Tools (placeholder) |
+| `/keys` | SSH / GPG keys |
+| `/connect` | Connect form + info |
 
 ## Documentation Map
 

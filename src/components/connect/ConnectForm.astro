@@ -1,0 +1,322 @@
+---
+/**
+ * Connect form — fields from `src/content/site.ts`.
+ *
+ * n8n webhook scaffold:
+ * Set `PUBLIC_N8N_WEBHOOK_URL` in `.env` (see `.env.example`) to the n8n
+ * webhook endpoint. On submit, the client POSTs JSON:
+ *   { name, email, subject, message }
+ * If the URL is unset, fields still validate but the UI shows a friendly
+ * “form not connected yet” message (no fake success).
+ * Turnstile / Workers email / live n8n wiring are intentionally out of scope.
+ */
+import { connect } from '../../content/site';
+
+const webhookUrl = import.meta.env.PUBLIC_N8N_WEBHOOK_URL?.trim() ?? '';
+const { fields, submitLabel } = connect.form;
+---
+
+<div class="connect-form-wrapper">
+  <form
+    class="connect-form"
+    id="connect-form"
+    novalidate
+    data-webhook-url={webhookUrl}
+  >
+    {
+      fields.map((field) => (
+        <div class="form-group">
+          <label for={field.name}>{field.label}</label>
+          {field.type === 'textarea' ? (
+            <textarea
+              id={field.name}
+              name={field.name}
+              required={field.required}
+              placeholder={field.placeholder}
+              rows={6}
+            />
+          ) : (
+            <input
+              type={field.type}
+              id={field.name}
+              name={field.name}
+              required={field.required}
+              placeholder={field.placeholder}
+              autocomplete={
+                field.name === 'name'
+                  ? 'name'
+                  : field.name === 'email'
+                    ? 'email'
+                    : undefined
+              }
+            />
+          )}
+        </div>
+      ))
+    }
+
+    <p
+      class="form-status"
+      id="connect-form-status"
+      role="status"
+      aria-live="polite"
+      hidden
+    ></p>
+
+    <button type="submit" class="btn-primary" id="connect-form-submit">
+      {submitLabel}
+    </button>
+  </form>
+</div>
+
+<script>
+  function initConnectForm() {
+    const form = document.getElementById('connect-form');
+    if (!(form instanceof HTMLFormElement) || form.dataset.bound === '1') return;
+    form.dataset.bound = '1';
+
+    const statusEl = document.getElementById('connect-form-status');
+    const submitBtn = document.getElementById('connect-form-submit');
+    if (!(statusEl instanceof HTMLElement) || !(submitBtn instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const defaultLabel = submitBtn.textContent ?? 'Send Message';
+
+    function setStatus(
+      message: string,
+      kind: 'idle' | 'loading' | 'success' | 'error' | 'disconnected',
+    ) {
+      statusEl.hidden = !message;
+      statusEl.textContent = message;
+      statusEl.dataset.kind = kind;
+      statusEl.className = `form-status form-status--${kind}`;
+    }
+
+    function setLoading(loading: boolean) {
+      submitBtn.disabled = loading;
+      submitBtn.textContent = loading ? 'Sending…' : defaultLabel;
+      form.setAttribute('aria-busy', loading ? 'true' : 'false');
+    }
+
+    function validate(): boolean {
+      const controls = form.querySelectorAll<
+        HTMLInputElement | HTMLTextAreaElement
+      >('input, textarea');
+
+      for (const el of controls) {
+        el.setCustomValidity('');
+        const value = el.value.trim();
+        if (el.required && !value) {
+          el.setCustomValidity('This field is required.');
+          el.reportValidity();
+          el.focus();
+          return false;
+        }
+        if (el.type === 'email' && value) {
+          // Lightweight client check; server/n8n can validate further.
+          const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+          if (!ok) {
+            el.setCustomValidity('Please enter a valid email address.');
+            el.reportValidity();
+            el.focus();
+            return false;
+          }
+        }
+      }
+      return form.checkValidity();
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      setStatus('', 'idle');
+
+      if (!validate()) return;
+
+      const webhook = (form.dataset.webhookUrl ?? '').trim();
+      const data = Object.fromEntries(new FormData(form).entries()) as Record<
+        string,
+        string
+      >;
+      const payload = {
+        name: (data.name ?? '').trim(),
+        email: (data.email ?? '').trim(),
+        subject: (data.subject ?? '').trim(),
+        message: (data.message ?? '').trim(),
+      };
+
+      if (!webhook) {
+        setStatus(
+          'Thanks for filling this out — the form is not connected yet. Please email hello@dmeim.com directly for now.',
+          'disconnected',
+        );
+        return;
+      }
+
+      setLoading(true);
+      setStatus('Sending your message…', 'loading');
+
+      try {
+        const res = await fetch(webhook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          throw new Error(`Request failed (${res.status})`);
+        }
+
+        form.reset();
+        setStatus('Message sent — thank you. Dimitri will be in touch soon.', 'success');
+      } catch {
+        setStatus(
+          'Something went wrong sending your message. Please try again or email hello@dmeim.com directly.',
+          'error',
+        );
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
+
+  initConnectForm();
+  document.addEventListener('astro:page-load', initConnectForm);
+</script>
+
+<style>
+  .connect-form-wrapper {
+    width: 100%;
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    background:
+      radial-gradient(
+        ellipse 80% 60% at 0% 0%,
+        var(--color-spot),
+        transparent 55%
+      ),
+      color-mix(in srgb, var(--color-ground-elevated) 88%, transparent);
+  }
+
+  .connect-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+
+  .form-group label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.85rem 0;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5;
+    transition:
+      border-color var(--duration) var(--ease-out),
+      background-color var(--duration) var(--ease-out);
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: var(--color-ink-muted);
+    opacity: 0.65;
+  }
+
+  .form-group input:hover,
+  .form-group textarea:hover {
+    border-bottom-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-bottom-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-spot) 35%, transparent);
+    padding-inline: 0.5rem;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 9rem;
+  }
+
+  .btn-primary {
+    align-self: flex-start;
+    margin-top: var(--space-sm);
+    padding: 0.9rem 1.85rem;
+    border: 1px solid var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-ground);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      background var(--duration) var(--ease-out),
+      color var(--duration) var(--ease-out),
+      border-color var(--duration) var(--ease-out),
+      opacity var(--duration) var(--ease-out);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: transparent;
+    color: var(--color-accent);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.65;
+    cursor: wait;
+  }
+
+  .form-status {
+    margin: 0;
+    padding: 0.85rem 0;
+    border: none;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    max-width: none;
+  }
+
+  .form-status--loading {
+    color: var(--color-ink-muted);
+  }
+
+  .form-status--success {
+    border-top-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border));
+    color: var(--color-ink);
+  }
+
+  .form-status--error,
+  .form-status--disconnected {
+    border-top-color: color-mix(in srgb, #c45c4a 45%, var(--color-border));
+    color: var(--color-ink);
+  }
+
+  @media (max-width: 800px) {
+    .connect-form-wrapper {
+      padding: var(--space-lg);
+    }
+  }
+</style>

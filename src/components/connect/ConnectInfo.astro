@@ -1,0 +1,115 @@
+---
+/**
+ * Connect details — sourced from `src/content/site.ts`.
+ * Page heading lives in connect.astro via PageIntro.
+ */
+import { Mail, MapPin, Code2 } from "@lucide/astro";
+import { connect } from "../../content/site";
+---
+
+<div class="connect-info">
+  <ul class="connect-details" role="list">
+    <li class="connect-item">
+      <span class="connect-item__icon" aria-hidden="true">
+        <Mail size={20} stroke-width={1.75} />
+      </span>
+      <div class="connect-item__content">
+        <span class="connect-item__label">Email</span>
+        <a href={`mailto:${connect.email}`}>{connect.email}</a>
+      </div>
+    </li>
+    <li class="connect-item">
+      <span class="connect-item__icon" aria-hidden="true">
+        <MapPin size={20} stroke-width={1.75} />
+      </span>
+      <div class="connect-item__content">
+        <span class="connect-item__label">Location</span>
+        <p>{connect.location}</p>
+        <p class="connect-item__detail">{connect.locationDetail}</p>
+      </div>
+    </li>
+    <li class="connect-item">
+      <span class="connect-item__icon" aria-hidden="true">
+        <Code2 size={20} stroke-width={1.75} />
+      </span>
+      <div class="connect-item__content">
+        <span class="connect-item__label">{connect.socialLabel}</span>
+        <a
+          href={connect.socialUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {connect.socialHandle}
+        </a>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<style>
+  .connect-details {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .connect-item {
+    display: flex;
+    gap: var(--space-md);
+    align-items: flex-start;
+  }
+
+  .connect-item__icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-ground-elevated) 80%, transparent);
+    color: var(--color-accent);
+  }
+
+  .connect-item__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    min-width: 0;
+    padding-top: 0.2rem;
+  }
+
+  .connect-item__label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .connect-item__content a,
+  .connect-item__content p {
+    margin: 0;
+    color: var(--color-ink);
+    text-decoration: none;
+    word-break: break-word;
+    font-size: 1.0625rem;
+    line-height: 1.45;
+  }
+
+  .connect-item__content a {
+    transition: color var(--duration) var(--ease-out);
+  }
+
+  .connect-item__content a:hover {
+    color: var(--color-accent);
+  }
+
+  .connect-item__detail {
+    font-size: 0.9375rem !important;
+    color: var(--color-ink-muted) !important;
+  }
+</style>

@@ -1,0 +1,179 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageIntro from "../components/react/PageIntro";
+import { projects, meta } from "../content/site";
+
+const statusLabel = {
+  live: "Live",
+  wip: "In progress",
+  archived: "Archive",
+} as const;
+---
+
+<BaseLayout
+  title="Projects"
+  description="Selected projects and experiments from Dimitri / dmeim."
+>
+  <section class="projects-page">
+    <PageIntro
+      client:visible
+      title="Projects"
+      lede="Selected builds, case studies, and experiments — some live, some still finding their voice."
+    />
+
+    <ul class="projects-list" role="list">
+      {
+        projects.map((project) => (
+          <li class="project-card">
+            <div class="project-card__media" aria-hidden="true">
+              <img
+                src={project.image}
+                alt=""
+                width="480"
+                height="300"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="project-card__body">
+              <div class="project-card__meta">
+                <span class="project-card__status" data-status={project.status}>
+                  {statusLabel[project.status]}
+                </span>
+                <ul class="project-card__tags" role="list">
+                  {project.tags.map((tag) => (
+                    <li>{tag}</li>
+                  ))}
+                </ul>
+              </div>
+              <h2 class="project-card__title">
+                {project.href ? (
+                  <a href={project.href}>{project.title}</a>
+                ) : (
+                  project.title
+                )}
+              </h2>
+              <p class="project-card__summary">{project.summary}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .projects-page {
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  .projects-page :global(.page-intro) {
+    margin-bottom: 0;
+  }
+
+  .projects-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2xl);
+  }
+
+  .project-card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: var(--space-xl);
+    align-items: center;
+    padding-block: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .project-card:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .project-card__media {
+    overflow: hidden;
+    border-radius: var(--he-frame-radius, 1.15rem);
+    box-shadow: var(--he-frame-shadow);
+    background: var(--color-ground-elevated);
+  }
+
+  .project-card__media img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .project-card__body {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .project-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm) var(--space-md);
+  }
+
+  .project-card__status {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .project-card__tags {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .project-card__tags li {
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-border);
+    padding: 0.2rem 0.55rem;
+  }
+
+  .project-card__title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  .project-card__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .project-card__title a:hover {
+    color: var(--color-accent);
+  }
+
+  .project-card__summary {
+    margin: 0;
+    max-width: var(--measure);
+    color: var(--color-ink-muted);
+    font-size: 1.0125rem;
+    line-height: 1.65;
+  }
+
+  @media (max-width: 800px) {
+    .project-card {
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+    }
+  }
+</style>

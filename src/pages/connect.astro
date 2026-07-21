@@ -1,0 +1,60 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ConnectInfo from "../components/connect/ConnectInfo.astro";
+import ConnectForm from "../components/connect/ConnectForm.astro";
+import PageIntro from "../components/react/PageIntro";
+import { connect, meta } from "../content/site";
+---
+
+<BaseLayout title="Connect" description={meta.description}>
+  <section class="connect-page" aria-labelledby="connect-heading">
+    <div class="connect-grid">
+      <div class="connect-page__copy">
+        <PageIntro
+          client:visible
+          title="Let's Connect"
+          lede={connect.intro}
+          titleId="connect-heading"
+          className="connect-page__intro"
+        />
+        <ConnectInfo />
+      </div>
+      <ConnectForm />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .connect-page {
+    display: grid;
+  }
+
+  .connect-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: var(--space-3xl);
+    align-items: start;
+  }
+
+  .connect-page__copy {
+    display: grid;
+    gap: var(--space-2xl);
+    max-width: 28rem;
+  }
+
+  .connect-page :global(.page-intro) {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 800px) {
+    .connect-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-2xl);
+    }
+
+    .connect-page__copy {
+      max-width: none;
+      gap: var(--space-xl);
+    }
+  }
+</style>

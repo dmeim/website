@@ -21,3 +21,6 @@ dist/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Local reference clones (do not commit)
+reference/
