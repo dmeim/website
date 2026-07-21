@@ -2,14 +2,14 @@
 
 ## Phase 1 — MVP
 
-- Scaffold Vite + React + TS + Tailwind
-- Install shadcn/ui, configure theme tokens
-- Implement layout, navbar, footer, theme toggle
+- ~~Scaffold Astro 7 + TypeScript + Cloudflare adapter + Wrangler (`dmeim`)~~
+- Implement real layout, navbar, footer, theme toggle
+- Wire Lucide into UI components
 - Build Home/About page (short intro, highlights, CTAs)
 - Build `/resume` page (experience, skills, education, contact)
 - Keys page with hosted files, fingerprints, copy buttons
 - Verify page with PGP + SSH verification flows
-- Dockerfile + Nginx config; run behind NPM
+- Deploy to Cloudflare Workers Assets via Wrangler
 
 ## Phase 2 — Polish
 
@@ -21,7 +21,7 @@
 
 - Projects index and detail pages
 - Image optimization pipeline
-- CI workflow to build and push image; deploy script
+- CI workflow to build and deploy with Wrangler
 
 ## Phase 4 — Enhancements
 

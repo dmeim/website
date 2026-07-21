@@ -1,8 +1,20 @@
 # dmeim.com — Project Overview
 
-This repository contains the plans and decisions for building a fast, modern personal website for dmeim.com. The site will be built with Vite + React + TypeScript + Tailwind and will exclusively use shadcn/ui components. It will be packaged as a static site and served from an `nginx:alpine` container behind Nginx Proxy Manager.
+Personal website for dmeim.com — portfolios, public keys, verification tools, and more.
 
-See the docs for full context and step‑by‑step plans.
+**Stack:** Astro 7 · TypeScript · plain CSS · Lucide · Cloudflare Workers Assets · Wrangler (`dmeim`) · Node ≥ 22
+
+## Quick start
+
+```bash
+npm install
+npm run dev
+```
+
+```bash
+npm run build
+npm run deploy   # requires Wrangler auth
+```
 
 ## Documentation Map
 
@@ -12,7 +24,7 @@ See the docs for full context and step‑by‑step plans.
 - docs/04-Design-System.md
 - docs/05-Keys-and-Security.md
 - docs/06-Verification.md
-- docs/07-Deployment-and-Docker.md
+- docs/07-Deployment.md
 - docs/08-Backlog.md
 - docs/09-SEO-and-Performance.md
 - docs/10-Content-and-Branding.md
@@ -21,13 +33,4 @@ See the docs for full context and step‑by‑step plans.
 
 ## Assets
 
-All non-code assets (keys, images, logos, vcards, downloads) live under `assets/` for easy maintenance. During build, these will be copied into the site’s `public/` directory.
-
-Directory:
-
-- assets/keys/
-- assets/images/
-- assets/logos/
-- assets/vcards/
-- assets/downloads/
-
+Canonical non-code assets live under `assets/` (keys, images, logos, vcards, downloads). Copy into `public/` as needed during feature work.

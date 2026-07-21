@@ -2,10 +2,10 @@
 
 ## Performance
 
-- Static-first, minimal JS; islands only where needed (verify)
-- Tailwind JIT with purging; small CSS footprint
+- Static-first, minimal JS; Astro islands only where needed (e.g. verify)
+- Plain CSS with a small, intentional footprint (no CSS framework)
 - Responsive images (WebP/AVIF where possible); width/height hints
-- Cache busting and long-lived asset caching
+- Cache busting and long-lived asset caching at the Cloudflare edge
 
 ## SEO
 

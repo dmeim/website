@@ -19,17 +19,18 @@ Roles (initial):
 
 ## Typography
 
-- Prefer system UI stack or a single variable font for performance
+- Prefer a purposeful, non-default font stack (avoid Inter/Roboto/Arial/system-only defaults as the sole identity)
 - Fluid type scale; responsive leading and spacing
 
-## Components (shadcn)
+## Styling Approach
 
-- NavigationMenu, Button, Card, Badge, Separator, Tabs, Accordion,
-  Tooltip, Alert, Toaster, Dialog/Sheet, Switch (theme toggle)
+- Plain CSS with CSS custom properties for theme tokens
+- Light and dark modes; dark respects user preference with a manual toggle
+- No CSS frameworks; no UI component libraries
+- Icons via Lucide
 
 ## Motion & A11y
 
 - Reduced motion friendly animations; micro-interactions only
-- Focus-visible styles; keyboard accessible components
+- Focus-visible styles; keyboard accessible controls
 - Sufficient contrast in both light and dark modes
-

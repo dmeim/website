@@ -23,7 +23,7 @@
   - `Preferred-Languages: en`
   - Optional `Expires:`
 
-## Headers (at reverse proxy / NPM)
+## Headers (at Cloudflare edge)
 
 - Content-Security-Policy: default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'
 - Strict-Transport-Security: max-age=31536000; includeSubDomains; preload (handled at TLS layer)

@@ -2,32 +2,40 @@
 
 ## Stack
 
-- Vite + React + TypeScript
-- Tailwind CSS
-- shadcn/ui (Radix primitives), lucide-react icons
-- Output: static build
+- Framework: Astro 7
+- Language: TypeScript
+- Runtime: Node ≥ 22
+- Styling: Plain CSS (no framework) — CSS variables + dark mode
+- Icons: Lucide
+- Hosting: Cloudflare Workers Assets
+- Deploy: Wrangler (project name: `dmeim`)
+- Adapter: `@astrojs/cloudflare` (on-demand rendering capable)
 
-## shadcn/ui Usage Directive
+## Styling Directive
 
-- Exclusively use shadcn/ui components. No other UI libraries.
-- Prefer composition of shadcn primitives over bespoke CSS where feasible.
-- Extend via Tailwind utilities and tokens.
+- Plain CSS only. No Tailwind or other CSS frameworks.
+- Theme tokens as CSS custom properties on `:root` / `[data-theme="dark"]`.
+- Prefer semantic HTML and light, hand-written components over UI libraries.
 
-## Directory Layout (planned)
+## Directory Layout
 
-Top-level:
+Top-level (repo root is the Astro app):
 
-- `assets/` — canonical assets (keys, images, logos, vcards, downloads)
-- `docs/` — documentation set (this folder)
-- `site/` — Vite app (to be scaffolded later)
+- `src/` — pages, layouts, components, styles, lib
+- `public/` — static files served as-is (plus `.assetsignore` for Workers)
+- `assets/` — canonical content assets (keys, images, logos, vcards, downloads)
+- `docs/` — project documentation
+- `astro.config.ts` — Astro + Cloudflare adapter
+- `wrangler.jsonc` — Workers Assets deploy config (`name: "dmeim"`)
+- `package.json` — npm scripts (`dev`, `build`, `preview`, `deploy`)
 
-Inside `site/` (planned):
+Inside `src/`:
 
-- `public/` — static assets copied from `assets/`
-- `src/components/` — shadcn components + composables
-- `src/pages/` — route pages (`/`, `/keys`, `/verify`)
-- `src/lib/` — utils (verification helpers, formatting)
-- `tailwind.config.ts` — custom theme tokens
+- `pages/` — file-based routes
+- `layouts/` — shared HTML shells
+- `components/` — Astro / TS components (as needed)
+- `styles/` — global CSS and tokens
+- `lib/` — utilities (as needed)
 
 ## Color Palette Mapping
 
@@ -39,13 +47,4 @@ Brand palette (light → dark):
 - 600: `#476f95`
 - 800: `#194a7a`
 
-Tailwind theme tokens (example):
-
-- primary: 600 `#476f95` (default)
-- primary-foreground: white
-- secondary: 200 `#a3b7ca`
-- muted: 50 `#d1dbe4`
-- accent: 400 `#7593af`
-
-Implementation detail will be added in Tailwind config when scaffolding.
-
+CSS variables live in `src/styles/global.css` (`--color-*`).

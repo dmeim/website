@@ -4,18 +4,23 @@ This document records the key decisions for the dmeim.com site. Treat these as c
 
 ## AD-001: Tech Stack
 
-- Build tool: Vite
-- Framework: React + TypeScript
-- Styling: Tailwind CSS
-- UI Library: shadcn/ui (Radix UI under the hood)
-- Icons: lucide-react via shadcn
-- Output: Static site (no server runtime)
+- Framework: Astro 7
+- Language: TypeScript
+- Runtime: Node ≥ 22
+- Styling: Plain CSS (no CSS framework) — CSS variables + dark mode
+- Icons: Lucide
+- Hosting: Cloudflare Workers Assets
+- Deploy: Wrangler (project name: `dmeim`)
+- Adapter: `@astrojs/cloudflare` (on-demand rendering available; prerender where useful)
+- Package manager: npm
+- App lives at repository root
 
-## AD-002: UI Components Directive
+## AD-002: Styling Directive
 
-- Exclusively use shadcn/ui components for UI building blocks.
-- Do not introduce other component libraries (e.g., MUI, Chakra, Ant).
-- Custom components should follow shadcn patterns and Tailwind tokens.
+- Use plain CSS only. Do not introduce Tailwind, Bootstrap, or other CSS frameworks.
+- Theme via CSS custom properties; support light and dark modes.
+- Prefer semantic HTML and small, purpose-built components over a component library.
+- Do not introduce UI libraries (e.g., shadcn/ui, MUI, Chakra, Ant).
 
 ## AD-003: Branding & Domain
 
@@ -24,12 +29,12 @@ This document records the key decisions for the dmeim.com site. Treat these as c
   - #d1dbe4, #a3b7ca, #7593af, #476f95, #194a7a
 - Light/Dark themes supported; dark respects user preference.
 
-## AD-004: Container & Serving
+## AD-004: Hosting & Deploy
 
-- Container image: `nginx:alpine`
-- Static files served from `/usr/share/nginx/html`
-- This container runs behind Nginx Proxy Manager (TLS handled upstream)
-- Internal HTTP port: 8080
+- Host on Cloudflare Workers Assets via `@astrojs/cloudflare`
+- Deploy with Wrangler; Cloudflare project / Worker name: `dmeim`
+- Config: `wrangler.jsonc` at repo root; TLS and edge delivery by Cloudflare
+- Package manager: npm; app lives at repository root
 
 ## AD-005: Information Architecture (Initial)
 
@@ -49,7 +54,7 @@ This document records the key decisions for the dmeim.com site. Treat these as c
 
 - Publish keys and fingerprints; provide security.txt under `/.well-known/security.txt`
 - Document WKD (OpenPGP Web Key Directory) as a later enhancement
-- Use strong security headers (CSP/HSTS/etc.) at the reverse proxy layer (NPM)
+- Use strong security headers (CSP/HSTS/etc.) at the Cloudflare edge
 
 ## AD-008: Verification Modes
 
