@@ -24,9 +24,11 @@ npm run deploy   # requires Wrangler auth
 | --- | --- |
 | `/` | Home |
 | `/projects` | Project portfolio |
-| `/tools` | Tools (placeholder) |
+| `/tools` | Tools (catalogue + tool pages) |
 | `/keys` | SSH / GPG keys |
 | `/connect` | Connect form + info |
+| `/game-of-life` | Conway's Game of Life (landing) |
+| `/game-of-life/simulation` | Full-page Game of Life simulator |
 
 ## Documentation Map
 

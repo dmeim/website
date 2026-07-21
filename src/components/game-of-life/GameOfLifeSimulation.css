@@ -1,0 +1,188 @@
+.gol-sim {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  background: var(--color-ground);
+}
+
+.gol-sim__bar {
+  position: absolute;
+  z-index: 4;
+  top: var(--space-md);
+  left: var(--space-md);
+  right: var(--space-md);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-ground-elevated) 78%, transparent);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-ink) 4%, transparent),
+    0 12px 32px color-mix(in srgb, var(--color-ground) 55%, transparent);
+}
+
+.gol-sim[data-running="true"] .gol-sim__bar {
+  border-color: color-mix(in srgb, var(--color-accent) 32%, var(--color-border));
+}
+
+.gol-sim__bar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.gol-sim__exit {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-ink-muted);
+  padding: 0.35rem 0.15rem;
+  transition: color var(--duration) var(--ease-out);
+}
+
+.gol-sim__exit:hover {
+  color: var(--color-accent);
+}
+
+.gol-sim__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.gol-sim__actions .btn {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.6875rem;
+}
+
+.gol-sim__clear {
+  color: var(--color-ink-muted);
+}
+
+.gol-sim__clear:hover {
+  color: var(--color-ink);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+}
+
+.gol-sim__stats {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-lg);
+}
+
+.gol-sim__stats > div {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+
+.gol-sim__stats dt {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.gol-sim__stats dd {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.gol-sim__speed {
+  justify-self: end;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.15rem;
+  min-width: 10rem;
+  max-width: 14rem;
+  width: 100%;
+}
+
+.gol-sim__speed label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.gol-sim__fps-value {
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+
+.gol-sim__speed input[type="range"] {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.gol-sim__stage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  background: var(--color-ground-elevated);
+}
+
+.gol-sim__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+@media (max-width: 900px) {
+  .gol-sim__bar {
+    top: var(--space-sm);
+    left: var(--space-sm);
+    right: var(--space-sm);
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+
+  .gol-sim__stats {
+    justify-content: flex-start;
+    order: -1;
+    padding-bottom: var(--space-2xs);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .gol-sim__speed {
+    justify-self: stretch;
+    max-width: none;
+  }
+}

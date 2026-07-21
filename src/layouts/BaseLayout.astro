@@ -6,11 +6,14 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  /** Full-bleed main under the site header; hides footer. */
+  immersive?: boolean;
 }
 
 const {
   title = "dmeim.com",
   description = "Personal site for Dimitri — projects, keys, and tools.",
+  immersive = false,
 } = Astro.props;
 
 const pageTitle = title === "dmeim.com" ? title : `${title} · dmeim.com`;
@@ -130,15 +133,22 @@ const year = new Date().getFullYear();
       }
     </nav>
 
-    <main class="site-main" id="main">
+    <main
+      class:list={["site-main", { "site-main--immersive": immersive }]}
+      id="main"
+    >
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <p class="site-footer__line">
-        &copy; {year} dmeim — Dimitri · hello@dmeim.com
-      </p>
-    </footer>
+    {
+      !immersive ? (
+        <footer class="site-footer">
+          <p class="site-footer__line">
+            &copy; {year} dmeim — Dimitri · hello@dmeim.com
+          </p>
+        </footer>
+      ) : null
+    }
 
     <SiteEffects client:load />
 

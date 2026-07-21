@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import GameOfLifeSimulation from "../../components/game-of-life/GameOfLifeSimulation";
+---
+
+<BaseLayout
+  title="Game of Life — Simulation"
+  description="Full-page Conway's Game of Life simulator — B3/S23 with toroidal wrapping."
+  immersive
+>
+  <GameOfLifeSimulation client:load />
+</BaseLayout>
