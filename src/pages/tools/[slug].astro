@@ -49,6 +49,7 @@ import JwtParser from "../../components/tools/islands/JwtParser";
 import KeycodeInfo from "../../components/tools/islands/KeycodeInfo";
 import SlugifyString from "../../components/tools/islands/SlugifyString";
 import HtmlWysiwygEditor from "../../components/tools/islands/HtmlWysiwygEditor";
+import UserAgentParser from "../../components/tools/islands/UserAgentParser";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -270,6 +271,10 @@ const slug = tool.id;
           ) : slug === "html-wysiwyg-editor" ? (
             <div class="tool-mount" data-tool={slug}>
               <HtmlWysiwygEditor client:load />
+            </div>
+          ) : slug === "user-agent-parser" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <UserAgentParser client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
