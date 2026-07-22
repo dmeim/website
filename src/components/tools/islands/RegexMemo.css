@@ -1,0 +1,136 @@
+/* Regex memo — searchable expression cheatsheet */
+
+@import "./toolIsland.css";
+
+.rm-tool {
+  gap: var(--space-lg);
+}
+
+.rm-tool__panel {
+  max-width: 48rem;
+}
+
+.rm-inline-link {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.rm-inline-link:hover {
+  color: var(--color-accent, var(--color-ink));
+}
+
+.rm-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.rm-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.rm-section__group {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.rm-section__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.rm-list {
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+}
+
+.rm-card {
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.rm-card__row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 14rem) minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.rm-card__expression {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-ink) 4%, var(--color-surface));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-ink);
+  white-space: pre;
+}
+
+.rm-card__expression code {
+  font: inherit;
+}
+
+.rm-card__description {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-stone);
+}
+
+.rm-notes {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-stone);
+}
+
+.rm-refs {
+  max-width: 48rem;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.rm-refs__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  line-height: 1.25;
+  color: var(--color-ink);
+}
+
+.rm-refs__list {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 640px) {
+  .rm-card__row {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+}

@@ -66,6 +66,7 @@ import XmlFormatter from "../../components/tools/islands/XmlFormatter";
 import YamlPrettify from "../../components/tools/islands/YamlPrettify";
 import EmailNormalizer from "../../components/tools/islands/EmailNormalizer";
 import RegexTester from "../../components/tools/islands/RegexTester";
+import RegexMemo from "../../components/tools/islands/RegexMemo";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -355,6 +356,10 @@ const slug = tool.id;
           ) : slug === "regex-tester" ? (
             <div class="tool-mount" data-tool={slug}>
               <RegexTester client:load />
+            </div>
+          ) : slug === "regex-memo" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <RegexMemo client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
