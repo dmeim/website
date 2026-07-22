@@ -1,0 +1,76 @@
+/* Device information — Screen / Device info grids */
+
+@import "./toolIsland.css";
+
+.devinfo-tool {
+  gap: var(--space-lg);
+}
+
+.devinfo-workspace {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .devinfo-workspace {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.devinfo-section-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.devinfo-loading {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-stone);
+}
+
+.devinfo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 400px) {
+  .devinfo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.devinfo-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  min-width: 0;
+}
+
+.devinfo-cell__label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  color: var(--color-stone);
+}
+
+.devinfo-cell__value {
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.devinfo-cell__value--unknown {
+  color: var(--color-stone);
+}

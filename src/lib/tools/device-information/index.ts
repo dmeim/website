@@ -1,0 +1,16 @@
+export {
+  buildDeviceInformation,
+  displayValue,
+  formatColorDepth,
+  formatLanguages,
+  formatOrientationAngle,
+  formatPixelRatio,
+  formatScreenSize,
+  formatWindowSize,
+  readDeviceEnvironment,
+  type DeviceEnvironmentSnapshot,
+  type DeviceInfoItem,
+  type DeviceInfoSection,
+  type DeviceNavigatorSnapshot,
+  type DeviceScreenSnapshot,
+} from "./deviceInformation.service";
