@@ -55,6 +55,7 @@ import JsonDiff from "../../components/tools/islands/JsonDiff";
 import SafelinkDecoder from "../../components/tools/islands/SafelinkDecoder";
 import GitMemo from "../../components/tools/islands/GitMemo";
 import RandomPortGenerator from "../../components/tools/islands/RandomPortGenerator";
+import CrontabGenerator from "../../components/tools/islands/CrontabGenerator";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -300,6 +301,10 @@ const slug = tool.id;
           ) : slug === "random-port-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <RandomPortGenerator client:load />
+            </div>
+          ) : slug === "crontab-generator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <CrontabGenerator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

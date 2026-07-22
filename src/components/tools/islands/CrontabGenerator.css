@@ -1,0 +1,127 @@
+/* Crontab generator — large expression input, description, reference table */
+
+@import "./toolIsland.css";
+
+.cg-tool__workspace {
+  align-items: stretch;
+}
+
+.cg-tool__panel {
+  max-width: 40rem;
+  margin-inline: auto;
+  width: 100%;
+}
+
+.cg-expression {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: clamp(1.25rem, 3.5vw, 1.875rem);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.cg-description {
+  margin: 0.15rem 0 0;
+  text-align: center;
+  font-size: clamp(1.05rem, 2.4vw, 1.375rem);
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--color-ink) 82%, transparent);
+  min-height: 1.45em;
+}
+
+.cg-toggles {
+  margin-top: 0.25rem;
+}
+
+.cg-diagram {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 78%, transparent);
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--color-ink);
+  white-space: pre;
+}
+
+.cg-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--color-border);
+}
+
+.cg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.cg-table th,
+.cg-table td {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cg-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: color-mix(in srgb, var(--color-surface) 92%, var(--color-ink));
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.cg-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cg-table code {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.8125rem;
+}
+
+.cg-helper-cards {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.75rem;
+}
+
+.cg-helper-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 78%, transparent);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-stone);
+}
+
+.cg-helper-card strong {
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.cg-helper-card code {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 720px) {
+  .cg-table-wrap {
+    display: none;
+  }
+
+  .cg-helper-cards {
+    display: grid;
+  }
+}
