@@ -1,0 +1,13 @@
+/* Markdown to HTML converter — single-panel live transform */
+
+@import "./toolIsland.css";
+
+.md2h-tool__panel {
+  max-width: 48rem;
+}
+
+.md2h-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}

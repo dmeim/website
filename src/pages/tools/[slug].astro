@@ -36,6 +36,7 @@ import TomlToYaml from "../../components/tools/islands/TomlToYaml";
 import YamlToToml from "../../components/tools/islands/YamlToToml";
 import XmlToJson from "../../components/tools/islands/XmlToJson";
 import JsonToXml from "../../components/tools/islands/JsonToXml";
+import MarkdownToHtml from "../../components/tools/islands/MarkdownToHtml";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -205,6 +206,10 @@ const slug = tool.id;
           ) : slug === "json-to-xml" ? (
             <div class="tool-mount" data-tool={slug}>
               <JsonToXml client:load />
+            </div>
+          ) : slug === "markdown-to-html" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <MarkdownToHtml client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
