@@ -31,6 +31,7 @@
     "cron-validator": "^1.4.0",
     "cronstrue": "^2.59.0",
     "crypto-js": "^4.2.0",
+    "diff": "^9.0.0",
     "email-normalizer": "^1.0.0",
     "framer-motion": "^12.42.2",
     "iarna-toml-esm": "^3.0.5",
