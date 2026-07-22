@@ -50,6 +50,7 @@ import KeycodeInfo from "../../components/tools/islands/KeycodeInfo";
 import SlugifyString from "../../components/tools/islands/SlugifyString";
 import HtmlWysiwygEditor from "../../components/tools/islands/HtmlWysiwygEditor";
 import UserAgentParser from "../../components/tools/islands/UserAgentParser";
+import HttpStatusCodes from "../../components/tools/islands/HttpStatusCodes";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -275,6 +276,10 @@ const slug = tool.id;
           ) : slug === "user-agent-parser" ? (
             <div class="tool-mount" data-tool={slug}>
               <UserAgentParser client:load />
+            </div>
+          ) : slug === "http-status-codes" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <HttpStatusCodes client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
