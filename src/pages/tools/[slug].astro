@@ -32,6 +32,7 @@ import YamlToJsonConverter from "../../components/tools/islands/YamlToJsonConver
 import JsonToYamlConverter from "../../components/tools/islands/JsonToYamlConverter";
 import JsonToToml from "../../components/tools/islands/JsonToToml";
 import TomlToJson from "../../components/tools/islands/TomlToJson";
+import TomlToYaml from "../../components/tools/islands/TomlToYaml";
 import YamlToToml from "../../components/tools/islands/YamlToToml";
 import { availableTools, type Tool } from "../../content/tools";
 
@@ -185,6 +186,10 @@ const slug = tool.id;
           ) : slug === "toml-to-json" ? (
             <div class="tool-mount" data-tool={slug}>
               <TomlToJson client:load />
+            </div>
+          ) : slug === "toml-to-yaml" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <TomlToYaml client:load />
             </div>
           ) : slug === "yaml-to-toml" ? (
             <div class="tool-mount" data-tool={slug}>
