@@ -653,9 +653,10 @@ export const toolsCatalogue: ToolsCatalogue = {
         },
         {
           id: "docker-run-to-docker-compose-converter",
-          title: "Docker run to Docker compose converter",
+          title: "Docker run to Compose",
           description: "Transforms \"docker run\" commands into docker-compose files!",
-          status: "planned",
+          status: "available",
+          route: "/tools/docker-run-to-docker-compose-converter",
           sourcePath: "/docker-run-to-docker-compose-converter",
           sourceUrl: "https://it-tools.tech/docker-run-to-docker-compose-converter",
         },
