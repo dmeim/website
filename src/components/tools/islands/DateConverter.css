@@ -1,0 +1,73 @@
+/* Date-time converter — compact format list chrome */
+
+@import "./toolIsland.css";
+
+.dc-tool__panel {
+  max-width: 48rem;
+}
+
+.dc-controls {
+  align-items: end;
+}
+
+.dc-format-select {
+  min-width: 11rem;
+}
+
+.dc-formats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.dc-format {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.dc-format__label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-stone);
+  text-align: right;
+}
+
+.dc-format .tool-field {
+  gap: 0;
+}
+
+.dc-format .tool-field label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.dc-format__value {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .dc-format {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+    align-items: stretch;
+  }
+
+  .dc-format__label {
+    text-align: left;
+  }
+
+  .dc-format__actions {
+    justify-content: flex-start;
+  }
+}

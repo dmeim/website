@@ -26,6 +26,7 @@ import ListConverter from "../../components/tools/islands/ListConverter";
 import Base64StringConverter from "../../components/tools/islands/Base64StringConverter";
 import Base64FileConverter from "../../components/tools/islands/Base64FileConverter";
 import CaseConverter from "../../components/tools/islands/CaseConverter";
+import DateConverter from "../../components/tools/islands/DateConverter";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -154,6 +155,10 @@ const slug = tool.id;
           ) : slug === "case-converter" ? (
             <div class="tool-mount" data-tool={slug}>
               <CaseConverter client:load />
+            </div>
+          ) : slug === "date-converter" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <DateConverter client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
