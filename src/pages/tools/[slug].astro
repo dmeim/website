@@ -42,6 +42,7 @@ import HtmlEntities from "../../components/tools/islands/HtmlEntities";
 import UrlParser from "../../components/tools/islands/UrlParser";
 import DeviceInformation from "../../components/tools/islands/DeviceInformation";
 import BasicAuthGenerator from "../../components/tools/islands/BasicAuthGenerator";
+import OgMetaGenerator from "../../components/tools/islands/OgMetaGenerator";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -235,6 +236,10 @@ const slug = tool.id;
           ) : slug === "basic-auth-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <BasicAuthGenerator client:load />
+            </div>
+          ) : slug === "og-meta-generator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <OgMetaGenerator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
