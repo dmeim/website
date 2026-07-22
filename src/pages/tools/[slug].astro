@@ -13,6 +13,7 @@ import UuidGenerator from "../../components/tools/islands/UuidGenerator";
 import UlidGenerator from "../../components/tools/islands/UlidGenerator";
 import PasswordStrengthAnalyser from "../../components/tools/islands/PasswordStrengthAnalyser";
 import HmacGenerator from "../../components/tools/islands/HmacGenerator";
+import Encryption from "../../components/tools/islands/Encryption";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -88,6 +89,10 @@ const slug = tool.id;
           ) : slug === "hmac-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <HmacGenerator client:load />
+            </div>
+          ) : slug === "encryption" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <Encryption client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

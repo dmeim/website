@@ -1,0 +1,18 @@
+/* Encrypt / decrypt — dual-panel workspace */
+
+@import "./toolIsland.css";
+
+.enc-tool__workspace {
+  display: grid;
+  gap: var(--space-lg);
+  max-width: 42rem;
+}
+
+.enc-tool__panel {
+  max-width: 42rem;
+}
+
+.enc-tool__output {
+  word-break: break-all;
+  resize: vertical;
+}
