@@ -27,6 +27,7 @@ import Base64StringConverter from "../../components/tools/islands/Base64StringCo
 import Base64FileConverter from "../../components/tools/islands/Base64FileConverter";
 import CaseConverter from "../../components/tools/islands/CaseConverter";
 import DateConverter from "../../components/tools/islands/DateConverter";
+import ColorConverter from "../../components/tools/islands/ColorConverter";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -159,6 +160,10 @@ const slug = tool.id;
           ) : slug === "date-converter" ? (
             <div class="tool-mount" data-tool={slug}>
               <DateConverter client:load />
+            </div>
+          ) : slug === "color-converter" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <ColorConverter client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

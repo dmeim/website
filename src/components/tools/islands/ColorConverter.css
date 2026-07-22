@@ -1,0 +1,84 @@
+/* Color converter — labeled format rows + color picker */
+
+@import "./toolIsland.css";
+
+.clc-tool__panel {
+  max-width: 42rem;
+}
+
+.clc-formats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.clc-format {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: start;
+}
+
+.clc-format__label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-stone);
+  text-align: right;
+  padding-top: 0.85rem;
+}
+
+.clc-format__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.clc-format__field {
+  gap: 0;
+}
+
+.clc-format__field label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.clc-format__value {
+  min-width: 0;
+}
+
+.clc-format__actions {
+  padding-top: 0.35rem;
+}
+
+.clc-format input[type="color"] {
+  width: 100%;
+  max-width: 12rem;
+}
+
+@media (max-width: 640px) {
+  .clc-format {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+    align-items: stretch;
+  }
+
+  .clc-format__label {
+    text-align: left;
+    padding-top: 0;
+  }
+
+  .clc-format__actions {
+    padding-top: 0;
+    justify-content: flex-start;
+  }
+}
