@@ -1,0 +1,13 @@
+/* Basic auth generator — compact single-panel chrome */
+
+@import "./toolIsland.css";
+
+.basicauth-tool__panel {
+  max-width: 42rem;
+}
+
+.basicauth-header {
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
