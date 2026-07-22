@@ -60,6 +60,7 @@ import JsonPrettify from "../../components/tools/islands/JsonPrettify";
 import JsonMinify from "../../components/tools/islands/JsonMinify";
 import JsonToCsv from "../../components/tools/islands/JsonToCsv";
 import SqlPrettify from "../../components/tools/islands/SqlPrettify";
+import ChmodCalculator from "../../components/tools/islands/ChmodCalculator";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -325,6 +326,10 @@ const slug = tool.id;
           ) : slug === "sql-prettify" ? (
             <div class="tool-mount" data-tool={slug}>
               <SqlPrettify client:load />
+            </div>
+          ) : slug === "chmod-calculator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <ChmodCalculator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

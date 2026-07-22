@@ -1,0 +1,95 @@
+/* Chmod calculator — permission matrix + large mode display */
+
+@import "./toolIsland.css";
+
+.chmod-tool__panel {
+  max-width: 40rem;
+}
+
+.chmod-table-wrap {
+  overflow-x: auto;
+}
+
+.chmod-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.chmod-table th,
+.chmod-table td {
+  padding: 0.85rem 0.65rem;
+  vertical-align: middle;
+}
+
+@media (max-width: 600px) {
+  .chmod-table th,
+  .chmod-table td {
+    padding: 0.45rem 0.25rem;
+  }
+}
+
+.chmod-table__corner {
+  width: 7.5rem;
+}
+
+.chmod-table__col {
+  text-align: center;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+
+.chmod-table__row {
+  text-align: right;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-stone);
+  max-width: 5rem;
+}
+
+.chmod-table__cell {
+  text-align: center;
+}
+
+.chmod-check {
+  display: inline-flex;
+  justify-content: center;
+  width: auto;
+  margin-inline: auto;
+}
+
+.chmod-result {
+  margin: 0;
+  padding: 0.15rem 0;
+  text-align: center;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: clamp(2rem, 6vw, 3.125rem);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--color-gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.chmod-result--symbolic {
+  font-size: clamp(1.35rem, 4vw, 2.25rem);
+  letter-spacing: 0.08em;
+  color: var(--color-ink);
+}
+
+.chmod-command {
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
