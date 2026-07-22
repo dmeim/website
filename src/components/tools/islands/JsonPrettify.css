@@ -1,0 +1,17 @@
+/* JSON prettify — single-panel format tool */
+
+@import "./toolIsland.css";
+
+.jp-tool__panel {
+  max-width: 48rem;
+}
+
+.jp-settings {
+  align-items: end;
+}
+
+.jp-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}

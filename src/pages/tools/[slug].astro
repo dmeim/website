@@ -56,6 +56,7 @@ import SafelinkDecoder from "../../components/tools/islands/SafelinkDecoder";
 import GitMemo from "../../components/tools/islands/GitMemo";
 import RandomPortGenerator from "../../components/tools/islands/RandomPortGenerator";
 import CrontabGenerator from "../../components/tools/islands/CrontabGenerator";
+import JsonPrettify from "../../components/tools/islands/JsonPrettify";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -305,6 +306,10 @@ const slug = tool.id;
           ) : slug === "crontab-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <CrontabGenerator client:load />
+            </div>
+          ) : slug === "json-prettify" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <JsonPrettify client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
