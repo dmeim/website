@@ -59,6 +59,7 @@ import CrontabGenerator from "../../components/tools/islands/CrontabGenerator";
 import JsonPrettify from "../../components/tools/islands/JsonPrettify";
 import JsonMinify from "../../components/tools/islands/JsonMinify";
 import JsonToCsv from "../../components/tools/islands/JsonToCsv";
+import SqlPrettify from "../../components/tools/islands/SqlPrettify";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -320,6 +321,10 @@ const slug = tool.id;
           ) : slug === "json-to-csv" ? (
             <div class="tool-mount" data-tool={slug}>
               <JsonToCsv client:load />
+            </div>
+          ) : slug === "sql-prettify" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <SqlPrettify client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

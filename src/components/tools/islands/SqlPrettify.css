@@ -1,0 +1,17 @@
+/* SQL prettify — single-panel format tool */
+
+@import "./toolIsland.css";
+
+.sp-tool__panel {
+  max-width: 48rem;
+}
+
+.sp-settings {
+  align-items: end;
+}
+
+.sp-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}
