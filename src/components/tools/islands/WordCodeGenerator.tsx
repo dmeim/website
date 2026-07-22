@@ -8,6 +8,22 @@ import {
   type CSSProperties,
 } from "react";
 
+import {
+  ToolActionRow,
+  ToolButton,
+  ToolCheck,
+  ToolField,
+  ToolFormGrid,
+  ToolHint,
+  ToolInput,
+  ToolIsland,
+  ToolPanel,
+  ToolSectionHeading,
+  ToolSelect,
+  ToolStatus,
+  ToolTextarea,
+  ToolWorkspace,
+} from "@/components/tools/ui";
 import { copyTextToClipboard } from "@/lib/tools/clipboard";
 import {
   applyLengthFilter,
@@ -375,32 +391,26 @@ export default function WordCodeGenerator() {
   }, [lastOutput]);
 
   return (
-    <div className="wc-tool">
-      <div className="wc-tool__layout">
-        <section className="wc-panel" aria-labelledby="wc-categories-heading">
-          <div className="wc-panel__heading">
-            <h2 id="wc-categories-heading">Word Categories</h2>
-            <p
-              className={`wc-status${loadStatusType ? ` wc-status--${loadStatusType}` : ""}`}
-              role="status"
-            >
-              {loadStatusMessage}
-            </p>
-          </div>
+    <ToolIsland className="wc-tool">
+      <ToolWorkspace className="wc-tool__layout">
+        <ToolPanel labelledBy="wc-categories-heading">
+          <ToolSectionHeading
+            title="Word Categories"
+            titleId="wc-categories-heading"
+            description={
+              <ToolStatus tone={loadStatusType || "default"}>{loadStatusMessage}</ToolStatus>
+            }
+          />
 
-          <div className="wc-toolbar" aria-label="Category actions">
-            <button type="button" className="wc-btn wc-btn--secondary" onClick={selectAllCategories}>
-              Select All
-            </button>
-            <button type="button" className="wc-btn wc-btn--secondary" onClick={selectNoCategories}>
-              Select None
-            </button>
+          <ToolActionRow className="wc-toolbar" aria-label="Category actions">
+            <ToolButton onClick={selectAllCategories}>Select All</ToolButton>
+            <ToolButton onClick={selectNoCategories}>Select None</ToolButton>
             <p className="wc-pool-summary">{poolSummary}</p>
-          </div>
+          </ToolActionRow>
 
           <div className="wc-category-wrap" aria-live="polite">
             {!categories.length ? (
-              <p className="wc-hint">No Categories Loaded Yet.</p>
+              <ToolHint>No Categories Loaded Yet.</ToolHint>
             ) : (
               <table className="wc-category-table">
                 <thead>
@@ -461,14 +471,12 @@ export default function WordCodeGenerator() {
 
           <details className="wc-details">
             <summary>Optional Extra Words</summary>
-            <p className="wc-hint">
+            <ToolHint>
               Use This Only For One-Off Additions. Put Each Word On Its Own Line Or Separate Words
               With Commas.
-            </p>
-            <label className="wc-field-label" htmlFor="wc-extra-words">
-              Extra Words
-            </label>
-            <textarea
+            </ToolHint>
+            <ToolTextarea
+              label="Extra Words"
               id="wc-extra-words"
               spellCheck={false}
               placeholder={"sunflower\nmoonbeam"}
@@ -476,41 +484,33 @@ export default function WordCodeGenerator() {
               onChange={(event) => setExtraWordsText(event.target.value)}
             />
           </details>
-        </section>
+        </ToolPanel>
 
-        <section className="wc-panel" aria-labelledby="wc-settings-heading">
-          <h2 id="wc-settings-heading">Generation Settings</h2>
+        <ToolPanel labelledBy="wc-settings-heading">
+          <ToolSectionHeading title="Generation Settings" titleId="wc-settings-heading" />
 
-          <div className="wc-settings-grid">
-            <div className="wc-field">
-              <label className="wc-field-label" htmlFor="wc-digits">
-                Digits
-              </label>
-              <input
-                id="wc-digits"
-                type="number"
-                min={1}
-                max={8}
-                value={digits}
-                onChange={(event) => setDigits(Number(event.target.value))}
-              />
-            </div>
+          <ToolFormGrid className="wc-settings-grid">
+            <ToolInput
+              label="Digits"
+              id="wc-digits"
+              type="number"
+              min={1}
+              max={8}
+              value={digits}
+              onChange={(event) => setDigits(Number(event.target.value))}
+            />
 
-            <div className="wc-field">
-              <label className="wc-field-label" htmlFor="wc-position">
-                Digits Position
-              </label>
-              <select
-                id="wc-position"
-                value={position}
-                onChange={(event) => setPosition(event.target.value as DigitPosition)}
-              >
-                <option value="end">At End: Word00</option>
-                <option value="start">At Start: 00Word</option>
-              </select>
-            </div>
+            <ToolSelect
+              label="Digits Position"
+              id="wc-position"
+              value={position}
+              onChange={(event) => setPosition(event.target.value as DigitPosition)}
+            >
+              <option value="end">At End: Word00</option>
+              <option value="start">At Start: 00Word</option>
+            </ToolSelect>
 
-            <div className="wc-field wc-field--full">
+            <ToolField full className="wc-length-field">
               <div className="wc-length-heading">
                 <span className="wc-length-label-row">
                   <span className="wc-field-label" id="wc-length-label">
@@ -559,75 +559,60 @@ export default function WordCodeGenerator() {
                 <span>{lengthBounds.min}</span>
                 <span>{lengthBounds.max}+</span>
               </div>
-            </div>
-          </div>
+            </ToolField>
+          </ToolFormGrid>
 
           <div className="wc-checks">
-            <label className="wc-check-row">
-              <input
-                type="checkbox"
-                checked={randomize}
-                onChange={(event) => setRandomize(event.target.checked)}
-              />
-              Randomize Word Order
-            </label>
-            <label className="wc-check-row">
-              <input
-                type="checkbox"
-                checked={allowRepeats}
-                onChange={(event) => setAllowRepeats(event.target.checked)}
-              />
-              Allow Words To Repeat
-            </label>
-          </div>
-
-          <div className="wc-field">
-            <label className="wc-field-label" htmlFor="wc-word-case">
-              Word Case
-            </label>
-            <select
-              id="wc-word-case"
-              value={wordCase}
-              onChange={(event) => setWordCase(event.target.value as WordCase)}
-            >
-              <option value="normal">As Listed</option>
-              <option value="capitalize">First Letter Capitalized</option>
-              <option value="uppercase">Uppercase</option>
-              <option value="lowercase">Lowercase</option>
-              <option value="random">Random Letter Capitalization</option>
-            </select>
-          </div>
-
-          <div className="wc-field">
-            <label className="wc-field-label" htmlFor="wc-results">
-              Results
-            </label>
-            <input
-              id="wc-results"
-              type="number"
-              min={1}
-              max={1000}
-              value={results}
-              onChange={(event) => setResults(Number(event.target.value))}
+            <ToolCheck
+              label="Randomize Word Order"
+              checked={randomize}
+              onChange={(event) => setRandomize(event.target.checked)}
+            />
+            <ToolCheck
+              label="Allow Words To Repeat"
+              checked={allowRepeats}
+              onChange={(event) => setAllowRepeats(event.target.checked)}
             />
           </div>
 
-          <div className="wc-actions">
-            <button
-              type="button"
-              className="wc-btn wc-btn--primary"
+          <ToolSelect
+            label="Word Case"
+            id="wc-word-case"
+            value={wordCase}
+            onChange={(event) => setWordCase(event.target.value as WordCase)}
+          >
+            <option value="normal">As Listed</option>
+            <option value="capitalize">First Letter Capitalized</option>
+            <option value="uppercase">Uppercase</option>
+            <option value="lowercase">Lowercase</option>
+            <option value="random">Random Letter Capitalization</option>
+          </ToolSelect>
+
+          <ToolInput
+            label="Results"
+            id="wc-results"
+            type="number"
+            min={1}
+            max={1000}
+            value={results}
+            onChange={(event) => setResults(Number(event.target.value))}
+          />
+
+          <ToolActionRow>
+            <ToolButton
+              variant="primary"
               disabled={isLoading || !categories.length}
               onClick={generateCodes}
             >
               Generate
-            </button>
-          </div>
-        </section>
-      </div>
+            </ToolButton>
+          </ToolActionRow>
+        </ToolPanel>
+      </ToolWorkspace>
 
-      <section className="wc-panel wc-panel--output" aria-labelledby="wc-output-heading">
+      <ToolPanel className="wc-panel--output" labelledBy="wc-output-heading">
         <div className="wc-output-header">
-          <h2 id="wc-output-heading">Output</h2>
+          <ToolSectionHeading title="Output" titleId="wc-output-heading" />
           <div className="wc-format-options" role="radiogroup" aria-label="Output Format">
             <label className="wc-radio-row">
               <input
@@ -652,60 +637,49 @@ export default function WordCodeGenerator() {
 
             {outputFormat === "line" ? (
               <div className="wc-line-controls">
-                <div className="wc-field">
-                  <label className="wc-field-label" htmlFor="wc-sep">
-                    Separator
-                  </label>
-                  <select
-                    id="wc-sep"
-                    value={separator}
-                    onChange={(event) => setSeparator(event.target.value as SeparatorOption)}
-                  >
-                    <option value=",">Comma</option>
-                    <option value=";">Semicolon</option>
-                    <option value=".">Period</option>
-                    <option value=" ">Space</option>
-                    <option value="custom">Custom</option>
-                  </select>
-                </div>
+                <ToolSelect
+                  label="Separator"
+                  id="wc-sep"
+                  value={separator}
+                  onChange={(event) => setSeparator(event.target.value as SeparatorOption)}
+                >
+                  <option value=",">Comma</option>
+                  <option value=";">Semicolon</option>
+                  <option value=".">Period</option>
+                  <option value=" ">Space</option>
+                  <option value="custom">Custom</option>
+                </ToolSelect>
 
                 {separator === "custom" ? (
-                  <div className="wc-field">
-                    <label className="wc-field-label" htmlFor="wc-custom-sep">
-                      Custom
-                    </label>
-                    <input
-                      id="wc-custom-sep"
-                      type="text"
-                      maxLength={12}
-                      value={customSeparator}
-                      onChange={(event) => setCustomSeparator(event.target.value)}
-                    />
-                  </div>
+                  <ToolInput
+                    label="Custom"
+                    id="wc-custom-sep"
+                    type="text"
+                    maxLength={12}
+                    value={customSeparator}
+                    onChange={(event) => setCustomSeparator(event.target.value)}
+                  />
                 ) : null}
 
-                <label className="wc-check-row">
-                  <input
-                    type="checkbox"
-                    checked={addSpaces}
-                    onChange={(event) => setAddSpaces(event.target.checked)}
-                  />
-                  Add Spaces After Separators
-                </label>
+                <ToolCheck
+                  label="Add Spaces After Separators"
+                  checked={addSpaces}
+                  onChange={(event) => setAddSpaces(event.target.checked)}
+                />
               </div>
             ) : null}
           </div>
 
-          <button type="button" className="wc-btn wc-btn--secondary" onClick={() => void copyOutput()}>
-            Copy To Clipboard
-          </button>
+          <ToolActionRow>
+            <ToolButton onClick={() => void copyOutput()}>Copy To Clipboard</ToolButton>
+          </ToolActionRow>
         </div>
 
-        <p className="wc-meta">{outputMetaText}</p>
+        <ToolStatus live="off">{outputMetaText}</ToolStatus>
         <div className="wc-output-area" aria-live="polite">
           {outputText}
         </div>
-      </section>
-    </div>
+      </ToolPanel>
+    </ToolIsland>
   );
 }

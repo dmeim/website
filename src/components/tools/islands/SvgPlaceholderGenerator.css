@@ -1,103 +1,7 @@
-.sp-tool {
-  display: grid;
-  gap: var(--space-xl);
-  width: 100%;
-}
+@import "./toolIsland.css";
 
 .sp-tool__workspace {
-  display: grid;
-  gap: var(--space-lg);
   grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.9fr);
-  align-items: start;
-}
-
-.sp-panel {
-  display: grid;
-  gap: var(--space-lg);
-  padding: var(--space-xl);
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  background:
-    radial-gradient(
-      ellipse 80% 60% at 0% 0%,
-      var(--color-spot),
-      transparent 55%
-    ),
-    color-mix(in srgb, var(--color-surface) 88%, transparent);
-}
-
-.sp-panel h2 {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: clamp(1.35rem, 2.2vw, 1.65rem);
-  letter-spacing: -0.01em;
-}
-
-.sp-panel__heading {
-  display: grid;
-  gap: var(--space-2xs);
-}
-
-.sp-hint {
-  margin: 0;
-  max-width: none;
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--color-stone);
-}
-
-.sp-form-grid,
-.sp-output-grid {
-  display: grid;
-  gap: var(--space-md);
-  grid-template-columns: 1fr 1fr;
-}
-
-.sp-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.sp-field--full {
-  grid-column: 1 / -1;
-}
-
-.sp-field-label {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-gold);
-}
-
-.sp-field input[type="number"],
-.sp-field input[type="text"] {
-  width: 100%;
-  padding: 0.7rem 0;
-  border: none;
-  border-bottom: 1px solid var(--color-border);
-  border-radius: 0;
-  background: transparent;
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  font-size: 0.9375rem;
-  line-height: 1.4;
-  transition:
-    border-color var(--duration) var(--ease-out),
-    background-color var(--duration) var(--ease-out);
-}
-
-.sp-field input:hover {
-  border-bottom-color: color-mix(in srgb, var(--color-gold) 40%, var(--color-border));
-}
-
-.sp-field input:focus {
-  outline: none;
-  border-bottom-color: var(--color-gold);
-  background: color-mix(in srgb, var(--color-spot) 35%, transparent);
-  padding-inline: 0.5rem;
 }
 
 .sp-color-row {
@@ -125,73 +29,9 @@
   text-transform: uppercase;
 }
 
-.sp-check-row {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  font-size: 0.875rem;
-  color: var(--color-ink);
-  cursor: pointer;
-}
-
-.sp-check-row--inline {
+.sp-check-inline {
   align-self: end;
   padding-bottom: 0.7rem;
-}
-
-.sp-check-row input {
-  accent-color: var(--color-gold);
-}
-
-.sp-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-}
-
-.sp-btn {
-  padding: 0.85rem 1.35rem;
-  border: 1px solid var(--color-gold);
-  border-radius: var(--radius);
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    background var(--duration) var(--ease-out),
-    color var(--duration) var(--ease-out),
-    border-color var(--duration) var(--ease-out);
-}
-
-.sp-btn--primary {
-  background: var(--color-gold);
-  color: var(--color-night);
-}
-
-.sp-btn--primary:hover {
-  background: transparent;
-  color: var(--color-gold);
-}
-
-.sp-btn--secondary {
-  background: transparent;
-  color: var(--color-gold);
-}
-
-.sp-btn--secondary:hover {
-  background: color-mix(in srgb, var(--color-spot) 55%, transparent);
-}
-
-.sp-status {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--color-stone);
-}
-
-.sp-status--accent {
-  color: var(--color-gold);
 }
 
 .sp-preview-frame {
@@ -215,41 +55,12 @@
   box-shadow: 0 8px 28px color-mix(in srgb, var(--color-ground) 55%, transparent);
 }
 
-.sp-code-textarea {
-  width: 100%;
-  min-height: 8rem;
-  padding: var(--space-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--color-ground) 70%, transparent);
-  color: var(--color-stone);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.8125rem;
-  line-height: 1.55;
-  resize: vertical;
-}
-
-.sp-code-textarea:focus {
-  outline: 2px solid var(--color-gold);
-  outline-offset: 2px;
-}
-
-@media (max-width: 900px) {
-  .sp-tool__workspace {
-    grid-template-columns: 1fr;
-  }
+.sp-output-grid {
+  grid-template-columns: 1fr;
 }
 
 @media (max-width: 700px) {
-  .sp-panel {
-    padding: var(--space-lg);
-  }
-
-  .sp-form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .sp-check-row--inline {
+  .sp-check-inline {
     padding-bottom: 0;
   }
 }

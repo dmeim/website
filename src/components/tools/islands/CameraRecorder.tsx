@@ -1,5 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  ToolActionRow,
+  ToolButton,
+  ToolCheck,
+  ToolEmpty,
+  ToolFormGrid,
+  ToolHint,
+  ToolIsland,
+  ToolPanel,
+  ToolSectionHeading,
+  ToolStatus,
+  ToolWorkspace,
+} from "@/components/tools/ui";
 import { downloadUrl } from "@/lib/tools/download";
 import {
   CAMERA_ASPECT_RATIOS,
@@ -439,49 +452,45 @@ export default function CameraRecorder() {
 
   if (!isSupported) {
     return (
-      <div className="tool-island camera-island">
-        <section className="tool-panel" aria-live="polite">
-          <h2>Camera capture is unavailable</h2>
-          <p className="tool-status tool-status--error">
+      <ToolIsland className="camera-island" animate={false}>
+        <ToolPanel animate={false} aria-live="polite">
+          <ToolSectionHeading title="Camera capture is unavailable" />
+          <ToolStatus tone="error">
             Your browser does not expose the camera APIs needed for this tool.
-          </p>
-        </section>
-      </div>
+          </ToolStatus>
+        </ToolPanel>
+      </ToolIsland>
     );
   }
 
   if (needsSecureContext) {
     return (
-      <div className="tool-island camera-island">
-        <section className="tool-panel" aria-live="polite">
-          <h2>Secure context required</h2>
-          <p className="tool-status tool-status--error">
+      <ToolIsland className="camera-island" animate={false}>
+        <ToolPanel animate={false} aria-live="polite">
+          <ToolSectionHeading title="Secure context required" />
+          <ToolStatus tone="error">
             Camera APIs require HTTPS or localhost. Open this page over a secure origin.
-          </p>
-        </section>
-      </div>
+          </ToolStatus>
+        </ToolPanel>
+      </ToolIsland>
     );
   }
 
   return (
-    <div className="tool-island camera-island">
-      <div className="tool-workspace">
-        <section className="tool-panel" aria-labelledby="camera-settings-heading">
-          <div className="tool-section-heading">
-            <h2 id="camera-settings-heading">Camera Controls</h2>
-            <p
-              className={`tool-status${statusType ? ` tool-status--${statusType}` : ""}`}
-              aria-live="polite"
-            >
-              {statusMessage}
-            </p>
-          </div>
+    <ToolIsland className="camera-island">
+      <ToolWorkspace>
+        <ToolPanel labelledBy="camera-settings-heading">
+          <ToolSectionHeading
+            title="Camera Controls"
+            titleId="camera-settings-heading"
+            description={
+              <ToolStatus tone={statusType || "default"}>{statusMessage}</ToolStatus>
+            }
+          />
 
-          {permissionError && (
-            <p className="tool-status tool-status--error">{permissionError}</p>
-          )}
+          {permissionError ? <ToolStatus tone="error">{permissionError}</ToolStatus> : null}
 
-          <div className="tool-form-grid">
+          <ToolFormGrid>
             <div className="tool-field tool-field--full">
               <label htmlFor="camera-device">Video input</label>
               <select
@@ -532,15 +541,13 @@ export default function CameraRecorder() {
               </select>
             </div>
 
-            <label className="tool-check tool-check--full" htmlFor="camera-include-audio">
-              <input
-                id="camera-include-audio"
-                type="checkbox"
-                checked={includeAudio}
-                onChange={(event) => setIncludeAudio(event.target.checked)}
-              />
-              Include microphone audio in videos
-            </label>
+            <ToolCheck
+              id="camera-include-audio"
+              full
+              label="Include microphone audio in videos"
+              checked={includeAudio}
+              onChange={(event) => setIncludeAudio(event.target.checked)}
+            />
 
             {includeAudio && (
               <div className="tool-field tool-field--full">
@@ -560,50 +567,41 @@ export default function CameraRecorder() {
                 </select>
               </div>
             )}
-          </div>
+          </ToolFormGrid>
 
-          <div className="tool-actions">
+          <ToolActionRow>
             {!isCameraOn ? (
-              <button
-                type="button"
-                className="btn btn--primary"
-                onClick={() => void startCamera()}
-              >
+              <ToolButton variant="primary" onClick={() => void startCamera()}>
                 Start camera
-              </button>
+              </ToolButton>
             ) : (
-              <button type="button" className="btn" onClick={() => void startCamera()}>
-                Apply settings
-              </button>
+              <ToolButton onClick={() => void startCamera()}>Apply settings</ToolButton>
             )}
-            <button type="button" className="btn btn--ghost" onClick={() => void refreshDevices()}>
+            <ToolButton variant="ghost" onClick={() => void refreshDevices()}>
               Refresh devices
-            </button>
-            {isCameraOn && (
-              <button
-                type="button"
-                className="btn tool-btn--danger"
-                onClick={() => stopCamera()}
-              >
+            </ToolButton>
+            {isCameraOn ? (
+              <ToolButton variant="danger" onClick={() => stopCamera()}>
                 Stop camera
-              </button>
-            )}
-          </div>
+              </ToolButton>
+            ) : null}
+          </ToolActionRow>
 
-          <p className="tool-hint">
+          <ToolHint>
             Device labels usually appear after permission is granted. Resolution and aspect ratio
             are best-effort browser constraints; use Apply settings after changing them while the
             camera is on.
-          </p>
-        </section>
+          </ToolHint>
+        </ToolPanel>
 
-        <section className="tool-panel" aria-labelledby="camera-preview-heading">
-          <div className="tool-section-heading">
-            <h2 id="camera-preview-heading">Live Preview</h2>
-            <p className="tool-hint">
-              Use the controls below the preview to capture photos or videos.
-            </p>
-          </div>
+        <ToolPanel labelledBy="camera-preview-heading">
+          <ToolSectionHeading
+            title="Live Preview"
+            titleId="camera-preview-heading"
+            description={
+              <ToolHint>Use the controls below the preview to capture photos or videos.</ToolHint>
+            }
+          />
 
           <div className="camera-preview-frame">
             <video
@@ -614,58 +612,38 @@ export default function CameraRecorder() {
               hidden={!isCameraOn}
               style={{ transform: cameraTransform }}
             />
-            {!isCameraOn && (
-              <p className="tool-empty">Start the camera to see a live preview.</p>
-            )}
+            {!isCameraOn ? (
+              <ToolEmpty>Start the camera to see a live preview.</ToolEmpty>
+            ) : null}
           </div>
 
           <div className="camera-control-bar">
             <div className="camera-capture-controls">
-              <button
-                type="button"
-                className="btn btn--primary"
-                disabled={!isCameraOn}
-                onClick={takePhoto}
-              >
+              <ToolButton variant="primary" disabled={!isCameraOn} onClick={takePhoto}>
                 Take photo
-              </button>
+              </ToolButton>
 
               {isRecordingSupported ? (
                 <>
-                  {recordingState === "inactive" && (
-                    <button
-                      type="button"
-                      className="btn"
-                      disabled={!isCameraOn}
-                      onClick={startVideoRecording}
-                    >
+                  {recordingState === "inactive" ? (
+                    <ToolButton disabled={!isCameraOn} onClick={startVideoRecording}>
                       Start recording
-                    </button>
-                  )}
-                  {recordingState === "recording" && (
-                    <button type="button" className="btn" onClick={pauseRecording}>
-                      Pause
-                    </button>
-                  )}
-                  {recordingState === "paused" && (
-                    <button type="button" className="btn" onClick={resumeRecording}>
-                      Resume
-                    </button>
-                  )}
-                  {recordingState !== "inactive" && (
-                    <button
-                      type="button"
-                      className="btn tool-btn--danger"
-                      onClick={stopRecording}
-                    >
+                    </ToolButton>
+                  ) : null}
+                  {recordingState === "recording" ? (
+                    <ToolButton onClick={pauseRecording}>Pause</ToolButton>
+                  ) : null}
+                  {recordingState === "paused" ? (
+                    <ToolButton onClick={resumeRecording}>Resume</ToolButton>
+                  ) : null}
+                  {recordingState !== "inactive" ? (
+                    <ToolButton variant="danger" onClick={stopRecording}>
                       Stop recording
-                    </button>
-                  )}
+                    </ToolButton>
+                  ) : null}
                 </>
               ) : (
-                <p className="tool-status tool-status--error">
-                  Video recording is not supported in this browser.
-                </p>
+                <ToolStatus tone="error">Video recording is not supported in this browser.</ToolStatus>
               )}
             </div>
 
@@ -673,39 +651,39 @@ export default function CameraRecorder() {
               className="camera-orientation-controls"
               aria-label={`Camera orientation: ${cameraOrientationLabel}`}
             >
-              <button
-                type="button"
-                className={isMirrored ? "btn" : "btn btn--ghost"}
+              <ToolButton
+                variant={isMirrored ? "default" : "ghost"}
                 aria-pressed={isMirrored}
                 onClick={() => setIsMirrored((value) => !value)}
               >
                 {isMirrored ? "Mirror on" : "Mirror"}
-              </button>
-              <button
-                type="button"
-                className={isFlipped ? "btn" : "btn btn--ghost"}
+              </ToolButton>
+              <ToolButton
+                variant={isFlipped ? "default" : "ghost"}
                 aria-pressed={isFlipped}
                 onClick={() => setIsFlipped((value) => !value)}
               >
                 {isFlipped ? "Flip on" : "Flip"}
-              </button>
+              </ToolButton>
             </div>
           </div>
-        </section>
-      </div>
+        </ToolPanel>
+      </ToolWorkspace>
 
-      <section className="tool-panel" aria-labelledby="camera-gallery-heading">
-        <div className="tool-section-heading tool-section-heading--row">
-          <div>
-            <h2 id="camera-gallery-heading">Local Capture Gallery</h2>
-            <p className="tool-hint">{galleryHint}</p>
-          </div>
-          {captures.length > 0 && (
-            <button type="button" className="btn btn--ghost" onClick={clearCaptures}>
-              Clear all
-            </button>
-          )}
-        </div>
+      <ToolPanel labelledBy="camera-gallery-heading">
+        <ToolSectionHeading
+          title="Local Capture Gallery"
+          titleId="camera-gallery-heading"
+          row
+          description={<ToolHint>{galleryHint}</ToolHint>}
+          trailing={
+            captures.length > 0 ? (
+              <ToolButton variant="ghost" onClick={clearCaptures}>
+                Clear all
+              </ToolButton>
+            ) : null
+          }
+        />
 
         {captures.length > 0 ? (
           <div className="capture-gallery">
@@ -727,29 +705,19 @@ export default function CameraRecorder() {
                     <span>{capture.filename}</span>
                   </div>
                   <div className="capture-actions">
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => downloadCapture(capture)}
-                    >
-                      Download
-                    </button>
-                    <button
-                      type="button"
-                      className="btn tool-btn--danger"
-                      onClick={() => deleteCapture(capture)}
-                    >
+                    <ToolButton onClick={() => downloadCapture(capture)}>Download</ToolButton>
+                    <ToolButton variant="danger" onClick={() => deleteCapture(capture)}>
                       Delete
-                    </button>
+                    </ToolButton>
                   </div>
                 </div>
               </article>
             ))}
           </div>
         ) : (
-          <p className="tool-empty">No captures yet.</p>
+          <ToolEmpty>No captures yet.</ToolEmpty>
         )}
-      </section>
-    </div>
+      </ToolPanel>
+    </ToolIsland>
   );
 }

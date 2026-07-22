@@ -35,6 +35,13 @@
   gap: var(--space-xs);
 }
 
+.tool-section-heading__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
 .tool-section-heading--row {
   flex-direction: row;
   align-items: flex-start;
@@ -184,6 +191,65 @@
   accent-color: var(--color-gold);
 }
 
+.tool-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.9375rem;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.tool-toggle--full {
+  grid-column: 1 / -1;
+}
+
+.tool-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.tool-toggle__track {
+  position: relative;
+  width: 2.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  transition:
+    background-color var(--duration) var(--ease-out),
+    border-color var(--duration) var(--ease-out);
+}
+
+.tool-toggle__track::after {
+  content: "";
+  position: absolute;
+  top: 0.15rem;
+  left: 0.15rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  background: var(--color-stone);
+  transition: transform var(--duration) var(--ease-out), background-color var(--duration) var(--ease-out);
+}
+
+.tool-toggle input:checked + .tool-toggle__track {
+  border-color: var(--color-gold);
+  background: color-mix(in srgb, var(--color-gold) 22%, transparent);
+}
+
+.tool-toggle input:checked + .tool-toggle__track::after {
+  transform: translateX(0.95rem);
+  background: var(--color-gold);
+}
+
+.tool-toggle input:focus-visible + .tool-toggle__track {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
 .tool-actions {
   display: flex;
   flex-wrap: wrap;
@@ -220,6 +286,10 @@
 
 .tool-status--error {
   color: color-mix(in srgb, #c45c4a 80%, var(--color-ink));
+}
+
+.tool-status--accent {
+  color: var(--color-gold);
 }
 
 .tool-empty {

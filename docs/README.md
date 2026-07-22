@@ -12,6 +12,7 @@ Start here to understand the project and navigate the docs.
 8. 08-Backlog.md — Phased roadmap
 9. 09-SEO-and-Performance.md — SEO and perf practices
 10. 10-Content-and-Branding.md — Branding, content seeds, assets
+11. tools/AGENT_BRIEF.md — Checklist for porting it-tools onto the shared kit
 
 Related:
 

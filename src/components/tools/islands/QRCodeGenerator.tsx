@@ -1,5 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  ToolActionRow,
+  ToolButton,
+  ToolCheck,
+  ToolEmpty,
+  ToolField,
+  ToolFormGrid,
+  ToolHint,
+  ToolInput,
+  ToolIsland,
+  ToolNested,
+  ToolPanel,
+  ToolSectionHeading,
+  ToolSelect,
+  ToolStatus,
+  ToolTextarea,
+  ToolWorkspace,
+} from "@/components/tools/ui";
 import { copyTextToClipboard } from "@/lib/tools/clipboard";
 import { downloadDataUrl, downloadTextFile } from "@/lib/tools/download";
 import {
@@ -226,35 +244,36 @@ export default function QRCodeGenerator() {
   }
 
   return (
-    <div className="tool-island qr-island">
-      <div className="tool-workspace">
-        <section className="tool-panel" aria-labelledby="qr-settings-heading">
-          <div className="tool-section-heading">
-            <h2 id="qr-settings-heading">QR Content</h2>
-            <p className="tool-hint">
-              Choose a preset, fill in its fields, then audit the generated payload before
-              exporting.
-            </p>
-          </div>
+    <ToolIsland className="qr-island">
+      <ToolWorkspace>
+        <ToolPanel labelledBy="qr-settings-heading">
+          <ToolSectionHeading
+            title="QR Content"
+            titleId="qr-settings-heading"
+            description={
+              <ToolHint>
+                Choose a preset, fill in its fields, then audit the generated payload before
+                exporting.
+              </ToolHint>
+            }
+          />
 
-          <div className="tool-field tool-field--full">
-            <label htmlFor="qr-content-type">QR type</label>
-            <select
-              id="qr-content-type"
-              value={content.type}
-              onChange={(event) => updateContent("type", event.target.value as QrContentType)}
-            >
-              {QR_CONTENT_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <ToolSelect
+            label="QR type"
+            id="qr-content-type"
+            full
+            value={content.type}
+            onChange={(event) => updateContent("type", event.target.value as QrContentType)}
+          >
+            {QR_CONTENT_TYPES.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </ToolSelect>
 
           {content.type !== "text" && (
-            <div className="tool-nested">
-              <h3>Preset Options</h3>
+            <ToolNested title="Preset Options">
 
               {content.type === "website" && (
                 <div className="tool-form-grid">
@@ -431,15 +450,12 @@ export default function QRCodeGenerator() {
                       ))}
                     </select>
                   </div>
-                  <label className="tool-check" htmlFor="qr-wifi-hidden">
-                    <input
-                      id="qr-wifi-hidden"
-                      type="checkbox"
-                      checked={content.wifiHidden}
-                      onChange={(event) => updateContent("wifiHidden", event.target.checked)}
-                    />
-                    Hidden SSID
-                  </label>
+                  <ToolCheck
+                    id="qr-wifi-hidden"
+                    label="Hidden SSID"
+                    checked={content.wifiHidden}
+                    onChange={(event) => updateContent("wifiHidden", event.target.checked)}
+                  />
                   {content.wifiEncryption !== "nopass" && (
                     <div className="tool-field tool-field--full">
                       <label htmlFor="qr-wifi-password">Password</label>
@@ -504,17 +520,14 @@ export default function QRCodeGenerator() {
                           }
                         />
                       </div>
-                      <label className="tool-check" htmlFor="qr-wifi-eap-anonymous">
-                        <input
-                          id="qr-wifi-eap-anonymous"
-                          type="checkbox"
-                          checked={content.wifiEapAnonymousIdentity}
-                          onChange={(event) =>
-                            updateContent("wifiEapAnonymousIdentity", event.target.checked)
-                          }
-                        />
-                        Use anonymous identity
-                      </label>
+                      <ToolCheck
+                        id="qr-wifi-eap-anonymous"
+                        label="Use anonymous identity"
+                        checked={content.wifiEapAnonymousIdentity}
+                        onChange={(event) =>
+                          updateContent("wifiEapAnonymousIdentity", event.target.checked)
+                        }
+                      />
                     </>
                   )}
                 </div>
@@ -629,13 +642,14 @@ export default function QRCodeGenerator() {
                   </div>
                 </div>
               )}
-            </div>
+            </ToolNested>
           )}
 
-          <div className="tool-field tool-field--full">
-            <label htmlFor={showPayloadAsGenerated ? "qr-generated-payload" : "qr-text"}>
-              {showPayloadAsGenerated ? "Generated QR payload" : "Text"}
-            </label>
+          <ToolField
+            label={showPayloadAsGenerated ? "Generated QR payload" : "Text"}
+            htmlFor={showPayloadAsGenerated ? "qr-generated-payload" : "qr-text"}
+            full
+          >
             {showPayloadAsGenerated ? (
               <textarea
                 id="qr-generated-payload"
@@ -653,11 +667,10 @@ export default function QRCodeGenerator() {
                 onChange={(event) => updateContent("text", event.target.value)}
               />
             )}
-          </div>
+          </ToolField>
 
-          <div className="tool-nested">
-            <h3>Colors</h3>
-            <div className="tool-form-grid">
+          <ToolNested title="Colors">
+            <ToolFormGrid>
               <div className="tool-field">
                 <label htmlFor="qr-foreground">Foreground color</label>
                 <input
@@ -677,21 +690,18 @@ export default function QRCodeGenerator() {
                   onChange={(event) => setBackgroundColor(event.target.value)}
                 />
               </div>
-              <label className="tool-check tool-check--full" htmlFor="qr-transparent-background">
-                <input
-                  id="qr-transparent-background"
-                  type="checkbox"
-                  checked={transparentBackground}
-                  onChange={(event) => setTransparentBackground(event.target.checked)}
-                />
-                Transparent background for exports
-              </label>
-            </div>
-          </div>
+              <ToolCheck
+                id="qr-transparent-background"
+                full
+                label="Transparent background for exports"
+                checked={transparentBackground}
+                onChange={(event) => setTransparentBackground(event.target.checked)}
+              />
+            </ToolFormGrid>
+          </ToolNested>
 
-          <div className="tool-nested">
-            <h3>Export Options</h3>
-            <div className="tool-form-grid tool-form-grid--export">
+          <ToolNested title="Export Options">
+            <ToolFormGrid exportLayout>
               <div className="tool-field">
                 <label htmlFor="qr-error-correction">Error resistance</label>
                 <select
@@ -732,75 +742,61 @@ export default function QRCodeGenerator() {
                   onChange={(event) => setSize(Number(event.target.value))}
                 />
               </div>
-            </div>
-          </div>
+            </ToolFormGrid>
+          </ToolNested>
 
-          <div className="tool-actions">
-            <button
-              type="button"
-              className="btn btn--primary"
+          <ToolActionRow>
+            <ToolButton
+              variant="primary"
               disabled={!payloadResult.isValid}
               onClick={() => void copyPayload()}
             >
               Copy payload
-            </button>
-            <button
-              type="button"
-              className="btn"
-              disabled={!canExport}
-              onClick={() => void copySvg()}
-            >
+            </ToolButton>
+            <ToolButton disabled={!canExport} onClick={() => void copySvg()}>
               Copy SVG
-            </button>
-          </div>
+            </ToolButton>
+          </ToolActionRow>
 
-          {actionStatus && (
-            <p className="tool-status" aria-live="polite">
-              {actionStatus}
-            </p>
-          )}
-        </section>
+          {actionStatus ? <ToolStatus>{actionStatus}</ToolStatus> : null}
+        </ToolPanel>
 
-        <section className="tool-panel" aria-labelledby="qr-preview-heading">
-          <div className="tool-section-heading">
-            <h2 id="qr-preview-heading">Preview &amp; Export</h2>
-            <p
-              className={`tool-status${previewStatusType ? ` tool-status--${previewStatusType}` : ""}`}
-              aria-live="polite"
-            >
-              {previewStatus}
-            </p>
-          </div>
+        <ToolPanel labelledBy="qr-preview-heading">
+          <ToolSectionHeading
+            title="Preview & Export"
+            titleId="qr-preview-heading"
+            description={
+              <ToolStatus tone={previewStatusType || "default"}>{previewStatus}</ToolStatus>
+            }
+          />
 
           <div className="qr-preview">
             {qrPng ? (
               <img src={qrPng} alt="Generated QR code preview" />
             ) : (
-              <p className="tool-empty">Your QR code will appear here.</p>
+              <ToolEmpty>Your QR code will appear here.</ToolEmpty>
             )}
           </div>
 
-          <div className="tool-actions">
-            <button
-              type="button"
-              className="btn btn--primary"
-              disabled={!canExport}
-              onClick={downloadPng}
-            >
+          <ToolActionRow>
+            <ToolButton variant="primary" disabled={!canExport} onClick={downloadPng}>
               Download PNG
-            </button>
-            <button type="button" className="btn" disabled={!canExport} onClick={downloadSvg}>
+            </ToolButton>
+            <ToolButton disabled={!canExport} onClick={downloadSvg}>
               Download SVG
-            </button>
-          </div>
-        </section>
-      </div>
+            </ToolButton>
+          </ToolActionRow>
+        </ToolPanel>
+      </ToolWorkspace>
 
-      <section className="tool-panel" aria-labelledby="qr-svg-heading">
-        <div className="tool-section-heading">
-          <h2 id="qr-svg-heading">SVG Output</h2>
-          <p className="tool-hint">Useful for auditing, embedding, or copying into design files.</p>
-        </div>
+      <ToolPanel labelledBy="qr-svg-heading">
+        <ToolSectionHeading
+          title="SVG Output"
+          titleId="qr-svg-heading"
+          description={
+            <ToolHint>Useful for auditing, embedding, or copying into design files.</ToolHint>
+          }
+        />
         <textarea
           className="tool-code"
           readOnly
@@ -808,7 +804,7 @@ export default function QRCodeGenerator() {
           value={qrSvg || "Generate a QR code to see SVG output."}
           aria-label="Generated SVG markup"
         />
-      </section>
-    </div>
+      </ToolPanel>
+    </ToolIsland>
   );
 }
