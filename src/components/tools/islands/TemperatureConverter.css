@@ -1,0 +1,45 @@
+/* Temperature converter — linked scale rows */
+
+@import "./toolIsland.css";
+
+.temp-tool__panel {
+  max-width: 28rem;
+}
+
+.temp-list {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.temp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.75rem;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.temp-row__input {
+  font-variant-numeric: tabular-nums;
+}
+
+.temp-row__unit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0 var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 4px);
+  background: color-mix(in srgb, var(--color-surface) 88%, var(--color-border));
+  color: var(--color-muted, var(--color-text-muted));
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .temp-row {
+    grid-template-columns: minmax(0, 1fr) 2.5rem;
+    gap: var(--space-xs);
+  }
+}
