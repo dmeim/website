@@ -1,0 +1,15 @@
+/* List converter — panel width chrome */
+
+@import "./toolIsland.css";
+
+.lc-tool__panel {
+  max-width: 42rem;
+}
+
+.lc-toggles {
+  align-items: center;
+}
+
+.lc-output {
+  word-break: break-word;
+}
