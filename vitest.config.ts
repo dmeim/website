@@ -11,5 +11,11 @@ export default defineConfig({
     environment: "node",
     include: ["src/lib/tools/**/*.service.test.ts"],
     globals: false,
+    server: {
+      deps: {
+        // iarna-toml-esm ships ESM sources inside a CommonJS package
+        inline: ["iarna-toml-esm"],
+      },
+    },
   },
 });
