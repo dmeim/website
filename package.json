@@ -34,6 +34,7 @@
     "diff": "^9.0.0",
     "email-normalizer": "^1.0.0",
     "emojilib": "^3.0.12",
+    "figlet": "^1.11.3",
     "framer-motion": "^12.42.2",
     "fuse.js": "^6.6.2",
     "iarna-toml-esm": "^3.0.5",
@@ -60,6 +61,7 @@
   "devDependencies": {
     "@astrojs/react": "^6.0.1",
     "@types/crypto-js": "^4.2.2",
+    "@types/figlet": "^1.7.0",
     "@types/markdown-it": "^13.0.9",
     "@types/mime-db": "^1.43.5",
     "@types/netmask": "^2.0.6",

@@ -33,3 +33,4 @@ export { default as StringObfuscator } from "./StringObfuscator";
 export { default as LoremIpsumGenerator } from "./LoremIpsumGenerator";
 export { default as TextDiff } from "./TextDiff";
 export { default as EmojiPicker } from "./EmojiPicker";
+export { default as AsciiTextDrawer } from "./AsciiTextDrawer";

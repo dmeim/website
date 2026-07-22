@@ -1,0 +1,19 @@
+/* ASCII text drawer — monospace preview chrome */
+
+@import "./toolIsland.css";
+
+.ascii-drawer-tool__panel {
+  max-width: 42rem;
+}
+
+.ascii-drawer-settings {
+  align-items: end;
+}
+
+.ascii-drawer-output {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  white-space: pre;
+  overflow-x: auto;
+}

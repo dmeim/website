@@ -85,6 +85,7 @@ import StringObfuscator from "../../components/tools/islands/StringObfuscator";
 import LoremIpsumGenerator from "../../components/tools/islands/LoremIpsumGenerator";
 import TextDiff from "../../components/tools/islands/TextDiff";
 import EmojiPicker from "../../components/tools/islands/EmojiPicker";
+import AsciiTextDrawer from "../../components/tools/islands/AsciiTextDrawer";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -450,6 +451,10 @@ const slug = tool.id;
           ) : slug === "emoji-picker" ? (
             <div class="tool-mount" data-tool={slug}>
               <EmojiPicker client:load />
+            </div>
+          ) : slug === "ascii-text-drawer" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <AsciiTextDrawer client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
