@@ -20,6 +20,7 @@ import PdfSignatureChecker from "../../components/tools/islands/PdfSignatureChec
 import TextToNatoAlphabet from "../../components/tools/islands/TextToNatoAlphabet";
 import TextToBinary from "../../components/tools/islands/TextToBinary";
 import TextToUnicode from "../../components/tools/islands/TextToUnicode";
+import RomanNumeralConverter from "../../components/tools/islands/RomanNumeralConverter";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -124,6 +125,10 @@ const slug = tool.id;
           ) : slug === "text-to-unicode" ? (
             <div class="tool-mount" data-tool={slug}>
               <TextToUnicode client:load />
+            </div>
+          ) : slug === "roman-numeral-converter" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <RomanNumeralConverter client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

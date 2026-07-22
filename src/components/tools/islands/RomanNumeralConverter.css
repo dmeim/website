@@ -1,0 +1,29 @@
+/* Roman numeral converter — dual-panel workspace */
+
+@import "./toolIsland.css";
+
+.rnc-tool__workspace {
+  align-items: stretch;
+}
+
+.rnc-result {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-sm) 0;
+}
+
+.rnc-result__label {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.rnc-result__value {
+  display: block;
+  font-size: 1.375rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  color: var(--color-ink);
+  word-break: break-word;
+}
