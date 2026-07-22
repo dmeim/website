@@ -14,6 +14,7 @@ import UlidGenerator from "../../components/tools/islands/UlidGenerator";
 import PasswordStrengthAnalyser from "../../components/tools/islands/PasswordStrengthAnalyser";
 import HmacGenerator from "../../components/tools/islands/HmacGenerator";
 import Encryption from "../../components/tools/islands/Encryption";
+import Bip39Generator from "../../components/tools/islands/Bip39Generator";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -93,6 +94,10 @@ const slug = tool.id;
           ) : slug === "encryption" ? (
             <div class="tool-mount" data-tool={slug}>
               <Encryption client:load />
+            </div>
+          ) : slug === "bip39-generator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <Bip39Generator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

@@ -10,3 +10,4 @@ export { default as UlidGenerator } from "./UlidGenerator";
 export { default as PasswordStrengthAnalyser } from "./PasswordStrengthAnalyser";
 export { default as HmacGenerator } from "./HmacGenerator";
 export { default as Encryption } from "./Encryption";
+export { default as Bip39Generator } from "./Bip39Generator";

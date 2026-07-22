@@ -1,0 +1,16 @@
+/* BIP39 generator — panel width + monospace entropy / mnemonic wrap */
+
+@import "./toolIsland.css";
+
+.bip39-tool__panel {
+  max-width: 42rem;
+}
+
+.bip39-tool__entropy,
+.bip39-tool__mnemonic {
+  word-break: break-word;
+}
+
+.bip39-tool__mnemonic {
+  resize: vertical;
+}
