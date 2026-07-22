@@ -44,6 +44,7 @@ import DeviceInformation from "../../components/tools/islands/DeviceInformation"
 import BasicAuthGenerator from "../../components/tools/islands/BasicAuthGenerator";
 import OgMetaGenerator from "../../components/tools/islands/OgMetaGenerator";
 import OtpGenerator from "../../components/tools/islands/OtpGenerator";
+import MimeTypes from "../../components/tools/islands/MimeTypes";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -245,6 +246,10 @@ const slug = tool.id;
           ) : slug === "otp-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <OtpGenerator client:load />
+            </div>
+          ) : slug === "mime-types" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <MimeTypes client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
