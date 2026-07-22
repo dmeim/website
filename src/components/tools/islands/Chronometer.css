@@ -1,0 +1,23 @@
+/* Chronometer — large monospace elapsed display */
+
+@import "./toolIsland.css";
+
+.chrono-tool__panel {
+  max-width: 28rem;
+}
+
+.chrono-duration {
+  margin: var(--space-md) 0;
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: clamp(2rem, 8vw, 2.5rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--color-ink);
+  line-height: 1.2;
+}
+
+.chrono-actions {
+  justify-content: center;
+}

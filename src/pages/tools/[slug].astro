@@ -77,6 +77,7 @@ import PercentageCalculator from "../../components/tools/islands/PercentageCalcu
 import EtaCalculator from "../../components/tools/islands/EtaCalculator";
 import MathEvaluator from "../../components/tools/islands/MathEvaluator";
 import TemperatureConverter from "../../components/tools/islands/TemperatureConverter";
+import Chronometer from "../../components/tools/islands/Chronometer";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -410,6 +411,10 @@ const slug = tool.id;
           ) : slug === "temperature-converter" ? (
             <div class="tool-mount" data-tool={slug}>
               <TemperatureConverter client:load />
+            </div>
+          ) : slug === "chronometer" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <Chronometer client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
