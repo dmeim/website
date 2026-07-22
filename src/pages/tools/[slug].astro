@@ -71,6 +71,7 @@ import Ipv4SubnetCalculator from "../../components/tools/islands/Ipv4SubnetCalcu
 import Ipv4AddressConverter from "../../components/tools/islands/Ipv4AddressConverter";
 import Ipv4RangeExpander from "../../components/tools/islands/Ipv4RangeExpander";
 import MacAddressGenerator from "../../components/tools/islands/MacAddressGenerator";
+import Ipv6UlaGenerator from "../../components/tools/islands/Ipv6UlaGenerator";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -380,6 +381,10 @@ const slug = tool.id;
           ) : slug === "mac-address-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <MacAddressGenerator client:load />
+            </div>
+          ) : slug === "ipv6-ula-generator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <Ipv6UlaGenerator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
