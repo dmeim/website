@@ -1,0 +1,13 @@
+/* YAML to TOML — single-panel live transform */
+
+@import "./toolIsland.css";
+
+.y2t-tool__panel {
+  max-width: 48rem;
+}
+
+.y2t-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}
