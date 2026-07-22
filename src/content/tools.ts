@@ -404,10 +404,12 @@ export const toolsCatalogue: ToolsCatalogue = {
           id: "json-to-xml",
           title: "JSON to XML",
           description: "Convert JSON to XML",
-          status: "planned",
+          status: "available",
+          route: "/tools/json-to-xml",
           sourcePath: "/json-to-xml",
           sourceUrl: "https://it-tools.tech/json-to-xml",
         },
+
         {
           id: "markdown-to-html",
           title: "Markdown to HTML",

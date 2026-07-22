@@ -35,7 +35,9 @@ import TomlToJson from "../../components/tools/islands/TomlToJson";
 import TomlToYaml from "../../components/tools/islands/TomlToYaml";
 import YamlToToml from "../../components/tools/islands/YamlToToml";
 import XmlToJson from "../../components/tools/islands/XmlToJson";
+import JsonToXml from "../../components/tools/islands/JsonToXml";
 import { availableTools, type Tool } from "../../content/tools";
+
 
 export function getStaticPaths() {
   return availableTools().map((tool) => ({
@@ -199,6 +201,10 @@ const slug = tool.id;
           ) : slug === "xml-to-json" ? (
             <div class="tool-mount" data-tool={slug}>
               <XmlToJson client:load />
+            </div>
+          ) : slug === "json-to-xml" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <JsonToXml client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
