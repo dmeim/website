@@ -1,0 +1,13 @@
+/* JSON to YAML converter — single-panel live transform */
+
+@import "./toolIsland.css";
+
+.j2y-tool__panel {
+  max-width: 48rem;
+}
+
+.j2y-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}
