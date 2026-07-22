@@ -1,0 +1,70 @@
+/* IPv4 address converter — labeled conversion table */
+
+@import "./toolIsland.css";
+
+.ipv4ac-tool__panel {
+  max-width: 48rem;
+}
+
+.ipv4ac-table-wrap {
+  overflow-x: auto;
+  margin-top: var(--space-sm);
+}
+
+.ipv4ac-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+}
+
+.ipv4ac-table th,
+.ipv4ac-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-stone) 28%, transparent);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ipv4ac-table__label {
+  width: 28%;
+  font-weight: 600;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.ipv4ac-table__value {
+  min-width: 0;
+}
+
+.ipv4ac-value-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.ipv4ac-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-ink);
+}
+
+.ipv4ac-fallback {
+  color: color-mix(in srgb, var(--color-stone) 85%, var(--color-ink));
+  font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .ipv4ac-table__label {
+    white-space: normal;
+    width: 36%;
+  }
+
+  .ipv4ac-value-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+}
