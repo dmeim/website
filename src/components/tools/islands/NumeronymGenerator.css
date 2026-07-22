@@ -1,0 +1,12 @@
+/* Numeronym generator — compact single-panel chrome */
+
+@import "./toolIsland.css";
+
+.numeronym-tool__panel {
+  max-width: 42rem;
+}
+
+.numeronym-output {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.02em;
+}
