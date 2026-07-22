@@ -5,3 +5,4 @@ export { default as CameraRecorder } from "./CameraRecorder";
 export { default as TokenGenerator } from "./TokenGenerator";
 export { default as HashText } from "./HashText";
 export { default as Bcrypt } from "./Bcrypt";
+export { default as UuidGenerator } from "./UuidGenerator";
