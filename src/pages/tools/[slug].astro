@@ -54,6 +54,7 @@ import HttpStatusCodes from "../../components/tools/islands/HttpStatusCodes";
 import JsonDiff from "../../components/tools/islands/JsonDiff";
 import SafelinkDecoder from "../../components/tools/islands/SafelinkDecoder";
 import GitMemo from "../../components/tools/islands/GitMemo";
+import RandomPortGenerator from "../../components/tools/islands/RandomPortGenerator";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -295,6 +296,10 @@ const slug = tool.id;
           ) : slug === "git-memo" ? (
             <div class="tool-mount" data-tool={slug}>
               <GitMemo client:load />
+            </div>
+          ) : slug === "random-port-generator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <RandomPortGenerator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
