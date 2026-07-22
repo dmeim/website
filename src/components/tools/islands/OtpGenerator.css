@@ -1,0 +1,161 @@
+/* OTP generator — token strip, progress, and QR chrome */
+
+@import "./toolIsland.css";
+
+.otp-tool__workspace {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.otp-tool__panel {
+  max-width: none;
+}
+
+.otp-secret-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.otp-refresh {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.otp-tokens {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.otp-tokens__labels {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.otp-tokens__labels span:nth-child(1) {
+  text-align: left;
+}
+
+.otp-tokens__labels span:nth-child(2) {
+  text-align: center;
+}
+
+.otp-tokens__labels span:nth-child(3) {
+  text-align: right;
+}
+
+.otp-tokens__row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+}
+
+.otp-token {
+  appearance: none;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  color: var(--color-ink);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9375rem;
+  line-height: 1;
+  padding: 0.9rem 0.5rem;
+  cursor: pointer;
+  transition:
+    background 160ms var(--ease-out, ease),
+    border-color 160ms var(--ease-out, ease);
+}
+
+.otp-token:hover,
+.otp-token:focus-visible {
+  background: color-mix(in srgb, var(--color-gold) 12%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-gold) 45%, var(--color-border));
+  outline: none;
+}
+
+.otp-token--side:first-child {
+  border-radius: 2px 0 0 2px;
+}
+
+.otp-token--side:last-child {
+  border-radius: 0 2px 2px 0;
+  border-left: none;
+}
+
+.otp-token--current {
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.otp-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.otp-progress__track {
+  height: 4px;
+  width: 100%;
+  background: color-mix(in srgb, var(--color-border) 80%, transparent);
+  overflow: hidden;
+}
+
+.otp-progress__fill {
+  height: 100%;
+  background: var(--color-gold);
+  transition: width 80ms linear;
+}
+
+.otp-progress__label {
+  margin: 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-stone);
+  font-variant-numeric: tabular-nums;
+}
+
+.otp-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.otp-qr__image {
+  display: block;
+  width: 210px;
+  height: 210px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+}
+
+.otp-qr__placeholder {
+  display: grid;
+  place-items: center;
+  width: 210px;
+  height: 210px;
+  border: 1px dashed var(--color-border);
+  color: var(--color-stone);
+  font-size: 0.8125rem;
+  text-align: center;
+  padding: var(--space-md);
+}
+
+@media (max-width: 860px) {
+  .otp-tool__workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .otp-secret-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
