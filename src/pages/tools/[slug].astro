@@ -39,6 +39,7 @@ import JsonToXml from "../../components/tools/islands/JsonToXml";
 import MarkdownToHtml from "../../components/tools/islands/MarkdownToHtml";
 import UrlEncoder from "../../components/tools/islands/UrlEncoder";
 import HtmlEntities from "../../components/tools/islands/HtmlEntities";
+import UrlParser from "../../components/tools/islands/UrlParser";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -220,6 +221,10 @@ const slug = tool.id;
           ) : slug === "html-entities" ? (
             <div class="tool-mount" data-tool={slug}>
               <HtmlEntities client:load />
+            </div>
+          ) : slug === "url-parser" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <UrlParser client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
