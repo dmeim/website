@@ -14,3 +14,4 @@ export { default as Bip39Generator } from "./Bip39Generator";
 export { default as RsaKeyPairGenerator } from "./RsaKeyPairGenerator";
 export { default as PdfSignatureChecker } from "./PdfSignatureChecker";
 export { default as TextToNatoAlphabet } from "./TextToNatoAlphabet";
+export { default as TextToUnicode } from "./TextToUnicode";

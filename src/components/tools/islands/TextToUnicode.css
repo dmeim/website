@@ -1,0 +1,12 @@
+/* Text to Unicode — dual-panel workspace */
+
+@import "./toolIsland.css";
+
+.ttu-tool__workspace {
+  align-items: stretch;
+}
+
+.ttu-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

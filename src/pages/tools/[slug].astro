@@ -18,6 +18,7 @@ import Bip39Generator from "../../components/tools/islands/Bip39Generator";
 import RsaKeyPairGenerator from "../../components/tools/islands/RsaKeyPairGenerator";
 import PdfSignatureChecker from "../../components/tools/islands/PdfSignatureChecker";
 import TextToNatoAlphabet from "../../components/tools/islands/TextToNatoAlphabet";
+import TextToUnicode from "../../components/tools/islands/TextToUnicode";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -114,6 +115,10 @@ const slug = tool.id;
           ) : slug === "text-to-nato-alphabet" ? (
             <div class="tool-mount" data-tool={slug}>
               <TextToNatoAlphabet client:load />
+            </div>
+          ) : slug === "text-to-unicode" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <TextToUnicode client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
