@@ -918,9 +918,10 @@ export const toolsCatalogue: ToolsCatalogue = {
       tools: [
         {
           id: "phone-parser-and-formatter",
-          title: "Phone parser and formatter",
+          title: "Phone Parser",
           description: "Parse, validate and format phone numbers. Get information about the phone number, like the country code, type, etc.",
-          status: "planned",
+          status: "available",
+          route: "/tools/phone-parser-and-formatter",
           sourcePath: "/phone-parser-and-formatter",
           sourceUrl: "https://it-tools.tech/phone-parser-and-formatter",
         },

@@ -87,6 +87,7 @@ import TextDiff from "../../components/tools/islands/TextDiff";
 import EmojiPicker from "../../components/tools/islands/EmojiPicker";
 import AsciiTextDrawer from "../../components/tools/islands/AsciiTextDrawer";
 import IbanValidatorAndParser from "../../components/tools/islands/IbanValidatorAndParser";
+import PhoneParserAndFormatter from "../../components/tools/islands/PhoneParserAndFormatter";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -460,6 +461,10 @@ const slug = tool.id;
           ) : slug === "iban-validator-and-parser" ? (
             <div class="tool-mount" data-tool={slug}>
               <IbanValidatorAndParser client:load />
+            </div>
+          ) : slug === "phone-parser-and-formatter" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <PhoneParserAndFormatter client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

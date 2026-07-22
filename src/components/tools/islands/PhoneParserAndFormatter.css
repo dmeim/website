@@ -1,0 +1,69 @@
+/* Phone parser — result rows */
+
+@import "./toolIsland.css";
+
+.phone-tool__panel {
+  max-width: 48rem;
+}
+
+.phone-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--color-border);
+}
+
+.phone-row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 13rem) minmax(0, 1fr);
+  gap: var(--space-sm);
+  align-items: start;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.phone-row:last-child {
+  border-bottom: none;
+}
+
+.phone-row__label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-stone);
+  padding-top: 0.15rem;
+}
+
+.phone-row__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+  min-width: 0;
+}
+
+.phone-row__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  word-break: break-word;
+  color: var(--color-ink);
+}
+
+.phone-row__value--unknown {
+  font-family: var(--font-sans);
+  opacity: 0.7;
+}
+
+.phone-row__actions {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  .phone-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+}
