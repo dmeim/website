@@ -1,0 +1,12 @@
+/* Slugify string — compact single-panel chrome */
+
+@import "./toolIsland.css";
+
+.slugify-tool__panel {
+  max-width: 42rem;
+}
+
+.slugify-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
