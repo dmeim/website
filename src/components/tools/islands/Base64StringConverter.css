@@ -1,0 +1,12 @@
+/* Base64 string converter — dual-panel workspace */
+
+@import "./toolIsland.css";
+
+.b64s-tool__workspace {
+  align-items: stretch;
+}
+
+.b64s-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

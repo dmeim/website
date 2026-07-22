@@ -23,6 +23,7 @@ import TextToUnicode from "../../components/tools/islands/TextToUnicode";
 import RomanNumeralConverter from "../../components/tools/islands/RomanNumeralConverter";
 import BaseConverter from "../../components/tools/islands/BaseConverter";
 import ListConverter from "../../components/tools/islands/ListConverter";
+import Base64StringConverter from "../../components/tools/islands/Base64StringConverter";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -139,6 +140,10 @@ const slug = tool.id;
           ) : slug === "list-converter" ? (
             <div class="tool-mount" data-tool={slug}>
               <ListConverter client:load />
+            </div>
+          ) : slug === "base64-string-converter" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <Base64StringConverter client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
