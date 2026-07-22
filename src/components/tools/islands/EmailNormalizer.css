@@ -1,0 +1,12 @@
+/* Email normalizer — compact single-panel chrome */
+
+@import "./toolIsland.css";
+
+.en-tool__panel {
+  max-width: 42rem;
+}
+
+.en-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

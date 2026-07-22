@@ -64,6 +64,7 @@ import ChmodCalculator from "../../components/tools/islands/ChmodCalculator";
 import DockerRunToDockerComposeConverter from "../../components/tools/islands/DockerRunToDockerComposeConverter";
 import XmlFormatter from "../../components/tools/islands/XmlFormatter";
 import YamlPrettify from "../../components/tools/islands/YamlPrettify";
+import EmailNormalizer from "../../components/tools/islands/EmailNormalizer";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -345,6 +346,10 @@ const slug = tool.id;
           ) : slug === "yaml-prettify" ? (
             <div class="tool-mount" data-tool={slug}>
               <YamlPrettify client:load />
+            </div>
+          ) : slug === "email-normalizer" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <EmailNormalizer client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
