@@ -75,6 +75,7 @@ import MacAddressGenerator from "../../components/tools/islands/MacAddressGenera
 import Ipv6UlaGenerator from "../../components/tools/islands/Ipv6UlaGenerator";
 import PercentageCalculator from "../../components/tools/islands/PercentageCalculator";
 import EtaCalculator from "../../components/tools/islands/EtaCalculator";
+import MathEvaluator from "../../components/tools/islands/MathEvaluator";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -400,6 +401,10 @@ const slug = tool.id;
           ) : slug === "eta-calculator" ? (
             <div class="tool-mount" data-tool={slug}>
               <EtaCalculator client:load />
+            </div>
+          ) : slug === "math-evaluator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <MathEvaluator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

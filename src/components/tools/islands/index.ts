@@ -23,3 +23,4 @@ export { default as MacAddressGenerator } from "./MacAddressGenerator";
 export { default as Ipv6UlaGenerator } from "./Ipv6UlaGenerator";
 export { default as PercentageCalculator } from "./PercentageCalculator";
 export { default as EtaCalculator } from "./EtaCalculator";
+export { default as MathEvaluator } from "./MathEvaluator";
