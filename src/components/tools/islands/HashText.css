@@ -1,0 +1,62 @@
+/* Hash text — compact digest list chrome */
+
+@import "./toolIsland.css";
+
+.ht-tool__panel {
+  max-width: 42rem;
+}
+
+.ht-digests {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.ht-digest {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.ht-digest__algo {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-stone);
+}
+
+.ht-digest .tool-field {
+  gap: 0;
+}
+
+.ht-digest .tool-field label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ht-digest__value {
+  word-break: break-all;
+  min-height: 2.75rem;
+  resize: vertical;
+}
+
+@media (max-width: 640px) {
+  .ht-digest {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+    align-items: stretch;
+  }
+
+  .ht-digest__actions {
+    justify-content: flex-start;
+  }
+}

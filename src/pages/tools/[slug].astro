@@ -7,6 +7,7 @@ import QRCodeGenerator from "../../components/tools/islands/QRCodeGenerator";
 import SvgPlaceholderGenerator from "../../components/tools/islands/SvgPlaceholderGenerator";
 import CameraRecorder from "../../components/tools/islands/CameraRecorder";
 import TokenGenerator from "../../components/tools/islands/TokenGenerator";
+import HashText from "../../components/tools/islands/HashText";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -58,6 +59,10 @@ const slug = tool.id;
           ) : slug === "token-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <TokenGenerator client:load />
+            </div>
+          ) : slug === "hash-text" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <HashText client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
