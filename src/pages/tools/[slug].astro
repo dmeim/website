@@ -78,6 +78,7 @@ import EtaCalculator from "../../components/tools/islands/EtaCalculator";
 import MathEvaluator from "../../components/tools/islands/MathEvaluator";
 import TemperatureConverter from "../../components/tools/islands/TemperatureConverter";
 import Chronometer from "../../components/tools/islands/Chronometer";
+import BenchmarkBuilder from "../../components/tools/islands/BenchmarkBuilder";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -415,6 +416,10 @@ const slug = tool.id;
           ) : slug === "chronometer" ? (
             <div class="tool-mount" data-tool={slug}>
               <Chronometer client:load />
+            </div>
+          ) : slug === "benchmark-builder" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <BenchmarkBuilder client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

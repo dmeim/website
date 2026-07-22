@@ -26,3 +26,4 @@ export { default as EtaCalculator } from "./EtaCalculator";
 export { default as MathEvaluator } from "./MathEvaluator";
 export { default as TemperatureConverter } from "./TemperatureConverter";
 export { default as Chronometer } from "./Chronometer";
+export { default as BenchmarkBuilder } from "./BenchmarkBuilder";

@@ -1,0 +1,119 @@
+/* Benchmark builder — suite cards + ranked results table */
+
+@import "./toolIsland.css";
+
+.bb-tool {
+  gap: var(--space-lg);
+}
+
+.bb-suites {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-md);
+  overflow-x: auto;
+  padding-bottom: var(--space-xs);
+  scroll-snap-type: x proximity;
+}
+
+.bb-suite {
+  flex: 0 0 min(18.5rem, 85vw);
+  scroll-snap-align: start;
+  max-width: 20rem;
+}
+
+.bb-suite__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.bb-measures {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.bb-measure-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.bb-measure-row__field {
+  flex: 1;
+  min-width: 0;
+}
+
+.bb-measure-row__delete {
+  flex-shrink: 0;
+  margin-bottom: 0.1rem;
+}
+
+.bb-suite__actions {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.bb-results-workspace {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.bb-results {
+  max-width: 40rem;
+  width: 100%;
+  justify-self: center;
+}
+
+.bb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-md);
+}
+
+.bb-unit-field {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.bb-table-wrap {
+  overflow-x: auto;
+  margin-top: var(--space-sm);
+}
+
+.bb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+}
+
+.bb-table th,
+.bb-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-stone) 28%, transparent);
+  text-align: left;
+  vertical-align: top;
+}
+
+.bb-table th {
+  font-weight: 600;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.bb-table td {
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  .bb-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
