@@ -51,6 +51,7 @@ import SlugifyString from "../../components/tools/islands/SlugifyString";
 import HtmlWysiwygEditor from "../../components/tools/islands/HtmlWysiwygEditor";
 import UserAgentParser from "../../components/tools/islands/UserAgentParser";
 import HttpStatusCodes from "../../components/tools/islands/HttpStatusCodes";
+import JsonDiff from "../../components/tools/islands/JsonDiff";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -280,6 +281,10 @@ const slug = tool.id;
           ) : slug === "http-status-codes" ? (
             <div class="tool-mount" data-tool={slug}>
               <HttpStatusCodes client:load />
+            </div>
+          ) : slug === "json-diff" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <JsonDiff client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
