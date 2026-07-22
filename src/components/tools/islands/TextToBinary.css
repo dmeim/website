@@ -1,0 +1,12 @@
+/* Text to ASCII binary — dual-panel workspace */
+
+@import "./toolIsland.css";
+
+.ttb-tool__workspace {
+  align-items: stretch;
+}
+
+.ttb-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
