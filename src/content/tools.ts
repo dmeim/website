@@ -160,9 +160,11 @@ export const toolsCatalogue: ToolsCatalogue = {
         },
         {
           id: "hmac-generator",
-          title: "Hmac generator",
+          title: "HMAC generator",
           description: "Computes a hash-based message authentication code (HMAC) using a secret key and your favorite hashing function.",
-          status: "planned",
+          status: "available",
+          route: "/tools/hmac-generator",
+          tags: ["hmac", "hash", "MD5", "SHA", "secret", "MAC", "crypto"],
           sourcePath: "/hmac-generator",
           sourceUrl: "https://it-tools.tech/hmac-generator",
         },

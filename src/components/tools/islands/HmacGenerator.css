@@ -1,0 +1,12 @@
+/* HMAC generator — panel width + digest wrap */
+
+@import "./toolIsland.css";
+
+.hmac-tool__panel {
+  max-width: 42rem;
+}
+
+.hmac-tool__output {
+  word-break: break-all;
+  resize: vertical;
+}

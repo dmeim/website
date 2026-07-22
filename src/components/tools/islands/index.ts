@@ -8,3 +8,4 @@ export { default as Bcrypt } from "./Bcrypt";
 export { default as UuidGenerator } from "./UuidGenerator";
 export { default as UlidGenerator } from "./UlidGenerator";
 export { default as PasswordStrengthAnalyser } from "./PasswordStrengthAnalyser";
+export { default as HmacGenerator } from "./HmacGenerator";

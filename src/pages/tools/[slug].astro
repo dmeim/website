@@ -12,6 +12,7 @@ import Bcrypt from "../../components/tools/islands/Bcrypt";
 import UuidGenerator from "../../components/tools/islands/UuidGenerator";
 import UlidGenerator from "../../components/tools/islands/UlidGenerator";
 import PasswordStrengthAnalyser from "../../components/tools/islands/PasswordStrengthAnalyser";
+import HmacGenerator from "../../components/tools/islands/HmacGenerator";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -83,6 +84,10 @@ const slug = tool.id;
           ) : slug === "password-strength-analyser" ? (
             <div class="tool-mount" data-tool={slug}>
               <PasswordStrengthAnalyser client:load />
+            </div>
+          ) : slug === "hmac-generator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <HmacGenerator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
