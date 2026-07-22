@@ -38,6 +38,7 @@
     "framer-motion": "^12.42.2",
     "fuse.js": "^6.6.2",
     "iarna-toml-esm": "^3.0.5",
+    "ibantools": "^4.5.4",
     "json5": "^2.2.3",
     "lucide": "^1.25.0",
     "markdown-it": "^14.3.0",

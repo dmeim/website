@@ -86,6 +86,7 @@ import LoremIpsumGenerator from "../../components/tools/islands/LoremIpsumGenera
 import TextDiff from "../../components/tools/islands/TextDiff";
 import EmojiPicker from "../../components/tools/islands/EmojiPicker";
 import AsciiTextDrawer from "../../components/tools/islands/AsciiTextDrawer";
+import IbanValidatorAndParser from "../../components/tools/islands/IbanValidatorAndParser";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -455,6 +456,10 @@ const slug = tool.id;
           ) : slug === "ascii-text-drawer" ? (
             <div class="tool-mount" data-tool={slug}>
               <AsciiTextDrawer client:load />
+            </div>
+          ) : slug === "iban-validator-and-parser" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <IbanValidatorAndParser client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

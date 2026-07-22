@@ -1,0 +1,122 @@
+/* IBAN validator — result rows + example list */
+
+@import "./toolIsland.css";
+
+.iban-tool__panel {
+  max-width: 48rem;
+}
+
+.iban-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--color-border);
+}
+
+.iban-row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 12rem) minmax(0, 1fr);
+  gap: var(--space-sm);
+  align-items: start;
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.iban-row:last-child {
+  border-bottom: none;
+}
+
+.iban-row__label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-stone);
+  padding-top: 0.15rem;
+}
+
+.iban-row__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+  min-width: 0;
+}
+
+.iban-row__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  word-break: break-word;
+  color: var(--color-ink);
+  white-space: pre-wrap;
+}
+
+.iban-row__value--errors {
+  font-family: var(--font-sans);
+  color: color-mix(in srgb, var(--color-ink) 85%, #b33);
+}
+
+.iban-row__actions {
+  flex: 0 0 auto;
+}
+
+.iban-examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.iban-examples__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.iban-examples__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.iban-examples__item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.iban-examples__btn {
+  appearance: none;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  color: var(--color-ink);
+  padding: 0.45rem 0.7rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.iban-examples__btn:hover,
+.iban-examples__btn:focus-visible {
+  border-color: color-mix(in srgb, var(--color-ink) 35%, var(--color-border));
+  outline: none;
+}
+
+@media (max-width: 640px) {
+  .iban-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+}

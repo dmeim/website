@@ -926,9 +926,10 @@ export const toolsCatalogue: ToolsCatalogue = {
         },
         {
           id: "iban-validator-and-parser",
-          title: "IBAN validator and parser",
+          title: "IBAN Validator",
           description: "Validate and parse IBAN numbers. Check if an IBAN is valid and get the country, BBAN, if it is a QR-IBAN and the IBAN friendly format.",
-          status: "planned",
+          status: "available",
+          route: "/tools/iban-validator-and-parser",
           sourcePath: "/iban-validator-and-parser",
           sourceUrl: "https://it-tools.tech/iban-validator-and-parser",
         },
