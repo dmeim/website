@@ -1,0 +1,12 @@
+/* Text to NATO alphabet — compact single-panel chrome */
+
+@import "./toolIsland.css";
+
+.nato-tool__panel {
+  max-width: 42rem;
+}
+
+.nato-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

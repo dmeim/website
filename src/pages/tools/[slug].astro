@@ -17,6 +17,7 @@ import Encryption from "../../components/tools/islands/Encryption";
 import Bip39Generator from "../../components/tools/islands/Bip39Generator";
 import RsaKeyPairGenerator from "../../components/tools/islands/RsaKeyPairGenerator";
 import PdfSignatureChecker from "../../components/tools/islands/PdfSignatureChecker";
+import TextToNatoAlphabet from "../../components/tools/islands/TextToNatoAlphabet";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -109,6 +110,10 @@ const slug = tool.id;
             <div class="tool-mount" data-tool={slug}>
               {/* client:only — pdf-signature-reader / node-forge must not enter Worker SSR */}
               <PdfSignatureChecker client:only="react" />
+            </div>
+          ) : slug === "text-to-nato-alphabet" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <TextToNatoAlphabet client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
