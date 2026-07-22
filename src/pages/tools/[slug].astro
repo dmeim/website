@@ -48,6 +48,7 @@ import MimeTypes from "../../components/tools/islands/MimeTypes";
 import JwtParser from "../../components/tools/islands/JwtParser";
 import KeycodeInfo from "../../components/tools/islands/KeycodeInfo";
 import SlugifyString from "../../components/tools/islands/SlugifyString";
+import HtmlWysiwygEditor from "../../components/tools/islands/HtmlWysiwygEditor";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -265,6 +266,10 @@ const slug = tool.id;
           ) : slug === "slugify-string" ? (
             <div class="tool-mount" data-tool={slug}>
               <SlugifyString client:load />
+            </div>
+          ) : slug === "html-wysiwyg-editor" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <HtmlWysiwygEditor client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
