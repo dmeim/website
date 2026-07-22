@@ -1,0 +1,17 @@
+/* YAML prettify — single-panel format tool */
+
+@import "./toolIsland.css";
+
+.yp-tool__panel {
+  max-width: 48rem;
+}
+
+.yp-settings {
+  align-items: end;
+}
+
+.yp-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}

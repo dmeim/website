@@ -63,6 +63,7 @@ import SqlPrettify from "../../components/tools/islands/SqlPrettify";
 import ChmodCalculator from "../../components/tools/islands/ChmodCalculator";
 import DockerRunToDockerComposeConverter from "../../components/tools/islands/DockerRunToDockerComposeConverter";
 import XmlFormatter from "../../components/tools/islands/XmlFormatter";
+import YamlPrettify from "../../components/tools/islands/YamlPrettify";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -340,6 +341,10 @@ const slug = tool.id;
           ) : slug === "xml-formatter" ? (
             <div class="tool-mount" data-tool={slug}>
               <XmlFormatter client:load />
+            </div>
+          ) : slug === "yaml-prettify" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <YamlPrettify client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

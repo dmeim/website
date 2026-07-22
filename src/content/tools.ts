@@ -671,9 +671,10 @@ export const toolsCatalogue: ToolsCatalogue = {
         },
         {
           id: "yaml-prettify",
-          title: "YAML prettify and format",
+          title: "YAML prettify",
           description: "Prettify your YAML string into a friendly, human-readable format.",
-          status: "planned",
+          status: "available",
+          route: "/tools/yaml-prettify",
           sourcePath: "/yaml-prettify",
           sourceUrl: "https://it-tools.tech/yaml-prettify",
         },
