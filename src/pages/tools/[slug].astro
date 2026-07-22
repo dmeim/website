@@ -84,6 +84,7 @@ import TextStatistics from "../../components/tools/islands/TextStatistics";
 import StringObfuscator from "../../components/tools/islands/StringObfuscator";
 import LoremIpsumGenerator from "../../components/tools/islands/LoremIpsumGenerator";
 import TextDiff from "../../components/tools/islands/TextDiff";
+import EmojiPicker from "../../components/tools/islands/EmojiPicker";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -445,6 +446,10 @@ const slug = tool.id;
           ) : slug === "text-diff" ? (
             <div class="tool-mount" data-tool={slug}>
               <TextDiff client:load />
+            </div>
+          ) : slug === "emoji-picker" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <EmojiPicker client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
