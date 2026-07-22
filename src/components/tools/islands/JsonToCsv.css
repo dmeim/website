@@ -1,0 +1,13 @@
+/* JSON to CSV — single-panel format tool */
+
+@import "./toolIsland.css";
+
+.jtc-tool__panel {
+  max-width: 48rem;
+}
+
+.jtc-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}
