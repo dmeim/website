@@ -1,0 +1,105 @@
+/* JWT parser — claim table + signature segment */
+
+@import "./toolIsland.css";
+
+.jwt-tool__panel {
+  max-width: 48rem;
+}
+
+.jwt-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--color-border);
+}
+
+.jwt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.jwt-table__section {
+  text-align: center;
+  padding: 0.7rem 0.85rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+  background: color-mix(in srgb, var(--color-surface) 88%, var(--color-ink));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.jwt-table td {
+  padding: 0.65rem 0.85rem;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border);
+  word-break: break-word;
+}
+
+.jwt-table__claim {
+  width: 42%;
+  color: var(--color-ink);
+}
+
+.jwt-table__claim-name {
+  font-weight: 600;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+}
+
+.jwt-table__claim-desc,
+.jwt-table__friendly {
+  margin-left: 0.4rem;
+  color: var(--color-stone);
+  opacity: 0.85;
+}
+
+.jwt-table__value {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.jwt-signature {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.jwt-signature__label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.jwt-signature__value {
+  display: block;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  word-break: break-all;
+  color: var(--color-ink);
+}
+
+@media (max-width: 640px) {
+  .jwt-table,
+  .jwt-table tbody,
+  .jwt-table tr,
+  .jwt-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .jwt-table__section {
+    display: block;
+  }
+
+  .jwt-table__claim {
+    padding-bottom: 0.2rem;
+    border-bottom: none;
+  }
+}

@@ -45,6 +45,7 @@ import BasicAuthGenerator from "../../components/tools/islands/BasicAuthGenerato
 import OgMetaGenerator from "../../components/tools/islands/OgMetaGenerator";
 import OtpGenerator from "../../components/tools/islands/OtpGenerator";
 import MimeTypes from "../../components/tools/islands/MimeTypes";
+import JwtParser from "../../components/tools/islands/JwtParser";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -250,6 +251,10 @@ const slug = tool.id;
           ) : slug === "mime-types" ? (
             <div class="tool-mount" data-tool={slug}>
               <MimeTypes client:load />
+            </div>
+          ) : slug === "jwt-parser" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <JwtParser client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
