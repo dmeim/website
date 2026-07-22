@@ -80,6 +80,7 @@ import TemperatureConverter from "../../components/tools/islands/TemperatureConv
 import Chronometer from "../../components/tools/islands/Chronometer";
 import BenchmarkBuilder from "../../components/tools/islands/BenchmarkBuilder";
 import NumeronymGenerator from "../../components/tools/islands/NumeronymGenerator";
+import TextStatistics from "../../components/tools/islands/TextStatistics";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -425,6 +426,10 @@ const slug = tool.id;
           ) : slug === "numeronym-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <NumeronymGenerator client:load />
+            </div>
+          ) : slug === "text-statistics" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <TextStatistics client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

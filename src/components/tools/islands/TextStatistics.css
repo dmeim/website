@@ -1,0 +1,48 @@
+/* Text statistics — live metric grid */
+
+@import "./toolIsland.css";
+
+.text-stats-tool__panel {
+  max-width: 48rem;
+}
+
+.text-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+}
+
+.text-stats-grid__item {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  text-align: center;
+}
+
+.text-stats-grid__item dt {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-stone);
+}
+
+.text-stats-grid__item dd {
+  margin: 0;
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-ink);
+  word-break: break-word;
+}
+
+@media (max-width: 720px) {
+  .text-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
