@@ -1,0 +1,17 @@
+/* String obfuscator — compact single-panel chrome */
+
+@import "./toolIsland.css";
+
+.string-obfuscator-tool__panel {
+  max-width: 42rem;
+}
+
+.string-obfuscator-tool__controls {
+  align-items: end;
+}
+
+.string-obfuscator-output {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.02em;
+  word-break: break-word;
+}

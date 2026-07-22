@@ -29,3 +29,4 @@ export { default as Chronometer } from "./Chronometer";
 export { default as BenchmarkBuilder } from "./BenchmarkBuilder";
 export { default as NumeronymGenerator } from "./NumeronymGenerator";
 export { default as TextStatistics } from "./TextStatistics";
+export { default as StringObfuscator } from "./StringObfuscator";

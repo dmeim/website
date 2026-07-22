@@ -81,6 +81,7 @@ import Chronometer from "../../components/tools/islands/Chronometer";
 import BenchmarkBuilder from "../../components/tools/islands/BenchmarkBuilder";
 import NumeronymGenerator from "../../components/tools/islands/NumeronymGenerator";
 import TextStatistics from "../../components/tools/islands/TextStatistics";
+import StringObfuscator from "../../components/tools/islands/StringObfuscator";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -430,6 +431,10 @@ const slug = tool.id;
           ) : slug === "text-statistics" ? (
             <div class="tool-mount" data-tool={slug}>
               <TextStatistics client:load />
+            </div>
+          ) : slug === "string-obfuscator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <StringObfuscator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
