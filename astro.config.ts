@@ -1,7 +1,12 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import type { Plugin } from "vite";
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
+const nodeTlsStub = path.resolve(rootDir, "src/shims/node-tls.ts");
 
 /**
  * Cloudflare workerd SSR uses a separate Vite environment. Mid-request dep
@@ -58,6 +63,8 @@ export default defineConfig({
       // workerd (astro + Cloudflare adapter) needs the edge server build
       alias: {
         "react-dom/server": "react-dom/server.edge",
+        // pdf-signature-reader (client-only) expects Node `tls.rootCertificates`
+        tls: nodeTlsStub,
       },
     },
     optimizeDeps: {

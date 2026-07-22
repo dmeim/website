@@ -16,6 +16,7 @@ import HmacGenerator from "../../components/tools/islands/HmacGenerator";
 import Encryption from "../../components/tools/islands/Encryption";
 import Bip39Generator from "../../components/tools/islands/Bip39Generator";
 import RsaKeyPairGenerator from "../../components/tools/islands/RsaKeyPairGenerator";
+import PdfSignatureChecker from "../../components/tools/islands/PdfSignatureChecker";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -103,6 +104,11 @@ const slug = tool.id;
           ) : slug === "rsa-key-pair-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <RsaKeyPairGenerator client:load />
+            </div>
+          ) : slug === "pdf-signature-checker" ? (
+            <div class="tool-mount" data-tool={slug}>
+              {/* client:only — pdf-signature-reader / node-forge must not enter Worker SSR */}
+              <PdfSignatureChecker client:only="react" />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

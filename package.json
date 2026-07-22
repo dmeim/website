@@ -24,6 +24,7 @@
     "crypto-js": "^4.2.0",
     "framer-motion": "^12.42.2",
     "lucide": "^1.25.0",
+    "pdf-signature-reader": "^1.4.3",
     "qrcode": "^1.5.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

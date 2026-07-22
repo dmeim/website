@@ -1,0 +1,188 @@
+@import "./toolIsland.css";
+
+.pdf-sig__panel {
+  max-width: 42rem;
+}
+
+.pdf-sig__upload {
+  position: relative;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.pdf-sig__upload-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-xl);
+  border: 1px dashed color-mix(in srgb, var(--color-border) 80%, var(--color-gold) 20%);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.pdf-sig__upload-label:hover {
+  border-color: var(--color-gold);
+  background: color-mix(in srgb, var(--color-spot) 35%, transparent);
+}
+
+.pdf-sig__upload-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.pdf-sig__upload-hint {
+  font-size: 0.975rem;
+  line-height: 1.45;
+  color: var(--color-ink);
+}
+
+.pdf-sig__file-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.pdf-sig__file-meta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.35rem;
+  font-size: 0.9375rem;
+  color: var(--color-stone);
+}
+
+.pdf-sig__file-meta strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.pdf-sig__results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: 52rem;
+}
+
+.pdf-sig__signature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.pdf-sig__signature-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.pdf-sig__certs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.pdf-sig__cert {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+}
+
+.pdf-sig__cert-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.pdf-sig__cert-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.pdf-sig__cert-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.pdf-sig__kv {
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.pdf-sig__kv-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr);
+  gap: var(--space-sm);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.pdf-sig__kv-row dt {
+  margin: 0;
+  color: var(--color-stone);
+}
+
+.pdf-sig__kv-row dd {
+  margin: 0;
+  color: var(--color-ink);
+  word-break: break-word;
+}
+
+.pdf-sig__muted {
+  margin: 0;
+  color: var(--color-stone);
+  font-size: 0.9rem;
+}
+
+.pdf-sig__pem {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-sm);
+}
+
+.pdf-sig__pem summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-gold);
+  list-style-position: outside;
+}
+
+.pdf-sig__pem-body {
+  margin: var(--space-sm) 0 0;
+  padding: var(--space-md);
+  max-height: 16rem;
+  overflow: auto;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
+  border: 1px solid var(--color-border);
+}
+
+@media (max-width: 640px) {
+  .pdf-sig__kv-row {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+}
