@@ -1,0 +1,79 @@
+/* IPv4 subnet calculator — detail table + block navigation */
+
+@import "./toolIsland.css";
+
+.ipv4sc-tool__panel {
+  max-width: 48rem;
+}
+
+.ipv4sc-table-wrap {
+  overflow-x: auto;
+  margin-top: var(--space-sm);
+}
+
+.ipv4sc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+}
+
+.ipv4sc-table th,
+.ipv4sc-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-stone) 28%, transparent);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ipv4sc-table__label {
+  width: 38%;
+  font-weight: 600;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.ipv4sc-table__value {
+  min-width: 0;
+}
+
+.ipv4sc-value-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.ipv4sc-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-ink);
+}
+
+.ipv4sc-fallback {
+  color: color-mix(in srgb, var(--color-stone) 85%, var(--color-ink));
+  font-style: italic;
+}
+
+.ipv4sc-nav {
+  margin-top: var(--space-md);
+  justify-content: space-between;
+}
+
+@media (max-width: 640px) {
+  .ipv4sc-table__label {
+    white-space: normal;
+    width: 42%;
+  }
+
+  .ipv4sc-value-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+
+  .ipv4sc-nav {
+    flex-wrap: wrap;
+  }
+}

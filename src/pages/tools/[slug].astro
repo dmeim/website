@@ -67,6 +67,7 @@ import YamlPrettify from "../../components/tools/islands/YamlPrettify";
 import EmailNormalizer from "../../components/tools/islands/EmailNormalizer";
 import RegexTester from "../../components/tools/islands/RegexTester";
 import RegexMemo from "../../components/tools/islands/RegexMemo";
+import Ipv4SubnetCalculator from "../../components/tools/islands/Ipv4SubnetCalculator";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -360,6 +361,10 @@ const slug = tool.id;
           ) : slug === "regex-memo" ? (
             <div class="tool-mount" data-tool={slug}>
               <RegexMemo client:load />
+            </div>
+          ) : slug === "ipv4-subnet-calculator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <Ipv4SubnetCalculator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
