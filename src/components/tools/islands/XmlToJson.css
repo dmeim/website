@@ -1,0 +1,13 @@
+/* XML to JSON converter — single-panel live transform */
+
+@import "./toolIsland.css";
+
+.x2j-tool__panel {
+  max-width: 48rem;
+}
+
+.x2j-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}
