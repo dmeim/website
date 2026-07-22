@@ -21,6 +21,7 @@ import TextToNatoAlphabet from "../../components/tools/islands/TextToNatoAlphabe
 import TextToBinary from "../../components/tools/islands/TextToBinary";
 import TextToUnicode from "../../components/tools/islands/TextToUnicode";
 import RomanNumeralConverter from "../../components/tools/islands/RomanNumeralConverter";
+import BaseConverter from "../../components/tools/islands/BaseConverter";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -129,6 +130,10 @@ const slug = tool.id;
           ) : slug === "roman-numeral-converter" ? (
             <div class="tool-mount" data-tool={slug}>
               <RomanNumeralConverter client:load />
+            </div>
+          ) : slug === "base-converter" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <BaseConverter client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

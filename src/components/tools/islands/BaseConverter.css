@@ -1,0 +1,53 @@
+/* Integer base converter — output row chrome */
+
+@import "./toolIsland.css";
+
+.bc-tool__panel {
+  max-width: 42rem;
+}
+
+.bc-outputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.bc-output {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-sm);
+  align-items: end;
+}
+
+.bc-output--custom {
+  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.bc-custom-base {
+  min-width: 0;
+}
+
+.bc-output__value {
+  font-variant-numeric: tabular-nums;
+  word-break: break-all;
+}
+
+.bc-output .tool-field label {
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 640px) {
+  .bc-output,
+  .bc-output--custom {
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+    align-items: stretch;
+  }
+
+  .bc-output__actions {
+    justify-content: flex-start;
+  }
+}
