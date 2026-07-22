@@ -73,6 +73,7 @@ import Ipv4RangeExpander from "../../components/tools/islands/Ipv4RangeExpander"
 import MacAddressLookup from "../../components/tools/islands/MacAddressLookup";
 import MacAddressGenerator from "../../components/tools/islands/MacAddressGenerator";
 import Ipv6UlaGenerator from "../../components/tools/islands/Ipv6UlaGenerator";
+import PercentageCalculator from "../../components/tools/islands/PercentageCalculator";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -390,6 +391,10 @@ const slug = tool.id;
           ) : slug === "ipv6-ula-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <Ipv6UlaGenerator client:load />
+            </div>
+          ) : slug === "percentage-calculator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <PercentageCalculator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
