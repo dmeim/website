@@ -7,3 +7,4 @@ export { default as HashText } from "./HashText";
 export { default as Bcrypt } from "./Bcrypt";
 export { default as UuidGenerator } from "./UuidGenerator";
 export { default as UlidGenerator } from "./UlidGenerator";
+export { default as PasswordStrengthAnalyser } from "./PasswordStrengthAnalyser";
