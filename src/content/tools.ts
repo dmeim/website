@@ -429,9 +429,10 @@ export const toolsCatalogue: ToolsCatalogue = {
       tools: [
         {
           id: "url-encoder",
-          title: "Encode/decode URL-formatted strings",
+          title: "URL encode/decode",
           description: "Encode text to URL-encoded format (also known as \"percent-encoded\"), or decode from it.",
-          status: "planned",
+          status: "available",
+          route: "/tools/url-encoder",
           sourcePath: "/url-encoder",
           sourceUrl: "https://it-tools.tech/url-encoder",
         },

@@ -1,0 +1,12 @@
+/* URL encoder — dual-panel workspace */
+
+@import "./toolIsland.css";
+
+.urlenc-tool__workspace {
+  align-items: stretch;
+}
+
+.urlenc-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
