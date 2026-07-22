@@ -24,12 +24,15 @@
     "colord": "^2.9.3",
     "crypto-js": "^4.2.0",
     "framer-motion": "^12.42.2",
+    "iarna-toml-esm": "^3.0.5",
+    "json5": "^2.2.3",
     "lucide": "^1.25.0",
     "pdf-signature-reader": "^1.4.3",
     "qrcode": "^1.5.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "uuid": "^11.1.1"
+    "uuid": "^11.1.1",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@astrojs/react": "^6.0.1",
