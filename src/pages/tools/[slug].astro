@@ -30,6 +30,7 @@ import DateConverter from "../../components/tools/islands/DateConverter";
 import ColorConverter from "../../components/tools/islands/ColorConverter";
 import YamlToJsonConverter from "../../components/tools/islands/YamlToJsonConverter";
 import JsonToYamlConverter from "../../components/tools/islands/JsonToYamlConverter";
+import JsonToToml from "../../components/tools/islands/JsonToToml";
 import TomlToJson from "../../components/tools/islands/TomlToJson";
 import { availableTools, type Tool } from "../../content/tools";
 
@@ -175,6 +176,10 @@ const slug = tool.id;
           ) : slug === "json-to-yaml-converter" ? (
             <div class="tool-mount" data-tool={slug}>
               <JsonToYamlConverter client:load />
+            </div>
+          ) : slug === "json-to-toml" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <JsonToToml client:load />
             </div>
           ) : slug === "toml-to-json" ? (
             <div class="tool-mount" data-tool={slug}>

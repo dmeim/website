@@ -1,0 +1,13 @@
+/* JSON to TOML — single-panel live transform */
+
+@import "./toolIsland.css";
+
+.j2t-tool__panel {
+  max-width: 48rem;
+}
+
+.j2t-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}
