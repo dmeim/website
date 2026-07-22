@@ -1,0 +1,13 @@
+/* JSON minify — single-panel format tool */
+
+@import "./toolIsland.css";
+
+.jm-tool__panel {
+  max-width: 48rem;
+}
+
+.jm-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}

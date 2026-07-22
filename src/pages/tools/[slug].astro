@@ -57,6 +57,7 @@ import GitMemo from "../../components/tools/islands/GitMemo";
 import RandomPortGenerator from "../../components/tools/islands/RandomPortGenerator";
 import CrontabGenerator from "../../components/tools/islands/CrontabGenerator";
 import JsonPrettify from "../../components/tools/islands/JsonPrettify";
+import JsonMinify from "../../components/tools/islands/JsonMinify";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -310,6 +311,10 @@ const slug = tool.id;
           ) : slug === "json-prettify" ? (
             <div class="tool-mount" data-tool={slug}>
               <JsonPrettify client:load />
+            </div>
+          ) : slug === "json-minify" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <JsonMinify client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
