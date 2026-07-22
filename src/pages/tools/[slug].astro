@@ -6,6 +6,7 @@ import WordCodeGenerator from "../../components/tools/islands/WordCodeGenerator"
 import QRCodeGenerator from "../../components/tools/islands/QRCodeGenerator";
 import SvgPlaceholderGenerator from "../../components/tools/islands/SvgPlaceholderGenerator";
 import CameraRecorder from "../../components/tools/islands/CameraRecorder";
+import TokenGenerator from "../../components/tools/islands/TokenGenerator";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -53,6 +54,10 @@ const slug = tool.id;
           ) : slug === "camera-recorder" ? (
             <div class="tool-mount" data-tool={slug}>
               <CameraRecorder client:load />
+            </div>
+          ) : slug === "token-generator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <TokenGenerator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
