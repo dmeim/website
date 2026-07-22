@@ -53,6 +53,7 @@ import UserAgentParser from "../../components/tools/islands/UserAgentParser";
 import HttpStatusCodes from "../../components/tools/islands/HttpStatusCodes";
 import JsonDiff from "../../components/tools/islands/JsonDiff";
 import SafelinkDecoder from "../../components/tools/islands/SafelinkDecoder";
+import GitMemo from "../../components/tools/islands/GitMemo";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -290,6 +291,10 @@ const slug = tool.id;
           ) : slug === "safelink-decoder" ? (
             <div class="tool-mount" data-tool={slug}>
               <SafelinkDecoder client:load />
+            </div>
+          ) : slug === "git-memo" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <GitMemo client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

@@ -1,0 +1,68 @@
+/* Git memo — searchable command cheatsheet */
+
+@import "./toolIsland.css";
+
+.gm-tool {
+  gap: var(--space-lg);
+}
+
+.gm-tool__panel {
+  max-width: 48rem;
+}
+
+.gm-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.gm-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.gm-section__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.gm-list {
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+}
+
+.gm-card {
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+}
+
+.gm-card__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--color-ink);
+}
+
+.gm-card__command {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-ink) 4%, var(--color-surface));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--color-ink);
+  white-space: pre;
+}
+
+.gm-card__command code {
+  font: inherit;
+}
