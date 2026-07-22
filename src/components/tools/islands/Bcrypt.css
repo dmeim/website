@@ -1,0 +1,103 @@
+/* Bcrypt — dual-panel hash / compare chrome */
+
+@import "./toolIsland.css";
+
+.bc-tool__workspace {
+  display: grid;
+  gap: var(--space-lg);
+  max-width: 42rem;
+}
+
+.bc-tool__panel {
+  max-width: 42rem;
+}
+
+.bc-range-slider {
+  position: relative;
+  height: 1.75rem;
+  margin-top: var(--space-xs);
+}
+
+.bc-range-track,
+.bc-range-fill {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  border-radius: var(--radius);
+  pointer-events: none;
+}
+
+.bc-range-track {
+  inset-inline: 0;
+  background: var(--color-border);
+}
+
+.bc-range-fill {
+  background: var(--color-gold);
+}
+
+.bc-range-slider input[type="range"] {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.bc-range-slider input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius);
+  background: var(--color-ground);
+  cursor: pointer;
+}
+
+.bc-range-slider input[type="range"]::-moz-range-thumb {
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius);
+  background: var(--color-ground);
+  cursor: pointer;
+}
+
+.bc-range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-xs);
+  font-size: 0.75rem;
+  color: var(--color-stone);
+}
+
+.bc-hash-display {
+  word-break: break-all;
+}
+
+.bc-compare-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.bc-compare-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-stone);
+}
+
+.bc-compare-result {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  font-weight: 600;
+}

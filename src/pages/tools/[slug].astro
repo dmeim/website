@@ -8,6 +8,7 @@ import SvgPlaceholderGenerator from "../../components/tools/islands/SvgPlacehold
 import CameraRecorder from "../../components/tools/islands/CameraRecorder";
 import TokenGenerator from "../../components/tools/islands/TokenGenerator";
 import HashText from "../../components/tools/islands/HashText";
+import Bcrypt from "../../components/tools/islands/Bcrypt";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -63,6 +64,10 @@ const slug = tool.id;
           ) : slug === "hash-text" ? (
             <div class="tool-mount" data-tool={slug}>
               <HashText client:load />
+            </div>
+          ) : slug === "bcrypt" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <Bcrypt client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
