@@ -15,6 +15,7 @@ import PasswordStrengthAnalyser from "../../components/tools/islands/PasswordStr
 import HmacGenerator from "../../components/tools/islands/HmacGenerator";
 import Encryption from "../../components/tools/islands/Encryption";
 import Bip39Generator from "../../components/tools/islands/Bip39Generator";
+import RsaKeyPairGenerator from "../../components/tools/islands/RsaKeyPairGenerator";
 import { availableTools, type Tool } from "../../content/tools";
 
 export function getStaticPaths() {
@@ -98,6 +99,10 @@ const slug = tool.id;
           ) : slug === "bip39-generator" ? (
             <div class="tool-mount" data-tool={slug}>
               <Bip39Generator client:load />
+            </div>
+          ) : slug === "rsa-key-pair-generator" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <RsaKeyPairGenerator client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

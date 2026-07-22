@@ -1,0 +1,15 @@
+/* RSA key pair generator — panel width + PEM wrap */
+
+@import "./toolIsland.css";
+
+.rsa-tool__panel {
+  max-width: 42rem;
+}
+
+.rsa-tool__pem {
+  word-break: break-all;
+  resize: vertical;
+  min-height: 8rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
