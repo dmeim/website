@@ -70,6 +70,7 @@ import RegexMemo from "../../components/tools/islands/RegexMemo";
 import Ipv4SubnetCalculator from "../../components/tools/islands/Ipv4SubnetCalculator";
 import Ipv4AddressConverter from "../../components/tools/islands/Ipv4AddressConverter";
 import Ipv4RangeExpander from "../../components/tools/islands/Ipv4RangeExpander";
+import MacAddressLookup from "../../components/tools/islands/MacAddressLookup";
 import MacAddressGenerator from "../../components/tools/islands/MacAddressGenerator";
 import Ipv6UlaGenerator from "../../components/tools/islands/Ipv6UlaGenerator";
 import { availableTools, type Tool } from "../../content/tools";
@@ -377,6 +378,10 @@ const slug = tool.id;
           ) : slug === "ipv4-range-expander" ? (
             <div class="tool-mount" data-tool={slug}>
               <Ipv4RangeExpander client:load />
+            </div>
+          ) : slug === "mac-address-lookup" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <MacAddressLookup client:load />
             </div>
           ) : slug === "mac-address-generator" ? (
             <div class="tool-mount" data-tool={slug}>

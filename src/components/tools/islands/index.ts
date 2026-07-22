@@ -18,5 +18,6 @@ export { default as TextToUnicode } from "./TextToUnicode";
 export { default as Ipv4SubnetCalculator } from "./Ipv4SubnetCalculator";
 export { default as Ipv4AddressConverter } from "./Ipv4AddressConverter";
 export { default as Ipv4RangeExpander } from "./Ipv4RangeExpander";
+export { default as MacAddressLookup } from "./MacAddressLookup";
 export { default as MacAddressGenerator } from "./MacAddressGenerator";
 export { default as Ipv6UlaGenerator } from "./Ipv6UlaGenerator";

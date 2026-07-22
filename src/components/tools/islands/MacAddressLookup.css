@@ -1,0 +1,43 @@
+/* MAC address lookup — vendor info panel */
+
+@import "./toolIsland.css";
+
+.maclookup-tool__panel {
+  max-width: 42rem;
+}
+
+.maclookup-vendor {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.maclookup-vendor__label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-ink);
+}
+
+.maclookup-vendor__card {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.maclookup-vendor__line {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.maclookup-vendor__unknown {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-stone) 28%, transparent);
+}

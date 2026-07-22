@@ -39,6 +39,7 @@
     "markdown-it": "^14.3.0",
     "mime-db": "^1.52.0",
     "netmask": "^2.1.1",
+    "oui-data": "^1.1.571",
     "pdf-signature-reader": "^1.4.3",
     "qrcode": "^1.5.4",
     "randexp": "^0.5.3",
