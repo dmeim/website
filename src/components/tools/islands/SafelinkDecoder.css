@@ -1,0 +1,12 @@
+/* Outlook SafeLink decoder — compact single-panel chrome */
+
+@import "./toolIsland.css";
+
+.safelink-tool__panel {
+  max-width: 42rem;
+}
+
+.safelink-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
