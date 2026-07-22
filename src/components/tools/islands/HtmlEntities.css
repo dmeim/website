@@ -1,0 +1,12 @@
+/* HTML entities — dual-panel workspace */
+
+@import "./toolIsland.css";
+
+.htmlent-tool__workspace {
+  align-items: stretch;
+}
+
+.htmlent-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

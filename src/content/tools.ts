@@ -438,9 +438,10 @@ export const toolsCatalogue: ToolsCatalogue = {
         },
         {
           id: "html-entities",
-          title: "Escape HTML entities",
+          title: "HTML entities",
           description: "Escape or unescape HTML entities (replace characters like <,>, &, \" and ' with their HTML version)",
-          status: "planned",
+          status: "available",
+          route: "/tools/html-entities",
           sourcePath: "/html-entities",
           sourceUrl: "https://it-tools.tech/html-entities",
         },
