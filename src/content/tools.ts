@@ -689,9 +689,10 @@ export const toolsCatalogue: ToolsCatalogue = {
         },
         {
           id: "regex-tester",
-          title: "Regex Tester",
+          title: "Regex tester",
           description: "Test your regular expressions with sample text.",
-          status: "planned",
+          status: "available",
+          route: "/tools/regex-tester",
           sourcePath: "/regex-tester",
           sourceUrl: "https://it-tools.tech/regex-tester",
         },

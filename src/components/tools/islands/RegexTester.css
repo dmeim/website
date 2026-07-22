@@ -1,0 +1,155 @@
+/* Regex tester — matches table, highlight, diagram chrome */
+
+@import "./toolIsland.css";
+
+.rt-tool {
+  gap: var(--space-lg);
+}
+
+.rt-tool__panel {
+  max-width: 48rem;
+}
+
+.rt-flags {
+  align-items: start;
+}
+
+.rt-flags code {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.85em;
+}
+
+.rt-highlight {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.rt-highlight__label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+.rt-highlight__body {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--color-ink);
+}
+
+.rt-highlight__mark {
+  padding: 0.05em 0.15em;
+  background: color-mix(in srgb, var(--color-gold) 35%, transparent);
+  color: inherit;
+  border-radius: 0.15em;
+}
+
+.rt-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--color-border);
+}
+
+.rt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.rt-table th {
+  text-align: left;
+  padding: 0.7rem 0.85rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+  background: color-mix(in srgb, var(--color-surface) 88%, var(--color-ink));
+  border-bottom: 1px solid var(--color-border);
+}
+
+.rt-table td {
+  padding: 0.65rem 0.85rem;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border);
+  word-break: break-word;
+  color: var(--color-ink);
+}
+
+.rt-table__mono {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.rt-capture-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.25rem;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.8125rem;
+}
+
+.rt-muted {
+  color: var(--color-stone);
+}
+
+.rt-sample {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--color-ink);
+}
+
+.rt-diagram {
+  min-height: 2.5rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+
+@media (max-width: 720px) {
+  .rt-table,
+  .rt-table thead,
+  .rt-table tbody,
+  .rt-table tr,
+  .rt-table th,
+  .rt-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .rt-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .rt-table td {
+    border-bottom: none;
+  }
+
+  .rt-table tr {
+    padding: 0.75rem 0.85rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .rt-table tr:last-child {
+    border-bottom: none;
+  }
+}

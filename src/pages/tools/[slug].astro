@@ -65,6 +65,7 @@ import DockerRunToDockerComposeConverter from "../../components/tools/islands/Do
 import XmlFormatter from "../../components/tools/islands/XmlFormatter";
 import YamlPrettify from "../../components/tools/islands/YamlPrettify";
 import EmailNormalizer from "../../components/tools/islands/EmailNormalizer";
+import RegexTester from "../../components/tools/islands/RegexTester";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -350,6 +351,10 @@ const slug = tool.id;
           ) : slug === "email-normalizer" ? (
             <div class="tool-mount" data-tool={slug}>
               <EmailNormalizer client:load />
+            </div>
+          ) : slug === "regex-tester" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <RegexTester client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>
