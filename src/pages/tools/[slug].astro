@@ -62,6 +62,7 @@ import JsonToCsv from "../../components/tools/islands/JsonToCsv";
 import SqlPrettify from "../../components/tools/islands/SqlPrettify";
 import ChmodCalculator from "../../components/tools/islands/ChmodCalculator";
 import DockerRunToDockerComposeConverter from "../../components/tools/islands/DockerRunToDockerComposeConverter";
+import XmlFormatter from "../../components/tools/islands/XmlFormatter";
 import { availableTools, type Tool } from "../../content/tools";
 
 
@@ -335,6 +336,10 @@ const slug = tool.id;
           ) : slug === "docker-run-to-docker-compose-converter" ? (
             <div class="tool-mount" data-tool={slug}>
               <DockerRunToDockerComposeConverter client:load />
+            </div>
+          ) : slug === "xml-formatter" ? (
+            <div class="tool-mount" data-tool={slug}>
+              <XmlFormatter client:load />
             </div>
           ) : (
             <div class="tool-mount" data-tool={slug}>

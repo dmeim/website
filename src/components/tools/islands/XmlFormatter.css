@@ -1,0 +1,17 @@
+/* XML formatter — single-panel format tool */
+
+@import "./toolIsland.css";
+
+.xf-tool__panel {
+  max-width: 48rem;
+}
+
+.xf-settings {
+  align-items: end;
+}
+
+.xf-output {
+  white-space: pre;
+  overflow-x: auto;
+  word-break: normal;
+}
