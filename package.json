@@ -59,6 +59,7 @@
     "sql-formatter": "^13.1.0",
     "ua-parser-js": "^1.0.41",
     "unicode-emoji-json": "^0.4.0",
+    "unpdf": "^1.6.2",
     "uuid": "^11.1.1",
     "xml-formatter": "^3.7.0",
     "xml-js": "^1.6.11",

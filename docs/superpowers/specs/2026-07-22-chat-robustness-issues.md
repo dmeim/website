@@ -8,7 +8,7 @@ Goal: make private chat reliable enough for day-to-day replacement of ChatGPT. P
 
 ---
 
-## Status (2026-07-22 evening)
+## Status (2026-07-22 late evening)
 
 | ID | Item | Status |
 | --- | --- | --- |
@@ -21,17 +21,17 @@ Goal: make private chat reliable enough for day-to-day replacement of ChatGPT. P
 | P1.6 | Markdown / code blocks | **Done** (fence chrome + Copy) |
 | P1.7 | Title updates in sidebar | **Done** (list refresh on finish + poll) |
 | P1.8 | Abort vs persist across nav | **Done** (nav ≠ cancel; Stop = cancel) |
-| P2.1 | Edit / regenerate | **Partial** (regenerate last; no edit-user yet) |
-| P2.2 | Branching / fork | **Deferred** |
+| P2.1 | Edit / regenerate | **Done** (regenerate last; edit-user forks + auto-regenerate) |
+| P2.2 | Branching / fork | **Done** (`POST …/fork`, header + per-message Fork; lineage columns) |
 | P2.3 | Search chats | **Done** (sidebar title filter) |
 | P2.4 | Keyboard shortcuts | **Done** (Esc, ⌘⇧O, ⌘/, Enter/⌘Enter) |
-| P2.5 | Multimodal to model | **Partial** (images inlined ≤4MiB; PDF/other = text note) |
+| P2.5 | Multimodal to model | **Done** (images ≤4MiB; text/JSON extract; PDF via unpdf; video/other = notes) |
 | P2.6 | Context truncation | **Done** (keep recent 40 msgs) |
 | P2.7 | Export chat | **Done** (`GET …/export` markdown) |
 | P2.8 | Mobile drawer polish | **Done** (backdrop/overscroll/padding) |
 | P2.9 | Skills | **Deferred** (stub remains) |
 
-**Local storage:** wiped/recreated local D1 + cleared local R2 state; migrations `0001`–`0003` applied locally. No production wipe/deploy.
+**Local storage:** wipe/reapply local D1 + R2 OK; migrations `0001`–`0004` (fork lineage). No production wipe/deploy unless needed.
 
 ---
 
@@ -105,11 +105,13 @@ Library/nav keeps server generation; only Stop cancels.
 
 ## Parity nice-to-haves (P2)
 
-### P2.1 — Edit / regenerate message — **Partial**
+### P2.1 — Edit / regenerate message — **Shipped**
 
-Regenerate last assistant (or retry after failed user turn). Edit-user / truncate-from-mid not shipped.
+Regenerate last assistant (or retry after failed user turn). Edit on a user message forks into a new chat (messages before + edited turn), leaves the original intact, then auto-regenerates the assistant reply.
 
-### P2.2 — Branching / fork chat — **Deferred**
+### P2.2 — Branching / fork chat — **Shipped**
+
+`POST /api/chats/[id]/fork` with optional `messageId` / `editContent`. D1 lineage: `forked_from_chat_id`, `forked_from_message_id`. UI: header Fork + per-message Fork here.
 
 ### P2.3 — Search chats — **Shipped**
 
@@ -119,9 +121,9 @@ Sidebar title filter.
 
 Esc stop/close · ⌘/Ctrl+Shift+O new chat · ⌘/Ctrl+/ or `/` focus composer · Enter / ⌘Enter send.
 
-### P2.5 — Multimodal attachments actually sent to the model — **Partial**
+### P2.5 — Multimodal attachments actually sent to the model — **Shipped**
 
-Images loaded from R2 and passed as image parts (≤4 MiB). Non-images stay as `[Attached: …]` text notes.
+Images loaded from R2 and passed as image parts (≤4 MiB). Text-like files and PDFs extracted best-effort into the prompt (`unpdf` for PDF). Video/other binaries degrade to filename + type + size notes without failing the chat. Limits documented in empty-state / attach tooltip / `extract-attachment.ts`.
 
 ### P2.6 — Context window / truncation strategy — **Shipped**
 
@@ -160,9 +162,13 @@ Stub remains disabled.
 5. **Title:** First message → sidebar title updates without reload.
 6. **Search:** Type in sidebar search → filters by title.
 7. **Regenerate:** After a reply → Regenerate on last assistant.
-8. **Export:** Export → downloads `.md`.
-9. **Shortcuts:** ⌘⇧O new chat; Esc stops; `/` focuses composer.
-10. **Images:** Attach a small PNG → model request includes image part (check reply quality).
+8. **Edit→fork:** Edit a past user message → Save & branch → new chat selected; original intact; assistant regenerates.
+9. **Fork:** Header Fork (full) or Fork here on a bubble → new chat with truncated history.
+10. **Export:** Export → downloads `.md`.
+11. **Shortcuts:** ⌘⇧O new chat; Esc stops; `/` focuses composer.
+12. **Images:** Attach a small PNG → model request includes image part.
+13. **Text/PDF:** Attach `.txt` / `.pdf` → model receives extract (or clear degradation note if extract fails).
+14. **Video:** Attach a small video → reply still works; filename note only.
 
 ### Local migration
 
@@ -174,3 +180,5 @@ npx wrangler d1 migrations apply dmeim-chat --local
 rm -rf .wrangler/state/v3/d1 .wrangler/state/v3/r2
 npx wrangler d1 migrations apply dmeim-chat --local
 ```
+
+Migrations: `0001` schema · `0002` generating_at · `0003` last_error · `0004` fork lineage.

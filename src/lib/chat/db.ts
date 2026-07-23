@@ -1,3 +1,4 @@
+import { forkChatTitle, planForkMessages } from "./fork";
 import type {
   ChatMessageDto,
   ChatRow,
@@ -24,6 +25,8 @@ export function chatToSummary(row: ChatRow): ChatSummary {
     archivedAt: row.archived_at,
     generatingAt: row.generating_at ?? null,
     lastError: row.last_error ?? null,
+    forkedFromChatId: row.forked_from_chat_id ?? null,
+    forkedFromMessageId: row.forked_from_message_id ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -84,17 +87,34 @@ export async function getChat(
 
 export async function createChat(
   db: D1Database,
-  input: { title?: string; modelId: string },
+  input: {
+    title?: string;
+    modelId: string;
+    forkedFromChatId?: string | null;
+    forkedFromMessageId?: string | null;
+  },
 ): Promise<ChatSummary> {
   const id = newId();
   const ts = nowIso();
   const title = input.title?.trim() || "New chat";
+  const forkedFromChatId = input.forkedFromChatId ?? null;
+  const forkedFromMessageId = input.forkedFromMessageId ?? null;
   await db
     .prepare(
-      `INSERT INTO chats (id, title, model_id, archived_at, generating_at, last_error, created_at, updated_at)
-       VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?)`,
+      `INSERT INTO chats (
+         id, title, model_id, archived_at, generating_at, last_error,
+         forked_from_chat_id, forked_from_message_id, created_at, updated_at
+       ) VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?, ?, ?)`,
     )
-    .bind(id, title, input.modelId, ts, ts)
+    .bind(
+      id,
+      title,
+      input.modelId,
+      forkedFromChatId,
+      forkedFromMessageId,
+      ts,
+      ts,
+    )
     .run();
   return {
     id,
@@ -103,6 +123,8 @@ export async function createChat(
     archivedAt: null,
     generatingAt: null,
     lastError: null,
+    forkedFromChatId,
+    forkedFromMessageId,
     createdAt: ts,
     updatedAt: ts,
   };
@@ -137,9 +159,112 @@ export async function updateChat(
     archivedAt,
     generatingAt: existing.generating_at ?? null,
     lastError: existing.last_error ?? null,
+    forkedFromChatId: existing.forked_from_chat_id ?? null,
+    forkedFromMessageId: existing.forked_from_message_id ?? null,
     createdAt: existing.created_at,
     updatedAt,
   };
+}
+
+export type ForkChatResult =
+  | { ok: true; chat: ChatSummary; messages: ChatMessageDto[]; edited: boolean }
+  | { ok: false; error: string; status: number };
+
+/**
+ * Create a new chat that copies history from `sourceChatId` up to an optional
+ * pivot message. When `editContent` is set, the pivot must be a user message:
+ * messages before it are copied, then the edited user turn is inserted (original
+ * chat is never rewritten).
+ */
+export async function forkChat(
+  db: D1Database,
+  input: {
+    sourceChatId: string;
+    throughMessageId?: string | null;
+    editContent?: string | null;
+  },
+): Promise<ForkChatResult> {
+  const source = await getChat(db, input.sourceChatId);
+  if (!source) {
+    return { ok: false, error: "Chat not found", status: 404 };
+  }
+
+  const history = await listMessages(db, input.sourceChatId);
+  const plan = planForkMessages(history, {
+    throughMessageId: input.throughMessageId,
+    editContent: input.editContent,
+  });
+  if (!plan.ok) {
+    return { ok: false, error: plan.error, status: 400 };
+  }
+
+  const edited = plan.editedUser !== null;
+  const chat = await createChat(db, {
+    title: forkChatTitle(source.title, edited),
+    modelId: source.model_id,
+    forkedFromChatId: source.id,
+    forkedFromMessageId: plan.forkedFromMessageId,
+  });
+
+  let seq = 0;
+  const ts = nowIso();
+
+  for (const m of plan.copy) {
+    seq += 1;
+    const newMsgId = newId();
+    await db
+      .prepare(
+        `INSERT INTO messages (id, chat_id, role, content, created_at, seq)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(newMsgId, chat.id, m.role, m.content, ts, seq)
+      .run();
+    for (const a of m.attachments) {
+      await db
+        .prepare(
+          `INSERT OR IGNORE INTO message_attachments (id, message_id, library_asset_id)
+           VALUES (?, ?, ?)`,
+        )
+        .bind(newId(), newMsgId, a.libraryAssetId)
+        .run();
+    }
+  }
+
+  if (plan.editedUser) {
+    seq += 1;
+    const newMsgId = newId();
+    await db
+      .prepare(
+        `INSERT INTO messages (id, chat_id, role, content, created_at, seq)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      )
+      .bind(
+        newMsgId,
+        chat.id,
+        "user",
+        plan.editedUser.content,
+        ts,
+        seq,
+      )
+      .run();
+    for (const a of plan.editedUser.source.attachments) {
+      await db
+        .prepare(
+          `INSERT OR IGNORE INTO message_attachments (id, message_id, library_asset_id)
+           VALUES (?, ?, ?)`,
+        )
+        .bind(newId(), newMsgId, a.libraryAssetId)
+        .run();
+    }
+  }
+
+  await db
+    .prepare(`UPDATE chats SET updated_at = ? WHERE id = ?`)
+    .bind(ts, chat.id)
+    .run();
+
+  const messages = await listMessages(db, chat.id);
+  return { ok: true, chat: { ...chat, updatedAt: ts }, messages, edited };
 }
 
 export async function setChatGenerating(

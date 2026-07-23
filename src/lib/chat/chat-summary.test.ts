@@ -11,6 +11,8 @@ describe("chatToSummary generatingAt", () => {
       archived_at: null,
       generating_at: "2026-07-22T12:00:00.000Z",
       last_error: null,
+      forked_from_chat_id: null,
+      forked_from_message_id: null,
       created_at: "2026-07-22T11:00:00.000Z",
       updated_at: "2026-07-22T12:00:00.000Z",
     };
@@ -18,6 +20,8 @@ describe("chatToSummary generatingAt", () => {
       id: "c1",
       generatingAt: "2026-07-22T12:00:00.000Z",
       lastError: null,
+      forkedFromChatId: null,
+      forkedFromMessageId: null,
     });
   });
 
@@ -42,9 +46,13 @@ describe("chatToSummary generatingAt", () => {
       archived_at: null,
       generating_at: null,
       last_error: "Rate limited: 429",
+      forked_from_chat_id: "c0",
+      forked_from_message_id: "m1",
       created_at: "2026-07-22T11:00:00.000Z",
       updated_at: "2026-07-22T12:00:00.000Z",
     };
     expect(chatToSummary(row).lastError).toBe("Rate limited: 429");
+    expect(chatToSummary(row).forkedFromChatId).toBe("c0");
+    expect(chatToSummary(row).forkedFromMessageId).toBe("m1");
   });
 });

@@ -1,8 +1,10 @@
 import type { ModelMessage } from "ai";
+import { MODEL_IMAGE_MAX_BYTES } from "./constants";
+import { resolveAttachmentForModel } from "./extract-attachment";
 import type { ChatMessageDto, MessageAttachmentSummary } from "./types";
 
 /** Soft cap for inline image bytes sent to the model (~4 MiB). */
-export const MODEL_IMAGE_MAX_BYTES = 4 * 1024 * 1024;
+export { MODEL_IMAGE_MAX_BYTES };
 
 export type AssetBytesLoader = (
   attachment: MessageAttachmentSummary,
@@ -26,7 +28,8 @@ function textWithAttachmentNote(
 
 /**
  * Convert persisted chat messages into AI SDK ModelMessages.
- * Image attachments are inlined when loader returns bytes; otherwise a text note.
+ * Images are inlined when possible; text/PDF content is extracted best-effort;
+ * other binaries degrade to visible filename notes (never fail the whole chat).
  */
 export async function buildModelMessages(
   history: ChatMessageDto[],
@@ -57,41 +60,44 @@ export async function buildModelMessages(
       image: Uint8Array;
       mediaType?: string;
     }> = [];
+    const textExtracts: string[] = [];
     const skipNotes: string[] = [];
 
-    if (loadAssetBytes) {
+    if (loadAssetBytes && m.attachments.length > 0) {
       for (const a of m.attachments) {
-        if (a.kind !== "image") {
-          skipNotes.push(
-            `[Attachment “${a.filename}” noted as text only — not an image for the model.]`,
-          );
-          continue;
+        const resolved = await resolveAttachmentForModel(
+          a,
+          () => loadAssetBytes(a),
+          { imageMaxBytes: MODEL_IMAGE_MAX_BYTES },
+        );
+        if (resolved.kind === "image") {
+          imageParts.push({
+            type: "image",
+            image: resolved.bytes,
+            mediaType: resolved.mediaType,
+          });
+          multimodalNotes.push(resolved.note);
+        } else if (resolved.kind === "text") {
+          textExtracts.push(resolved.text);
+          multimodalNotes.push(resolved.note);
+        } else {
+          skipNotes.push(resolved.note);
+          multimodalNotes.push(`degraded:${a.filename}`);
         }
-        if (a.byteSize > MODEL_IMAGE_MAX_BYTES) {
-          skipNotes.push(
-            `[Image “${a.filename}” skipped for the model (too large; kept as filename note).]`,
-          );
-          multimodalNotes.push(`skipped-large:${a.filename}`);
-          continue;
-        }
-        const bytes = await loadAssetBytes(a);
-        if (!bytes) {
-          skipNotes.push(
-            `[Image “${a.filename}” could not be loaded for the model.]`,
-          );
-          multimodalNotes.push(`missing:${a.filename}`);
-          continue;
-        }
-        imageParts.push({
-          type: "image",
-          image: bytes,
-          mediaType: a.contentType || undefined,
-        });
-        multimodalNotes.push(`image:${a.filename}`);
+      }
+    } else if (m.attachments.length > 0) {
+      for (const a of m.attachments) {
+        skipNotes.push(
+          `[Attachment “${a.filename}” noted as text only — content not loaded for the model.]`,
+        );
+        multimodalNotes.push(`unloaded:${a.filename}`);
       }
     }
 
-    const text = textWithAttachmentNote(m.content, attachmentNames, skipNotes);
+    const text = textWithAttachmentNote(m.content, attachmentNames, [
+      ...textExtracts,
+      ...skipNotes,
+    ]);
 
     if (imageParts.length === 0) {
       messages.push({ role: "user", content: text });

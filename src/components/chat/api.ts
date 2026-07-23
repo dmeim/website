@@ -142,3 +142,20 @@ export async function stopChat(id: string): Promise<{ aborted: boolean }> {
 export function chatExportUrl(id: string): string {
   return `/api/chats/${encodeURIComponent(id)}/export`;
 }
+
+export async function forkChat(
+  id: string,
+  input?: { messageId?: string; editContent?: string },
+): Promise<{
+  chat: ChatSummary;
+  messages: ChatMessageDto[];
+  edited: boolean;
+}> {
+  return readJson(
+    await fetch(`/api/chats/${encodeURIComponent(id)}/fork`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input ?? {}),
+    }),
+  );
+}

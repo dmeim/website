@@ -139,13 +139,14 @@ export const POST: APIRoute = async (context) => {
     const { messages: contextMessages, truncated } =
       truncateMessagesForContext(history);
 
-    const needsImages = contextMessages.some(
-      (m) =>
-        m.role === "user" && m.attachments.some((a) => a.kind === "image"),
+    const needsAssets = contextMessages.some(
+      (m) => m.role === "user" && m.attachments.length > 0,
     );
 
-    let loadBytes: ((a: MessageAttachmentSummary) => Promise<Uint8Array | null>) | undefined;
-    if (needsImages) {
+    let loadBytes:
+      | ((a: MessageAttachmentSummary) => Promise<Uint8Array | null>)
+      | undefined;
+    if (needsAssets) {
       const bucket = getLibraryBucket(env);
       loadBytes = async (attachment: MessageAttachmentSummary) => {
         const asset = await getLibraryAsset(db, attachment.libraryAssetId);
@@ -157,7 +158,10 @@ export const POST: APIRoute = async (context) => {
       };
     }
 
-    const { messages } = await buildModelMessages(contextMessages, loadBytes);
+    const { messages, multimodalNotes } = await buildModelMessages(
+      contextMessages,
+      loadBytes,
+    );
 
     if (truncated && messages.length > 0) {
       // Soft system hint only when we actually dropped older turns.
@@ -243,7 +247,22 @@ export const POST: APIRoute = async (context) => {
       })(),
     );
 
-    return result.toUIMessageStreamResponse();
+    const degradedNotes = multimodalNotes.filter(
+      (n) =>
+        n.startsWith("degraded:") ||
+        n.startsWith("unloaded:") ||
+        n.startsWith("skipped-large:") ||
+        n.startsWith("missing:") ||
+        n.includes("-truncated:"),
+    );
+    return result.toUIMessageStreamResponse({
+      headers:
+        degradedNotes.length > 0
+          ? {
+              "X-Chat-Attachment-Notes": degradedNotes.join("; ").slice(0, 480),
+            }
+          : undefined,
+    });
   } catch (err) {
     clearGenerationAbort(chatId);
     if (markedGenerating) {

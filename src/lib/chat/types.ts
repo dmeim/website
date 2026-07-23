@@ -16,6 +16,10 @@ export interface ChatRow {
   generating_at: string | null;
   /** Last stream failure message (rate limit, provider error); null when healthy. */
   last_error: string | null;
+  /** Source chat when this row was created via fork / edit-branch. */
+  forked_from_chat_id: string | null;
+  /** Pivot message id in the source chat (inclusive fork point or edited user msg). */
+  forked_from_message_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -54,6 +58,8 @@ export interface ChatSummary {
   generatingAt: string | null;
   /** Surfaced provider / stream error for retry UI; null when clear. */
   lastError: string | null;
+  forkedFromChatId: string | null;
+  forkedFromMessageId: string | null;
   createdAt: string;
   updatedAt: string;
 }

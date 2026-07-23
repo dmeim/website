@@ -11,6 +11,8 @@ describe("chatToMarkdownExport", () => {
       archivedAt: null,
       generatingAt: null,
       lastError: null,
+      forkedFromChatId: null,
+      forkedFromMessageId: null,
       createdAt: "2026-07-22T10:00:00.000Z",
       updatedAt: "2026-07-22T11:00:00.000Z",
     };

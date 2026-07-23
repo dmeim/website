@@ -64,30 +64,65 @@ describe("buildModelMessages", () => {
     }
   });
 
-  it("notes non-image attachments as text only", async () => {
+  it("extracts text-like attachments into the prompt", async () => {
     const history: ChatMessageDto[] = [
       {
         id: "1",
         role: "user",
-        content: "See PDF",
+        content: "Summarize",
         createdAt: "t",
         seq: 1,
         attachments: [
           {
             id: "att1",
             libraryAssetId: "a1",
-            filename: "doc.pdf",
-            contentType: "application/pdf",
-            kind: "pdf",
+            filename: "note.txt",
+            contentType: "text/plain",
+            kind: "other",
+            byteSize: 11,
+          },
+        ],
+      },
+    ];
+    const { messages, multimodalNotes } = await buildModelMessages(
+      history,
+      async () => new TextEncoder().encode("hello world"),
+    );
+    expect(multimodalNotes.some((n) => n.startsWith("text:"))).toBe(true);
+    expect(messages[0]).toEqual({
+      role: "user",
+      content: expect.stringContaining("hello world"),
+    });
+  });
+
+  it("notes video attachments without failing", async () => {
+    const history: ChatMessageDto[] = [
+      {
+        id: "1",
+        role: "user",
+        content: "See clip",
+        createdAt: "t",
+        seq: 1,
+        attachments: [
+          {
+            id: "att1",
+            libraryAssetId: "a1",
+            filename: "clip.mp4",
+            contentType: "video/mp4",
+            kind: "video",
             byteSize: 100,
           },
         ],
       },
     ];
-    const { messages } = await buildModelMessages(history, async () => null);
+    const { messages, multimodalNotes } = await buildModelMessages(
+      history,
+      async () => null,
+    );
+    expect(multimodalNotes).toContain("degraded:clip.mp4");
     expect(messages[0]).toEqual({
       role: "user",
-      content: expect.stringContaining("doc.pdf"),
+      content: expect.stringContaining("Video"),
     });
   });
 });

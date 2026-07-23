@@ -12,6 +12,18 @@ export const OPENCODE_GO_MESSAGES_URL = `${OPENCODE_GO_BASE}/messages`;
 /** Max Library upload size (25 MiB). */
 export const LIBRARY_MAX_BYTES = 25 * 1024 * 1024;
 
+/** Soft cap for inline image bytes sent to the model (~4 MiB). */
+export const MODEL_IMAGE_MAX_BYTES = 4 * 1024 * 1024;
+
+/** Max UTF-8 file size we will decode for text-like attachments. */
+export const MODEL_TEXT_ATTACHMENT_MAX_BYTES = 1 * 1024 * 1024;
+
+/** Max characters of extracted text attached into the model prompt. */
+export const MODEL_TEXT_ATTACHMENT_MAX_CHARS = 80_000;
+
+/** Soft cap for attempting PDF text extraction in the Worker. */
+export const MODEL_PDF_EXTRACT_MAX_BYTES = 8 * 1024 * 1024;
+
 export const LIBRARY_ALLOWED_MIME_PREFIXES = [
   "image/",
   "video/",

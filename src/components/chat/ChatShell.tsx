@@ -23,6 +23,7 @@ import {
   fetchChats,
   fetchLibrary,
   fetchModels,
+  forkChat,
   patchChat,
   stopChat,
   uploadLibraryFile,
@@ -634,6 +635,77 @@ export default function ChatShell({ initialChatId = null }: Props) {
     window.open(chatExportUrl(activeChatId), "_blank", "noopener,noreferrer");
   };
 
+  const handleFork = async (messageId?: string) => {
+    if (!activeChatId || streaming || busy) return;
+    setBusy(true);
+    setBanner(null);
+    try {
+      const { chat } = await forkChat(
+        activeChatId,
+        messageId ? { messageId } : undefined,
+      );
+      await refreshChats();
+      await selectChat(chat.id);
+      setBanner(
+        messageId
+          ? "Forked from that message into a new chat."
+          : "Forked into a new chat.",
+      );
+    } catch (err) {
+      setBanner(err instanceof Error ? err.message : "Fork failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleEditMessage = async (messageId: string, content: string) => {
+    if (!activeChatId || streaming || busy) return;
+    setBusy(true);
+    setBanner(null);
+    clearError();
+    stickToBottomRef.current = true;
+    try {
+      const { chat } = await forkChat(activeChatId, {
+        messageId,
+        editContent: content,
+      });
+      await refreshChats();
+      await selectChat(chat.id);
+      markAwaiting(chat.id, true);
+      idlePollsLeftRef.current = POST_IDLE_POLLS;
+      const optimisticAt = new Date().toISOString();
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === chat.id
+            ? {
+                ...c,
+                generatingAt: c.generatingAt ?? optimisticAt,
+                lastError: null,
+              }
+            : c,
+        ),
+      );
+      setActiveChat((prev) =>
+        prev && prev.id === chat.id
+          ? {
+              ...prev,
+              generatingAt: prev.generatingAt ?? optimisticAt,
+              lastError: null,
+            }
+          : prev,
+      );
+      // Branch ends on the edited user turn — regenerate the assistant reply.
+      await regenerate();
+      setBanner("Branched edit into a new chat; original unchanged.");
+    } catch (err) {
+      const id = activeChatIdRef.current;
+      if (id) markAwaiting(id, false);
+      setBanner(err instanceof Error ? err.message : "Edit branch failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleUpload = async (files: FileList | null) => {
     if (!files?.length) return;
     setBusy(true);
@@ -851,6 +923,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
             canRetry={canRetry}
             canRegenerate={canRegenerate}
             canExport={Boolean(activeChatId) && messages.length > 0}
+            canFork={Boolean(activeChatId) && messages.length > 0}
             onOpenSidebar={() => setSidebarOpen(true)}
             onModelChange={(next) => void handleModelChange(next)}
             onInputChange={setInput}
@@ -859,6 +932,10 @@ export default function ChatShell({ initialChatId = null }: Props) {
             onRetry={() => void handleRetry()}
             onRegenerate={() => void handleRegenerate()}
             onExport={handleExport}
+            onFork={(messageId) => void handleFork(messageId)}
+            onEditMessage={(messageId, content) =>
+              void handleEditMessage(messageId, content)
+            }
             onDismissError={() => {
               setBanner(null);
               clearError();

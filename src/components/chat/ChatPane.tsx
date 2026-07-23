@@ -1,9 +1,9 @@
-import type { FormEvent, KeyboardEvent, RefObject } from "react";
+import { useState, type FormEvent, type KeyboardEvent, type RefObject } from "react";
 import type { UIMessage } from "ai";
 import type { GoModelInfo, LibraryAssetSummary } from "@/lib/chat/types";
 import MarkdownBody from "./MarkdownBody";
 import { ModelPicker } from "./ModelPicker";
-import { textFromParts } from "./messageUtils";
+import { attachmentsOf, textFromParts } from "./messageUtils";
 
 type ChatPaneProps = {
   title: string;
@@ -21,6 +21,7 @@ type ChatPaneProps = {
   canRetry?: boolean;
   canRegenerate?: boolean;
   canExport?: boolean;
+  canFork?: boolean;
   onOpenSidebar: () => void;
   onModelChange: (modelId: string) => void;
   onInputChange: (value: string) => void;
@@ -29,6 +30,8 @@ type ChatPaneProps = {
   onRetry?: () => void;
   onRegenerate?: () => void;
   onExport?: () => void;
+  onFork?: (messageId?: string) => void;
+  onEditMessage?: (messageId: string, content: string) => void;
   onDismissError?: () => void;
   onAttachClick: () => void;
   onRemoveAttachment: (id: string) => void;
@@ -52,6 +55,7 @@ export function ChatPane({
   canRetry = false,
   canRegenerate = false,
   canExport = false,
+  canFork = false,
   onOpenSidebar,
   onModelChange,
   onInputChange,
@@ -60,6 +64,8 @@ export function ChatPane({
   onRetry,
   onRegenerate,
   onExport,
+  onFork,
+  onEditMessage,
   onDismissError,
   onAttachClick,
   onRemoveAttachment,
@@ -67,6 +73,9 @@ export function ChatPane({
   threadEndRef,
   composerRef,
 }: ChatPaneProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState("");
+
   const onComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
       event.preventDefault();
@@ -81,6 +90,25 @@ export function ChatPane({
 
   const composerBusy = streaming || generating;
   const showStop = streaming || generating;
+  const actionsEnabled = canFork && !composerBusy && !busy;
+
+  const startEdit = (messageId: string, content: string) => {
+    setEditingId(messageId);
+    setEditDraft(content);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditDraft("");
+  };
+
+  const saveEdit = () => {
+    if (!editingId || !onEditMessage) return;
+    const next = editDraft.trim();
+    if (!next) return;
+    onEditMessage(editingId, next);
+    cancelEdit();
+  };
 
   return (
     <>
@@ -102,16 +130,29 @@ export function ChatPane({
             disabled={composerBusy}
           />
         </div>
-        {canExport ? (
-          <button
-            type="button"
-            className="chat-btn chat-btn--ghost chat-main__export"
-            onClick={onExport}
-            disabled={busy || composerBusy}
-          >
-            Export
-          </button>
-        ) : null}
+        <div className="chat-main__header-actions">
+          {canFork && onFork ? (
+            <button
+              type="button"
+              className="chat-btn chat-btn--ghost"
+              onClick={() => onFork()}
+              disabled={!actionsEnabled}
+              title="Fork this chat (full history)"
+            >
+              Fork
+            </button>
+          ) : null}
+          {canExport ? (
+            <button
+              type="button"
+              className="chat-btn chat-btn--ghost chat-main__export"
+              onClick={onExport}
+              disabled={busy || composerBusy}
+            >
+              Export
+            </button>
+          ) : null}
+        </div>
       </header>
 
       {errorMessage ? (
@@ -148,7 +189,8 @@ export function ChatPane({
             </p>
             <p className="chat-empty__hints">
               Shortcuts: ⌘/Ctrl+Shift+O new chat · Esc stop / close menu · ⌘/Ctrl+Enter
-              send
+              send. Attach: images ≤4MiB inlined; text/PDF extracted when possible;
+              video/other sent as filename notes.
             </p>
           </div>
         ) : (
@@ -159,6 +201,8 @@ export function ChatPane({
               !isUser &&
               index === messages.length - 1 &&
               message.role === "assistant";
+            const attachments = attachmentsOf(message);
+            const isEditing = editingId === message.id;
             return (
               <article
                 key={message.id}
@@ -170,21 +214,93 @@ export function ChatPane({
               >
                 <header className="chat-bubble__role">
                   <span>{isUser ? "You" : "Assistant"}</span>
-                  {isLastAssistant && canRegenerate && onRegenerate && !composerBusy ? (
-                    <button
-                      type="button"
-                      className="chat-bubble__regen"
-                      onClick={onRegenerate}
-                    >
-                      Regenerate
-                    </button>
-                  ) : null}
+                  <div className="chat-bubble__actions">
+                    {isLastAssistant && canRegenerate && onRegenerate && !composerBusy ? (
+                      <button
+                        type="button"
+                        className="chat-bubble__action"
+                        onClick={onRegenerate}
+                      >
+                        Regenerate
+                      </button>
+                    ) : null}
+                    {actionsEnabled && onFork ? (
+                      <button
+                        type="button"
+                        className="chat-bubble__action"
+                        onClick={() => onFork(message.id)}
+                      >
+                        Fork here
+                      </button>
+                    ) : null}
+                    {actionsEnabled && isUser && onEditMessage && !isEditing ? (
+                      <button
+                        type="button"
+                        className="chat-bubble__action"
+                        onClick={() => startEdit(message.id, text)}
+                      >
+                        Edit
+                      </button>
+                    ) : null}
+                  </div>
                 </header>
-                {isUser ? (
+                {isEditing ? (
+                  <div className="chat-bubble__edit">
+                    <textarea
+                      className="chat-bubble__edit-input"
+                      rows={4}
+                      value={editDraft}
+                      onChange={(event) => setEditDraft(event.target.value)}
+                      aria-label="Edit message"
+                    />
+                    <div className="chat-bubble__edit-actions">
+                      <button
+                        type="button"
+                        className="chat-btn"
+                        onClick={saveEdit}
+                        disabled={!editDraft.trim()}
+                      >
+                        Save &amp; branch
+                      </button>
+                      <button
+                        type="button"
+                        className="chat-btn chat-btn--ghost"
+                        onClick={cancelEdit}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    <p className="chat-bubble__edit-hint">
+                      Creates a new chat from this point with your edit. The
+                      original chat stays unchanged.
+                    </p>
+                  </div>
+                ) : isUser ? (
                   <p className="chat-bubble__text">{text}</p>
                 ) : (
                   <MarkdownBody className="chat-bubble__md" text={text} />
                 )}
+                {attachments.length > 0 && !isEditing ? (
+                  <ul className="chat-bubble__attachments">
+                    {attachments.map((a) => (
+                      <li key={a.id}>
+                        {a.filename}
+                        <span className="chat-bubble__attach-kind">
+                          {a.kind === "image"
+                            ? " · image (inlined ≤4MiB)"
+                            : a.kind === "pdf"
+                              ? " · PDF (text extract when possible)"
+                              : a.kind === "video"
+                                ? " · video (filename note only)"
+                                : a.contentType.startsWith("text/") ||
+                                    a.contentType === "application/json"
+                                  ? " · text extract"
+                                  : " · filename note"}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </article>
             );
           })
@@ -222,6 +338,7 @@ export function ChatPane({
             onClick={onAttachClick}
             disabled={busy || composerBusy}
             aria-label="Attach file"
+            title="Library-first upload. Images ≤4MiB inlined; text/PDF extracted; video/other as notes."
           >
             Attach
           </button>
