@@ -9,4 +9,23 @@
   "observability": {
     "enabled": true,
   },
+  // Local/miniflare uses these bindings automatically.
+  // Production: create with `npx wrangler d1 create dmeim-chat` and
+  // `npx wrangler r2 bucket create dmeim-chat-library`, then replace ids/names.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dmeim-chat",
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "migrations",
+      "preview_database_id": "DB",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "CHAT_LIBRARY",
+      "bucket_name": "dmeim-chat-library",
+      "preview_bucket_name": "dmeim-chat-library-preview",
+    },
+  ],
 }

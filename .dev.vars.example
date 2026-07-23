@@ -1,0 +1,9 @@
+# Local secrets for Astro + Cloudflare (never commit real values)
+# Copy to `.dev.vars` and fill in:
+#
+#   cp .dev.vars.example .dev.vars
+#
+# Production:
+#   npx wrangler secret put OPENCODE_API_KEY
+
+OPENCODE_API_KEY=

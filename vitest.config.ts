@@ -9,7 +9,10 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["src/lib/tools/**/*.service.test.ts"],
+    include: [
+      "src/lib/tools/**/*.service.test.ts",
+      "src/lib/chat/**/*.test.ts",
+    ],
     globals: false,
     server: {
       deps: {
