@@ -29,6 +29,17 @@ npm run deploy   # requires Wrangler auth
 | `/connect` | Connect form + info |
 | `/game-of-life` | Conway's Game of Life (landing) |
 | `/game-of-life/simulation` | Full-page Game of Life simulator |
+| `/chat` | Private AI chat (Access-gated; OpenCode Go) |
+| `/chat/archive` | Archived chats |
+
+### Private chat (local)
+
+```bash
+cp .dev.vars.example .dev.vars   # set OPENCODE_API_KEY
+npm run dev                      # D1/R2 via local Miniflare bindings
+```
+
+Production Access + secrets checklist: `docs/chat-access-setup.md`.
 
 ## Documentation Map
 

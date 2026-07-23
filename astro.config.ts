@@ -27,6 +27,11 @@ const CLOUDFLARE_SSR_OPTIMIZE_DEPS = [
   "framer-motion",
   "lucide",
   "@lucide/astro",
+  "ai",
+  "@ai-sdk/react",
+  "@ai-sdk/openai-compatible",
+  "@ai-sdk/anthropic",
+  "markdown-it",
   // ClientRouter pulls these; mid-request discovery reloads workerd and
   // desyncs React (Invalid hook call in MotionConfig).
   "astro/virtual-modules/transitions.js",
