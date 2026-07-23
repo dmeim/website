@@ -34,13 +34,14 @@ import {
   stopChat,
   uploadLibraryFile,
 } from "./api";
+import { ArchivePane } from "./ArchivePane";
 import { ChatPane } from "./ChatPane";
 import { ChatSidebar } from "./ChatSidebar";
 import { LibraryPane } from "./LibraryPane";
 import { dtoToUiMessages, textFromParts } from "./messageUtils";
 import "./ChatShell.css";
 
-type ViewMode = "chat" | "library";
+type ViewMode = "chat" | "library" | "archive";
 
 type Props = {
   initialChatId?: string | null;
@@ -69,6 +70,7 @@ function isEditableTarget(target: EventTarget | null): boolean {
 
 export default function ChatShell({ initialChatId = null }: Props) {
   const [chats, setChats] = useState<ChatSummary[]>([]);
+  const [archivedChats, setArchivedChats] = useState<ChatSummary[]>([]);
   const [models, setModels] = useState<GoModelInfo[]>([]);
   const [assets, setAssets] = useState<LibraryAssetSummary[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(
@@ -87,8 +89,10 @@ export default function ChatShell({ initialChatId = null }: Props) {
   const [thinkingLevel, setThinkingLevel] = useState<ThinkingLevel>("off");
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
+  const [archiveBanner, setArchiveBanner] = useState<string | null>(null);
   const [loadingThread, setLoadingThread] = useState(false);
   const [libraryLoading, setLibraryLoading] = useState(false);
+  const [archiveLoading, setArchiveLoading] = useState(false);
   /** Chats we expect an assistant reply for (local + server generating). */
   const [awaitingByChat, setAwaitingByChat] = useState<Record<string, boolean>>(
     {},
@@ -242,6 +246,17 @@ export default function ChatShell({ initialChatId = null }: Props) {
     }
   }, []);
 
+  const refreshArchive = useCallback(async () => {
+    setArchiveLoading(true);
+    try {
+      const list = await fetchChats(true);
+      setArchivedChats(list);
+      return list;
+    } finally {
+      setArchiveLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -297,6 +312,26 @@ export default function ChatShell({ initialChatId = null }: Props) {
       cancelled = true;
     };
   }, [view, refreshLibrary]);
+
+  useEffect(() => {
+    if (view !== "archive") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await refreshArchive();
+        if (!cancelled) setArchivedChats(list);
+      } catch (err) {
+        if (!cancelled) {
+          setArchiveBanner(
+            err instanceof Error ? err.message : "Failed to load archive",
+          );
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [view, refreshArchive]);
 
   const selectChat = useCallback(
     async (id: string | null, opts?: { replaceUrl?: boolean }) => {
@@ -515,6 +550,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
     try {
       await patchChat(id, { archived: true });
       const list = await refreshChats();
+      if (view === "archive") {
+        await refreshArchive();
+      }
       if (activeChatId === id) {
         const next = list[0]?.id ?? null;
         await selectChat(next);
@@ -535,6 +573,27 @@ export default function ChatShell({ initialChatId = null }: Props) {
       }
     } catch (err) {
       setBanner(err instanceof Error ? err.message : "Delete failed");
+    }
+  };
+
+  const handleRestoreArchived = async (id: string) => {
+    try {
+      await patchChat(id, { archived: false });
+      await Promise.all([refreshChats(), refreshArchive()]);
+      setArchiveBanner("Chat restored.");
+    } catch (err) {
+      setArchiveBanner(err instanceof Error ? err.message : "Restore failed");
+    }
+  };
+
+  const handleDeleteArchived = async (id: string, title: string) => {
+    if (!window.confirm(`Permanently delete “${title}”?`)) return;
+    try {
+      await deleteChat(id);
+      await Promise.all([refreshChats(), refreshArchive()]);
+      setArchiveBanner(null);
+    } catch (err) {
+      setArchiveBanner(err instanceof Error ? err.message : "Delete failed");
     }
   };
 
@@ -979,6 +1038,11 @@ export default function ChatShell({ initialChatId = null }: Props) {
           setView("library");
           setSidebarOpen(false);
         }}
+        onOpenArchive={() => {
+          setView("archive");
+          setSidebarOpen(false);
+          setArchiveBanner(null);
+        }}
         onArchiveChat={(id) => void handleArchive(id)}
         onDeleteChat={(id) => void handleDeleteChat(id)}
       />
@@ -992,6 +1056,17 @@ export default function ChatShell({ initialChatId = null }: Props) {
             onUploadClick={() => fileInputRef.current?.click()}
             onAttach={attachFromLibrary}
             onDelete={(asset) => void handleDeleteAsset(asset)}
+          />
+        ) : view === "archive" ? (
+          <ArchivePane
+            chats={archivedChats}
+            loading={archiveLoading}
+            busy={busy}
+            banner={archiveBanner}
+            onOpenSidebar={() => setSidebarOpen(true)}
+            onDismissBanner={() => setArchiveBanner(null)}
+            onRestore={(id) => void handleRestoreArchived(id)}
+            onDelete={(id, title) => void handleDeleteArchived(id, title)}
           />
         ) : (
           <ChatPane

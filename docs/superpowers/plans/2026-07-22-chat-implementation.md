@@ -8,7 +8,7 @@
 
 | Choice | Decision |
 | --- | --- |
-| Active chat URL | `/chat?c=<chatId>` (and `/chat/archive` for archive) |
+| Active chat URL | `/chat?c=<chatId>` (Archive is a ChatShell pane, same as Library) |
 | Library UX | Pane mode inside ChatShell (`view=library`), not a separate primary route |
 | Abort / partials | Discard incomplete assistant text unless `onFinish` fires |
 | Default model | `deepseek-v4-flash` |
@@ -26,7 +26,7 @@
 ## Workstreams
 
 1. **Foundation** — wrangler bindings, SQL migration, shared types/helpers, deps, `.dev.vars.example`
-2. **UI shell** — nav Chat link, `/chat`, `/chat/archive`, ChatShell sidebar + panes, mobile drawer
+2. **UI shell** — nav Chat link, `/chat`, ChatShell sidebar + panes (chat / library / archive), mobile drawer
 3. **Chats API** — CRUD + messages load; sidebar archive/delete; archive restore/delete
 4. **AI streaming** — `POST /api/chat`, model catalog endpoint, model picker, markdown
 5. **Library** — upload/list/delete/download; Library-first attach; block delete while referenced
@@ -40,7 +40,6 @@ wrangler.jsonc                          # DB + CHAT_LIBRARY bindings
 .dev.vars.example
 src/lib/chat/{types,constants,models,library,title,access,db,env}.ts
 src/pages/chat/index.astro
-src/pages/chat/archive.astro
 src/pages/api/chat/index.ts
 src/pages/api/chat/models.ts
 src/pages/api/chats/index.ts
@@ -48,7 +47,7 @@ src/pages/api/chats/[id].ts
 src/pages/api/library/index.ts
 src/pages/api/library/[id].ts
 src/pages/api/library/[id]/content.ts
-src/components/chat/ChatShell.tsx (+ CSS / subcomponents)
+src/components/chat/ChatShell.tsx (+ CSS / LibraryPane / ArchivePane / subcomponents)
 docs/chat-access-setup.md
 ```
 

@@ -41,7 +41,7 @@ Browser
   ▼
 Astro on Cloudflare Workers
   ├─ Pages (SSR, prerender = false for chat surfaces)
-  │     /chat, /chat/archive, optional /chat/library route or pane mode
+  │     /chat (Library + Archive as ChatShell right-pane modes)
   ├─ React island: ChatShell (sidebar + active pane)
   └─ API routes
         POST /api/chat          → AI SDK stream → OpenCode Go
@@ -61,9 +61,8 @@ Astro on Cloudflare Workers
 
 | Path | Purpose |
 | --- | --- |
-| `/chat` | Main shell: sidebar + active chat (or empty/new state) |
+| `/chat` | Main shell: sidebar + active chat (or empty/new state); Library and Archive are right-pane modes |
 | `/chat?c=<chatId>` (or `/chat/<id>`) | Active chat selection (exact URL shape chosen in implementation plan; prefer query or soft client state to match Tools shell if simpler) |
-| `/chat/archive` | Archived chats: restore or permanent delete |
 | `/chat/library` | Optional dedicated Library view; may instead be a right-pane mode toggled from the sidebar |
 | `POST /api/chat` | Streaming completion for the active chat |
 | `/api/chats` … | List / create / rename / archive / delete chats; load messages |
@@ -88,7 +87,7 @@ Use site tokens (`--color-ground`, `--color-accent`, `--font-sans` / display / s
 2. **Library** — opens Library view (pane or `/chat/library`); browse/search assets; upload new assets; attach selected assets into the active chat  
 3. **Skills** — out of v1 product behavior; hide or show a disabled/stub item so IA stays stable  
 4. **Chats** — collapsible section listing non-archived chats (title, optional preview/date). On hover (and keyboard focus): **Archive** and **Delete** actions  
-5. **Archive** — navigates to `/chat/archive` (not an inline list). Archive page lists archived chats with **Restore** and **Delete**
+5. **Archive** — opens Archive pane (same shell pattern as Library). Lists archived chats with **Restore** and **Delete**
 
 ### 6.3 Main chat pane
 

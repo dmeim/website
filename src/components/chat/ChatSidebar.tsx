@@ -14,13 +14,14 @@ import { LucideIcon } from "./LucideIcon";
 type ChatSidebarProps = {
   chats: ChatSummary[];
   activeChatId: string | null;
-  view: "chat" | "library";
+  view: "chat" | "library" | "archive";
   busy?: boolean;
   streaming?: boolean;
   generatingChatIds?: Set<string>;
   onNewChat: () => void;
   onSelectChat: (id: string) => void;
   onOpenLibrary: () => void;
+  onOpenArchive: () => void;
   onArchiveChat: (id: string) => void;
   onDeleteChat: (id: string) => void;
 };
@@ -35,6 +36,7 @@ export function ChatSidebar({
   onNewChat,
   onSelectChat,
   onOpenLibrary,
+  onOpenArchive,
   onArchiveChat,
   onDeleteChat,
 }: ChatSidebarProps) {
@@ -201,10 +203,18 @@ export function ChatSidebar({
       </div>
 
       <div className="chat-sidebar__foot">
-        <a className="chat-sidebar__nav" href="/chat/archive">
+        <button
+          type="button"
+          className={
+            view === "archive"
+              ? "chat-sidebar__nav is-active"
+              : "chat-sidebar__nav"
+          }
+          onClick={onOpenArchive}
+        >
           <LucideIcon icon={Archive} size={16} />
           Archive
-        </a>
+        </button>
       </div>
     </aside>
   );

@@ -29,8 +29,7 @@ npm run deploy   # requires Wrangler auth
 | `/connect` | Connect form + info |
 | `/game-of-life` | Conway's Game of Life (landing) |
 | `/game-of-life/simulation` | Full-page Game of Life simulator |
-| `/chat` | Private AI chat (Access-gated; OpenCode Go) |
-| `/chat/archive` | Archived chats |
+| `/chat` | Private AI chat (Access-gated; OpenCode Go; Library + Archive panes) |
 
 ### Private chat (local)
 
