@@ -1,0 +1,16 @@
+---
+export const prerender = false;
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ChatShell from "../../components/chat/ChatShell";
+
+const initialChatId = Astro.url.searchParams.get("c");
+---
+
+<BaseLayout
+  title="Chat"
+  description="Private AI chat."
+  immersive
+>
+  <ChatShell client:load initialChatId={initialChatId} />
+</BaseLayout>

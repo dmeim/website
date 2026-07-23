@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import {
+  DEFAULT_CHAT_MODEL_ID,
   denyIfAccessRequired,
   getRuntimeEnv,
   json,
@@ -16,7 +17,7 @@ export const GET: APIRoute = async (context) => {
 
   try {
     const models = await getCachedGoModels(env.OPENCODE_API_KEY);
-    return json({ models });
+    return json({ models, defaultModelId: DEFAULT_CHAT_MODEL_ID });
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Failed to load models";

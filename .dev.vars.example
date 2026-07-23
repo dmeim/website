@@ -5,5 +5,9 @@
 #
 # Production:
 #   npx wrangler secret put OPENCODE_API_KEY
+#
+# Optional: REQUIRE_ACCESS=1 forces API 401 without Access email header.
+# Leave unset for local miniflare / astro dev.
 
 OPENCODE_API_KEY=
+# REQUIRE_ACCESS=

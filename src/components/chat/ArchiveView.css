@@ -1,0 +1,130 @@
+.chat-archive {
+  display: grid;
+  gap: var(--space-xl);
+  padding-block: var(--space-xl);
+  max-width: 48rem;
+}
+
+.chat-archive__intro {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.chat-archive__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.chat-archive__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  letter-spacing: -0.03em;
+}
+
+.chat-archive__lede {
+  margin: 0;
+  color: var(--color-ink-muted);
+  max-width: 40ch;
+  line-height: 1.55;
+}
+
+.chat-archive__nav {
+  margin: var(--space-sm) 0 0;
+}
+
+.chat-archive__nav a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.chat-archive__nav a:hover {
+  text-decoration: underline;
+}
+
+.chat-archive__banner {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.chat-archive__banner button {
+  font: inherit;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.chat-archive__empty {
+  margin: 0;
+  color: var(--color-ink-muted);
+}
+
+.chat-archive__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.chat-archive__item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  background:
+    radial-gradient(
+      ellipse 70% 50% at 0% 0%,
+      var(--color-spot),
+      transparent 55%
+    ),
+    color-mix(in srgb, var(--color-surface) 88%, transparent);
+}
+
+.chat-archive__item-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+
+.chat-archive__item-sub {
+  margin: 0.25rem 0 0;
+  color: var(--color-ink-muted);
+  font-size: 0.8125rem;
+}
+
+.chat-archive__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  align-items: start;
+}
+
+.chat-archive__btn {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+  padding: 0.5rem 0.8rem;
+  font-weight: 600;
+}
+
+.chat-archive__btn--danger {
+  background: transparent;
+  color: color-mix(in srgb, #c45b5b 85%, var(--color-ink));
+  border-color: color-mix(in srgb, #c45b5b 35%, var(--color-border));
+  font-weight: 500;
+}
