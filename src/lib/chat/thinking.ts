@@ -52,9 +52,39 @@ const MODEL_THINKING_LEVELS: Record<string, ThinkingLevel[]> = {
   "qwen3.6-plus": ANTHROPIC_THINKING,
 };
 
+function normalizeModelId(modelId: string): string {
+  return modelId.trim().toLowerCase();
+}
+
 export function thinkingLevelsForModel(modelId: string): ThinkingLevel[] {
-  const levels = MODEL_THINKING_LEVELS[modelId.trim().toLowerCase()];
+  const levels = MODEL_THINKING_LEVELS[normalizeModelId(modelId)];
   return levels?.length ? [...levels] : [...OFF_ONLY];
+}
+
+/** True when the model exposes thinking UI levels beyond Off-only. */
+export function modelHasThinkingLevels(modelId: string): boolean {
+  return thinkingLevelsForModel(modelId).some((level) => level !== "off");
+}
+
+/**
+ * OpenAI-compatible Go models that accept `thinking: { type: "disabled" }`.
+ * DeepSeek V4 and Kimi K2.6 default thinking on and require an explicit disable.
+ * Kimi K3 / K2.7-code are always-on and reject (or ignore) disable.
+ */
+export function openaiCompatibleThinkingCanDisable(modelId: string): boolean {
+  const id = normalizeModelId(modelId);
+  if (!modelHasThinkingLevels(id)) return false;
+  if (id.startsWith("kimi-k2.7")) return false;
+  if (id === "kimi-k3" || id.startsWith("kimi-k3.")) return false;
+  return true;
+}
+
+/**
+ * DeepSeek-style OpenAI path: send `thinking` toggle together with
+ * `reasoning_effort`. Kimi K2.x rejects combining both; K3 uses effort only.
+ */
+export function openaiCompatibleUsesThinkingWithEffort(modelId: string): boolean {
+  return normalizeModelId(modelId).startsWith("deepseek");
 }
 
 export function isThinkingLevel(

@@ -7,6 +7,9 @@ import { providerKindForModelId } from "./models";
 import {
   anthropicThinkingBudget,
   coerceThinkingLevel,
+  modelHasThinkingLevels,
+  openaiCompatibleThinkingCanDisable,
+  openaiCompatibleUsesThinkingWithEffort,
   reasoningEffortForLevel,
 } from "./thinking";
 import type { ProviderKind, ThinkingLevel } from "./types";
@@ -39,18 +42,31 @@ export function createGoLanguageModel(
   return openai(modelId);
 }
 
-/** Provider option bag for streamText based on model + thinking UI level. */
+/**
+ * Provider option bag for streamText based on model + thinking UI level.
+ *
+ * Off must be explicit for families that default thinking on (DeepSeek V4,
+ * Kimi K2.6, Qwen/MiniMax Anthropic hybrids). Omitting options leaves thinking
+ * enabled upstream.
+ */
 export function goThinkingProviderOptions(
   modelId: string,
   thinkingLevel: ThinkingLevel,
   catalogProvider?: ProviderKind | string | null,
 ): SharedV4ProviderOptions | undefined {
   const level = coerceThinkingLevel(modelId, thinkingLevel);
-  if (level === "off") return undefined;
-
   const kind = providerKindForModelId(modelId, catalogProvider);
 
   if (kind === "anthropic") {
+    if (level === "off") {
+      if (!modelHasThinkingLevels(modelId)) return undefined;
+      return {
+        "opencode-go": {
+          thinking: { type: "disabled" },
+        },
+      };
+    }
+
     const budget = anthropicThinkingBudget(level);
     if (budget == null) return undefined;
     return {
@@ -60,8 +76,27 @@ export function goThinkingProviderOptions(
     };
   }
 
+  if (level === "off") {
+    if (!openaiCompatibleThinkingCanDisable(modelId)) return undefined;
+    return {
+      "opencode-go": {
+        thinking: { type: "disabled" },
+      },
+    };
+  }
+
   const effort = reasoningEffortForLevel(level);
   if (!effort) return undefined;
+
+  if (openaiCompatibleUsesThinkingWithEffort(modelId)) {
+    return {
+      "opencode-go": {
+        thinking: { type: "enabled" },
+        reasoningEffort: effort,
+      },
+    };
+  }
+
   return {
     "opencode-go": {
       reasoningEffort: effort,
