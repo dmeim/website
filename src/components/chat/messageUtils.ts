@@ -10,14 +10,25 @@ export type ChatUiMessage = UIMessage & {
 export function dtoToUiMessages(messages: ChatMessageDto[]): ChatUiMessage[] {
   return messages
     .filter((m) => m.role === "user" || m.role === "assistant")
-    .map((m) => ({
-      id: m.id,
-      role: m.role,
-      parts: [{ type: "text" as const, text: m.content }],
-      metadata: {
-        attachments: m.attachments,
-      },
-    }));
+    .map((m) => {
+      const parts: ChatUiMessage["parts"] = [];
+      if (m.reasoning?.trim()) {
+        parts.push({
+          type: "reasoning",
+          text: m.reasoning,
+          state: "done",
+        });
+      }
+      parts.push({ type: "text", text: m.content });
+      return {
+        id: m.id,
+        role: m.role,
+        parts,
+        metadata: {
+          attachments: m.attachments,
+        },
+      };
+    });
 }
 
 export function textFromParts(message: UIMessage): string {
@@ -25,6 +36,21 @@ export function textFromParts(message: UIMessage): string {
     .filter((p): p is { type: "text"; text: string } => p.type === "text")
     .map((p) => p.text)
     .join("");
+}
+
+export function reasoningFromParts(message: UIMessage): {
+  text: string;
+  streaming: boolean;
+} | null {
+  const reasoningParts = message.parts.filter(
+    (p): p is { type: "reasoning"; text: string; state?: "streaming" | "done" } =>
+      p.type === "reasoning",
+  );
+  if (reasoningParts.length === 0) return null;
+  const text = reasoningParts.map((p) => p.text).join("");
+  if (!text.trim()) return null;
+  const streaming = reasoningParts.some((p) => p.state === "streaming");
+  return { text, streaming };
 }
 
 export function attachmentsOf(message: UIMessage): MessageAttachmentSummary[] {

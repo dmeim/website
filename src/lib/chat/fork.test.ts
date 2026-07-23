@@ -9,6 +9,7 @@ const msgs = (
     id: r.id,
     role: r.role,
     content: r.content,
+    reasoning: null,
     createdAt: "t",
     seq: i + 1,
     attachments: [],

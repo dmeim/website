@@ -8,6 +8,9 @@ export type LibraryKind = "image" | "video" | "pdf" | "other";
 
 export type ProviderKind = "openai-compatible" | "anthropic";
 
+/** UI thinking / reasoning effort levels (model may support a subset). */
+export type ThinkingLevel = "off" | "low" | "medium" | "high" | "xhigh";
+
 export interface ChatRow {
   id: string;
   title: string;
@@ -29,6 +32,8 @@ export interface MessageRow {
   chat_id: string;
   role: ChatRole;
   content: string;
+  /** Model chain-of-thought / reasoning text when present. */
+  reasoning: string | null;
   created_at: string;
   seq: number;
 }
@@ -93,6 +98,8 @@ export interface ChatMessageDto {
   id: string;
   role: ChatRole;
   content: string;
+  /** Assistant reasoning / thinking text when the model returned any. */
+  reasoning: string | null;
   createdAt: string;
   seq: number;
   attachments: MessageAttachmentSummary[];
@@ -101,7 +108,12 @@ export interface ChatMessageDto {
 export interface GoModelInfo {
   id: string;
   name: string;
+  /** API family for the request (OpenAI-compatible vs Anthropic messages). */
   provider: ProviderKind;
+  /** Catalog / service provider (e.g. OpenCode Go). */
+  chatProvider: "opencode-go";
+  /** Thinking levels this model accepts in the UI. */
+  thinkingLevels: ThinkingLevel[];
 }
 
 export interface ChatShellView {

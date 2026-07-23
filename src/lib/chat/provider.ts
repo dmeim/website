@@ -1,9 +1,15 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import type { SharedV4ProviderOptions } from "@ai-sdk/provider";
 import type { LanguageModel } from "ai";
 import { OPENCODE_GO_BASE } from "./constants";
 import { providerKindForModelId } from "./models";
-import type { ProviderKind } from "./types";
+import {
+  anthropicThinkingBudget,
+  coerceThinkingLevel,
+  reasoningEffortForLevel,
+} from "./thinking";
+import type { ProviderKind, ThinkingLevel } from "./types";
 
 /**
  * Build an OpenCode Go language model for the given model id.
@@ -31,4 +37,34 @@ export function createGoLanguageModel(
     apiKey,
   });
   return openai(modelId);
+}
+
+/** Provider option bag for streamText based on model + thinking UI level. */
+export function goThinkingProviderOptions(
+  modelId: string,
+  thinkingLevel: ThinkingLevel,
+  catalogProvider?: ProviderKind | string | null,
+): SharedV4ProviderOptions | undefined {
+  const level = coerceThinkingLevel(modelId, thinkingLevel);
+  if (level === "off") return undefined;
+
+  const kind = providerKindForModelId(modelId, catalogProvider);
+
+  if (kind === "anthropic") {
+    const budget = anthropicThinkingBudget(level);
+    if (budget == null) return undefined;
+    return {
+      "opencode-go": {
+        thinking: { type: "enabled", budgetTokens: budget },
+      },
+    };
+  }
+
+  const effort = reasoningEffortForLevel(level);
+  if (!effort) return undefined;
+  return {
+    "opencode-go": {
+      reasoningEffort: effort,
+    },
+  };
 }

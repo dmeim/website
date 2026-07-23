@@ -24,8 +24,9 @@ import {
   updateChat,
 } from "@/lib/chat";
 import { assistantContentToPersist } from "@/lib/chat/persist-assistant";
-import { createGoLanguageModel } from "@/lib/chat/provider";
-import type { MessageAttachmentSummary } from "@/lib/chat/types";
+import { createGoLanguageModel, goThinkingProviderOptions } from "@/lib/chat/provider";
+import { coerceThinkingLevel, isThinkingLevel } from "@/lib/chat/thinking";
+import type { MessageAttachmentSummary, ThinkingLevel } from "@/lib/chat/types";
 
 export const prerender = false;
 
@@ -62,6 +63,7 @@ export const POST: APIRoute = async (context) => {
     chatId?: string;
     message?: string;
     modelId?: string;
+    thinkingLevel?: string;
     attachmentIds?: string[];
     /** Re-run completion for the last user turn (delete trailing assistants). */
     regenerate?: boolean;
@@ -106,6 +108,12 @@ export const POST: APIRoute = async (context) => {
       typeof body.modelId === "string" && body.modelId.trim()
         ? body.modelId.trim()
         : chat.model_id;
+
+    const thinkingRaw =
+      typeof body.thinkingLevel === "string" ? body.thinkingLevel.trim() : "off";
+    const thinkingLevel: ThinkingLevel = isThinkingLevel(thinkingRaw)
+      ? coerceThinkingLevel(modelId, thinkingRaw)
+      : "off";
 
     if (modelId !== chat.model_id) {
       await updateChat(db, chatId, { modelId });
@@ -172,12 +180,18 @@ export const POST: APIRoute = async (context) => {
       });
     }
 
-    const persistAssistant = async (content: string | null) => {
-      if (!content) return;
+    const persistAssistant = async (payload: {
+      text?: string | null;
+      reasoningText?: string | null;
+      steps?: Array<{ text?: string; reasoningText?: string }>;
+    }) => {
+      const normalized = assistantContentToPersist(payload);
+      if (!normalized) return;
       await insertMessage(db, {
         chatId,
         role: "assistant",
-        content,
+        content: normalized.content,
+        reasoning: normalized.reasoning,
       });
     };
 
@@ -199,9 +213,10 @@ export const POST: APIRoute = async (context) => {
       model: createGoLanguageModel(modelId, apiKey),
       messages,
       abortSignal,
-      onFinish: async ({ text }) => {
+      providerOptions: goThinkingProviderOptions(modelId, thinkingLevel),
+      onFinish: async ({ text, reasoningText }) => {
         try {
-          await persistAssistant(assistantContentToPersist({ text }));
+          await persistAssistant({ text, reasoningText });
           await setChatLastError(db, chatId, null);
         } finally {
           clearGenerationAbort(chatId);
@@ -211,7 +226,12 @@ export const POST: APIRoute = async (context) => {
       onAbort: async ({ steps }) => {
         try {
           // Persist partials on explicit Stop so the user keeps progress.
-          await persistAssistant(assistantContentToPersist({ steps }));
+          await persistAssistant({
+            steps: steps.map((step) => ({
+              text: step.text,
+              reasoningText: step.reasoningText,
+            })),
+          });
           await setChatLastError(db, chatId, null);
         } finally {
           clearGenerationAbort(chatId);
@@ -256,6 +276,7 @@ export const POST: APIRoute = async (context) => {
         n.includes("-truncated:"),
     );
     return result.toUIMessageStreamResponse({
+      sendReasoning: true,
       headers:
         degradedNotes.length > 0
           ? {

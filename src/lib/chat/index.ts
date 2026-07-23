@@ -2,6 +2,7 @@ export * from "./types";
 export * from "./constants";
 export * from "./models";
 export * from "./models-cache";
+export * from "./thinking";
 export * from "./library";
 export * from "./title";
 export * from "./access";

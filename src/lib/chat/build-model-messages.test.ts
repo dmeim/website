@@ -9,6 +9,7 @@ describe("buildModelMessages", () => {
         id: "1",
         role: "user",
         content: "Hello",
+        reasoning: null,
         createdAt: "t",
         seq: 1,
         attachments: [],
@@ -17,6 +18,7 @@ describe("buildModelMessages", () => {
         id: "2",
         role: "assistant",
         content: "Hi",
+        reasoning: null,
         createdAt: "t",
         seq: 2,
         attachments: [],
@@ -36,6 +38,7 @@ describe("buildModelMessages", () => {
         id: "1",
         role: "user",
         content: "Describe",
+        reasoning: null,
         createdAt: "t",
         seq: 1,
         attachments: [
@@ -70,6 +73,7 @@ describe("buildModelMessages", () => {
         id: "1",
         role: "user",
         content: "Summarize",
+        reasoning: null,
         createdAt: "t",
         seq: 1,
         attachments: [
@@ -101,6 +105,7 @@ describe("buildModelMessages", () => {
         id: "1",
         role: "user",
         content: "See clip",
+        reasoning: null,
         createdAt: "t",
         seq: 1,
         attachments: [

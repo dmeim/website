@@ -25,6 +25,15 @@ export function chatToMarkdownExport(
     lines.push(`_${message.createdAt}_`);
     lines.push("");
     lines.push(fenceIfNeeded(message.content || "").trimEnd() || "_(empty)_");
+    if (message.reasoning?.trim()) {
+      lines.push("");
+      lines.push("<details>");
+      lines.push("<summary>Thinking</summary>");
+      lines.push("");
+      lines.push(fenceIfNeeded(message.reasoning).trimEnd());
+      lines.push("");
+      lines.push("</details>");
+    }
     if (message.attachments.length > 0) {
       lines.push("");
       lines.push(

@@ -1,4 +1,5 @@
 import type { GoModelInfo, ProviderKind } from "./types";
+import { thinkingLevelsForModel } from "./thinking";
 
 /** Models that use the Anthropic-compatible `/messages` endpoint. */
 const ANTHROPIC_MODEL_IDS = new Set([
@@ -30,25 +31,39 @@ export function providerKindForModelId(
   return "openai-compatible";
 }
 
+function enrichModel(
+  id: string,
+  name: string,
+  provider: ProviderKind,
+): GoModelInfo {
+  return {
+    id,
+    name,
+    provider,
+    chatProvider: "opencode-go",
+    thinkingLevels: thinkingLevelsForModel(id),
+  };
+}
+
 /** Static fallback when live `/v1/models` fetch fails. */
 export const FALLBACK_GO_MODELS: GoModelInfo[] = [
-  { id: "deepseek-v4-flash", name: "DeepSeek V4 Flash", provider: "openai-compatible" },
-  { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro", provider: "openai-compatible" },
-  { id: "kimi-k2.7-code", name: "Kimi K2.7 Code", provider: "openai-compatible" },
-  { id: "kimi-k2.6", name: "Kimi K2.6", provider: "openai-compatible" },
-  { id: "kimi-k3", name: "Kimi K3", provider: "openai-compatible" },
-  { id: "glm-5.2", name: "GLM-5.2", provider: "openai-compatible" },
-  { id: "glm-5.1", name: "GLM-5.1", provider: "openai-compatible" },
-  { id: "grok-4.5", name: "Grok 4.5", provider: "openai-compatible" },
-  { id: "mimo-v2.5", name: "MiMo-V2.5", provider: "openai-compatible" },
-  { id: "mimo-v2.5-pro", name: "MiMo-V2.5-Pro", provider: "openai-compatible" },
-  { id: "hy3", name: "Hy3", provider: "openai-compatible" },
-  { id: "minimax-m3", name: "MiniMax M3", provider: "anthropic" },
-  { id: "minimax-m2.7", name: "MiniMax M2.7", provider: "anthropic" },
-  { id: "minimax-m2.5", name: "MiniMax M2.5", provider: "anthropic" },
-  { id: "qwen3.7-max", name: "Qwen3.7 Max", provider: "anthropic" },
-  { id: "qwen3.7-plus", name: "Qwen3.7 Plus", provider: "anthropic" },
-  { id: "qwen3.6-plus", name: "Qwen3.6 Plus", provider: "anthropic" },
+  enrichModel("deepseek-v4-flash", "DeepSeek V4 Flash", "openai-compatible"),
+  enrichModel("deepseek-v4-pro", "DeepSeek V4 Pro", "openai-compatible"),
+  enrichModel("kimi-k2.7-code", "Kimi K2.7 Code", "openai-compatible"),
+  enrichModel("kimi-k2.6", "Kimi K2.6", "openai-compatible"),
+  enrichModel("kimi-k3", "Kimi K3", "openai-compatible"),
+  enrichModel("glm-5.2", "GLM-5.2", "openai-compatible"),
+  enrichModel("glm-5.1", "GLM-5.1", "openai-compatible"),
+  enrichModel("grok-4.5", "Grok 4.5", "openai-compatible"),
+  enrichModel("mimo-v2.5", "MiMo-V2.5", "openai-compatible"),
+  enrichModel("mimo-v2.5-pro", "MiMo-V2.5-Pro", "openai-compatible"),
+  enrichModel("hy3", "Hy3", "openai-compatible"),
+  enrichModel("minimax-m3", "MiniMax M3", "anthropic"),
+  enrichModel("minimax-m2.7", "MiniMax M2.7", "anthropic"),
+  enrichModel("minimax-m2.5", "MiniMax M2.5", "anthropic"),
+  enrichModel("qwen3.7-max", "Qwen3.7 Max", "anthropic"),
+  enrichModel("qwen3.7-plus", "Qwen3.7 Plus", "anthropic"),
+  enrichModel("qwen3.6-plus", "Qwen3.6 Plus", "anthropic"),
 ];
 
 interface RawGoModel {
@@ -95,11 +110,7 @@ export function normalizeGoModelsPayload(payload: unknown): GoModelInfo[] {
       typeof raw.name === "string" && raw.name.trim()
         ? raw.name.trim()
         : id;
-    out.push({
-      id,
-      name,
-      provider: inferProviderFromRaw(raw, id),
-    });
+    out.push(enrichModel(id, name, inferProviderFromRaw(raw, id)));
   }
 
   return out.length > 0 ? out : [...FALLBACK_GO_MODELS];

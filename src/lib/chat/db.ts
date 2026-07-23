@@ -214,10 +214,10 @@ export async function forkChat(
     const newMsgId = newId();
     await db
       .prepare(
-        `INSERT INTO messages (id, chat_id, role, content, created_at, seq)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO messages (id, chat_id, role, content, reasoning, created_at, seq)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(newMsgId, chat.id, m.role, m.content, ts, seq)
+      .bind(newMsgId, chat.id, m.role, m.content, m.reasoning, ts, seq)
       .run();
     for (const a of m.attachments) {
       await db
@@ -235,14 +235,15 @@ export async function forkChat(
     const newMsgId = newId();
     await db
       .prepare(
-        `INSERT INTO messages (id, chat_id, role, content, created_at, seq)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO messages (id, chat_id, role, content, reasoning, created_at, seq)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         newMsgId,
         chat.id,
         "user",
         plan.editedUser.content,
+        null,
         ts,
         seq,
       )
@@ -398,6 +399,7 @@ export async function listMessages(
     id: m.id,
     role: m.role,
     content: m.content,
+    reasoning: m.reasoning ?? null,
     createdAt: m.created_at,
     seq: m.seq,
     attachments: byMessage.get(m.id) ?? [],
@@ -421,18 +423,23 @@ export async function insertMessage(
     chatId: string;
     role: MessageRow["role"];
     content: string;
+    reasoning?: string | null;
     attachmentIds?: string[];
   },
 ): Promise<ChatMessageDto> {
   const id = newId();
   const ts = nowIso();
   const seq = await nextMessageSeq(db, input.chatId);
+  const reasoning =
+    typeof input.reasoning === "string" && input.reasoning.trim()
+      ? input.reasoning.trim()
+      : null;
   await db
     .prepare(
-      `INSERT INTO messages (id, chat_id, role, content, created_at, seq)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO messages (id, chat_id, role, content, reasoning, created_at, seq)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
     )
-    .bind(id, input.chatId, input.role, input.content, ts, seq)
+    .bind(id, input.chatId, input.role, input.content, reasoning, ts, seq)
     .run();
 
   const attachments: MessageAttachmentSummary[] = [];
@@ -469,6 +476,7 @@ export async function insertMessage(
     id,
     role: input.role,
     content: input.content,
+    reasoning,
     createdAt: ts,
     seq,
     attachments,

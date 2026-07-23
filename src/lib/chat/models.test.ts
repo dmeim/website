@@ -33,6 +33,8 @@ describe("normalizeGoModelsPayload", () => {
         id: "deepseek-v4-flash",
         name: "DeepSeek V4 Flash",
         provider: "openai-compatible",
+        chatProvider: "opencode-go",
+        thinkingLevels: ["off", "low", "medium", "high", "xhigh"],
       },
     ]);
   });
