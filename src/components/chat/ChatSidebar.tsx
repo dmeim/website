@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Archive,
   Library,
   MessageCirclePlus,
   ScrollText,
+  Search,
   Trash2,
+  X,
 } from "lucide";
 import type { ChatSummary } from "@/lib/chat/types";
 import { LucideIcon } from "./LucideIcon";
@@ -37,6 +39,19 @@ export function ChatSidebar({
   onDeleteChat,
 }: ChatSidebarProps) {
   const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (searchOpen) {
+      searchInputRef.current?.focus();
+    }
+  }, [searchOpen]);
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setQuery("");
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -85,17 +100,48 @@ export function ChatSidebar({
       </div>
 
       <div className="chat-sidebar__section">
-        <h2 className="chat-sidebar__heading">Chats</h2>
-        <label className="chat-sidebar__search">
-          <span className="visually-hidden">Search chats</span>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search chats…"
-            autoComplete="off"
-          />
-        </label>
+        <div className="chat-sidebar__section-head">
+          {searchOpen ? (
+            <div className="chat-sidebar__search-field">
+              <label className="visually-hidden" htmlFor="chat-sidebar-search">
+                Search chats
+              </label>
+              <input
+                ref={searchInputRef}
+                id="chat-sidebar-search"
+                type="search"
+                className="chat-sidebar__search-input"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search chats…"
+                autoComplete="off"
+              />
+              <button
+                type="button"
+                className="chat-sidebar__search-close"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={closeSearch}
+                aria-label="Close search"
+                title="Close"
+              >
+                <LucideIcon icon={X} size={16} />
+              </button>
+            </div>
+          ) : (
+            <>
+              <h2 className="chat-sidebar__heading">Chats</h2>
+              <button
+                type="button"
+                className="chat-sidebar__search-btn"
+                onClick={() => setSearchOpen(true)}
+                aria-label="Search chats"
+                title="Search chats"
+              >
+                <LucideIcon icon={Search} size={16} />
+              </button>
+            </>
+          )}
+        </div>
         <ul className="chat-sidebar__list">
           {filtered.length === 0 ? (
             <li className="chat-sidebar__empty">

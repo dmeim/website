@@ -109,16 +109,99 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-sm);
+}
+
+.chat-sidebar__section-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-shrink: 0;
 }
 
 .chat-sidebar__heading {
   margin: 0;
+  flex: 1;
+  min-width: 0;
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-ink-muted);
+}
+
+.chat-sidebar__search-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.85rem;
+  height: 1.85rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+}
+
+.chat-sidebar__search-btn:hover {
+  color: var(--color-ink);
+  border-color: var(--color-border);
+  background: color-mix(in srgb, var(--color-cream) 8%, transparent);
+}
+
+.chat-sidebar__search-field {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.chat-sidebar__search-input {
+  box-sizing: border-box;
+  height: 2.25rem;
+  min-width: 0;
+  flex: 1;
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0 0.55rem;
+}
+
+.chat-sidebar__search-input:focus {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  outline-offset: 1px;
+}
+
+.chat-sidebar__search-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex: 0 0 2.25rem;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  font: inherit;
+}
+
+.chat-sidebar__search-close:hover {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-cream) 8%, transparent);
 }
 
 .chat-sidebar__list {
@@ -401,26 +484,6 @@
   font-size: 0.8125rem;
   color: var(--color-ink-muted);
   opacity: 0.9;
-}
-
-.chat-sidebar__search {
-  display: block;
-  padding: 0 var(--space-md) var(--space-xs);
-}
-
-.chat-sidebar__search input {
-  width: 100%;
-  font: inherit;
-  font-size: 0.8125rem;
-  color: var(--color-ink);
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  border: 1px solid var(--color-border);
-  padding: 0.45rem 0.6rem;
-}
-
-.chat-sidebar__search input:focus {
-  outline: 2px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
-  outline-offset: 1px;
 }
 
 .chat-bubble__regen {
