@@ -15,6 +15,7 @@ import type {
   LibraryAssetSummary,
 } from "@/lib/chat/types";
 import {
+  chatExportUrl,
   createChat,
   deleteChat,
   deleteLibraryAsset,
@@ -23,6 +24,7 @@ import {
   fetchLibrary,
   fetchModels,
   patchChat,
+  stopChat,
   uploadLibraryFile,
 } from "./api";
 import { ChatPane } from "./ChatPane";
@@ -39,10 +41,23 @@ type Props = {
 
 const POLL_MS = 1500;
 const POST_IDLE_POLLS = 2;
+const NEAR_BOTTOM_PX = 120;
 
 function lastMessageIsUser(messages: { role: string }[]): boolean {
   const last = messages[messages.length - 1];
   return last?.role === "user";
+}
+
+function lastMessageIsAssistant(messages: { role: string }[]): boolean {
+  const last = messages[messages.length - 1];
+  return last?.role === "assistant";
+}
+
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+  return target.isContentEditable;
 }
 
 export default function ChatShell({ initialChatId = null }: Props) {
@@ -71,12 +86,15 @@ export default function ChatShell({ initialChatId = null }: Props) {
   const activeChatIdRef = useRef(activeChatId);
   const modelIdRef = useRef(modelId);
   const pendingIdsRef = useRef<string[]>([]);
+  const threadRef = useRef<HTMLDivElement | null>(null);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesRef = useRef<UIMessage[]>([]);
   const awaitingRef = useRef(awaitingByChat);
   const streamingRef = useRef(false);
   const idlePollsLeftRef = useRef(0);
+  const stickToBottomRef = useRef(true);
 
   useEffect(() => {
     activeChatIdRef.current = activeChatId;
@@ -95,7 +113,16 @@ export default function ChatShell({ initialChatId = null }: Props) {
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        prepareSendMessagesRequest: ({ messages }) => {
+        prepareSendMessagesRequest: ({ messages, trigger }) => {
+          if (trigger === "regenerate-message") {
+            return {
+              body: {
+                chatId: activeChatIdRef.current,
+                modelId: modelIdRef.current,
+                regenerate: true,
+              },
+            };
+          }
           const lastUser = [...messages]
             .reverse()
             .find((m) => m.role === "user");
@@ -117,6 +144,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
     messages,
     setMessages,
     sendMessage,
+    regenerate,
     status,
     stop,
     error,
@@ -140,6 +168,25 @@ export default function ChatShell({ initialChatId = null }: Props) {
       } catch {
         // ignore refresh errors
       }
+    },
+    onError: (err) => {
+      const id = activeChatIdRef.current;
+      if (id) {
+        setAwaitingByChat((prev) => ({ ...prev, [id]: false }));
+        setActiveChat((prev) =>
+          prev && prev.id === id
+            ? { ...prev, generatingAt: null, lastError: err.message }
+            : prev,
+        );
+        setChats((prev) =>
+          prev.map((c) =>
+            c.id === id
+              ? { ...c, generatingAt: null, lastError: err.message }
+              : c,
+          ),
+        );
+      }
+      setBanner(err.message);
     },
   });
 
@@ -230,8 +277,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
 
   const selectChat = useCallback(
     async (id: string | null, opts?: { replaceUrl?: boolean }) => {
-      // Abort any in-flight stream so status returns to ready (avoids stuck Send).
-      // Server-side consumeStream still finishes and persists the assistant turn.
+      // Abort any in-flight *client* stream so status returns to ready.
+      // Server-side consumeStream still finishes and persists the assistant turn
+      // unless the user explicitly hits Stop (which calls /stop).
       void stop();
       clearError();
       setBusy(false);
@@ -240,6 +288,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
       setPendingAttachments([]);
       setBanner(null);
       idlePollsLeftRef.current = 0;
+      stickToBottomRef.current = true;
 
       if (!id) {
         setActiveChatId(null);
@@ -261,6 +310,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
         setActiveChat(chat);
         setModelId(chat.modelId || DEFAULT_CHAT_MODEL_ID);
         setMessages(dtoToUiMessages(rows));
+        if (chat.lastError) {
+          setBanner(chat.lastError);
+        }
         if (chat.generatingAt) {
           markAwaiting(id, true);
           idlePollsLeftRef.current = POST_IDLE_POLLS;
@@ -290,9 +342,17 @@ export default function ChatShell({ initialChatId = null }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Track whether the user is following the live reply (near bottom).
   useEffect(() => {
-    threadEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages, streaming]);
+    const el = threadRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+      stickToBottomRef.current = distance < NEAR_BOTTOM_PX;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [activeChatId, view, loadingThread]);
 
   const needsPoll =
     Object.values(awaitingByChat).some(Boolean) ||
@@ -321,7 +381,6 @@ export default function ChatShell({ initialChatId = null }: Props) {
           const next = { ...prev };
           const activeId = activeChatIdRef.current;
           for (const id of Object.keys(next)) {
-            // Clear non-active chats once the server marks them idle.
             if (next[id] && !generatingIds.has(id) && id !== activeId) {
               next[id] = false;
               changed = true;
@@ -342,6 +401,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
         const summary = list.find((c) => c.id === id) ?? null;
         if (summary) {
           setActiveChat(summary);
+          if (summary.lastError && !streamingRef.current) {
+            setBanner((prev) => prev ?? summary.lastError);
+          }
         }
 
         const serverGenerating = Boolean(summary?.generatingAt);
@@ -351,7 +413,6 @@ export default function ChatShell({ initialChatId = null }: Props) {
           idlePollsLeftRef.current > 0 ||
           lastMessageIsUser(messagesRef.current);
 
-        // While the live client stream is active, don't clobber tokens from D1.
         if (!shouldRefreshThread || streamingRef.current) {
           return;
         }
@@ -395,6 +456,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
       const chat = await createChat({ modelId });
       await refreshChats();
       await selectChat(chat.id);
+      composerRef.current?.focus();
     } catch (err) {
       setBanner(err instanceof Error ? err.message : "Could not create chat");
     } finally {
@@ -465,6 +527,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
     setBusy(true);
     setBanner(null);
     clearError();
+    stickToBottomRef.current = true;
     try {
       const chatId = await ensureChat();
       markAwaiting(chatId, true);
@@ -473,13 +536,21 @@ export default function ChatShell({ initialChatId = null }: Props) {
       setChats((prev) =>
         prev.map((c) =>
           c.id === chatId
-            ? { ...c, generatingAt: c.generatingAt ?? optimisticAt }
+            ? {
+                ...c,
+                generatingAt: c.generatingAt ?? optimisticAt,
+                lastError: null,
+              }
             : c,
         ),
       );
       setActiveChat((prev) =>
         prev && prev.id === chatId
-          ? { ...prev, generatingAt: prev.generatingAt ?? optimisticAt }
+          ? {
+              ...prev,
+              generatingAt: prev.generatingAt ?? optimisticAt,
+              lastError: null,
+            }
           : prev,
       );
       setInput("");
@@ -489,7 +560,6 @@ export default function ChatShell({ initialChatId = null }: Props) {
           ? `(Attached ${pendingAttachments.length} file${pendingAttachments.length === 1 ? "" : "s"})`
           : "");
       const sendPromise = sendMessage({ text: outbound });
-      // prepareSendMessagesRequest already read pendingIdsRef; clear chips now.
       setPendingAttachments([]);
       pendingIdsRef.current = [];
       await sendPromise;
@@ -500,6 +570,68 @@ export default function ChatShell({ initialChatId = null }: Props) {
     } finally {
       setBusy(false);
     }
+  };
+
+  const handleStop = async () => {
+    const id = activeChatIdRef.current;
+    void stop();
+    if (!id) return;
+    try {
+      await stopChat(id);
+      markAwaiting(id, false);
+      setActiveChat((prev) =>
+        prev && prev.id === id ? { ...prev, generatingAt: null } : prev,
+      );
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === id ? { ...c, generatingAt: null } : c,
+        ),
+      );
+      // Pull server state (partial assistant may have been persisted).
+      idlePollsLeftRef.current = POST_IDLE_POLLS;
+      markAwaiting(id, true);
+    } catch (err) {
+      setBanner(err instanceof Error ? err.message : "Stop failed");
+    }
+  };
+
+  const handleRegenerate = async () => {
+    if (!activeChatId || streaming || busy) return;
+    if (!lastMessageIsAssistant(messages) && !lastMessageIsUser(messages)) {
+      return;
+    }
+    setBanner(null);
+    clearError();
+    stickToBottomRef.current = true;
+    markAwaiting(activeChatId, true);
+    idlePollsLeftRef.current = POST_IDLE_POLLS;
+    try {
+      // Drop trailing assistant locally; server truncate happens on regenerate.
+      if (lastMessageIsAssistant(messages)) {
+        setMessages(messages.slice(0, -1));
+      }
+      await regenerate();
+    } catch (err) {
+      markAwaiting(activeChatId, false);
+      setBanner(err instanceof Error ? err.message : "Regenerate failed");
+    }
+  };
+
+  const handleRetry = async () => {
+    setBanner(null);
+    clearError();
+    if (lastMessageIsUser(messages)) {
+      await handleRegenerate();
+      return;
+    }
+    if (lastMessageIsAssistant(messages)) {
+      await handleRegenerate();
+    }
+  };
+
+  const handleExport = () => {
+    if (!activeChatId) return;
+    window.open(chatExportUrl(activeChatId), "_blank", "noopener,noreferrer");
   };
 
   const handleUpload = async (files: FileList | null) => {
@@ -564,6 +696,16 @@ export default function ChatShell({ initialChatId = null }: Props) {
       Boolean(activeChatId && awaitingByChat[activeChatId])) &&
     (streaming || lastMessageIsUser(messages));
 
+  // Auto-scroll when generating indicator / messages change (near-bottom only).
+  useEffect(() => {
+    if (view !== "chat") return;
+    if (!stickToBottomRef.current) return;
+    threadEndRef.current?.scrollIntoView({
+      behavior: streaming ? "auto" : "smooth",
+      block: "end",
+    });
+  }, [messages, streaming, view, showGeneratingIndicator]);
+
   const generatingChatIds = useMemo(() => {
     const ids = new Set<string>();
     for (const c of chats) {
@@ -574,6 +716,78 @@ export default function ChatShell({ initialChatId = null }: Props) {
     }
     return ids;
   }, [chats, awaitingByChat]);
+
+  const paneError =
+    banner ||
+    error?.message ||
+    activeChat?.lastError ||
+    null;
+
+  const canRetry =
+    Boolean(paneError) &&
+    Boolean(activeChatId) &&
+    !streaming &&
+    (lastMessageIsUser(messages) || lastMessageIsAssistant(messages));
+
+  const canRegenerate =
+    Boolean(activeChatId) &&
+    !streaming &&
+    !busy &&
+    (lastMessageIsAssistant(messages) ||
+      (lastMessageIsUser(messages) && !showGeneratingIndicator));
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const mod = event.metaKey || event.ctrlKey;
+
+      if (event.key === "Escape") {
+        if (streaming || showGeneratingIndicator) {
+          event.preventDefault();
+          void handleStop();
+          return;
+        }
+        if (sidebarOpen) {
+          event.preventDefault();
+          setSidebarOpen(false);
+        }
+        return;
+      }
+
+      // ⌘/Ctrl+Shift+O — new chat (ChatGPT-like; avoids browser new-window)
+      if (mod && event.shiftKey && event.key.toLowerCase() === "o") {
+        event.preventDefault();
+        void handleNewChat();
+        return;
+      }
+
+      // ⌘/Ctrl+/ — focus composer
+      if (mod && event.key === "/") {
+        event.preventDefault();
+        setView("chat");
+        setSidebarOpen(false);
+        composerRef.current?.focus();
+        return;
+      }
+
+      // "/" focuses composer when not typing elsewhere
+      if (
+        event.key === "/" &&
+        !mod &&
+        !event.altKey &&
+        !isEditableTarget(event.target)
+      ) {
+        event.preventDefault();
+        setView("chat");
+        composerRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // intentionally omit handleNewChat/handleStop — use refs for stable listener
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streaming, showGeneratingIndicator, sidebarOpen]);
 
   return (
     <div
@@ -612,21 +826,6 @@ export default function ChatShell({ initialChatId = null }: Props) {
       />
 
       <section className="chat-main" aria-label="Chat workspace">
-        {banner || error ? (
-          <p className="chat-main__banner" role="status">
-            {banner || error?.message}
-            <button
-              type="button"
-              onClick={() => {
-                setBanner(null);
-                clearError();
-              }}
-            >
-              Dismiss
-            </button>
-          </p>
-        ) : null}
-
         {view === "library" ? (
           <LibraryPane
             assets={assets}
@@ -648,16 +847,32 @@ export default function ChatShell({ initialChatId = null }: Props) {
             streaming={streaming}
             generating={showGeneratingIndicator}
             busy={busy}
+            errorMessage={paneError}
+            canRetry={canRetry}
+            canRegenerate={canRegenerate}
+            canExport={Boolean(activeChatId) && messages.length > 0}
             onOpenSidebar={() => setSidebarOpen(true)}
             onModelChange={(next) => void handleModelChange(next)}
             onInputChange={setInput}
             onSubmit={(event) => void handleSubmit(event)}
-            onStop={() => stop()}
+            onStop={() => void handleStop()}
+            onRetry={() => void handleRetry()}
+            onRegenerate={() => void handleRegenerate()}
+            onExport={handleExport}
+            onDismissError={() => {
+              setBanner(null);
+              clearError();
+              setActiveChat((prev) =>
+                prev ? { ...prev, lastError: null } : prev,
+              );
+            }}
             onAttachClick={() => fileInputRef.current?.click()}
             onRemoveAttachment={(id) =>
               setPendingAttachments((prev) => prev.filter((a) => a.id !== id))
             }
+            threadRef={threadRef}
             threadEndRef={threadEndRef}
+            composerRef={composerRef}
           />
         )}
 

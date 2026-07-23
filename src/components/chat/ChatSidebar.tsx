@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import type { ChatSummary } from "@/lib/chat/types";
 
 type ChatSidebarProps = {
@@ -27,6 +28,14 @@ export function ChatSidebar({
   onArchiveChat,
   onDeleteChat,
 }: ChatSidebarProps) {
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return chats;
+    return chats.filter((c) => c.title.toLowerCase().includes(q));
+  }, [chats, query]);
+
   return (
     <aside className="chat-sidebar" aria-label="Chat navigation">
       <div className="chat-sidebar__top">
@@ -62,11 +71,23 @@ export function ChatSidebar({
 
       <div className="chat-sidebar__section">
         <h2 className="chat-sidebar__heading">Chats</h2>
+        <label className="chat-sidebar__search">
+          <span className="visually-hidden">Search chats</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search chats…"
+            autoComplete="off"
+          />
+        </label>
         <ul className="chat-sidebar__list">
-          {chats.length === 0 ? (
-            <li className="chat-sidebar__empty">No chats yet</li>
+          {filtered.length === 0 ? (
+            <li className="chat-sidebar__empty">
+              {chats.length === 0 ? "No chats yet" : "No matching chats"}
+            </li>
           ) : (
-            chats.map((chat) => {
+            filtered.map((chat) => {
               const isGenerating =
                 Boolean(chat.generatingAt) ||
                 Boolean(generatingChatIds?.has(chat.id));

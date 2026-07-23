@@ -23,6 +23,7 @@ export function chatToSummary(row: ChatRow): ChatSummary {
     modelId: row.model_id,
     archivedAt: row.archived_at,
     generatingAt: row.generating_at ?? null,
+    lastError: row.last_error ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -90,8 +91,8 @@ export async function createChat(
   const title = input.title?.trim() || "New chat";
   await db
     .prepare(
-      `INSERT INTO chats (id, title, model_id, archived_at, generating_at, created_at, updated_at)
-       VALUES (?, ?, ?, NULL, NULL, ?, ?)`,
+      `INSERT INTO chats (id, title, model_id, archived_at, generating_at, last_error, created_at, updated_at)
+       VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?)`,
     )
     .bind(id, title, input.modelId, ts, ts)
     .run();
@@ -101,6 +102,7 @@ export async function createChat(
     modelId: input.modelId,
     archivedAt: null,
     generatingAt: null,
+    lastError: null,
     createdAt: ts,
     updatedAt: ts,
   };
@@ -134,6 +136,7 @@ export async function updateChat(
     modelId,
     archivedAt,
     generatingAt: existing.generating_at ?? null,
+    lastError: existing.last_error ?? null,
     createdAt: existing.created_at,
     updatedAt,
   };
@@ -148,7 +151,7 @@ export async function setChatGenerating(
   if (generating) {
     await db
       .prepare(
-        `UPDATE chats SET generating_at = ?, updated_at = ? WHERE id = ?`,
+        `UPDATE chats SET generating_at = ?, last_error = NULL, updated_at = ? WHERE id = ?`,
       )
       .bind(ts, ts, id)
       .run();
@@ -160,6 +163,57 @@ export async function setChatGenerating(
     )
     .bind(ts, id)
     .run();
+}
+
+export async function setChatLastError(
+  db: D1Database,
+  id: string,
+  error: string | null,
+): Promise<void> {
+  const ts = nowIso();
+  await db
+    .prepare(`UPDATE chats SET last_error = ?, updated_at = ? WHERE id = ?`)
+    .bind(error, ts, id)
+    .run();
+}
+
+/** Delete messages at or after `fromSeq` (inclusive). Attachments cascade via FK. */
+export async function deleteMessagesFromSeq(
+  db: D1Database,
+  chatId: string,
+  fromSeq: number,
+): Promise<number> {
+  const result = await db
+    .prepare(`DELETE FROM messages WHERE chat_id = ? AND seq >= ?`)
+    .bind(chatId, fromSeq)
+    .run();
+  return result.meta.changes ?? 0;
+}
+
+/**
+ * Remove trailing assistant turns after the last user message.
+ * Returns the last user message dto, or null if none.
+ */
+export async function truncateAfterLastUser(
+  db: D1Database,
+  chatId: string,
+): Promise<ChatMessageDto | null> {
+  const messages = await listMessages(db, chatId);
+  let lastUserIdx = -1;
+  for (let i = messages.length - 1; i >= 0; i -= 1) {
+    if (messages[i]?.role === "user") {
+      lastUserIdx = i;
+      break;
+    }
+  }
+  if (lastUserIdx < 0) return null;
+  const lastUser = messages[lastUserIdx]!;
+  const trailing = messages.slice(lastUserIdx + 1);
+  if (trailing.length > 0) {
+    const fromSeq = trailing[0]!.seq;
+    await deleteMessagesFromSeq(db, chatId, fromSeq);
+  }
+  return lastUser;
 }
 
 export async function deleteChat(db: D1Database, id: string): Promise<boolean> {

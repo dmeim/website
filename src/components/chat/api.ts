@@ -129,3 +129,16 @@ export async function deleteLibraryAsset(id: string): Promise<void> {
 export function libraryContentUrl(id: string): string {
   return `/api/library/${encodeURIComponent(id)}/content`;
 }
+
+export async function stopChat(id: string): Promise<{ aborted: boolean }> {
+  const data = await readJson<{ ok: boolean; aborted: boolean }>(
+    await fetch(`/api/chats/${encodeURIComponent(id)}/stop`, {
+      method: "POST",
+    }),
+  );
+  return { aborted: Boolean(data.aborted) };
+}
+
+export function chatExportUrl(id: string): string {
+  return `/api/chats/${encodeURIComponent(id)}/export`;
+}

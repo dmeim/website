@@ -17,14 +17,24 @@ type ChatPaneProps = {
   /** Server or client still producing a reply (may be after navigate-away). */
   generating?: boolean;
   busy: boolean;
+  errorMessage?: string | null;
+  canRetry?: boolean;
+  canRegenerate?: boolean;
+  canExport?: boolean;
   onOpenSidebar: () => void;
   onModelChange: (modelId: string) => void;
   onInputChange: (value: string) => void;
   onSubmit: (event?: FormEvent) => void;
   onStop: () => void;
+  onRetry?: () => void;
+  onRegenerate?: () => void;
+  onExport?: () => void;
+  onDismissError?: () => void;
   onAttachClick: () => void;
   onRemoveAttachment: (id: string) => void;
+  threadRef: RefObject<HTMLDivElement | null>;
   threadEndRef: RefObject<HTMLDivElement | null>;
+  composerRef: RefObject<HTMLTextAreaElement | null>;
 };
 
 export function ChatPane({
@@ -38,16 +48,31 @@ export function ChatPane({
   streaming,
   generating = false,
   busy,
+  errorMessage = null,
+  canRetry = false,
+  canRegenerate = false,
+  canExport = false,
   onOpenSidebar,
   onModelChange,
   onInputChange,
   onSubmit,
   onStop,
+  onRetry,
+  onRegenerate,
+  onExport,
+  onDismissError,
   onAttachClick,
   onRemoveAttachment,
+  threadRef,
   threadEndRef,
+  composerRef,
 }: ChatPaneProps) {
   const onComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      onSubmit();
+      return;
+    }
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       onSubmit();
@@ -55,6 +80,7 @@ export function ChatPane({
   };
 
   const composerBusy = streaming || generating;
+  const showStop = streaming || generating;
 
   return (
     <>
@@ -76,9 +102,41 @@ export function ChatPane({
             disabled={composerBusy}
           />
         </div>
+        {canExport ? (
+          <button
+            type="button"
+            className="chat-btn chat-btn--ghost chat-main__export"
+            onClick={onExport}
+            disabled={busy || composerBusy}
+          >
+            Export
+          </button>
+        ) : null}
       </header>
 
-      <div className="chat-thread" aria-live="polite">
+      {errorMessage ? (
+        <div className="chat-main__error" role="alert">
+          <p>{errorMessage}</p>
+          <div className="chat-main__error-actions">
+            {canRetry && onRetry ? (
+              <button type="button" className="chat-btn" onClick={onRetry}>
+                Retry
+              </button>
+            ) : null}
+            {onDismissError ? (
+              <button
+                type="button"
+                className="chat-btn chat-btn--ghost"
+                onClick={onDismissError}
+              >
+                Dismiss
+              </button>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="chat-thread" ref={threadRef} aria-live="polite">
         {loadingThread ? (
           <p className="chat-empty">Loading…</p>
         ) : messages.length === 0 ? (
@@ -88,11 +146,19 @@ export function ChatPane({
               Private OpenCode Go session. Default model is DeepSeek V4 Flash —
               pick another from the header when you need it.
             </p>
+            <p className="chat-empty__hints">
+              Shortcuts: ⌘/Ctrl+Shift+O new chat · Esc stop / close menu · ⌘/Ctrl+Enter
+              send
+            </p>
           </div>
         ) : (
-          messages.map((message) => {
+          messages.map((message, index) => {
             const text = textFromParts(message);
             const isUser = message.role === "user";
+            const isLastAssistant =
+              !isUser &&
+              index === messages.length - 1 &&
+              message.role === "assistant";
             return (
               <article
                 key={message.id}
@@ -103,7 +169,16 @@ export function ChatPane({
                 }
               >
                 <header className="chat-bubble__role">
-                  {isUser ? "You" : "Assistant"}
+                  <span>{isUser ? "You" : "Assistant"}</span>
+                  {isLastAssistant && canRegenerate && onRegenerate && !composerBusy ? (
+                    <button
+                      type="button"
+                      className="chat-bubble__regen"
+                      onClick={onRegenerate}
+                    >
+                      Regenerate
+                    </button>
+                  ) : null}
                 </header>
                 {isUser ? (
                   <p className="chat-bubble__text">{text}</p>
@@ -151,6 +226,7 @@ export function ChatPane({
             Attach
           </button>
           <textarea
+            ref={composerRef}
             className="chat-composer__input"
             rows={2}
             value={input}
@@ -159,7 +235,7 @@ export function ChatPane({
             placeholder="Message…"
             disabled={busy && !composerBusy}
           />
-          {streaming ? (
+          {showStop ? (
             <button type="button" className="chat-btn" onClick={onStop}>
               Stop
             </button>

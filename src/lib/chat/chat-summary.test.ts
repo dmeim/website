@@ -10,12 +10,14 @@ describe("chatToSummary generatingAt", () => {
       model_id: "deepseek-v4-flash",
       archived_at: null,
       generating_at: "2026-07-22T12:00:00.000Z",
+      last_error: null,
       created_at: "2026-07-22T11:00:00.000Z",
       updated_at: "2026-07-22T12:00:00.000Z",
     };
     expect(chatToSummary(row)).toMatchObject({
       id: "c1",
       generatingAt: "2026-07-22T12:00:00.000Z",
+      lastError: null,
     });
   });
 
@@ -29,5 +31,20 @@ describe("chatToSummary generatingAt", () => {
       updated_at: "2026-07-22T11:00:00.000Z",
     } as ChatRow;
     expect(chatToSummary(row).generatingAt).toBeNull();
+    expect(chatToSummary(row).lastError).toBeNull();
+  });
+
+  it("maps last_error onto lastError", () => {
+    const row: ChatRow = {
+      id: "c3",
+      title: "Err",
+      model_id: "deepseek-v4-flash",
+      archived_at: null,
+      generating_at: null,
+      last_error: "Rate limited: 429",
+      created_at: "2026-07-22T11:00:00.000Z",
+      updated_at: "2026-07-22T12:00:00.000Z",
+    };
+    expect(chatToSummary(row).lastError).toBe("Rate limited: 429");
   });
 });

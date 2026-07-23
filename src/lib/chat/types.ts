@@ -14,6 +14,8 @@ export interface ChatRow {
   model_id: string;
   archived_at: string | null;
   generating_at: string | null;
+  /** Last stream failure message (rate limit, provider error); null when healthy. */
+  last_error: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -50,6 +52,8 @@ export interface ChatSummary {
   archivedAt: string | null;
   /** ISO timestamp while server is generating an assistant reply; null when idle. */
   generatingAt: string | null;
+  /** Surfaced provider / stream error for retry UI; null when clear. */
+  lastError: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -58,6 +62,7 @@ export interface ChatStatusDto {
   chatId: string;
   generating: boolean;
   generatingAt: string | null;
+  lastError: string | null;
 }
 
 export interface LibraryAssetSummary {

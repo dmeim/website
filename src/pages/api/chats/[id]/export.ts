@@ -1,13 +1,15 @@
 import type { APIRoute } from "astro";
 import {
+  chatToMarkdownExport,
+  chatToSummary,
   denyIfAccessRequired,
   getChat,
   getDb,
   getRuntimeEnv,
   json,
+  listMessages,
   methodNotAllowed,
 } from "@/lib/chat";
-import type { ChatStatusDto } from "@/lib/chat/types";
 
 export const prerender = false;
 
@@ -27,17 +29,22 @@ export const GET: APIRoute = async (context) => {
     if (!row) {
       return json({ error: "Chat not found" }, { status: 404 });
     }
-    const generatingAt = row.generating_at ?? null;
-    const status: ChatStatusDto = {
-      chatId: id,
-      generating: generatingAt != null,
-      generatingAt,
-      lastError: row.last_error ?? null,
-    };
-    return json(status);
+    const messages = await listMessages(db, id);
+    const chat = chatToSummary(row);
+    const markdown = chatToMarkdownExport(chat, messages);
+    const safeTitle =
+      chat.title.replace(/[^\w\-]+/g, "_").slice(0, 48) || "chat";
+    return new Response(markdown, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/markdown; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${safeTitle}.md"`,
+        "Cache-Control": "no-store",
+      },
+    });
   } catch (err) {
     const message =
-      err instanceof Error ? err.message : "Failed to load chat status";
+      err instanceof Error ? err.message : "Failed to export chat";
     return json({ error: message }, { status: 500 });
   }
 };

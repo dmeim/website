@@ -1,6 +1,9 @@
 /** Default / test model — cheap & fast (OpenCode Go). */
 export const DEFAULT_CHAT_MODEL_ID = "deepseek-v4-flash";
 
+/** Max messages sent to the model (recent turns); older context is dropped. */
+export const CHAT_CONTEXT_MAX_MESSAGES = 40;
+
 export const OPENCODE_GO_BASE = "https://opencode.ai/zen/go/v1";
 export const OPENCODE_GO_MODELS_URL = `${OPENCODE_GO_BASE}/models`;
 export const OPENCODE_GO_CHAT_COMPLETIONS_URL = `${OPENCODE_GO_BASE}/chat/completions`;
