@@ -1,11 +1,16 @@
 import type { UIMessage } from "ai";
-import type { ChatMessageDto, MessageAttachmentSummary } from "@/lib/chat";
+import type {
+  ChatGenerationMetadata,
+  ChatMessageDto,
+  MessageAttachmentSummary,
+} from "@/lib/chat";
+import { mergeGenerationMetadata } from "@/lib/chat/message-metrics";
 
-export type ChatUiMessage = UIMessage & {
-  metadata?: {
-    attachments?: MessageAttachmentSummary[];
-  };
-};
+export type ChatUiMessage = UIMessage<ChatUiMessageMetadata>;
+
+export type ChatUiMessageMetadata = {
+  attachments?: MessageAttachmentSummary[];
+} & ChatGenerationMetadata;
 
 export function dtoToUiMessages(messages: ChatMessageDto[]): ChatUiMessage[] {
   return messages
@@ -20,12 +25,14 @@ export function dtoToUiMessages(messages: ChatMessageDto[]): ChatUiMessage[] {
         });
       }
       parts.push({ type: "text", text: m.content });
+      const generation = mergeGenerationMetadata(m.generation ?? undefined);
       return {
         id: m.id,
         role: m.role,
         parts,
         metadata: {
           attachments: m.attachments,
+          ...generation,
         },
       };
     });
@@ -56,4 +63,16 @@ export function reasoningFromParts(message: UIMessage): {
 export function attachmentsOf(message: UIMessage): MessageAttachmentSummary[] {
   const meta = (message as ChatUiMessage).metadata;
   return meta?.attachments ?? [];
+}
+
+export function generationOf(
+  message: UIMessage,
+): ChatGenerationMetadata | undefined {
+  const meta = (message as ChatUiMessage).metadata;
+  if (!meta) return undefined;
+  return mergeGenerationMetadata({
+    usage: meta.usage,
+    performance: meta.performance,
+    totalUsage: meta.totalUsage,
+  });
 }

@@ -10,6 +10,7 @@ export * from "./db";
 export * from "./http";
 export * from "./provider";
 export * from "./persist-assistant";
+export * from "./message-metrics";
 export * from "./generation-abort";
 export * from "./context-window";
 export * from "./export-markdown";

@@ -2,7 +2,11 @@
  * Shared chat domain types (D1-shaped + API DTOs).
  */
 
+import type { ChatGenerationMetadata } from "./message-metrics";
+
 export type ChatRole = "user" | "assistant" | "system";
+
+export type { ChatGenerationMetadata, ChatTokenUsage, ChatPerformanceMetrics } from "./message-metrics";
 
 export type LibraryKind = "image" | "video" | "pdf" | "other";
 
@@ -34,6 +38,8 @@ export interface MessageRow {
   content: string;
   /** Model chain-of-thought / reasoning text when present. */
   reasoning: string | null;
+  /** JSON blob of generation usage/performance when present. */
+  metadata: string | null;
   created_at: string;
   seq: number;
 }
@@ -100,6 +106,8 @@ export interface ChatMessageDto {
   content: string;
   /** Assistant reasoning / thinking text when the model returned any. */
   reasoning: string | null;
+  /** Assistant generation usage/performance when available. */
+  generation?: ChatGenerationMetadata | null;
   createdAt: string;
   seq: number;
   attachments: MessageAttachmentSummary[];

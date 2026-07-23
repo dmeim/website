@@ -12,22 +12,32 @@ import type { UIMessage } from "ai";
 import {
   Brain,
   Check,
+  Download,
   File,
+  GitFork,
   Images,
   Library,
   Plus,
+  RefreshCw,
   Send,
   SquarePen,
   X,
 } from "lucide";
 import type { ChatProviderId } from "@/lib/chat/thinking";
 import type { GoModelInfo, LibraryAssetSummary, ThinkingLevel } from "@/lib/chat/types";
+import { ComposerStatusBar } from "./ComposerStatusBar";
 import { LibraryPickerModal } from "./LibraryPickerModal";
 import { LucideIcon } from "./LucideIcon";
 import MarkdownBody from "./MarkdownBody";
 import { ModelSettingsPanel } from "./ModelSettingsPanel";
+import { MessageMetrics } from "./MessageMetrics";
 import { ThinkingBlock } from "./ThinkingBlock";
-import { attachmentsOf, reasoningFromParts, textFromParts } from "./messageUtils";
+import {
+  attachmentsOf,
+  generationOf,
+  reasoningFromParts,
+  textFromParts,
+} from "./messageUtils";
 
 type ChatPaneProps = {
   title: string;
@@ -206,6 +216,9 @@ export function ChatPane({
 
   const composerBusy = streaming || generating;
   const showStop = streaming || generating;
+  const assistantGenerations = messages
+    .filter((message) => message.role === "assistant")
+    .map((message) => generationOf(message));
   const actionsEnabled = canFork && !composerBusy && !busy;
 
   const startEdit = (messageId: string, content: string) => {
@@ -340,40 +353,43 @@ export function ChatPane({
               <h1 className="chat-main__title" title={title}>
                 {title}
               </h1>
-              {canRename && onRenameTitle ? (
-                <button
-                  type="button"
-                  className="chat-main__title-btn"
-                  onClick={startRename}
-                  aria-label="Rename chat"
-                  title="Rename"
-                >
-                  <LucideIcon icon={SquarePen} size={16} />
-                </button>
-              ) : null}
             </div>
           )}
         </div>
         <div className="chat-main__header-actions">
+          {canRename && onRenameTitle && !renaming ? (
+            <button
+              type="button"
+              className="chat-main__title-btn"
+              onClick={startRename}
+              aria-label="Rename chat"
+              title="Rename"
+            >
+              <LucideIcon icon={SquarePen} size={16} />
+            </button>
+          ) : null}
           {canFork && onFork ? (
             <button
               type="button"
-              className="chat-btn chat-btn--ghost"
+              className="chat-main__title-btn"
               onClick={() => onFork()}
               disabled={!actionsEnabled}
-              title="Fork this chat (full history)"
+              aria-label="Fork chat"
+              title="Fork chat"
             >
-              Fork
+              <LucideIcon icon={GitFork} size={16} />
             </button>
           ) : null}
           {canExport ? (
             <button
               type="button"
-              className="chat-btn chat-btn--ghost chat-main__export"
+              className="chat-main__title-btn"
               onClick={onExport}
               disabled={busy || composerBusy}
+              aria-label="Export"
+              title="Export"
             >
-              Export
+              <LucideIcon icon={Download} size={16} />
             </button>
           ) : null}
         </div>
@@ -422,12 +438,55 @@ export function ChatPane({
             const isUser = message.role === "user";
             const text = textFromParts(message);
             const thinking = !isUser ? reasoningFromParts(message) : null;
-            const isLastAssistant =
-              !isUser &&
-              index === messages.length - 1 &&
-              message.role === "assistant";
+            const isLastMessage = index === messages.length - 1;
             const attachments = attachmentsOf(message);
             const isEditing = editingId === message.id;
+            const showRegenerate =
+              isLastMessage &&
+              canRegenerate &&
+              Boolean(onRegenerate) &&
+              !composerBusy;
+            const showForkHere = actionsEnabled && Boolean(onFork);
+            const showEdit =
+              actionsEnabled && isUser && Boolean(onEditMessage) && !isEditing;
+            const statusActions =
+              showEdit || showRegenerate || showForkHere ? (
+                <>
+                  {showEdit ? (
+                    <button
+                      type="button"
+                      className="chat-bubble__icon-btn"
+                      onClick={() => startEdit(message.id, text)}
+                      aria-label="Edit message"
+                      title="Edit"
+                    >
+                      <LucideIcon icon={SquarePen} size={14} />
+                    </button>
+                  ) : null}
+                  {showRegenerate ? (
+                    <button
+                      type="button"
+                      className="chat-bubble__icon-btn"
+                      onClick={onRegenerate}
+                      aria-label="Regenerate"
+                      title="Regenerate"
+                    >
+                      <LucideIcon icon={RefreshCw} size={14} />
+                    </button>
+                  ) : null}
+                  {showForkHere ? (
+                    <button
+                      type="button"
+                      className="chat-bubble__icon-btn"
+                      onClick={() => onFork?.(message.id)}
+                      aria-label="Fork here"
+                      title="Fork here"
+                    >
+                      <LucideIcon icon={GitFork} size={14} />
+                    </button>
+                  ) : null}
+                </>
+              ) : null;
             return (
               <article
                 key={message.id}
@@ -437,38 +496,6 @@ export function ChatPane({
                     : "chat-bubble chat-bubble--assistant"
                 }
               >
-                <header className="chat-bubble__role">
-                  <span>{isUser ? "You" : "Assistant"}</span>
-                  <div className="chat-bubble__actions">
-                    {isLastAssistant && canRegenerate && onRegenerate && !composerBusy ? (
-                      <button
-                        type="button"
-                        className="chat-bubble__action"
-                        onClick={onRegenerate}
-                      >
-                        Regenerate
-                      </button>
-                    ) : null}
-                    {actionsEnabled && onFork ? (
-                      <button
-                        type="button"
-                        className="chat-bubble__action"
-                        onClick={() => onFork(message.id)}
-                      >
-                        Fork here
-                      </button>
-                    ) : null}
-                    {actionsEnabled && isUser && onEditMessage && !isEditing ? (
-                      <button
-                        type="button"
-                        className="chat-bubble__action"
-                        onClick={() => startEdit(message.id, text)}
-                      >
-                        Edit
-                      </button>
-                    ) : null}
-                  </div>
-                </header>
                 {isEditing ? (
                   <div className="chat-bubble__edit">
                     <textarea
@@ -501,7 +528,10 @@ export function ChatPane({
                     </p>
                   </div>
                 ) : isUser ? (
-                  <p className="chat-bubble__text">{text}</p>
+                  <>
+                    <p className="chat-bubble__text">{text}</p>
+                    <MessageMetrics actions={statusActions} />
+                  </>
                 ) : (
                   <>
                     {thinking ? (
@@ -513,6 +543,10 @@ export function ChatPane({
                     {text.trim() ? (
                       <MarkdownBody className="chat-bubble__md" text={text} />
                     ) : null}
+                    <MessageMetrics
+                      generation={generationOf(message)}
+                      actions={statusActions}
+                    />
                   </>
                 )}
                 {attachments.length > 0 && !isEditing ? (
@@ -566,6 +600,13 @@ export function ChatPane({
             ))}
           </ul>
         ) : null}
+        <ComposerStatusBar
+          models={models}
+          modelId={modelId}
+          chatProvider={chatProvider}
+          thinkingLevel={thinkingLevel}
+          generations={assistantGenerations}
+        />
         <div className="chat-composer__row">
           <div className="chat-composer__attach" ref={modelMenuRef}>
             <button

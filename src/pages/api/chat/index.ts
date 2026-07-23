@@ -14,10 +14,13 @@ import {
   insertMessage,
   json,
   listMessages,
+  mergeGenerationMetadata,
   methodNotAllowed,
   registerGenerationAbort,
   setChatGenerating,
   setChatLastError,
+  slimPerformance,
+  slimUsage,
   titleFromPrompt,
   truncateAfterLastUser,
   truncateMessagesForContext,
@@ -26,7 +29,11 @@ import {
 import { assistantContentToPersist } from "@/lib/chat/persist-assistant";
 import { createGoLanguageModel, goThinkingProviderOptions } from "@/lib/chat/provider";
 import { coerceThinkingLevel, isThinkingLevel } from "@/lib/chat/thinking";
-import type { MessageAttachmentSummary, ThinkingLevel } from "@/lib/chat/types";
+import type {
+  ChatGenerationMetadata,
+  MessageAttachmentSummary,
+  ThinkingLevel,
+} from "@/lib/chat/types";
 
 export const prerender = false;
 
@@ -183,15 +190,34 @@ export const POST: APIRoute = async (context) => {
     const persistAssistant = async (payload: {
       text?: string | null;
       reasoningText?: string | null;
-      steps?: Array<{ text?: string; reasoningText?: string }>;
+      steps?: Array<{
+        text?: string;
+        reasoningText?: string;
+        usage?: Parameters<typeof slimUsage>[0];
+        performance?: Parameters<typeof slimPerformance>[0];
+      }>;
+      usage?: Parameters<typeof slimUsage>[0];
+      totalUsage?: Parameters<typeof slimUsage>[0];
+      performance?: Parameters<typeof slimPerformance>[0];
     }) => {
       const normalized = assistantContentToPersist(payload);
       if (!normalized) return;
+
+      const lastStep = payload.steps?.at(-1);
+      const generation = mergeGenerationMetadata({
+        usage: slimUsage(payload.usage ?? lastStep?.usage),
+        performance: slimPerformance(
+          payload.performance ?? lastStep?.performance,
+        ),
+        totalUsage: slimUsage(payload.totalUsage),
+      });
+
       await insertMessage(db, {
         chatId,
         role: "assistant",
         content: normalized.content,
         reasoning: normalized.reasoning,
+        generation,
       });
     };
 
@@ -214,9 +240,15 @@ export const POST: APIRoute = async (context) => {
       messages,
       abortSignal,
       providerOptions: goThinkingProviderOptions(modelId, thinkingLevel),
-      onFinish: async ({ text, reasoningText }) => {
+      onFinish: async ({ text, reasoningText, usage, totalUsage, finalStep }) => {
         try {
-          await persistAssistant({ text, reasoningText });
+          await persistAssistant({
+            text,
+            reasoningText,
+            usage,
+            totalUsage,
+            performance: finalStep?.performance,
+          });
           await setChatLastError(db, chatId, null);
         } finally {
           clearGenerationAbort(chatId);
@@ -230,6 +262,8 @@ export const POST: APIRoute = async (context) => {
             steps: steps.map((step) => ({
               text: step.text,
               reasoningText: step.reasoningText,
+              usage: step.usage,
+              performance: step.performance,
             })),
           });
           await setChatLastError(db, chatId, null);
@@ -277,6 +311,20 @@ export const POST: APIRoute = async (context) => {
     );
     return result.toUIMessageStreamResponse({
       sendReasoning: true,
+      messageMetadata: ({ part }): ChatGenerationMetadata | undefined => {
+        if (part.type === "finish-step") {
+          return mergeGenerationMetadata({
+            usage: slimUsage(part.usage),
+            performance: slimPerformance(part.performance),
+          });
+        }
+        if (part.type === "finish") {
+          return mergeGenerationMetadata({
+            totalUsage: slimUsage(part.totalUsage),
+          });
+        }
+        return undefined;
+      },
       headers:
         degradedNotes.length > 0
           ? {

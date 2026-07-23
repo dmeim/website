@@ -1,5 +1,10 @@
 import { forkChatTitle, planForkMessages } from "./fork";
+import {
+  parseGenerationMetadata,
+  serializeGenerationMetadata,
+} from "./message-metrics";
 import type {
+  ChatGenerationMetadata,
   ChatMessageDto,
   ChatRow,
   ChatSummary,
@@ -214,10 +219,19 @@ export async function forkChat(
     const newMsgId = newId();
     await db
       .prepare(
-        `INSERT INTO messages (id, chat_id, role, content, reasoning, created_at, seq)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO messages (id, chat_id, role, content, reasoning, metadata, created_at, seq)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(newMsgId, chat.id, m.role, m.content, m.reasoning, ts, seq)
+      .bind(
+        newMsgId,
+        chat.id,
+        m.role,
+        m.content,
+        m.reasoning,
+        serializeGenerationMetadata(m.generation),
+        ts,
+        seq,
+      )
       .run();
     for (const a of m.attachments) {
       await db
@@ -235,14 +249,15 @@ export async function forkChat(
     const newMsgId = newId();
     await db
       .prepare(
-        `INSERT INTO messages (id, chat_id, role, content, reasoning, created_at, seq)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO messages (id, chat_id, role, content, reasoning, metadata, created_at, seq)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         newMsgId,
         chat.id,
         "user",
         plan.editedUser.content,
+        null,
         null,
         ts,
         seq,
@@ -400,6 +415,7 @@ export async function listMessages(
     role: m.role,
     content: m.content,
     reasoning: m.reasoning ?? null,
+    generation: parseGenerationMetadata(m.metadata),
     createdAt: m.created_at,
     seq: m.seq,
     attachments: byMessage.get(m.id) ?? [],
@@ -424,6 +440,7 @@ export async function insertMessage(
     role: MessageRow["role"];
     content: string;
     reasoning?: string | null;
+    generation?: ChatGenerationMetadata | null;
     attachmentIds?: string[];
   },
 ): Promise<ChatMessageDto> {
@@ -434,12 +451,13 @@ export async function insertMessage(
     typeof input.reasoning === "string" && input.reasoning.trim()
       ? input.reasoning.trim()
       : null;
+  const metadata = serializeGenerationMetadata(input.generation);
   await db
     .prepare(
-      `INSERT INTO messages (id, chat_id, role, content, reasoning, created_at, seq)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO messages (id, chat_id, role, content, reasoning, metadata, created_at, seq)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     )
-    .bind(id, input.chatId, input.role, input.content, reasoning, ts, seq)
+    .bind(id, input.chatId, input.role, input.content, reasoning, metadata, ts, seq)
     .run();
 
   const attachments: MessageAttachmentSummary[] = [];
@@ -477,6 +495,7 @@ export async function insertMessage(
     role: input.role,
     content: input.content,
     reasoning,
+    generation: parseGenerationMetadata(metadata),
     createdAt: ts,
     seq,
     attachments,
