@@ -37,15 +37,16 @@
 - Produces: `getToolLoader(slug): (() => Promise<{ default: ComponentType }>) | undefined`
 - Routing: `pushState`/`replaceState` + `popstate` for `/tools` ↔ `/tools/[slug]`
 
-- [ ] **Step 1:** Add lazy `toolRegistry` mapping every available slug → island module (include `pdf-signature-checker`)
-- [ ] **Step 2:** Implement `ToolsShell` + CSS mirroring chat immersive split (translucent panes, independent scroll, mobile drawer)
-- [ ] **Step 3:** Implement sidebar (All tools, search, categories, per-tool + category WIP badges) and catalogue pane
-- [ ] **Step 4:** Wire Astro pages to immersive `ToolsShell`; strip giant slug ternary
-- [ ] **Step 5:** `npm run build` — must pass
-- [ ] **Step 6:** Commit + push milestone
+- [x] **Step 1:** Add lazy `toolRegistry` mapping every available slug → island module (include `pdf-signature-checker`)
+- [x] **Step 2:** Implement `ToolsShell` + CSS mirroring chat immersive split (translucent panes, independent scroll, mobile drawer)
+- [x] **Step 3:** Implement sidebar (All tools, search, categories, per-tool + category WIP badges) and catalogue pane
+- [x] **Step 4:** Wire Astro pages to immersive `ToolsShell`; strip giant slug ternary
+- [x] **Step 5:** `npm run build` — must pass
+- [x] **Step 6:** Commit + push milestone
 
 ### Task 2: Polish + verify
 
-- [ ] Confirm `/tools` catalogue, `/tools/[slug]` deep link, in-shell navigation, search filter, mobile menu
-- [ ] Commit + push if polish landed
-- [ ] Follow verification-before-completion before claiming done
+- [x] Confirm `/tools` catalogue, `/tools/[slug]` deep link, in-shell navigation, search filter, mobile menu
+- [x] ClientRouter coexistence: null history state + `astro:before-preparation` no-op for tools↔tools
+- [x] Commit + push if polish landed
+- [x] Follow verification-before-completion before claiming done

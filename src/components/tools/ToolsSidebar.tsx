@@ -77,17 +77,30 @@ export function ToolsSidebar({
           </p>
         </div>
 
-        <button
-          type="button"
+        <a
+          href="/tools"
           className={
             !activeSlug
               ? "tools-sidebar__home is-active"
               : "tools-sidebar__home"
           }
-          onClick={onSelectCatalog}
+          onClick={(event) => {
+            if (
+              event.defaultPrevented ||
+              event.button !== 0 ||
+              event.metaKey ||
+              event.ctrlKey ||
+              event.shiftKey ||
+              event.altKey
+            ) {
+              return;
+            }
+            event.preventDefault();
+            onSelectCatalog();
+          }}
         >
           All tools
-        </button>
+        </a>
       </div>
 
       <div className="tools-sidebar__section">
@@ -171,20 +184,33 @@ export function ToolsSidebar({
                       if (href) {
                         return (
                           <li key={tool.id}>
-                            <button
-                              type="button"
+                            <a
+                              href={href}
                               className={
                                 isActive
                                   ? "tools-sidebar__item is-available is-active"
                                   : "tools-sidebar__item is-available"
                               }
-                              onClick={() => onSelectTool(tool.id)}
+                              onClick={(event) => {
+                                if (
+                                  event.defaultPrevented ||
+                                  event.button !== 0 ||
+                                  event.metaKey ||
+                                  event.ctrlKey ||
+                                  event.shiftKey ||
+                                  event.altKey
+                                ) {
+                                  return;
+                                }
+                                event.preventDefault();
+                                onSelectTool(tool.id);
+                              }}
                               aria-current={isActive ? "page" : undefined}
                             >
                               <span className="tools-sidebar__item-label">
                                 {tool.title}
                               </span>
-                            </button>
+                            </a>
                           </li>
                         );
                       }

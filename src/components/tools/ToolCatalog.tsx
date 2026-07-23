@@ -23,14 +23,27 @@ function CatalogItem({
 
   if (isAvailable && href) {
     return (
-      <button
-        type="button"
+      <a
+        href={href}
         className="tools-catalog-item is-available"
-        onClick={() => onOpenTool(tool.id)}
+        onClick={(event) => {
+          if (
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+          ) {
+            return;
+          }
+          event.preventDefault();
+          onOpenTool(tool.id);
+        }}
       >
         <span className="tools-catalog-item__title">{tool.title}</span>
         <span className="tools-catalog-item__desc">{tool.description}</span>
-      </button>
+      </a>
     );
   }
 
