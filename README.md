@@ -36,6 +36,7 @@ npm run deploy   # requires Wrangler auth
 
 ```bash
 cp .dev.vars.example .dev.vars   # set OPENCODE_API_KEY
+npx wrangler d1 migrations apply dmeim-chat --local
 npm run dev                      # D1/R2 via local Miniflare bindings
 ```
 

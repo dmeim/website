@@ -48,6 +48,7 @@ Local:
 ```bash
 cp .dev.vars.example .dev.vars
 # edit OPENCODE_API_KEY=
+npx wrangler d1 migrations apply dmeim-chat --local
 npm run dev
 ```
 
