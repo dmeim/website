@@ -9,18 +9,32 @@ import {
   type RefObject,
 } from "react";
 import type { UIMessage } from "ai";
-import { File, Images, Library, Plus, Send, X } from "lucide";
-import type { GoModelInfo, LibraryAssetSummary } from "@/lib/chat/types";
+import {
+  Brain,
+  Check,
+  File,
+  Images,
+  Library,
+  Plus,
+  Send,
+  SquarePen,
+  X,
+} from "lucide";
+import type { ChatProviderId } from "@/lib/chat/thinking";
+import type { GoModelInfo, LibraryAssetSummary, ThinkingLevel } from "@/lib/chat/types";
 import { LibraryPickerModal } from "./LibraryPickerModal";
 import { LucideIcon } from "./LucideIcon";
 import MarkdownBody from "./MarkdownBody";
-import { ModelPicker } from "./ModelPicker";
-import { attachmentsOf, textFromParts } from "./messageUtils";
+import { ModelSettingsPanel } from "./ModelSettingsPanel";
+import { ThinkingBlock } from "./ThinkingBlock";
+import { attachmentsOf, reasoningFromParts, textFromParts } from "./messageUtils";
 
 type ChatPaneProps = {
   title: string;
   models: GoModelInfo[];
   modelId: string;
+  chatProvider: ChatProviderId;
+  thinkingLevel: ThinkingLevel;
   messages: UIMessage[];
   input: string;
   pendingAttachments: LibraryAssetSummary[];
@@ -36,8 +50,13 @@ type ChatPaneProps = {
   canRegenerate?: boolean;
   canExport?: boolean;
   canFork?: boolean;
+  /** Persisted chats only — hide rename for ephemeral draft "New chat". */
+  canRename?: boolean;
   onOpenSidebar: () => void;
   onModelChange: (modelId: string) => void;
+  onChatProviderChange: (provider: ChatProviderId) => void;
+  onThinkingChange: (level: ThinkingLevel) => void;
+  onRenameTitle?: (title: string) => void | Promise<void>;
   onInputChange: (value: string) => void;
   onSubmit: (event?: FormEvent) => void;
   onStop: () => void;
@@ -61,6 +80,8 @@ export function ChatPane({
   title,
   models,
   modelId,
+  chatProvider,
+  thinkingLevel,
   messages,
   input,
   pendingAttachments,
@@ -75,8 +96,12 @@ export function ChatPane({
   canRegenerate = false,
   canExport = false,
   canFork = false,
+  canRename = false,
   onOpenSidebar,
   onModelChange,
+  onChatProviderChange,
+  onThinkingChange,
+  onRenameTitle,
   onInputChange,
   onSubmit,
   onStop,
@@ -97,22 +122,54 @@ export function ChatPane({
 }: ChatPaneProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
+  const [renaming, setRenaming] = useState(false);
+  const [titleDraft, setTitleDraft] = useState(title);
   const [attachMenuOpen, setAttachMenuOpen] = useState(false);
+  const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const [libraryModalOpen, setLibraryModalOpen] = useState(false);
   const attachMenuRef = useRef<HTMLDivElement | null>(null);
+  const modelMenuRef = useRef<HTMLDivElement | null>(null);
+  const titleInputRef = useRef<HTMLInputElement | null>(null);
+  const titleSaveGuardRef = useRef(false);
   const attachMenuId = useId();
+  const modelMenuId = useId();
 
   useEffect(() => {
-    if (!attachMenuOpen) return;
+    if (!renaming) setTitleDraft(title);
+  }, [title, renaming]);
+
+  useEffect(() => {
+    if (!canRename && renaming) {
+      setRenaming(false);
+      setTitleDraft(title);
+    }
+  }, [canRename, renaming, title]);
+
+  useLayoutEffect(() => {
+    if (!renaming) return;
+    const el = titleInputRef.current;
+    if (!el) return;
+    el.focus();
+    el.select();
+  }, [renaming]);
+
+  useEffect(() => {
+    if (!attachMenuOpen && !modelMenuOpen) return;
     const onPointerDown = (event: MouseEvent) => {
       const target = event.target;
       if (!(target instanceof Node)) return;
-      if (!attachMenuRef.current?.contains(target)) {
+      if (attachMenuOpen && !attachMenuRef.current?.contains(target)) {
         setAttachMenuOpen(false);
+      }
+      if (modelMenuOpen && !modelMenuRef.current?.contains(target)) {
+        setModelMenuOpen(false);
       }
     };
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "Escape") setAttachMenuOpen(false);
+      if (event.key === "Escape") {
+        setAttachMenuOpen(false);
+        setModelMenuOpen(false);
+      }
     };
     window.addEventListener("mousedown", onPointerDown);
     window.addEventListener("keydown", onKeyDown);
@@ -120,7 +177,7 @@ export function ChatPane({
       window.removeEventListener("mousedown", onPointerDown);
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [attachMenuOpen]);
+  }, [attachMenuOpen, modelMenuOpen]);
 
   const openLibraryPicker = () => {
     setAttachMenuOpen(false);
@@ -169,6 +226,68 @@ export function ChatPane({
     cancelEdit();
   };
 
+  const startRename = () => {
+    if (!canRename || !onRenameTitle) return;
+    titleSaveGuardRef.current = false;
+    setTitleDraft(title);
+    setRenaming(true);
+  };
+
+  const cancelRename = () => {
+    titleSaveGuardRef.current = true;
+    setRenaming(false);
+    setTitleDraft(title);
+  };
+
+  const commitRename = async () => {
+    if (!onRenameTitle) {
+      cancelRename();
+      return;
+    }
+    const next = titleDraft.trim();
+    if (!next) {
+      cancelRename();
+      return;
+    }
+    titleSaveGuardRef.current = true;
+    setRenaming(false);
+    if (next === title) {
+      setTitleDraft(title);
+      return;
+    }
+    setTitleDraft(next);
+    try {
+      await onRenameTitle(next);
+    } catch {
+      setTitleDraft(title);
+    }
+  };
+
+  const onTitleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      void commitRename();
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      cancelRename();
+    }
+  };
+
+  const onTitleBlur = () => {
+    if (titleSaveGuardRef.current) {
+      titleSaveGuardRef.current = false;
+      return;
+    }
+    const next = titleDraft.trim();
+    if (!next) {
+      cancelRename();
+      return;
+    }
+    void commitRename();
+  };
+
   return (
     <>
       <header className="chat-main__header">
@@ -181,13 +300,59 @@ export function ChatPane({
           Menu
         </button>
         <div className="chat-main__title-block">
-          <h1 className="chat-main__title">{title}</h1>
-          <ModelPicker
-            models={models}
-            value={modelId}
-            onChange={onModelChange}
-            disabled={composerBusy}
-          />
+          {renaming ? (
+            <div className="chat-main__title-edit">
+              <input
+                ref={titleInputRef}
+                className="chat-main__title-input"
+                value={titleDraft}
+                onChange={(event) => setTitleDraft(event.target.value)}
+                onKeyDown={onTitleKeyDown}
+                onBlur={onTitleBlur}
+                aria-label="Chat title"
+                maxLength={120}
+              />
+              <div className="chat-main__title-actions">
+                <button
+                  type="button"
+                  className="chat-main__title-btn"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => void commitRename()}
+                  aria-label="Save title"
+                  title="Save"
+                >
+                  <LucideIcon icon={Check} size={16} />
+                </button>
+                <button
+                  type="button"
+                  className="chat-main__title-btn"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={cancelRename}
+                  aria-label="Cancel rename"
+                  title="Cancel"
+                >
+                  <LucideIcon icon={X} size={16} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="chat-main__title-row">
+              <h1 className="chat-main__title" title={title}>
+                {title}
+              </h1>
+              {canRename && onRenameTitle ? (
+                <button
+                  type="button"
+                  className="chat-main__title-btn"
+                  onClick={startRename}
+                  aria-label="Rename chat"
+                  title="Rename"
+                >
+                  <LucideIcon icon={SquarePen} size={16} />
+                </button>
+              ) : null}
+            </div>
+          )}
         </div>
         <div className="chat-main__header-actions">
           {canFork && onFork ? (
@@ -244,7 +409,7 @@ export function ChatPane({
             <p className="chat-empty__brand">dmeim chat</p>
             <p>
               Private OpenCode Go session. Default model is DeepSeek V4 Flash —
-              pick another from the header when you need it.
+              pick another from the thinking control below when you need it.
             </p>
             <p className="chat-empty__hints">
               Shortcuts: ⌘/Ctrl+Shift+O new chat · Esc stop / close menu · ⌘/Ctrl+Enter
@@ -254,8 +419,9 @@ export function ChatPane({
           </div>
         ) : (
           messages.map((message, index) => {
-            const text = textFromParts(message);
             const isUser = message.role === "user";
+            const text = textFromParts(message);
+            const thinking = !isUser ? reasoningFromParts(message) : null;
             const isLastAssistant =
               !isUser &&
               index === messages.length - 1 &&
@@ -337,7 +503,17 @@ export function ChatPane({
                 ) : isUser ? (
                   <p className="chat-bubble__text">{text}</p>
                 ) : (
-                  <MarkdownBody className="chat-bubble__md" text={text} />
+                  <>
+                    {thinking ? (
+                      <ThinkingBlock
+                        text={thinking.text}
+                        streaming={thinking.streaming}
+                      />
+                    ) : null}
+                    {text.trim() ? (
+                      <MarkdownBody className="chat-bubble__md" text={text} />
+                    ) : null}
+                  </>
                 )}
                 {attachments.length > 0 && !isEditing ? (
                   <ul className="chat-bubble__attachments">
@@ -391,11 +567,52 @@ export function ChatPane({
           </ul>
         ) : null}
         <div className="chat-composer__row">
+          <div className="chat-composer__attach" ref={modelMenuRef}>
+            <button
+              type="button"
+              className="chat-btn chat-btn--ghost chat-btn--icon"
+              onClick={() => {
+                setModelMenuOpen((open) => !open);
+                setAttachMenuOpen(false);
+              }}
+              disabled={busy || composerBusy}
+              aria-label={
+                modelMenuOpen ? "Close model settings" : "Model settings"
+              }
+              aria-expanded={modelMenuOpen}
+              aria-controls={modelMenuId}
+              title="Provider, model, and thinking level"
+            >
+              <LucideIcon icon={modelMenuOpen ? X : Brain} size={24} />
+            </button>
+            {modelMenuOpen ? (
+              <div
+                id={modelMenuId}
+                className="chat-attach-menu chat-attach-menu--settings"
+                role="dialog"
+                aria-label="Model settings"
+              >
+                <ModelSettingsPanel
+                  models={models}
+                  chatProvider={chatProvider}
+                  modelId={modelId}
+                  thinkingLevel={thinkingLevel}
+                  disabled={busy || composerBusy}
+                  onChatProviderChange={onChatProviderChange}
+                  onModelChange={onModelChange}
+                  onThinkingChange={onThinkingChange}
+                />
+              </div>
+            ) : null}
+          </div>
           <div className="chat-composer__attach" ref={attachMenuRef}>
             <button
               type="button"
               className="chat-btn chat-btn--ghost chat-btn--icon"
-              onClick={() => setAttachMenuOpen((open) => !open)}
+              onClick={() => {
+                setAttachMenuOpen((open) => !open);
+                setModelMenuOpen(false);
+              }}
               disabled={busy || composerBusy}
               aria-label={attachMenuOpen ? "Close attach menu" : "Attach"}
               aria-expanded={attachMenuOpen}

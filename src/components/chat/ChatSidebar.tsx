@@ -41,7 +41,11 @@ export function ChatSidebar({
       <div className="chat-sidebar__top">
         <button
           type="button"
-          className="chat-sidebar__primary"
+          className={
+            view === "chat" && !activeChatId
+              ? "chat-sidebar__primary is-active"
+              : "chat-sidebar__primary"
+          }
           onClick={onNewChat}
           disabled={busy || streaming}
         >

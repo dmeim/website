@@ -9,10 +9,16 @@ import {
   type FormEvent,
 } from "react";
 import { DEFAULT_CHAT_MODEL_ID } from "@/lib/chat/constants";
+import type { ChatProviderId } from "@/lib/chat/thinking";
+import {
+  coerceThinkingLevel,
+  isThinkingLevel,
+} from "@/lib/chat/thinking";
 import type {
   ChatSummary,
   GoModelInfo,
   LibraryAssetSummary,
+  ThinkingLevel,
 } from "@/lib/chat/types";
 import {
   chatExportUrl,
@@ -76,6 +82,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
     LibraryAssetSummary[]
   >([]);
   const [modelId, setModelId] = useState(DEFAULT_CHAT_MODEL_ID);
+  const [chatProvider, setChatProvider] =
+    useState<ChatProviderId>("opencode-go");
+  const [thinkingLevel, setThinkingLevel] = useState<ThinkingLevel>("off");
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
   const [loadingThread, setLoadingThread] = useState(false);
@@ -87,6 +96,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
 
   const activeChatIdRef = useRef(activeChatId);
   const modelIdRef = useRef(modelId);
+  const thinkingLevelRef = useRef(thinkingLevel);
   const pendingIdsRef = useRef<string[]>([]);
   const threadRef = useRef<HTMLDivElement | null>(null);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
@@ -106,6 +116,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
     modelIdRef.current = modelId;
   }, [modelId]);
   useEffect(() => {
+    thinkingLevelRef.current = thinkingLevel;
+  }, [thinkingLevel]);
+  useEffect(() => {
     pendingIdsRef.current = pendingAttachments.map((a) => a.id);
   }, [pendingAttachments]);
   useEffect(() => {
@@ -122,6 +135,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
               body: {
                 chatId: activeChatIdRef.current,
                 modelId: modelIdRef.current,
+                thinkingLevel: thinkingLevelRef.current,
                 regenerate: true,
               },
             };
@@ -135,6 +149,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
               chatId: activeChatIdRef.current,
               message: text,
               modelId: modelIdRef.current,
+              thinkingLevel: thinkingLevelRef.current,
               attachmentIds: pendingIdsRef.current,
             },
           };
@@ -303,6 +318,8 @@ export default function ChatShell({ initialChatId = null }: Props) {
         setActiveChat(null);
         setMessages([]);
         setModelId(DEFAULT_CHAT_MODEL_ID);
+        setThinkingLevel("off");
+        setChatProvider("opencode-go");
         if (opts?.replaceUrl !== false) {
           window.history.replaceState({}, "", "/chat");
         }
@@ -316,7 +333,10 @@ export default function ChatShell({ initialChatId = null }: Props) {
       try {
         const { chat, messages: rows } = await fetchChat(id);
         setActiveChat(chat);
-        setModelId(chat.modelId || DEFAULT_CHAT_MODEL_ID);
+        const nextModel = chat.modelId || DEFAULT_CHAT_MODEL_ID;
+        setModelId(nextModel);
+        setChatProvider("opencode-go");
+        setThinkingLevel((prev) => coerceThinkingLevel(nextModel, prev));
         setMessages(dtoToUiMessages(rows));
         if (chat.lastError) {
           setBanner(chat.lastError);
@@ -458,17 +478,36 @@ export default function ChatShell({ initialChatId = null }: Props) {
   }, [needsPoll, markAwaiting, setMessages]);
 
   const handleNewChat = async () => {
-    setBusy(true);
-    setBanner(null);
-    try {
-      const chat = await createChat({ modelId });
-      await refreshChats();
-      await selectChat(chat.id);
+    // Draft mode only — persist on first send via ensureChat().
+    if (!activeChatId && view === "chat" && messages.length === 0) {
+      setInput("");
+      setPendingAttachments([]);
+      setBanner(null);
+      clearError();
+      setSidebarOpen(false);
       composerRef.current?.focus();
+      return;
+    }
+    setBusy(false);
+    setBanner(null);
+    clearError();
+    setInput("");
+    await selectChat(null);
+    composerRef.current?.focus();
+  };
+
+  const handleRenameTitle = async (nextTitle: string) => {
+    const id = activeChatIdRef.current;
+    if (!id) return;
+    const trimmed = nextTitle.trim();
+    if (!trimmed) return;
+    try {
+      const chat = await patchChat(id, { title: trimmed });
+      setActiveChat(chat);
+      setChats((prev) => prev.map((c) => (c.id === chat.id ? chat : c)));
     } catch (err) {
-      setBanner(err instanceof Error ? err.message : "Could not create chat");
-    } finally {
-      setBusy(false);
+      setBanner(err instanceof Error ? err.message : "Could not rename chat");
+      throw err;
     }
   };
 
@@ -501,6 +540,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
 
   const handleModelChange = async (next: string) => {
     setModelId(next);
+    setThinkingLevel((prev) => coerceThinkingLevel(next, prev));
     if (!activeChatId) return;
     try {
       const chat = await patchChat(activeChatId, { modelId: next });
@@ -509,6 +549,20 @@ export default function ChatShell({ initialChatId = null }: Props) {
     } catch (err) {
       setBanner(err instanceof Error ? err.message : "Could not update model");
     }
+  };
+
+  const handleChatProviderChange = (next: ChatProviderId) => {
+    setChatProvider(next);
+    const forProvider = models.filter((m) => m.chatProvider === next);
+    if (forProvider.length === 0) return;
+    if (!forProvider.some((m) => m.id === modelId)) {
+      void handleModelChange(forProvider[0].id);
+    }
+  };
+
+  const handleThinkingChange = (level: ThinkingLevel) => {
+    if (!isThinkingLevel(level)) return;
+    setThinkingLevel(coerceThinkingLevel(modelId, level));
   };
 
   const ensureChat = async (): Promise<string> => {
@@ -944,6 +998,8 @@ export default function ChatShell({ initialChatId = null }: Props) {
             title={activeChat?.title ?? "New chat"}
             models={models}
             modelId={modelId}
+            chatProvider={chatProvider}
+            thinkingLevel={thinkingLevel}
             messages={messages}
             input={input}
             pendingAttachments={pendingAttachments}
@@ -958,8 +1014,12 @@ export default function ChatShell({ initialChatId = null }: Props) {
             canRegenerate={canRegenerate}
             canExport={Boolean(activeChatId) && messages.length > 0}
             canFork={Boolean(activeChatId) && messages.length > 0}
+            canRename={Boolean(activeChatId)}
             onOpenSidebar={() => setSidebarOpen(true)}
             onModelChange={(next) => void handleModelChange(next)}
+            onChatProviderChange={handleChatProviderChange}
+            onThinkingChange={handleThinkingChange}
+            onRenameTitle={handleRenameTitle}
             onInputChange={setInput}
             onSubmit={(event) => void handleSubmit(event)}
             onStop={() => void handleStop()}
