@@ -187,7 +187,11 @@ export default function ChatShell({ initialChatId = null }: Props) {
 
   const selectChat = useCallback(
     async (id: string | null, opts?: { replaceUrl?: boolean }) => {
+      // Abort any in-flight stream so status returns to ready (avoids stuck Send).
+      // Server-side consumeStream still finishes and persists the assistant turn.
+      void stop();
       clearError();
+      setBusy(false);
       setView("chat");
       setSidebarOpen(false);
       setPendingAttachments([]);
@@ -220,7 +224,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
         setLoadingThread(false);
       }
     },
-    [clearError, setMessages],
+    [clearError, setMessages, stop],
   );
 
   useEffect(() => {

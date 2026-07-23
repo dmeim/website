@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { waitUntil } from "cloudflare:workers";
 import { streamText, type ModelMessage } from "ai";
 import {
   denyIfAccessRequired,
@@ -12,6 +13,7 @@ import {
   titleFromPrompt,
   updateChat,
 } from "@/lib/chat";
+import { assistantContentToPersist } from "@/lib/chat/persist-assistant";
 import { createGoLanguageModel } from "@/lib/chat/provider";
 
 export const prerender = false;
@@ -104,21 +106,30 @@ export const POST: APIRoute = async (context) => {
         ),
       }));
 
+    const persistAssistant = async (content: string | null) => {
+      if (!content) return;
+      await insertMessage(db, {
+        chatId,
+        role: "assistant",
+        content,
+      });
+    };
+
+    // Do not pass request.signal — client navigate/disconnect must not cancel
+    // LLM generation. consumeStream + waitUntil keep generation and D1 writes
+    // alive after the browser cancels the response body.
     const result = streamText({
       model: createGoLanguageModel(modelId, apiKey),
       messages,
-      abortSignal: context.request.signal,
       onFinish: async ({ text }) => {
-        const content = text?.trim();
-        if (!content) return;
-        // Persist only on successful finish; abort discards partial text.
-        await insertMessage(db, {
-          chatId,
-          role: "assistant",
-          content,
-        });
+        await persistAssistant(assistantContentToPersist({ text }));
+      },
+      onAbort: async ({ steps }) => {
+        await persistAssistant(assistantContentToPersist({ steps }));
       },
     });
+
+    waitUntil(result.consumeStream());
 
     return result.toUIMessageStreamResponse();
   } catch (err) {

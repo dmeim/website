@@ -8,3 +8,4 @@ export * from "./access";
 export * from "./db";
 export * from "./http";
 export * from "./provider";
+export * from "./persist-assistant";
