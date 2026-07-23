@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "deploy": "astro build && wrangler deploy",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "chat:reset-local": "rm -rf .wrangler/state/v3/d1 .wrangler/state/v3/r2 && wrangler d1 migrations apply dmeim-chat --local"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.18",

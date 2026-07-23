@@ -36,9 +36,11 @@ npm run deploy   # requires Wrangler auth
 
 ```bash
 cp .dev.vars.example .dev.vars   # set OPENCODE_API_KEY
-npx wrangler d1 migrations apply dmeim-chat --local
+npm run chat:reset-local         # wipe local D1/R2, then apply migrations 0001–0004
 npm run dev                      # D1/R2 via local Miniflare bindings
 ```
+
+`chat:reset-local` deletes Miniflare state under `.wrangler/state/v3/d1` and `.wrangler/state/v3/r2`, then recreates empty chat tables. Prefer that over re-running migrate alone when you need a clean slate (migrate-on-top keeps old rows).
 
 Production Access + secrets checklist: `docs/chat-access-setup.md`.
 

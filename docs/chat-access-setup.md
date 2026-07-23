@@ -48,8 +48,10 @@ Local:
 ```bash
 cp .dev.vars.example .dev.vars
 # edit OPENCODE_API_KEY=
-npx wrangler d1 migrations apply dmeim-chat --local
+npm run chat:reset-local   # wipe local D1 + CHAT_LIBRARY R2, apply migrations from scratch
 npm run dev
 ```
+
+`npm run chat:reset-local` removes `.wrangler/state/v3/d1` and `.wrangler/state/v3/r2`, then runs `wrangler d1 migrations apply dmeim-chat --local`. Wipe deletes data; migrate after wipe only creates empty tables — do not treat migrate-alone as a reset.
 
 OpenCode Go key: https://opencode.ai/ (Zen / Go subscription → API key).
