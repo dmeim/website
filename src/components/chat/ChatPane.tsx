@@ -1,6 +1,18 @@
-import { useState, type FormEvent, type KeyboardEvent, type RefObject } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+  type RefObject,
+} from "react";
 import type { UIMessage } from "ai";
+import { File, Images, Library, Plus, Send, X } from "lucide";
 import type { GoModelInfo, LibraryAssetSummary } from "@/lib/chat/types";
+import { LibraryPickerModal } from "./LibraryPickerModal";
+import { LucideIcon } from "./LucideIcon";
 import MarkdownBody from "./MarkdownBody";
 import { ModelPicker } from "./ModelPicker";
 import { attachmentsOf, textFromParts } from "./messageUtils";
@@ -12,6 +24,8 @@ type ChatPaneProps = {
   messages: UIMessage[];
   input: string;
   pendingAttachments: LibraryAssetSummary[];
+  libraryAssets: LibraryAssetSummary[];
+  libraryLoading?: boolean;
   loadingThread: boolean;
   streaming: boolean;
   /** Server or client still producing a reply (may be after navigate-away). */
@@ -33,7 +47,10 @@ type ChatPaneProps = {
   onFork?: (messageId?: string) => void;
   onEditMessage?: (messageId: string, content: string) => void;
   onDismissError?: () => void;
-  onAttachClick: () => void;
+  onPickImages: () => void;
+  onPickFiles: () => void;
+  onRefreshLibrary: () => Promise<void>;
+  onAttachFromLibrary: (assets: LibraryAssetSummary[]) => void;
   onRemoveAttachment: (id: string) => void;
   threadRef: RefObject<HTMLDivElement | null>;
   threadEndRef: RefObject<HTMLDivElement | null>;
@@ -47,6 +64,8 @@ export function ChatPane({
   messages,
   input,
   pendingAttachments,
+  libraryAssets,
+  libraryLoading = false,
   loadingThread,
   streaming,
   generating = false,
@@ -67,7 +86,10 @@ export function ChatPane({
   onFork,
   onEditMessage,
   onDismissError,
-  onAttachClick,
+  onPickImages,
+  onPickFiles,
+  onRefreshLibrary,
+  onAttachFromLibrary,
   onRemoveAttachment,
   threadRef,
   threadEndRef,
@@ -75,6 +97,43 @@ export function ChatPane({
 }: ChatPaneProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
+  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
+  const [libraryModalOpen, setLibraryModalOpen] = useState(false);
+  const attachMenuRef = useRef<HTMLDivElement | null>(null);
+  const attachMenuId = useId();
+
+  useEffect(() => {
+    if (!attachMenuOpen) return;
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (!attachMenuRef.current?.contains(target)) {
+        setAttachMenuOpen(false);
+      }
+    };
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") setAttachMenuOpen(false);
+    };
+    window.addEventListener("mousedown", onPointerDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("mousedown", onPointerDown);
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [attachMenuOpen]);
+
+  const openLibraryPicker = () => {
+    setAttachMenuOpen(false);
+    setLibraryModalOpen(true);
+    void onRefreshLibrary();
+  };
+
+  useLayoutEffect(() => {
+    const el = composerRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [input, composerRef]);
 
   const onComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
@@ -332,20 +391,66 @@ export function ChatPane({
           </ul>
         ) : null}
         <div className="chat-composer__row">
-          <button
-            type="button"
-            className="chat-btn chat-btn--ghost"
-            onClick={onAttachClick}
-            disabled={busy || composerBusy}
-            aria-label="Attach file"
-            title="Library-first upload. Images ≤4MiB inlined; text/PDF extracted; video/other as notes."
-          >
-            Attach
-          </button>
+          <div className="chat-composer__attach" ref={attachMenuRef}>
+            <button
+              type="button"
+              className="chat-btn chat-btn--ghost chat-btn--icon"
+              onClick={() => setAttachMenuOpen((open) => !open)}
+              disabled={busy || composerBusy}
+              aria-label={attachMenuOpen ? "Close attach menu" : "Attach"}
+              aria-expanded={attachMenuOpen}
+              aria-controls={attachMenuId}
+              title="Attach images, files, or library items"
+            >
+              <LucideIcon icon={attachMenuOpen ? X : Plus} size={24} />
+            </button>
+            {attachMenuOpen ? (
+              <div
+                id={attachMenuId}
+                className="chat-attach-menu"
+                role="menu"
+                aria-label="Attach"
+              >
+                <button
+                  type="button"
+                  className="chat-attach-menu__item"
+                  role="menuitem"
+                  onClick={() => {
+                    setAttachMenuOpen(false);
+                    onPickImages();
+                  }}
+                >
+                  <LucideIcon icon={Images} size={20} />
+                  <span>Images</span>
+                </button>
+                <button
+                  type="button"
+                  className="chat-attach-menu__item"
+                  role="menuitem"
+                  onClick={() => {
+                    setAttachMenuOpen(false);
+                    onPickFiles();
+                  }}
+                >
+                  <LucideIcon icon={File} size={20} />
+                  <span>Files</span>
+                </button>
+                <button
+                  type="button"
+                  className="chat-attach-menu__item"
+                  role="menuitem"
+                  onClick={openLibraryPicker}
+                >
+                  <LucideIcon icon={Library} size={20} />
+                  <span>From library</span>
+                </button>
+              </div>
+            ) : null}
+          </div>
           <textarea
             ref={composerRef}
             className="chat-composer__input"
-            rows={2}
+            rows={1}
             value={input}
             onChange={(event) => onInputChange(event.target.value)}
             onKeyDown={onComposerKeyDown}
@@ -359,18 +464,33 @@ export function ChatPane({
           ) : (
             <button
               type="submit"
-              className="chat-btn"
+              className="chat-btn chat-btn--icon"
               disabled={
                 busy ||
                 generating ||
                 (!input.trim() && pendingAttachments.length === 0)
               }
+              aria-label="Send"
+              title="Send"
             >
-              Send
+              <LucideIcon icon={Send} size={24} />
             </button>
           )}
         </div>
       </form>
+
+      {libraryModalOpen ? (
+        <LibraryPickerModal
+          assets={libraryAssets}
+          pendingIds={new Set(pendingAttachments.map((a) => a.id))}
+          loading={libraryLoading}
+          onClose={() => setLibraryModalOpen(false)}
+          onConfirm={(selected) => {
+            onAttachFromLibrary(selected);
+            setLibraryModalOpen(false);
+          }}
+        />
+      ) : null}
     </>
   );
 }

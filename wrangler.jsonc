@@ -9,6 +9,10 @@
   "observability": {
     "enabled": true,
   },
+  // Pin apex custom domain so dashboard-only attachment isn't lost on deploy.
+  "routes": [
+    { "pattern": "dmeim.com", "custom_domain": true },
+  ],
   // Code expects bindings DB + CHAT_LIBRARY (see src/lib/chat/db.ts).
   // Local `astro dev` uses Miniflare; do not set remote:true here or local hits prod data.
   "d1_databases": [

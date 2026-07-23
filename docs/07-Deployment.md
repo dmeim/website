@@ -21,7 +21,7 @@ Requires Wrangler authenticated to the Cloudflare account that owns `dmeim`, and
 - `astro.config.ts` — Cloudflare adapter
 - `public/.assetsignore` — excludes Worker build artifacts from the assets upload
 
-Exact custom domain wiring for `dmeim.com` is done in the Cloudflare dashboard (or later via Wrangler routes).
+Custom domain `dmeim.com` is pinned in `wrangler.jsonc` (`routes` + `custom_domain: true`) so deploys keep it attached.
 
 ## Headers & Caching
 

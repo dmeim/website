@@ -79,6 +79,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
   const [loadingThread, setLoadingThread] = useState(false);
+  const [libraryLoading, setLibraryLoading] = useState(false);
   /** Chats we expect an assistant reply for (local + server generating). */
   const [awaitingByChat, setAwaitingByChat] = useState<Record<string, boolean>>(
     {},
@@ -90,6 +91,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
   const threadRef = useRef<HTMLDivElement | null>(null);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const messagesRef = useRef<UIMessage[]>([]);
   const awaitingRef = useRef(awaitingByChat);
@@ -215,9 +217,14 @@ export default function ChatShell({ initialChatId = null }: Props) {
   }, [markAwaiting]);
 
   const refreshLibrary = useCallback(async () => {
-    const list = await fetchLibrary();
-    setAssets(list);
-    return list;
+    setLibraryLoading(true);
+    try {
+      const list = await fetchLibrary();
+      setAssets(list);
+      return list;
+    } finally {
+      setLibraryLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -718,11 +725,20 @@ export default function ChatShell({ initialChatId = null }: Props) {
       setPendingAttachments((prev) => [...prev, ...uploaded]);
       if (view === "library") {
         await refreshLibrary();
+      } else {
+        setAssets((prev) => {
+          const next = [...prev];
+          for (const asset of uploaded) {
+            if (!next.some((a) => a.id === asset.id)) next.unshift(asset);
+          }
+          return next;
+        });
       }
     } catch (err) {
       setBanner(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setBusy(false);
+      if (imageInputRef.current) imageInputRef.current.value = "";
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -757,6 +773,22 @@ export default function ChatShell({ initialChatId = null }: Props) {
     );
     setView("chat");
     setBanner(`Attached “${asset.filename}” to the next message.`);
+  };
+
+  const attachManyFromLibrary = (selected: LibraryAssetSummary[]) => {
+    if (!selected.length) return;
+    setPendingAttachments((prev) => {
+      const next = [...prev];
+      for (const asset of selected) {
+        if (!next.some((a) => a.id === asset.id)) next.push(asset);
+      }
+      return next;
+    });
+    const label =
+      selected.length === 1
+        ? `Attached “${selected[0].filename}” to the next message.`
+        : `Attached ${selected.length} library items to the next message.`;
+    setBanner(label);
   };
 
   const showGeneratingIndicator =
@@ -915,6 +947,8 @@ export default function ChatShell({ initialChatId = null }: Props) {
             messages={messages}
             input={input}
             pendingAttachments={pendingAttachments}
+            libraryAssets={assets}
+            libraryLoading={libraryLoading}
             loadingThread={loadingThread}
             streaming={streaming}
             generating={showGeneratingIndicator}
@@ -943,7 +977,10 @@ export default function ChatShell({ initialChatId = null }: Props) {
                 prev ? { ...prev, lastError: null } : prev,
               );
             }}
-            onAttachClick={() => fileInputRef.current?.click()}
+            onPickImages={() => imageInputRef.current?.click()}
+            onPickFiles={() => fileInputRef.current?.click()}
+            onRefreshLibrary={() => refreshLibrary().then(() => undefined)}
+            onAttachFromLibrary={attachManyFromLibrary}
             onRemoveAttachment={(id) =>
               setPendingAttachments((prev) => prev.filter((a) => a.id !== id))
             }
@@ -953,6 +990,14 @@ export default function ChatShell({ initialChatId = null }: Props) {
           />
         )}
 
+        <input
+          ref={imageInputRef}
+          type="file"
+          className="visually-hidden"
+          accept="image/*"
+          multiple
+          onChange={(event) => void handleUpload(event.target.files)}
+        />
         <input
           ref={fileInputRef}
           type="file"
