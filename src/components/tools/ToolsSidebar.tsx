@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, X } from "lucide";
+import { Search, Toolbox, X } from "lucide";
 import {
-  availableTools,
   getCategoryForTool,
-  plannedTools,
   toolCategories,
   toolRoute,
   type Tool,
@@ -35,8 +33,6 @@ export function ToolsSidebar({
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const availableCount = availableTools().length;
-  const plannedCount = plannedTools().length;
   const activeCategoryId = activeSlug
     ? getCategoryForTool(activeSlug)?.id
     : undefined;
@@ -68,15 +64,6 @@ export function ToolsSidebar({
   return (
     <aside className="tools-sidebar" aria-label="Tool categories">
       <div className="tools-sidebar__top">
-        <div className="tools-sidebar__head">
-          <p className="tools-sidebar__eyebrow">Catalogue</p>
-          <h2 className="tools-sidebar__title">Tools</h2>
-          <p className="tools-sidebar__meta">
-            {availableCount} ready
-            {plannedCount > 0 ? ` · ${plannedCount} WIP` : null}
-          </p>
-        </div>
-
         <a
           href="/tools"
           className={
@@ -99,6 +86,7 @@ export function ToolsSidebar({
             onSelectCatalog();
           }}
         >
+          <LucideIcon icon={Toolbox} size={16} />
           All tools
         </a>
       </div>
