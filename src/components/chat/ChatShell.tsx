@@ -15,11 +15,13 @@ import {
   isThinkingLevel,
 } from "@/lib/chat/thinking";
 import type {
+  ChatMcpSettings,
   ChatSummary,
   GoModelInfo,
   LibraryAssetSummary,
   ThinkingLevel,
 } from "@/lib/chat/types";
+import { defaultMcpSettings, parseMcpSettings } from "@/lib/chat/mcp/settings";
 import {
   chatExportUrl,
   createChat,
@@ -38,7 +40,12 @@ import { ArchivePane } from "./ArchivePane";
 import { ChatPane } from "./ChatPane";
 import { ChatSidebar } from "./ChatSidebar";
 import { LibraryPane } from "./LibraryPane";
-import { dtoToUiMessages, textFromParts } from "./messageUtils";
+import {
+  dtoToUiMessages,
+  isHollowAssistant,
+  shouldPreferLocalThread,
+  textFromParts,
+} from "./messageUtils";
 import "./ChatShell.css";
 
 type ViewMode = "chat" | "library" | "archive";
@@ -50,6 +57,23 @@ type Props = {
 const POLL_MS = 1500;
 const POST_IDLE_POLLS = 2;
 const NEAR_BOTTOM_PX = 120;
+/** Client-only belt-and-suspenders if server generating_at is stuck (no server TTL). */
+const STALE_GENERATING_MS = 15 * 60 * 1000;
+
+function ageOutStaleGenerating(chats: ChatSummary[]): ChatSummary[] {
+  const now = Date.now();
+  let changed = false;
+  const next = chats.map((c) => {
+    if (!c.generatingAt) return c;
+    const started = Date.parse(c.generatingAt);
+    if (!Number.isFinite(started) || now - started < STALE_GENERATING_MS) {
+      return c;
+    }
+    changed = true;
+    return { ...c, generatingAt: null };
+  });
+  return changed ? next : chats;
+}
 
 function lastMessageIsUser(messages: { role: string }[]): boolean {
   const last = messages[messages.length - 1];
@@ -87,8 +111,13 @@ export default function ChatShell({ initialChatId = null }: Props) {
   const [chatProvider, setChatProvider] =
     useState<ChatProviderId>("opencode-go");
   const [thinkingLevel, setThinkingLevel] = useState<ThinkingLevel>("off");
+  const [mcpSettings, setMcpSettings] = useState<ChatMcpSettings>(() =>
+    defaultMcpSettings(),
+  );
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
+  const setBannerRef = useRef(setBanner);
+  setBannerRef.current = setBanner;
   const [archiveBanner, setArchiveBanner] = useState<string | null>(null);
   const [loadingThread, setLoadingThread] = useState(false);
   const [libraryLoading, setLibraryLoading] = useState(false);
@@ -101,6 +130,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
   const activeChatIdRef = useRef(activeChatId);
   const modelIdRef = useRef(modelId);
   const thinkingLevelRef = useRef(thinkingLevel);
+  const mcpSettingsRef = useRef(mcpSettings);
   const pendingIdsRef = useRef<string[]>([]);
   const threadRef = useRef<HTMLDivElement | null>(null);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
@@ -112,6 +142,10 @@ export default function ChatShell({ initialChatId = null }: Props) {
   const streamingRef = useRef(false);
   const idlePollsLeftRef = useRef(0);
   const stickToBottomRef = useRef(true);
+  /** Chat id pinned for the in-flight send/regenerate body (not live active id). */
+  const sendChatIdRef = useRef<string | null>(null);
+  /** Monotonic generation so stale selectChat fetches can't clear newer loads. */
+  const selectChatGenRef = useRef(0);
 
   useEffect(() => {
     activeChatIdRef.current = activeChatId;
@@ -123,6 +157,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
     thinkingLevelRef.current = thinkingLevel;
   }, [thinkingLevel]);
   useEffect(() => {
+    mcpSettingsRef.current = mcpSettings;
+  }, [mcpSettings]);
+  useEffect(() => {
     pendingIdsRef.current = pendingAttachments.map((a) => a.id);
   }, [pendingAttachments]);
   useEffect(() => {
@@ -133,13 +170,22 @@ export default function ChatShell({ initialChatId = null }: Props) {
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
+        fetch: async (input, init) => {
+          const res = await globalThis.fetch(input, init);
+          const mcpNote = res.headers.get("X-Chat-Mcp-Notes");
+          if (mcpNote) setBannerRef.current(mcpNote);
+          return res;
+        },
         prepareSendMessagesRequest: ({ messages, trigger }) => {
+          const chatId =
+            sendChatIdRef.current ?? activeChatIdRef.current ?? undefined;
           if (trigger === "regenerate-message") {
             return {
               body: {
-                chatId: activeChatIdRef.current,
+                chatId,
                 modelId: modelIdRef.current,
                 thinkingLevel: thinkingLevelRef.current,
+                mcpSettings: mcpSettingsRef.current,
                 regenerate: true,
               },
             };
@@ -150,10 +196,11 @@ export default function ChatShell({ initialChatId = null }: Props) {
           const text = lastUser ? textFromParts(lastUser) : "";
           return {
             body: {
-              chatId: activeChatIdRef.current,
+              chatId,
               message: text,
               modelId: modelIdRef.current,
               thinkingLevel: thinkingLevelRef.current,
+              mcpSettings: mcpSettingsRef.current,
               attachmentIds: pendingIdsRef.current,
             },
           };
@@ -338,6 +385,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
       // Abort any in-flight *client* stream so status returns to ready.
       // Server-side consumeStream still finishes and persists the assistant turn
       // unless the user explicitly hits Stop (which calls /stop).
+      const gen = ++selectChatGenRef.current;
       void stop();
       clearError();
       setBusy(false);
@@ -355,8 +403,12 @@ export default function ChatShell({ initialChatId = null }: Props) {
         setModelId(DEFAULT_CHAT_MODEL_ID);
         setThinkingLevel("off");
         setChatProvider("opencode-go");
+        setMcpSettings(defaultMcpSettings());
         if (opts?.replaceUrl !== false) {
           window.history.replaceState({}, "", "/chat");
+        }
+        if (selectChatGenRef.current === gen) {
+          setLoadingThread(false);
         }
         return;
       }
@@ -367,11 +419,15 @@ export default function ChatShell({ initialChatId = null }: Props) {
 
       try {
         const { chat, messages: rows } = await fetchChat(id);
+        if (selectChatGenRef.current !== gen || activeChatIdRef.current !== id) {
+          return;
+        }
         setActiveChat(chat);
         const nextModel = chat.modelId || DEFAULT_CHAT_MODEL_ID;
         setModelId(nextModel);
         setChatProvider("opencode-go");
         setThinkingLevel((prev) => coerceThinkingLevel(nextModel, prev));
+        setMcpSettings(parseMcpSettings(chat.mcpSettings));
         setMessages(dtoToUiMessages(rows));
         if (chat.lastError) {
           setBanner(chat.lastError);
@@ -383,10 +439,15 @@ export default function ChatShell({ initialChatId = null }: Props) {
           idlePollsLeftRef.current = POST_IDLE_POLLS;
         }
       } catch (err) {
+        if (selectChatGenRef.current !== gen || activeChatIdRef.current !== id) {
+          return;
+        }
         setBanner(err instanceof Error ? err.message : "Failed to load chat");
         setMessages([]);
       } finally {
-        setLoadingThread(false);
+        if (selectChatGenRef.current === gen) {
+          setLoadingThread(false);
+        }
       }
     },
     [clearError, markAwaiting, setMessages, stop],
@@ -431,7 +492,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
 
     const tick = async () => {
       try {
-        const list = await fetchChats(false);
+        const list = ageOutStaleGenerating(await fetchChats(false));
         if (cancelled) return;
         setChats(list);
 
@@ -484,7 +545,19 @@ export default function ChatShell({ initialChatId = null }: Props) {
         if (cancelled || activeChatIdRef.current !== id) return;
 
         setActiveChat(chat);
-        // Server is source of truth — replace local thread to avoid duplicates.
+
+        // Don't wipe a local assistant that D1 hasn't persisted yet.
+        if (shouldPreferLocalThread(messagesRef.current, rows)) {
+          if (chat.generatingAt) {
+            markAwaiting(id, true);
+            idlePollsLeftRef.current = POST_IDLE_POLLS;
+          } else if (idlePollsLeftRef.current > 0) {
+            idlePollsLeftRef.current -= 1;
+          }
+          return;
+        }
+
+        // Server is source of truth once it has caught up.
         setMessages(dtoToUiMessages(rows));
 
         const hasAssistantReply = !lastMessageIsUser(rows);
@@ -624,9 +697,27 @@ export default function ChatShell({ initialChatId = null }: Props) {
     setThinkingLevel(coerceThinkingLevel(modelId, level));
   };
 
+  const handleMcpSettingsChange = (next: ChatMcpSettings) => {
+    const parsed = parseMcpSettings(next);
+    setMcpSettings(parsed);
+    mcpSettingsRef.current = parsed;
+    if (!activeChatId) return;
+    void (async () => {
+      try {
+        const chat = await patchChat(activeChatId, { mcpSettings: parsed });
+        setActiveChat(chat);
+        setChats((prev) => prev.map((c) => (c.id === chat.id ? chat : c)));
+      } catch (err) {
+        setBanner(
+          err instanceof Error ? err.message : "Could not update MCP settings",
+        );
+      }
+    })();
+  };
+
   const ensureChat = async (): Promise<string> => {
     if (activeChatId) return activeChatId;
-    const chat = await createChat({ modelId });
+    const chat = await createChat({ modelId, mcpSettings });
     await refreshChats();
     setActiveChatId(chat.id);
     setActiveChat(chat);
@@ -651,6 +742,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
     stickToBottomRef.current = true;
     try {
       const chatId = await ensureChat();
+      sendChatIdRef.current = chatId;
       markAwaiting(chatId, true);
       idlePollsLeftRef.current = POST_IDLE_POLLS;
       const optimisticAt = new Date().toISOString();
@@ -685,10 +777,11 @@ export default function ChatShell({ initialChatId = null }: Props) {
       pendingIdsRef.current = [];
       await sendPromise;
     } catch (err) {
-      const id = activeChatIdRef.current;
+      const id = sendChatIdRef.current ?? activeChatIdRef.current;
       if (id) markAwaiting(id, false);
       setBanner(err instanceof Error ? err.message : "Send failed");
     } finally {
+      sendChatIdRef.current = null;
       setBusy(false);
     }
   };
@@ -724,6 +817,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
     setBanner(null);
     clearError();
     stickToBottomRef.current = true;
+    sendChatIdRef.current = activeChatId;
     markAwaiting(activeChatId, true);
     idlePollsLeftRef.current = POST_IDLE_POLLS;
     try {
@@ -735,6 +829,8 @@ export default function ChatShell({ initialChatId = null }: Props) {
     } catch (err) {
       markAwaiting(activeChatId, false);
       setBanner(err instanceof Error ? err.message : "Regenerate failed");
+    } finally {
+      sendChatIdRef.current = null;
     }
   };
 
@@ -815,13 +911,15 @@ export default function ChatShell({ initialChatId = null }: Props) {
           : prev,
       );
       // Branch ends on the edited user turn — regenerate the assistant reply.
+      sendChatIdRef.current = chat.id;
       await regenerate();
       setBanner("Branched edit into a new chat; original unchanged.");
     } catch (err) {
-      const id = activeChatIdRef.current;
+      const id = sendChatIdRef.current ?? activeChatIdRef.current;
       if (id) markAwaiting(id, false);
       setBanner(err instanceof Error ? err.message : "Edit branch failed");
     } finally {
+      sendChatIdRef.current = null;
       setBusy(false);
     }
   };
@@ -904,6 +1002,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
     setBanner(label);
   };
 
+  const lastMessage = messages[messages.length - 1];
   const showGeneratingIndicator =
     view === "chat" &&
     Boolean(activeChatId) &&
@@ -911,7 +1010,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
     (streaming ||
       Boolean(activeChat?.generatingAt) ||
       Boolean(activeChatId && awaitingByChat[activeChatId])) &&
-    (streaming || lastMessageIsUser(messages));
+    (streaming ||
+      lastMessageIsUser(messages) ||
+      (lastMessage != null && isHollowAssistant(lastMessage)));
 
   // Auto-scroll when generating indicator / messages change (near-bottom only).
   useEffect(() => {
@@ -959,6 +1060,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
       const mod = event.metaKey || event.ctrlKey;
 
       if (event.key === "Escape") {
+        // ChatPane closes composer menus in capture and preventDefaults;
+        // do not also stop generation when a menu handled Esc.
+        if (event.defaultPrevented) return;
         if (streaming || showGeneratingIndicator) {
           event.preventDefault();
           void handleStop();
@@ -1075,6 +1179,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
             modelId={modelId}
             chatProvider={chatProvider}
             thinkingLevel={thinkingLevel}
+            mcpSettings={mcpSettings}
             messages={messages}
             input={input}
             pendingAttachments={pendingAttachments}
@@ -1094,6 +1199,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
             onModelChange={(next) => void handleModelChange(next)}
             onChatProviderChange={handleChatProviderChange}
             onThinkingChange={handleThinkingChange}
+            onMcpSettingsChange={handleMcpSettingsChange}
             onRenameTitle={handleRenameTitle}
             onInputChange={setInput}
             onSubmit={(event) => void handleSubmit(event)}

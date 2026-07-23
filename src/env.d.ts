@@ -4,6 +4,8 @@
 declare namespace Cloudflare {
   interface Env {
     OPENCODE_API_KEY?: string;
+    EXA_API_KEY?: string;
+    CONTEXT7_API_KEY?: string;
     REQUIRE_ACCESS?: string;
   }
 }

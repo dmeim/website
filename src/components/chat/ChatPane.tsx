@@ -21,22 +21,32 @@ import {
   RefreshCw,
   Send,
   SquarePen,
+  Wrench,
   X,
 } from "lucide";
 import type { ChatProviderId } from "@/lib/chat/thinking";
-import type { GoModelInfo, LibraryAssetSummary, ThinkingLevel } from "@/lib/chat/types";
+import type {
+  ChatMcpSettings,
+  GoModelInfo,
+  LibraryAssetSummary,
+  McpServerId,
+  ThinkingLevel,
+} from "@/lib/chat/types";
 import { ComposerStatusBar } from "./ComposerStatusBar";
 import { LibraryPickerModal } from "./LibraryPickerModal";
 import { LucideIcon } from "./LucideIcon";
 import MarkdownBody from "./MarkdownBody";
+import { McpSettingsPanel } from "./McpSettingsPanel";
 import { ModelSettingsPanel } from "./ModelSettingsPanel";
 import { MessageMetrics } from "./MessageMetrics";
 import { ThinkingBlock } from "./ThinkingBlock";
 import {
   attachmentsOf,
   generationOf,
+  isHollowAssistant,
   reasoningFromParts,
   textFromParts,
+  toolCallsFromParts,
 } from "./messageUtils";
 
 type ChatPaneProps = {
@@ -45,6 +55,7 @@ type ChatPaneProps = {
   modelId: string;
   chatProvider: ChatProviderId;
   thinkingLevel: ThinkingLevel;
+  mcpSettings: ChatMcpSettings;
   messages: UIMessage[];
   input: string;
   pendingAttachments: LibraryAssetSummary[];
@@ -66,6 +77,7 @@ type ChatPaneProps = {
   onModelChange: (modelId: string) => void;
   onChatProviderChange: (provider: ChatProviderId) => void;
   onThinkingChange: (level: ThinkingLevel) => void;
+  onMcpSettingsChange: (settings: ChatMcpSettings) => void;
   onRenameTitle?: (title: string) => void | Promise<void>;
   onInputChange: (value: string) => void;
   onSubmit: (event?: FormEvent) => void;
@@ -92,6 +104,7 @@ export function ChatPane({
   modelId,
   chatProvider,
   thinkingLevel,
+  mcpSettings,
   messages,
   input,
   pendingAttachments,
@@ -111,6 +124,7 @@ export function ChatPane({
   onModelChange,
   onChatProviderChange,
   onThinkingChange,
+  onMcpSettingsChange,
   onRenameTitle,
   onInputChange,
   onSubmit,
@@ -136,13 +150,25 @@ export function ChatPane({
   const [titleDraft, setTitleDraft] = useState(title);
   const [attachMenuOpen, setAttachMenuOpen] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
+  const [mcpMenuOpen, setMcpMenuOpen] = useState(false);
+  const [mcpDetailServerId, setMcpDetailServerId] =
+    useState<McpServerId | null>(null);
   const [libraryModalOpen, setLibraryModalOpen] = useState(false);
   const attachMenuRef = useRef<HTMLDivElement | null>(null);
   const modelMenuRef = useRef<HTMLDivElement | null>(null);
+  const mcpMenuRef = useRef<HTMLDivElement | null>(null);
   const titleInputRef = useRef<HTMLInputElement | null>(null);
   const titleSaveGuardRef = useRef(false);
   const attachMenuId = useId();
   const modelMenuId = useId();
+  const mcpMenuId = useId();
+
+  const closeComposerMenus = () => {
+    setAttachMenuOpen(false);
+    setModelMenuOpen(false);
+    setMcpMenuOpen(false);
+    setMcpDetailServerId(null);
+  };
 
   useEffect(() => {
     if (!renaming) setTitleDraft(title);
@@ -164,7 +190,7 @@ export function ChatPane({
   }, [renaming]);
 
   useEffect(() => {
-    if (!attachMenuOpen && !modelMenuOpen) return;
+    if (!attachMenuOpen && !modelMenuOpen && !mcpMenuOpen) return;
     const onPointerDown = (event: MouseEvent) => {
       const target = event.target;
       if (!(target instanceof Node)) return;
@@ -174,23 +200,28 @@ export function ChatPane({
       if (modelMenuOpen && !modelMenuRef.current?.contains(target)) {
         setModelMenuOpen(false);
       }
-    };
-    const onKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setAttachMenuOpen(false);
-        setModelMenuOpen(false);
+      if (mcpMenuOpen && !mcpMenuRef.current?.contains(target)) {
+        setMcpMenuOpen(false);
+        setMcpDetailServerId(null);
       }
     };
+    // Capture + stopImmediate so ChatShell Esc-to-stop does not also fire.
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeComposerMenus();
+    };
     window.addEventListener("mousedown", onPointerDown);
-    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", onKeyDown, true);
     return () => {
       window.removeEventListener("mousedown", onPointerDown);
-      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keydown", onKeyDown, true);
     };
-  }, [attachMenuOpen, modelMenuOpen]);
+  }, [attachMenuOpen, modelMenuOpen, mcpMenuOpen]);
 
   const openLibraryPicker = () => {
-    setAttachMenuOpen(false);
+    closeComposerMenus();
     setLibraryModalOpen(true);
     void onRefreshLibrary();
   };
@@ -202,20 +233,31 @@ export function ChatPane({
     el.style.height = `${el.scrollHeight}px`;
   }, [input, composerRef]);
 
+  const handleComposerSubmit = (event?: FormEvent) => {
+    closeComposerMenus();
+    onSubmit(event);
+  };
+
   const onComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
       event.preventDefault();
-      onSubmit();
+      handleComposerSubmit();
       return;
     }
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      onSubmit();
+      handleComposerSubmit();
     }
   };
 
   const composerBusy = streaming || generating;
   const showStop = streaming || generating;
+  const menusLocked = busy || composerBusy;
+  const lastMessage = messages[messages.length - 1];
+  const lastHasVisibleAssistantBody =
+    lastMessage?.role === "assistant" && !isHollowAssistant(lastMessage);
+  /** Spinner while waiting, or during stream until first visible tokens. */
+  const showGeneratingStatus = generating && !lastHasVisibleAssistantBody;
   const assistantGenerations = messages
     .filter((message) => message.role === "assistant")
     .map((message) => generationOf(message));
@@ -438,7 +480,12 @@ export function ChatPane({
             const isUser = message.role === "user";
             const text = textFromParts(message);
             const thinking = !isUser ? reasoningFromParts(message) : null;
+            const toolCalls = !isUser ? toolCallsFromParts(message) : [];
             const isLastMessage = index === messages.length - 1;
+            // Skip hollow assistant placeholders — generating status covers UX.
+            if (!isUser && isHollowAssistant(message)) {
+              return null;
+            }
             const attachments = attachmentsOf(message);
             const isEditing = editingId === message.id;
             const showRegenerate =
@@ -540,6 +587,19 @@ export function ChatPane({
                         streaming={thinking.streaming}
                       />
                     ) : null}
+                    {toolCalls.length > 0 ? (
+                      <ul className="chat-tool-chips" aria-label="Tools used">
+                        {toolCalls.map((chip) => (
+                          <li
+                            key={chip.key}
+                            className={`chat-tool-chip chat-tool-chip--${chip.state}`}
+                          >
+                            {chip.label}
+                            {chip.state === "pending" ? "…" : null}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                     {text.trim() ? (
                       <MarkdownBody className="chat-bubble__md" text={text} />
                     ) : null}
@@ -574,7 +634,7 @@ export function ChatPane({
             );
           })
         )}
-        {generating && !streaming ? (
+        {showGeneratingStatus ? (
           <p className="chat-generating" role="status" aria-live="polite">
             <span className="chat-generating__spinner" aria-hidden="true" />
             Generating…
@@ -583,7 +643,7 @@ export function ChatPane({
         <div ref={threadEndRef} />
       </div>
 
-      <form className="chat-composer" onSubmit={onSubmit}>
+      <form className="chat-composer" onSubmit={handleComposerSubmit}>
         {pendingAttachments.length > 0 ? (
           <ul className="chat-composer__attachments">
             {pendingAttachments.map((attachment) => (
@@ -615,8 +675,10 @@ export function ChatPane({
               onClick={() => {
                 setModelMenuOpen((open) => !open);
                 setAttachMenuOpen(false);
+                setMcpMenuOpen(false);
+                setMcpDetailServerId(null);
               }}
-              disabled={busy || composerBusy}
+              disabled={menusLocked && !modelMenuOpen}
               aria-label={
                 modelMenuOpen ? "Close model settings" : "Model settings"
               }
@@ -638,10 +700,47 @@ export function ChatPane({
                   chatProvider={chatProvider}
                   modelId={modelId}
                   thinkingLevel={thinkingLevel}
-                  disabled={busy || composerBusy}
+                  disabled={menusLocked}
                   onChatProviderChange={onChatProviderChange}
                   onModelChange={onModelChange}
                   onThinkingChange={onThinkingChange}
+                />
+              </div>
+            ) : null}
+          </div>
+          <div className="chat-composer__attach" ref={mcpMenuRef}>
+            <button
+              type="button"
+              className="chat-btn chat-btn--ghost chat-btn--icon"
+              onClick={() => {
+                setMcpMenuOpen((open) => {
+                  if (open) setMcpDetailServerId(null);
+                  return !open;
+                });
+                setModelMenuOpen(false);
+                setAttachMenuOpen(false);
+              }}
+              disabled={menusLocked && !mcpMenuOpen}
+              aria-label={mcpMenuOpen ? "Close MCP tools" : "MCP tools"}
+              aria-expanded={mcpMenuOpen}
+              aria-controls={mcpMenuId}
+              title="MCP tools (Exa, Context7)"
+            >
+              <LucideIcon icon={mcpMenuOpen ? X : Wrench} size={24} />
+            </button>
+            {mcpMenuOpen ? (
+              <div
+                id={mcpMenuId}
+                className="chat-attach-menu chat-attach-menu--settings chat-attach-menu--end"
+                role="dialog"
+                aria-label="MCP tools"
+              >
+                <McpSettingsPanel
+                  settings={mcpSettings}
+                  disabled={menusLocked}
+                  detailServerId={mcpDetailServerId}
+                  onDetailServerIdChange={setMcpDetailServerId}
+                  onChange={onMcpSettingsChange}
                 />
               </div>
             ) : null}
@@ -653,8 +752,10 @@ export function ChatPane({
               onClick={() => {
                 setAttachMenuOpen((open) => !open);
                 setModelMenuOpen(false);
+                setMcpMenuOpen(false);
+                setMcpDetailServerId(null);
               }}
-              disabled={busy || composerBusy}
+              disabled={menusLocked && !attachMenuOpen}
               aria-label={attachMenuOpen ? "Close attach menu" : "Attach"}
               aria-expanded={attachMenuOpen}
               aria-controls={attachMenuId}

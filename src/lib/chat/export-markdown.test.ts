@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { chatToMarkdownExport } from "./export-markdown";
+import { defaultMcpSettings } from "./mcp/settings";
 import type { ChatMessageDto, ChatSummary } from "./types";
 
 describe("chatToMarkdownExport", () => {
@@ -13,6 +14,7 @@ describe("chatToMarkdownExport", () => {
       lastError: null,
       forkedFromChatId: null,
       forkedFromMessageId: null,
+      mcpSettings: defaultMcpSettings(),
       createdAt: "2026-07-22T10:00:00.000Z",
       updatedAt: "2026-07-22T11:00:00.000Z",
     };

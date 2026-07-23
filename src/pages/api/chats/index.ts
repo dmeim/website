@@ -8,6 +8,7 @@ import {
   json,
   listChats,
   methodNotAllowed,
+  parseMcpSettings,
 } from "@/lib/chat";
 
 export const prerender = false;
@@ -35,7 +36,7 @@ export const POST: APIRoute = async (context) => {
   const denied = denyIfAccessRequired(context.request, env);
   if (denied) return denied;
 
-  let body: { title?: string; modelId?: string } = {};
+  let body: { title?: string; modelId?: string; mcpSettings?: unknown } = {};
   try {
     body = (await context.request.json()) as typeof body;
   } catch {
@@ -50,10 +51,14 @@ export const POST: APIRoute = async (context) => {
     typeof body.title === "string" && body.title.trim()
       ? body.title.trim()
       : undefined;
+  const mcpSettings =
+    body.mcpSettings !== undefined
+      ? parseMcpSettings(body.mcpSettings)
+      : undefined;
 
   try {
     const db = getDb(env);
-    const chat = await createChat(db, { title, modelId });
+    const chat = await createChat(db, { title, modelId, mcpSettings });
     return json({ chat }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to create chat";

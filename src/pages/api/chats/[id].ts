@@ -10,7 +10,9 @@ import {
   listMessages,
   methodNotAllowed,
   nowIso,
+  parseMcpSettings,
   updateChat,
+  type ChatMcpSettings,
 } from "@/lib/chat";
 
 export const prerender = false;
@@ -53,6 +55,7 @@ export const PATCH: APIRoute = async (context) => {
     title?: string;
     modelId?: string;
     archived?: boolean;
+    mcpSettings?: unknown;
   } = {};
   try {
     body = (await context.request.json()) as typeof body;
@@ -64,6 +67,7 @@ export const PATCH: APIRoute = async (context) => {
     title?: string;
     modelId?: string;
     archivedAt?: string | null;
+    mcpSettings?: ChatMcpSettings;
   } = {};
 
   if (typeof body.title === "string") {
@@ -75,14 +79,18 @@ export const PATCH: APIRoute = async (context) => {
   if (typeof body.archived === "boolean") {
     patch.archivedAt = body.archived ? nowIso() : null;
   }
+  if (body.mcpSettings !== undefined) {
+    patch.mcpSettings = parseMcpSettings(body.mcpSettings);
+  }
 
   if (
     patch.title === undefined &&
     patch.modelId === undefined &&
-    patch.archivedAt === undefined
+    patch.archivedAt === undefined &&
+    patch.mcpSettings === undefined
   ) {
     return json(
-      { error: "Provide title, modelId, and/or archived" },
+      { error: "Provide title, modelId, archived, and/or mcpSettings" },
       { status: 400 },
     );
   }

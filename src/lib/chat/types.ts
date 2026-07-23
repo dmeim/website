@@ -3,10 +3,13 @@
  */
 
 import type { ChatGenerationMetadata } from "./message-metrics";
+import type { ChatMcpSettings } from "./mcp/settings";
 
 export type ChatRole = "user" | "assistant" | "system";
 
 export type { ChatGenerationMetadata, ChatTokenUsage, ChatPerformanceMetrics } from "./message-metrics";
+export type { ChatMcpSettings, McpServerSettings } from "./mcp/settings";
+export type { McpServerId } from "./mcp/registry";
 
 export type LibraryKind = "image" | "video" | "pdf" | "other";
 
@@ -27,6 +30,8 @@ export interface ChatRow {
   forked_from_chat_id: string | null;
   /** Pivot message id in the source chat (inclusive fork point or edited user msg). */
   forked_from_message_id: string | null;
+  /** JSON blob of per-chat MCP server/tool prefs; null ⇒ defaults. */
+  mcp_settings: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -71,6 +76,8 @@ export interface ChatSummary {
   lastError: string | null;
   forkedFromChatId: string | null;
   forkedFromMessageId: string | null;
+  /** Per-chat MCP preferences (defaults when unset). */
+  mcpSettings: ChatMcpSettings;
   createdAt: string;
   updatedAt: string;
 }

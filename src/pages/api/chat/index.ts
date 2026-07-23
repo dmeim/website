@@ -1,9 +1,10 @@
 import type { APIRoute } from "astro";
 import { waitUntil } from "cloudflare:workers";
-import { streamText } from "ai";
+import { stepCountIs, streamText } from "ai";
 import {
   abortGeneration,
   buildModelMessages,
+  clearChatGeneratingIfMatch,
   clearGenerationAbort,
   denyIfAccessRequired,
   getChat,
@@ -16,16 +17,24 @@ import {
   listMessages,
   mergeGenerationMetadata,
   methodNotAllowed,
+  parseMcpSettings,
   registerGenerationAbort,
   setChatGenerating,
   setChatLastError,
   slimPerformance,
   slimUsage,
   titleFromPrompt,
+  toAsciiHeaderValue,
   truncateAfterLastUser,
   truncateMessagesForContext,
   updateChat,
+  type ChatMcpSettings,
 } from "@/lib/chat";
+import {
+  closeMcpClients,
+  loadMcpTools,
+  mcpLoadFailureNote,
+} from "@/lib/chat/mcp/load-tools";
 import { assistantContentToPersist } from "@/lib/chat/persist-assistant";
 import { createGoLanguageModel, goThinkingProviderOptions } from "@/lib/chat/provider";
 import { coerceThinkingLevel, isThinkingLevel } from "@/lib/chat/thinking";
@@ -36,6 +45,8 @@ import type {
 } from "@/lib/chat/types";
 
 export const prerender = false;
+
+const MCP_STEP_LIMIT = 8;
 
 function normalizeProviderError(err: unknown): string {
   const raw = err instanceof Error ? err.message : "Failed to stream chat";
@@ -72,6 +83,7 @@ export const POST: APIRoute = async (context) => {
     modelId?: string;
     thinkingLevel?: string;
     attachmentIds?: string[];
+    mcpSettings?: unknown;
     /** Re-run completion for the last user turn (delete trailing assistants). */
     regenerate?: boolean;
   };
@@ -100,6 +112,9 @@ export const POST: APIRoute = async (context) => {
   }
 
   let markedGenerating = false;
+  let generation: number | undefined;
+  let generationAt: string | null = null;
+  let mcpClients: Awaited<ReturnType<typeof loadMcpTools>>["clients"] = [];
 
   try {
     const db = getDb(env);
@@ -122,8 +137,19 @@ export const POST: APIRoute = async (context) => {
       ? coerceThinkingLevel(modelId, thinkingRaw)
       : "off";
 
-    if (modelId !== chat.model_id) {
-      await updateChat(db, chatId, { modelId });
+    const mcpSettings: ChatMcpSettings =
+      body.mcpSettings !== undefined
+        ? parseMcpSettings(body.mcpSettings)
+        : parseMcpSettings(chat.mcp_settings);
+
+    const chatPatch: {
+      modelId?: string;
+      mcpSettings?: ChatMcpSettings;
+    } = {};
+    if (modelId !== chat.model_id) chatPatch.modelId = modelId;
+    if (body.mcpSettings !== undefined) chatPatch.mcpSettings = mcpSettings;
+    if (Object.keys(chatPatch).length > 0) {
+      await updateChat(db, chatId, chatPatch);
     }
 
     if (regenerate) {
@@ -147,8 +173,14 @@ export const POST: APIRoute = async (context) => {
       }
     }
 
-    await setChatGenerating(db, chatId, true);
+    // Register abort early (before history/MCP prep) so Stop works during load.
+    // Generation token + generatingAt epoch: older onEnd/onAbort cleanup must not
+    // clear a newer generation's controller or busy flag.
+    generationAt = await setChatGenerating(db, chatId, true);
     markedGenerating = true;
+    const abortHandle = registerGenerationAbort(chatId);
+    generation = abortHandle.generation;
+    const abortSignal = abortHandle.signal;
 
     const history = await listMessages(db, chatId);
     const { messages: contextMessages, truncated } =
@@ -204,7 +236,7 @@ export const POST: APIRoute = async (context) => {
       if (!normalized) return;
 
       const lastStep = payload.steps?.at(-1);
-      const generation = mergeGenerationMetadata({
+      const metrics = mergeGenerationMetadata({
         usage: slimUsage(payload.usage ?? lastStep?.usage),
         performance: slimPerformance(
           payload.performance ?? lastStep?.performance,
@@ -217,42 +249,77 @@ export const POST: APIRoute = async (context) => {
         role: "assistant",
         content: normalized.content,
         reasoning: normalized.reasoning,
-        generation,
+        generation: metrics,
       });
     };
 
     const clearGenerating = async () => {
+      if (!generationAt) return;
       try {
-        await setChatGenerating(db, chatId, false);
+        await clearChatGeneratingIfMatch(db, chatId, generationAt);
       } catch {
         // Best-effort; client poll will eventually time out.
       }
     };
 
-    const abortSignal = registerGenerationAbort(chatId);
+    const releaseMcp = async () => {
+      const toClose = mcpClients;
+      mcpClients = [];
+      await closeMcpClients(toClose);
+    };
+
+    const loaded = await loadMcpTools(env, mcpSettings);
+    mcpClients = loaded.clients;
+    const mcpTools = loaded.tools;
+    const mcpToolNames = Object.keys(mcpTools);
+    const hasMcpTools = mcpToolNames.length > 0;
+    const mcpFailureNote = mcpLoadFailureNote(loaded);
+    if (mcpFailureNote) {
+      console.warn("[mcp]", mcpFailureNote, {
+        toolCount: mcpToolNames.length,
+        skipped: loaded.skipped.map((s) => ({ id: s.id, reason: s.reason })),
+      });
+    } else if (hasMcpTools) {
+      console.info("[mcp]", {
+        toolCount: mcpToolNames.length,
+        toolNames: mcpToolNames,
+      });
+    }
 
     // Do not pass request.signal — client navigate/disconnect must not cancel
     // LLM generation. Explicit Stop aborts via registerGenerationAbort.
     // consumeStream + waitUntil keep generation and D1 writes alive after the
     // browser cancels the response body.
+    //
+    // AI SDK 7: onFinish is a deprecated alias (`onEnd = onFinish`). Setting both
+    // means only onEnd runs — merge persist + MCP release into a single onEnd.
     const result = streamText({
       model: createGoLanguageModel(modelId, apiKey),
       messages,
       abortSignal,
       providerOptions: goThinkingProviderOptions(modelId, thinkingLevel),
-      onFinish: async ({ text, reasoningText, usage, totalUsage, finalStep }) => {
+      ...(hasMcpTools
+        ? { tools: mcpTools, stopWhen: stepCountIs(MCP_STEP_LIMIT) }
+        : {}),
+      onEnd: async ({ steps, usage, totalUsage, finalStep }) => {
         try {
+          // Join all steps — top-level text/reasoningText are final-step-only.
           await persistAssistant({
-            text,
-            reasoningText,
+            steps: steps.map((step) => ({
+              text: step.text,
+              reasoningText: step.reasoningText,
+              usage: step.usage,
+              performance: step.performance,
+            })),
             usage,
             totalUsage,
             performance: finalStep?.performance,
           });
           await setChatLastError(db, chatId, null);
         } finally {
-          clearGenerationAbort(chatId);
+          clearGenerationAbort(chatId, generation);
           await clearGenerating();
+          await releaseMcp();
         }
       },
       onAbort: async ({ steps }) => {
@@ -268,8 +335,9 @@ export const POST: APIRoute = async (context) => {
           });
           await setChatLastError(db, chatId, null);
         } finally {
-          clearGenerationAbort(chatId);
+          clearGenerationAbort(chatId, generation);
           await clearGenerating();
+          await releaseMcp();
         }
       },
       onError: async ({ error }) => {
@@ -292,11 +360,9 @@ export const POST: APIRoute = async (context) => {
             // ignore
           }
         } finally {
-          clearGenerationAbort(chatId);
-          const row = await getChat(db, chatId);
-          if (row?.generating_at) {
-            await clearGenerating();
-          }
+          clearGenerationAbort(chatId, generation);
+          await releaseMcp();
+          await clearGenerating();
         }
       })(),
     );
@@ -309,6 +375,17 @@ export const POST: APIRoute = async (context) => {
         n.startsWith("missing:") ||
         n.includes("-truncated:"),
     );
+    const responseHeaders: Record<string, string> = {};
+    if (degradedNotes.length > 0) {
+      responseHeaders["X-Chat-Attachment-Notes"] = toAsciiHeaderValue(
+        degradedNotes.join("; "),
+      );
+    }
+    if (mcpFailureNote) {
+      responseHeaders["X-Chat-Mcp-Notes"] = toAsciiHeaderValue(mcpFailureNote);
+    } else if (hasMcpTools) {
+      responseHeaders["X-Chat-Mcp-Tool-Count"] = String(mcpToolNames.length);
+    }
     return result.toUIMessageStreamResponse({
       sendReasoning: true,
       messageMetadata: ({ part }): ChatGenerationMetadata | undefined => {
@@ -326,18 +403,18 @@ export const POST: APIRoute = async (context) => {
         return undefined;
       },
       headers:
-        degradedNotes.length > 0
-          ? {
-              "X-Chat-Attachment-Notes": degradedNotes.join("; ").slice(0, 480),
-            }
-          : undefined,
+        Object.keys(responseHeaders).length > 0 ? responseHeaders : undefined,
     });
   } catch (err) {
-    clearGenerationAbort(chatId);
-    if (markedGenerating) {
+    if (generation !== undefined) {
+      clearGenerationAbort(chatId, generation);
+    }
+    await closeMcpClients(mcpClients);
+    mcpClients = [];
+    if (markedGenerating && generationAt) {
       try {
         const db = getDb(env);
-        await setChatGenerating(db, chatId, false);
+        await clearChatGeneratingIfMatch(db, chatId, generationAt);
         await setChatLastError(db, chatId, normalizeProviderError(err));
       } catch {
         // ignore

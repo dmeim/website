@@ -45,4 +45,27 @@ describe("assistantContentToPersist", () => {
       }),
     ).toEqual({ content: "", reasoning: "still thinking" });
   });
+
+  it("prefers joining steps over final-step-only text (onEnd payload)", () => {
+    expect(
+      assistantContentToPersist({
+        text: "final only",
+        reasoningText: "final reason",
+        steps: [
+          { text: "part A ", reasoningText: "think A " },
+          { text: "part B", reasoningText: "think B" },
+        ],
+      }),
+    ).toEqual({ content: "part A part B", reasoning: "think A think B" });
+  });
+
+  it("falls back to text when steps is empty", () => {
+    expect(
+      assistantContentToPersist({
+        text: "solo",
+        reasoningText: "r",
+        steps: [],
+      }),
+    ).toEqual({ content: "solo", reasoning: "r" });
+  });
 });

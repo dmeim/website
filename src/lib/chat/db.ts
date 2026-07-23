@@ -3,6 +3,12 @@ import {
   parseGenerationMetadata,
   serializeGenerationMetadata,
 } from "./message-metrics";
+import {
+  defaultMcpSettings,
+  parseMcpSettings,
+  serializeMcpSettings,
+  type ChatMcpSettings,
+} from "./mcp/settings";
 import type {
   ChatGenerationMetadata,
   ChatMessageDto,
@@ -32,6 +38,7 @@ export function chatToSummary(row: ChatRow): ChatSummary {
     lastError: row.last_error ?? null,
     forkedFromChatId: row.forked_from_chat_id ?? null,
     forkedFromMessageId: row.forked_from_message_id ?? null,
+    mcpSettings: parseMcpSettings(row.mcp_settings),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -97,6 +104,7 @@ export async function createChat(
     modelId: string;
     forkedFromChatId?: string | null;
     forkedFromMessageId?: string | null;
+    mcpSettings?: ChatMcpSettings | null;
   },
 ): Promise<ChatSummary> {
   const id = newId();
@@ -104,12 +112,17 @@ export async function createChat(
   const title = input.title?.trim() || "New chat";
   const forkedFromChatId = input.forkedFromChatId ?? null;
   const forkedFromMessageId = input.forkedFromMessageId ?? null;
+  const mcpSettings = parseMcpSettings(
+    input.mcpSettings ?? defaultMcpSettings(),
+  );
+  const mcpSettingsJson = serializeMcpSettings(mcpSettings);
   await db
     .prepare(
       `INSERT INTO chats (
          id, title, model_id, archived_at, generating_at, last_error,
-         forked_from_chat_id, forked_from_message_id, created_at, updated_at
-       ) VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?, ?, ?)`,
+         forked_from_chat_id, forked_from_message_id, mcp_settings,
+         created_at, updated_at
+       ) VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?, ?, ?, ?)`,
     )
     .bind(
       id,
@@ -117,6 +130,7 @@ export async function createChat(
       input.modelId,
       forkedFromChatId,
       forkedFromMessageId,
+      mcpSettingsJson,
       ts,
       ts,
     )
@@ -130,6 +144,7 @@ export async function createChat(
     lastError: null,
     forkedFromChatId,
     forkedFromMessageId,
+    mcpSettings,
     createdAt: ts,
     updatedAt: ts,
   };
@@ -142,6 +157,7 @@ export async function updateChat(
     title?: string;
     modelId?: string;
     archivedAt?: string | null;
+    mcpSettings?: ChatMcpSettings;
   },
 ): Promise<ChatSummary | null> {
   const existing = await getChat(db, id);
@@ -150,12 +166,17 @@ export async function updateChat(
   const modelId = patch.modelId ?? existing.model_id;
   const archivedAt =
     patch.archivedAt !== undefined ? patch.archivedAt : existing.archived_at;
+  const mcpSettings =
+    patch.mcpSettings !== undefined
+      ? parseMcpSettings(patch.mcpSettings)
+      : parseMcpSettings(existing.mcp_settings);
+  const mcpSettingsJson = serializeMcpSettings(mcpSettings);
   const updatedAt = nowIso();
   await db
     .prepare(
-      `UPDATE chats SET title = ?, model_id = ?, archived_at = ?, updated_at = ? WHERE id = ?`,
+      `UPDATE chats SET title = ?, model_id = ?, archived_at = ?, mcp_settings = ?, updated_at = ? WHERE id = ?`,
     )
-    .bind(title, modelId, archivedAt, updatedAt, id)
+    .bind(title, modelId, archivedAt, mcpSettingsJson, updatedAt, id)
     .run();
   return {
     id,
@@ -166,6 +187,7 @@ export async function updateChat(
     lastError: existing.last_error ?? null,
     forkedFromChatId: existing.forked_from_chat_id ?? null,
     forkedFromMessageId: existing.forked_from_message_id ?? null,
+    mcpSettings,
     createdAt: existing.created_at,
     updatedAt,
   };
@@ -209,6 +231,7 @@ export async function forkChat(
     modelId: source.model_id,
     forkedFromChatId: source.id,
     forkedFromMessageId: plan.forkedFromMessageId,
+    mcpSettings: parseMcpSettings(source.mcp_settings),
   });
 
   let seq = 0;
@@ -283,11 +306,19 @@ export async function forkChat(
   return { ok: true, chat: { ...chat, updatedAt: ts }, messages, edited };
 }
 
+/**
+ * Mark chat busy / idle. When `generating` is true, returns the new
+ * `generating_at` timestamp — pass it to clearChatGeneratingIfMatch so an
+ * older generation's cleanup cannot clear a newer run.
+ *
+ * Note: there is no server TTL; a stuck flag is cleared by Stop, stream
+ * callbacks, or (client) stale age-out. Prefer match-clear over blind clear.
+ */
 export async function setChatGenerating(
   db: D1Database,
   id: string,
   generating: boolean,
-): Promise<void> {
+): Promise<string | null> {
   const ts = nowIso();
   if (generating) {
     await db
@@ -296,7 +327,7 @@ export async function setChatGenerating(
       )
       .bind(ts, ts, id)
       .run();
-    return;
+    return ts;
   }
   await db
     .prepare(
@@ -304,6 +335,23 @@ export async function setChatGenerating(
     )
     .bind(ts, id)
     .run();
+  return null;
+}
+
+/** Clear generating only if `generating_at` still equals `expectedGeneratingAt`. */
+export async function clearChatGeneratingIfMatch(
+  db: D1Database,
+  id: string,
+  expectedGeneratingAt: string,
+): Promise<boolean> {
+  const ts = nowIso();
+  const result = await db
+    .prepare(
+      `UPDATE chats SET generating_at = NULL, updated_at = ? WHERE id = ? AND generating_at = ?`,
+    )
+    .bind(ts, id, expectedGeneratingAt)
+    .run();
+  return (result.meta.changes ?? 0) > 0;
 }
 
 export async function setChatLastError(

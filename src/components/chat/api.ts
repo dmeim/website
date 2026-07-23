@@ -1,5 +1,6 @@
 import type {
   ChatMessageDto,
+  ChatMcpSettings,
   ChatStatusDto,
   ChatSummary,
   GoModelInfo,
@@ -30,6 +31,7 @@ export async function fetchChats(archived = false): Promise<ChatSummary[]> {
 export async function createChat(input?: {
   title?: string;
   modelId?: string;
+  mcpSettings?: ChatMcpSettings;
 }): Promise<ChatSummary> {
   const data = await readJson<{ chat: ChatSummary }>(
     await fetch("/api/chats", {
@@ -55,7 +57,12 @@ export async function fetchChatStatus(id: string): Promise<ChatStatusDto> {
 
 export async function patchChat(
   id: string,
-  patch: { title?: string; modelId?: string; archived?: boolean },
+  patch: {
+    title?: string;
+    modelId?: string;
+    archived?: boolean;
+    mcpSettings?: ChatMcpSettings;
+  },
 ): Promise<ChatSummary> {
   const data = await readJson<{ chat: ChatSummary }>(
     await fetch(`/api/chats/${encodeURIComponent(id)}`, {
