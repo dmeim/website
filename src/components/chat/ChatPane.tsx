@@ -1,8 +1,8 @@
 import type { FormEvent, KeyboardEvent, RefObject } from "react";
 import type { UIMessage } from "ai";
-import { DEFAULT_CHAT_MODEL_ID } from "@/lib/chat/constants";
 import type { GoModelInfo, LibraryAssetSummary } from "@/lib/chat/types";
 import MarkdownBody from "./MarkdownBody";
+import { ModelPicker } from "./ModelPicker";
 import { textFromParts } from "./messageUtils";
 
 type ChatPaneProps = {
@@ -51,17 +51,6 @@ export function ChatPane({
     }
   };
 
-  const modelOptions =
-    models.length > 0
-      ? models
-      : [
-          {
-            id: DEFAULT_CHAT_MODEL_ID,
-            name: "DeepSeek V4 Flash",
-            provider: "openai-compatible" as const,
-          },
-        ];
-
   return (
     <>
       <header className="chat-main__header">
@@ -75,20 +64,12 @@ export function ChatPane({
         </button>
         <div className="chat-main__title-block">
           <h1 className="chat-main__title">{title}</h1>
-          <label className="chat-main__model">
-            <span className="visually-hidden">Model</span>
-            <select
-              value={modelId}
-              onChange={(event) => onModelChange(event.target.value)}
-              disabled={streaming}
-            >
-              {modelOptions.map((model) => (
-                <option key={model.id} value={model.id}>
-                  {model.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <ModelPicker
+            models={models}
+            value={modelId}
+            onChange={onModelChange}
+            disabled={streaming}
+          />
         </div>
       </header>
 
