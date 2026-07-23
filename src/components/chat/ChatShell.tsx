@@ -1,5 +1,5 @@
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
+import { DefaultChatTransport, type UIMessage } from "ai";
 import {
   useCallback,
   useEffect,
@@ -37,6 +37,14 @@ type Props = {
   initialChatId?: string | null;
 };
 
+const POLL_MS = 1500;
+const POST_IDLE_POLLS = 2;
+
+function lastMessageIsUser(messages: { role: string }[]): boolean {
+  const last = messages[messages.length - 1];
+  return last?.role === "user";
+}
+
 export default function ChatShell({ initialChatId = null }: Props) {
   const [chats, setChats] = useState<ChatSummary[]>([]);
   const [models, setModels] = useState<GoModelInfo[]>([]);
@@ -55,12 +63,20 @@ export default function ChatShell({ initialChatId = null }: Props) {
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<string | null>(null);
   const [loadingThread, setLoadingThread] = useState(false);
+  /** Chats we expect an assistant reply for (local + server generating). */
+  const [awaitingByChat, setAwaitingByChat] = useState<Record<string, boolean>>(
+    {},
+  );
 
   const activeChatIdRef = useRef(activeChatId);
   const modelIdRef = useRef(modelId);
   const pendingIdsRef = useRef<string[]>([]);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const messagesRef = useRef<UIMessage[]>([]);
+  const awaitingRef = useRef(awaitingByChat);
+  const streamingRef = useRef(false);
+  const idlePollsLeftRef = useRef(0);
 
   useEffect(() => {
     activeChatIdRef.current = activeChatId;
@@ -71,6 +87,9 @@ export default function ChatShell({ initialChatId = null }: Props) {
   useEffect(() => {
     pendingIdsRef.current = pendingAttachments.map((a) => a.id);
   }, [pendingAttachments]);
+  useEffect(() => {
+    awaitingRef.current = awaitingByChat;
+  }, [awaitingByChat]);
 
   const transport = useMemo(
     () =>
@@ -107,11 +126,15 @@ export default function ChatShell({ initialChatId = null }: Props) {
     transport,
     onFinish: async () => {
       setPendingAttachments([]);
+      const id = activeChatIdRef.current;
+      if (id) {
+        setAwaitingByChat((prev) => ({ ...prev, [id]: false }));
+      }
       try {
         const list = await fetchChats(false);
         setChats(list);
-        if (activeChatIdRef.current) {
-          const found = list.find((c) => c.id === activeChatIdRef.current);
+        if (id) {
+          const found = list.find((c) => c.id === id);
           if (found) setActiveChat(found);
         }
       } catch {
@@ -120,13 +143,28 @@ export default function ChatShell({ initialChatId = null }: Props) {
     },
   });
 
+  messagesRef.current = messages;
+
   const streaming = status === "submitted" || status === "streaming";
+  streamingRef.current = streaming;
+
+  const markAwaiting = useCallback((id: string, awaiting: boolean) => {
+    setAwaitingByChat((prev) => {
+      if (!!prev[id] === awaiting) return prev;
+      return { ...prev, [id]: awaiting };
+    });
+  }, []);
 
   const refreshChats = useCallback(async () => {
     const list = await fetchChats(false);
     setChats(list);
+    for (const chat of list) {
+      if (chat.generatingAt) {
+        markAwaiting(chat.id, true);
+      }
+    }
     return list;
-  }, []);
+  }, [markAwaiting]);
 
   const refreshLibrary = useCallback(async () => {
     const list = await fetchLibrary();
@@ -144,6 +182,11 @@ export default function ChatShell({ initialChatId = null }: Props) {
         ]);
         if (cancelled) return;
         setChats(chatList);
+        for (const chat of chatList) {
+          if (chat.generatingAt) {
+            markAwaiting(chat.id, true);
+          }
+        }
         setModels(modelPayload.models);
         if (modelPayload.defaultModelId) {
           setModelId((prev) =>
@@ -163,7 +206,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [markAwaiting]);
 
   useEffect(() => {
     if (view !== "library") return;
@@ -196,6 +239,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
       setSidebarOpen(false);
       setPendingAttachments([]);
       setBanner(null);
+      idlePollsLeftRef.current = 0;
 
       if (!id) {
         setActiveChatId(null);
@@ -217,6 +261,12 @@ export default function ChatShell({ initialChatId = null }: Props) {
         setActiveChat(chat);
         setModelId(chat.modelId || DEFAULT_CHAT_MODEL_ID);
         setMessages(dtoToUiMessages(rows));
+        if (chat.generatingAt) {
+          markAwaiting(id, true);
+          idlePollsLeftRef.current = POST_IDLE_POLLS;
+        } else if (lastMessageIsUser(rows) && awaitingRef.current[id]) {
+          idlePollsLeftRef.current = POST_IDLE_POLLS;
+        }
       } catch (err) {
         setBanner(err instanceof Error ? err.message : "Failed to load chat");
         setMessages([]);
@@ -224,8 +274,13 @@ export default function ChatShell({ initialChatId = null }: Props) {
         setLoadingThread(false);
       }
     },
-    [clearError, setMessages, stop],
+    [clearError, markAwaiting, setMessages, stop],
   );
+
+  const returnToActiveChat = useCallback(() => {
+    setView("chat");
+    setSidebarOpen(false);
+  }, []);
 
   useEffect(() => {
     if (initialChatId) {
@@ -238,6 +293,100 @@ export default function ChatShell({ initialChatId = null }: Props) {
   useEffect(() => {
     threadEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, streaming]);
+
+  const needsPoll =
+    Object.values(awaitingByChat).some(Boolean) ||
+    chats.some((c) => c.generatingAt);
+
+  // Poll chat list + active thread while any chat is generating / awaiting.
+  useEffect(() => {
+    if (!needsPoll) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const tick = async () => {
+      try {
+        const list = await fetchChats(false);
+        if (cancelled) return;
+        setChats(list);
+
+        const generatingIds = new Set(
+          list.filter((c) => c.generatingAt).map((c) => c.id),
+        );
+
+        setAwaitingByChat((prev) => {
+          let changed = false;
+          const next = { ...prev };
+          const activeId = activeChatIdRef.current;
+          for (const id of Object.keys(next)) {
+            // Clear non-active chats once the server marks them idle.
+            if (next[id] && !generatingIds.has(id) && id !== activeId) {
+              next[id] = false;
+              changed = true;
+            }
+          }
+          for (const id of generatingIds) {
+            if (!next[id]) {
+              next[id] = true;
+              changed = true;
+            }
+          }
+          return changed ? next : prev;
+        });
+
+        const id = activeChatIdRef.current;
+        if (!id) return;
+
+        const summary = list.find((c) => c.id === id) ?? null;
+        if (summary) {
+          setActiveChat(summary);
+        }
+
+        const serverGenerating = Boolean(summary?.generatingAt);
+        const shouldRefreshThread =
+          serverGenerating ||
+          Boolean(awaitingRef.current[id]) ||
+          idlePollsLeftRef.current > 0 ||
+          lastMessageIsUser(messagesRef.current);
+
+        // While the live client stream is active, don't clobber tokens from D1.
+        if (!shouldRefreshThread || streamingRef.current) {
+          return;
+        }
+
+        const { chat, messages: rows } = await fetchChat(id);
+        if (cancelled || activeChatIdRef.current !== id) return;
+
+        setActiveChat(chat);
+        // Server is source of truth — replace local thread to avoid duplicates.
+        setMessages(dtoToUiMessages(rows));
+
+        const hasAssistantReply = !lastMessageIsUser(rows);
+        if (hasAssistantReply) {
+          markAwaiting(id, false);
+          idlePollsLeftRef.current = 0;
+        } else if (chat.generatingAt) {
+          markAwaiting(id, true);
+          idlePollsLeftRef.current = POST_IDLE_POLLS;
+        } else if (idlePollsLeftRef.current > 0) {
+          idlePollsLeftRef.current -= 1;
+        } else {
+          markAwaiting(id, false);
+        }
+      } catch {
+        // ignore transient poll errors
+      }
+    };
+
+    void tick();
+    const handle = window.setInterval(() => void tick(), POLL_MS);
+    return () => {
+      cancelled = true;
+      window.clearInterval(handle);
+    };
+  }, [needsPoll, markAwaiting, setMessages]);
 
   const handleNewChat = async () => {
     setBusy(true);
@@ -317,7 +466,22 @@ export default function ChatShell({ initialChatId = null }: Props) {
     setBanner(null);
     clearError();
     try {
-      await ensureChat();
+      const chatId = await ensureChat();
+      markAwaiting(chatId, true);
+      idlePollsLeftRef.current = POST_IDLE_POLLS;
+      const optimisticAt = new Date().toISOString();
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === chatId
+            ? { ...c, generatingAt: c.generatingAt ?? optimisticAt }
+            : c,
+        ),
+      );
+      setActiveChat((prev) =>
+        prev && prev.id === chatId
+          ? { ...prev, generatingAt: prev.generatingAt ?? optimisticAt }
+          : prev,
+      );
       setInput("");
       const outbound =
         text ||
@@ -330,6 +494,8 @@ export default function ChatShell({ initialChatId = null }: Props) {
       pendingIdsRef.current = [];
       await sendPromise;
     } catch (err) {
+      const id = activeChatIdRef.current;
+      if (id) markAwaiting(id, false);
       setBanner(err instanceof Error ? err.message : "Send failed");
     } finally {
       setBusy(false);
@@ -389,6 +555,26 @@ export default function ChatShell({ initialChatId = null }: Props) {
     setBanner(`Attached “${asset.filename}” to the next message.`);
   };
 
+  const showGeneratingIndicator =
+    view === "chat" &&
+    Boolean(activeChatId) &&
+    !loadingThread &&
+    (streaming ||
+      Boolean(activeChat?.generatingAt) ||
+      Boolean(activeChatId && awaitingByChat[activeChatId])) &&
+    (streaming || lastMessageIsUser(messages));
+
+  const generatingChatIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const c of chats) {
+      if (c.generatingAt) ids.add(c.id);
+    }
+    for (const [id, awaiting] of Object.entries(awaitingByChat)) {
+      if (awaiting) ids.add(id);
+    }
+    return ids;
+  }, [chats, awaitingByChat]);
+
   return (
     <div
       className="chat-shell"
@@ -407,9 +593,17 @@ export default function ChatShell({ initialChatId = null }: Props) {
         view={view}
         busy={busy}
         streaming={streaming}
+        generatingChatIds={generatingChatIds}
         onNewChat={() => void handleNewChat()}
-        onSelectChat={(id) => void selectChat(id)}
+        onSelectChat={(id) => {
+          if (id === activeChatId && view !== "chat") {
+            returnToActiveChat();
+            return;
+          }
+          void selectChat(id);
+        }}
         onOpenLibrary={() => {
+          // Keep client stream alive when possible; server also continues.
           setView("library");
           setSidebarOpen(false);
         }}
@@ -452,6 +646,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
             pendingAttachments={pendingAttachments}
             loadingThread={loadingThread}
             streaming={streaming}
+            generating={showGeneratingIndicator}
             busy={busy}
             onOpenSidebar={() => setSidebarOpen(true)}
             onModelChange={(next) => void handleModelChange(next)}

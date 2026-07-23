@@ -14,6 +14,8 @@ type ChatPaneProps = {
   pendingAttachments: LibraryAssetSummary[];
   loadingThread: boolean;
   streaming: boolean;
+  /** Server or client still producing a reply (may be after navigate-away). */
+  generating?: boolean;
   busy: boolean;
   onOpenSidebar: () => void;
   onModelChange: (modelId: string) => void;
@@ -34,6 +36,7 @@ export function ChatPane({
   pendingAttachments,
   loadingThread,
   streaming,
+  generating = false,
   busy,
   onOpenSidebar,
   onModelChange,
@@ -50,6 +53,8 @@ export function ChatPane({
       onSubmit();
     }
   };
+
+  const composerBusy = streaming || generating;
 
   return (
     <>
@@ -68,7 +73,7 @@ export function ChatPane({
             models={models}
             value={modelId}
             onChange={onModelChange}
-            disabled={streaming}
+            disabled={composerBusy}
           />
         </div>
       </header>
@@ -109,6 +114,12 @@ export function ChatPane({
             );
           })
         )}
+        {generating && !streaming ? (
+          <p className="chat-generating" role="status" aria-live="polite">
+            <span className="chat-generating__spinner" aria-hidden="true" />
+            Generating…
+          </p>
+        ) : null}
         <div ref={threadEndRef} />
       </div>
 
@@ -134,7 +145,7 @@ export function ChatPane({
             type="button"
             className="chat-btn chat-btn--ghost"
             onClick={onAttachClick}
-            disabled={busy || streaming}
+            disabled={busy || composerBusy}
             aria-label="Attach file"
           >
             Attach
@@ -146,7 +157,7 @@ export function ChatPane({
             onChange={(event) => onInputChange(event.target.value)}
             onKeyDown={onComposerKeyDown}
             placeholder="Message…"
-            disabled={busy && !streaming}
+            disabled={busy && !composerBusy}
           />
           {streaming ? (
             <button type="button" className="chat-btn" onClick={onStop}>
@@ -157,7 +168,9 @@ export function ChatPane({
               type="submit"
               className="chat-btn"
               disabled={
-                busy || (!input.trim() && pendingAttachments.length === 0)
+                busy ||
+                generating ||
+                (!input.trim() && pendingAttachments.length === 0)
               }
             >
               Send

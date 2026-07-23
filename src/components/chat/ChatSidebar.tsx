@@ -6,6 +6,7 @@ type ChatSidebarProps = {
   view: "chat" | "library";
   busy?: boolean;
   streaming?: boolean;
+  generatingChatIds?: Set<string>;
   onNewChat: () => void;
   onSelectChat: (id: string) => void;
   onOpenLibrary: () => void;
@@ -19,6 +20,7 @@ export function ChatSidebar({
   view,
   busy = false,
   streaming = false,
+  generatingChatIds,
   onNewChat,
   onSelectChat,
   onOpenLibrary,
@@ -64,39 +66,52 @@ export function ChatSidebar({
           {chats.length === 0 ? (
             <li className="chat-sidebar__empty">No chats yet</li>
           ) : (
-            chats.map((chat) => (
-              <li key={chat.id} className="chat-sidebar__item">
-                <button
-                  type="button"
-                  className={
-                    chat.id === activeChatId && view === "chat"
-                      ? "chat-sidebar__chat is-active"
-                      : "chat-sidebar__chat"
-                  }
-                  onClick={() => onSelectChat(chat.id)}
-                >
-                  <span className="chat-sidebar__chat-title">{chat.title}</span>
-                </button>
-                <div className="chat-sidebar__actions">
+            chats.map((chat) => {
+              const isGenerating =
+                Boolean(chat.generatingAt) ||
+                Boolean(generatingChatIds?.has(chat.id));
+              return (
+                <li key={chat.id} className="chat-sidebar__item">
                   <button
                     type="button"
-                    className="chat-sidebar__action"
-                    onClick={() => onArchiveChat(chat.id)}
-                    aria-label={`Archive ${chat.title}`}
+                    className={
+                      chat.id === activeChatId && view === "chat"
+                        ? "chat-sidebar__chat is-active"
+                        : "chat-sidebar__chat"
+                    }
+                    onClick={() => onSelectChat(chat.id)}
+                    aria-busy={isGenerating || undefined}
                   >
-                    Archive
+                    {isGenerating ? (
+                      <span
+                        className="chat-sidebar__gen-dot"
+                        title="Generating"
+                        aria-label="Generating"
+                      />
+                    ) : null}
+                    <span className="chat-sidebar__chat-title">{chat.title}</span>
                   </button>
-                  <button
-                    type="button"
-                    className="chat-sidebar__action chat-sidebar__action--danger"
-                    onClick={() => onDeleteChat(chat.id)}
-                    aria-label={`Delete ${chat.title}`}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))
+                  <div className="chat-sidebar__actions">
+                    <button
+                      type="button"
+                      className="chat-sidebar__action"
+                      onClick={() => onArchiveChat(chat.id)}
+                      aria-label={`Archive ${chat.title}`}
+                    >
+                      Archive
+                    </button>
+                    <button
+                      type="button"
+                      className="chat-sidebar__action chat-sidebar__action--danger"
+                      onClick={() => onDeleteChat(chat.id)}
+                      aria-label={`Delete ${chat.title}`}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              );
+            })
           )}
         </ul>
       </div>
