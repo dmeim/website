@@ -1,4 +1,4 @@
-import type { APIContext } from "astro";
+import { env } from "cloudflare:workers";
 
 export function json(data: unknown, init: ResponseInit = {}): Response {
   const headers = new Headers(init.headers);
@@ -6,8 +6,9 @@ export function json(data: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(data), { ...init, headers });
 }
 
-export function getRuntimeEnv(context: APIContext): Env {
-  return context.locals.runtime.env;
+/** Cloudflare bindings + secrets (D1, R2, OPENCODE_API_KEY, …). */
+export function getRuntimeEnv(): Env {
+  return env;
 }
 
 export function methodNotAllowed(allowed: string[]): Response {

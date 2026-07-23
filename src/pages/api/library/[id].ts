@@ -14,7 +14,7 @@ import {
 export const prerender = false;
 
 export const DELETE: APIRoute = async (context) => {
-  const env = getRuntimeEnv(context);
+  const env = getRuntimeEnv();
   const denied = denyIfAccessRequired(context.request, env);
   if (denied) return denied;
 

@@ -13,7 +13,7 @@ import {
 export const prerender = false;
 
 export const GET: APIRoute = async (context) => {
-  const env = getRuntimeEnv(context);
+  const env = getRuntimeEnv();
   const denied = denyIfAccessRequired(context.request, env);
   if (denied) return denied;
 
@@ -31,7 +31,7 @@ export const GET: APIRoute = async (context) => {
 };
 
 export const POST: APIRoute = async (context) => {
-  const env = getRuntimeEnv(context);
+  const env = getRuntimeEnv();
   const denied = denyIfAccessRequired(context.request, env);
   if (denied) return denied;
 
