@@ -22,6 +22,7 @@ export function chatToSummary(row: ChatRow): ChatSummary {
     title: row.title,
     modelId: row.model_id,
     archivedAt: row.archived_at,
+    generatingAt: row.generating_at ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -89,8 +90,8 @@ export async function createChat(
   const title = input.title?.trim() || "New chat";
   await db
     .prepare(
-      `INSERT INTO chats (id, title, model_id, archived_at, created_at, updated_at)
-       VALUES (?, ?, ?, NULL, ?, ?)`,
+      `INSERT INTO chats (id, title, model_id, archived_at, generating_at, created_at, updated_at)
+       VALUES (?, ?, ?, NULL, NULL, ?, ?)`,
     )
     .bind(id, title, input.modelId, ts, ts)
     .run();
@@ -99,6 +100,7 @@ export async function createChat(
     title,
     modelId: input.modelId,
     archivedAt: null,
+    generatingAt: null,
     createdAt: ts,
     updatedAt: ts,
   };
@@ -131,9 +133,33 @@ export async function updateChat(
     title,
     modelId,
     archivedAt,
+    generatingAt: existing.generating_at ?? null,
     createdAt: existing.created_at,
     updatedAt,
   };
+}
+
+export async function setChatGenerating(
+  db: D1Database,
+  id: string,
+  generating: boolean,
+): Promise<void> {
+  const ts = nowIso();
+  if (generating) {
+    await db
+      .prepare(
+        `UPDATE chats SET generating_at = ?, updated_at = ? WHERE id = ?`,
+      )
+      .bind(ts, ts, id)
+      .run();
+    return;
+  }
+  await db
+    .prepare(
+      `UPDATE chats SET generating_at = NULL, updated_at = ? WHERE id = ?`,
+    )
+    .bind(ts, id)
+    .run();
 }
 
 export async function deleteChat(db: D1Database, id: string): Promise<boolean> {

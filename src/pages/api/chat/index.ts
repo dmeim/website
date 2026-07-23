@@ -10,6 +10,7 @@ import {
   json,
   listMessages,
   methodNotAllowed,
+  setChatGenerating,
   titleFromPrompt,
   updateChat,
 } from "@/lib/chat";
@@ -65,6 +66,8 @@ export const POST: APIRoute = async (context) => {
     return json({ error: "message is required" }, { status: 400 });
   }
 
+  let markedGenerating = false;
+
   try {
     const db = getDb(env);
     const chat = await getChat(db, chatId);
@@ -92,6 +95,9 @@ export const POST: APIRoute = async (context) => {
       await updateChat(db, chatId, { title: titleFromPrompt(message) });
     }
 
+    await setChatGenerating(db, chatId, true);
+    markedGenerating = true;
+
     const history = await listMessages(db, chatId);
     const messages: ModelMessage[] = history
       .filter(
@@ -115,6 +121,14 @@ export const POST: APIRoute = async (context) => {
       });
     };
 
+    const clearGenerating = async () => {
+      try {
+        await setChatGenerating(db, chatId, false);
+      } catch {
+        // Best-effort; client poll will eventually time out.
+      }
+    };
+
     // Do not pass request.signal — client navigate/disconnect must not cancel
     // LLM generation. consumeStream + waitUntil keep generation and D1 writes
     // alive after the browser cancels the response body.
@@ -122,17 +136,46 @@ export const POST: APIRoute = async (context) => {
       model: createGoLanguageModel(modelId, apiKey),
       messages,
       onFinish: async ({ text }) => {
-        await persistAssistant(assistantContentToPersist({ text }));
+        try {
+          await persistAssistant(assistantContentToPersist({ text }));
+        } finally {
+          await clearGenerating();
+        }
       },
       onAbort: async ({ steps }) => {
-        await persistAssistant(assistantContentToPersist({ steps }));
+        try {
+          await persistAssistant(assistantContentToPersist({ steps }));
+        } finally {
+          await clearGenerating();
+        }
       },
     });
 
-    waitUntil(result.consumeStream());
+    waitUntil(
+      (async () => {
+        try {
+          await result.consumeStream();
+        } catch {
+          // Stream errors still need the generating flag cleared.
+        } finally {
+          const row = await getChat(db, chatId);
+          if (row?.generating_at) {
+            await clearGenerating();
+          }
+        }
+      })(),
+    );
 
     return result.toUIMessageStreamResponse();
   } catch (err) {
+    if (markedGenerating) {
+      try {
+        const db = getDb(env);
+        await setChatGenerating(db, chatId, false);
+      } catch {
+        // ignore
+      }
+    }
     const messageText =
       err instanceof Error ? err.message : "Failed to stream chat";
     return json({ error: messageText }, { status: 500 });

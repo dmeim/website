@@ -13,6 +13,7 @@ export interface ChatRow {
   title: string;
   model_id: string;
   archived_at: string | null;
+  generating_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -47,8 +48,16 @@ export interface ChatSummary {
   title: string;
   modelId: string;
   archivedAt: string | null;
+  /** ISO timestamp while server is generating an assistant reply; null when idle. */
+  generatingAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ChatStatusDto {
+  chatId: string;
+  generating: boolean;
+  generatingAt: string | null;
 }
 
 export interface LibraryAssetSummary {
