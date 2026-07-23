@@ -1,5 +1,13 @@
 import { useMemo, useState } from "react";
+import {
+  Archive,
+  Library,
+  MessageCirclePlus,
+  ScrollText,
+  Trash2,
+} from "lucide";
 import type { ChatSummary } from "@/lib/chat/types";
+import { LucideIcon } from "./LucideIcon";
 
 type ChatSidebarProps = {
   chats: ChatSummary[];
@@ -49,6 +57,7 @@ export function ChatSidebar({
           onClick={onNewChat}
           disabled={busy || streaming}
         >
+          <LucideIcon icon={MessageCirclePlus} size={16} />
           New chat
         </button>
         <button
@@ -60,6 +69,7 @@ export function ChatSidebar({
           }
           onClick={onOpenLibrary}
         >
+          <LucideIcon icon={Library} size={16} />
           Library
         </button>
         <button
@@ -69,6 +79,7 @@ export function ChatSidebar({
           aria-disabled="true"
           title="Skills coming later"
         >
+          <LucideIcon icon={ScrollText} size={16} />
           Skills
         </button>
       </div>
@@ -122,16 +133,18 @@ export function ChatSidebar({
                       className="chat-sidebar__action"
                       onClick={() => onArchiveChat(chat.id)}
                       aria-label={`Archive ${chat.title}`}
+                      title="Archive"
                     >
-                      Archive
+                      <LucideIcon icon={Archive} size={14} />
                     </button>
                     <button
                       type="button"
                       className="chat-sidebar__action chat-sidebar__action--danger"
                       onClick={() => onDeleteChat(chat.id)}
                       aria-label={`Delete ${chat.title}`}
+                      title="Delete"
                     >
-                      Delete
+                      <LucideIcon icon={Trash2} size={14} />
                     </button>
                   </div>
                 </li>
@@ -143,6 +156,7 @@ export function ChatSidebar({
 
       <div className="chat-sidebar__foot">
         <a className="chat-sidebar__nav" href="/chat/archive">
+          <LucideIcon icon={Archive} size={16} />
           Archive
         </a>
       </div>
