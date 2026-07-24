@@ -636,7 +636,7 @@ export function ChatPane({
         )}
         {showGeneratingStatus ? (
           <p className="chat-generating" role="status" aria-live="polite">
-            <span className="chat-generating__spinner" aria-hidden="true" />
+            <span className="chat-status-spinner" aria-hidden="true" />
             Generating…
           </p>
         ) : null}

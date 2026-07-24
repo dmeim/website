@@ -168,7 +168,7 @@ export function ChatSidebar({
                   >
                     {isGenerating ? (
                       <span
-                        className="chat-sidebar__gen-dot"
+                        className="chat-status-spinner chat-sidebar__gen-spinner"
                         title="Generating"
                         aria-label="Generating"
                       />

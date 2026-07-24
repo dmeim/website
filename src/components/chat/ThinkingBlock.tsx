@@ -24,25 +24,14 @@ function distanceFromBottom(el: HTMLElement): number {
 
 export function ThinkingBlock({ text, streaming = false }: ThinkingBlockProps) {
   const panelId = useId();
-  const [open, setOpen] = useState(streaming);
+  const [open, setOpen] = useState(false);
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const stickToBottomRef = useRef(true);
-  const wasStreamingRef = useRef(streaming);
   const touchYRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const wasStreaming = wasStreamingRef.current;
-    wasStreamingRef.current = streaming;
-
     if (streaming) {
-      setOpen(true);
       stickToBottomRef.current = true;
-      return;
-    }
-
-    // Collapse only when thinking finishes — stay closed until the user opens it.
-    if (wasStreaming && !streaming) {
-      setOpen(false);
     }
   }, [streaming]);
 
@@ -108,9 +97,16 @@ export function ThinkingBlock({ text, streaming = false }: ThinkingBlockProps) {
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
       >
-        <span className="chat-thinking-block__chevron" aria-hidden="true">
-          {open ? "▾" : "▸"}
-        </span>
+        {streaming ? (
+          <span
+            className="chat-status-spinner chat-thinking-block__spinner"
+            aria-hidden="true"
+          />
+        ) : (
+          <span className="chat-thinking-block__chevron" aria-hidden="true">
+            {open ? "▾" : "▸"}
+          </span>
+        )}
         <span className="chat-thinking-block__title">
           {streaming ? "Thinking…" : "Thinking"}
         </span>
