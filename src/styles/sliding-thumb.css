@@ -1,0 +1,92 @@
+/* Sliding thumb — shared equal/measured track + optional chrome */
+
+.sliding-thumb {
+  position: relative;
+  box-sizing: border-box;
+  color: var(--color-ink-muted);
+}
+
+.sliding-thumb__thumb {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  box-sizing: border-box;
+  transition:
+    transform 0.2s ease,
+    width 0.2s ease;
+}
+
+.sliding-thumb__option {
+  position: relative;
+  z-index: 1;
+}
+
+/* ——— Equal mode ——— */
+
+.sliding-thumb--equal {
+  display: grid;
+  grid-template-columns: repeat(var(--sliding-thumb-count, 1), 1fr);
+  align-items: stretch;
+}
+
+.sliding-thumb--equal .sliding-thumb__thumb {
+  top: 2px;
+  left: 2px;
+  width: calc((100% - 4px) / var(--sliding-thumb-count, 1));
+  height: calc(100% - 4px);
+  transform: translateX(calc(var(--sliding-thumb-index, 0) * 100%));
+}
+
+/* ——— Measured mode ——— */
+
+.sliding-thumb--measured .sliding-thumb__thumb {
+  top: var(--sliding-thumb-inset-y, 0px);
+  left: 0;
+  height: calc(100% - (2 * var(--sliding-thumb-inset-y, 0px)));
+  width: var(--sliding-thumb-w, 0px);
+  transform: translateX(var(--sliding-thumb-x, 0px));
+}
+
+/* ——— Default chrome (bordered track + filled pill) ——— */
+
+.sliding-thumb:not(.sliding-thumb--ghost) {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-ground-elevated);
+}
+
+.sliding-thumb:not(.sliding-thumb--ghost) .sliding-thumb__thumb {
+  border-radius: var(--radius);
+  background: color-mix(
+    in srgb,
+    var(--color-spot) 80%,
+    var(--color-ground-elevated)
+  );
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+/* ——— Ghost chrome (quiet; no track border/fill) ——— */
+
+.sliding-thumb--ghost {
+  border: none;
+  background: transparent;
+}
+
+.sliding-thumb--ghost .sliding-thumb__thumb {
+  border-radius: var(--radius);
+  background: color-mix(
+    in srgb,
+    var(--color-spot) 90%,
+    var(--color-ground-elevated)
+  );
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+/* Prefers-reduced-motion: keep position updates, drop travel animation */
+@media (prefers-reduced-motion: reduce) {
+  .sliding-thumb__thumb {
+    transition: none;
+  }
+}

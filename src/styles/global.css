@@ -1,4 +1,5 @@
 /* dmeim.com — Gold, rich, old-money */
+@import "./sliding-thumb.css";
 
 :root {
   /* Raw palette — always present */
@@ -370,16 +371,20 @@ p {
   color: var(--color-accent);
 }
 
-/* Desktop nav */
+/* Desktop nav — measured sliding thumb (selection-only; hover = color) */
 .site-nav {
   display: flex;
   align-items: center;
   justify-self: center;
   gap: var(--space-xl);
+  --sliding-thumb-inset-y: 0.15em;
 }
 
-.site-nav a {
-  position: relative;
+.site-nav .sliding-thumb__option {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 0.35em;
+  padding-block: 0.2em;
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 500;
@@ -390,27 +395,9 @@ p {
   transition: color var(--duration) var(--ease-out);
 }
 
-.site-nav a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -0.35em;
-  width: 100%;
-  height: 1px;
-  background: var(--color-accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--duration) var(--ease-expo);
-}
-
-.site-nav a:hover,
-.site-nav a[aria-current="page"] {
+.site-nav .sliding-thumb__option:hover,
+.site-nav .sliding-thumb__option[aria-current="page"] {
   color: var(--color-ink);
-}
-
-.site-nav a[aria-current="page"]::after,
-.site-nav a:hover::after {
-  transform: scaleX(1);
 }
 
 /* Hamburger toggle — hidden on desktop */
@@ -546,41 +533,11 @@ p {
 .theme-toggle {
   width: 108px;
   height: 36px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  align-items: center;
-  position: relative;
   flex-shrink: 0;
-  box-sizing: border-box;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-ground-elevated);
-  color: var(--color-ink-muted);
+  --sliding-thumb-count: 3;
 }
 
-.theme-toggle-thumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: calc((100% - 4px) / 3);
-  height: calc(100% - 4px);
-  border-radius: var(--radius);
-  pointer-events: none;
-  transition: transform 0.2s ease;
-  z-index: 0;
-  background: color-mix(in srgb, var(--color-spot) 80%, var(--color-ground-elevated));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent);
-}
-
-[data-theme-pref="system"] .theme-toggle-thumb {
-  transform: translateX(100%);
-}
-
-[data-theme-pref="dark"] .theme-toggle-thumb {
-  transform: translateX(200%);
-}
-
-.theme-toggle-option {
+.theme-toggle .sliding-thumb__option {
   all: unset;
   box-sizing: border-box;
   display: flex;
@@ -593,25 +550,27 @@ p {
   z-index: 1;
   color: inherit;
   opacity: 0.55;
-  transition: opacity var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
 }
 
-.theme-toggle-option[aria-checked="true"] {
+.theme-toggle .sliding-thumb__option[aria-checked="true"] {
   opacity: 1;
   color: var(--color-accent);
 }
 
-.theme-toggle-option:hover {
+.theme-toggle .sliding-thumb__option:hover {
   opacity: 0.85;
   color: var(--color-ink);
 }
 
-.theme-toggle-option:focus-visible {
+.theme-toggle .sliding-thumb__option:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: -2px;
 }
 
-.theme-toggle-option svg {
+.theme-toggle .sliding-thumb__option svg {
   display: block;
 }
 

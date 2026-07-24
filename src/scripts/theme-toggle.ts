@@ -72,20 +72,21 @@ export class ThemeToggle {
 
   private build(): HTMLElement {
     const root = document.createElement('div');
-    root.className = 'theme-toggle';
+    root.className = 'theme-toggle sliding-thumb sliding-thumb--equal';
     root.id = 'theme-toggle';
     root.setAttribute('role', 'radiogroup');
     root.setAttribute('aria-label', 'Color theme');
+    root.style.setProperty('--sliding-thumb-count', String(PREFERENCES.length));
 
     const thumb = document.createElement('span');
-    thumb.className = 'theme-toggle-thumb';
+    thumb.className = 'sliding-thumb__thumb';
     thumb.setAttribute('aria-hidden', 'true');
     root.appendChild(thumb);
 
     for (const pref of PREFERENCES) {
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = 'theme-toggle-option';
+      button.className = 'sliding-thumb__option';
       button.dataset.themeOption = pref;
       button.setAttribute('role', 'radio');
       button.setAttribute('aria-label', LABELS[pref]);
@@ -114,6 +115,9 @@ export class ThemeToggle {
   }
 
   private syncAria(pref: ThemePreference): void {
+    const index = Math.max(0, PREFERENCES.indexOf(pref));
+    this.root.style.setProperty('--sliding-thumb-index', String(index));
+
     for (const button of this.options) {
       const selected = button.dataset.themeOption === pref;
       button.setAttribute('aria-checked', selected ? 'true' : 'false');

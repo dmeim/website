@@ -12,6 +12,7 @@ export default defineConfig({
     include: [
       "src/lib/tools/**/*.service.test.ts",
       "src/lib/chat/**/*.test.ts",
+      "src/scripts/**/*.test.ts",
     ],
     globals: false,
     server: {

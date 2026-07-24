@@ -22,13 +22,18 @@ export function ThinkingLevelThumb({
 
   return (
     <div
-      className="chat-thinking-toggle"
+      className="chat-thinking-toggle sliding-thumb sliding-thumb--equal"
       role="radiogroup"
       aria-label="Thinking level"
       data-thinking={value}
-      style={{ ["--thinking-index" as string]: String(index) } as CSSProperties}
+      style={
+        {
+          ["--sliding-thumb-index" as string]: String(index),
+          ["--sliding-thumb-count" as string]: String(THINKING_LEVELS.length),
+        } as CSSProperties
+      }
     >
-      <span className="chat-thinking-toggle__thumb" aria-hidden="true" />
+      <span className="sliding-thumb__thumb" aria-hidden="true" />
       {THINKING_LEVELS.map((level) => {
         const enabled = allowed.includes(level);
         const selected = value === level;
@@ -36,7 +41,7 @@ export function ThinkingLevelThumb({
           <button
             key={level}
             type="button"
-            className="chat-thinking-toggle__option"
+            className="sliding-thumb__option chat-thinking-toggle__option"
             role="radio"
             aria-label={THINKING_LEVEL_LABELS[level]}
             aria-checked={selected}

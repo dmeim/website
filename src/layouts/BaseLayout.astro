@@ -91,10 +91,15 @@ const year = new Date().getFullYear();
       <div class="site-header__inner">
         <a class="site-brand" href="/">dmeim</a>
 
-        <nav class="site-nav" aria-label="Primary">
+        <nav
+          class="site-nav sliding-thumb sliding-thumb--measured sliding-thumb--ghost"
+          aria-label="Primary"
+        >
+          <span class="sliding-thumb__thumb" aria-hidden="true"></span>
           {
             nav.map(({ href, label }) => (
               <a
+                class="sliding-thumb__option"
                 href={href}
                 aria-current={isCurrent(href) ? "page" : undefined}
               >
@@ -161,6 +166,7 @@ const year = new Date().getFullYear();
 
     <script>
       import "../scripts/theme-toggle";
+      import "../scripts/site-nav-thumb";
     </script>
 
     <script is:inline>
