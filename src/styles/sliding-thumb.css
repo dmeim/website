@@ -19,14 +19,23 @@
 .sliding-thumb__option {
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  line-height: 1;
 }
 
-/* ——— Equal mode ——— */
+/* ——— Equal mode ———
+   Track padding matches the abspos thumb inset so option cells and the
+   pill share the same content box — otherwise flex-centered labels/icons
+   sit in the full track while the thumb is inset 2px (reads top-left). */
 
 .sliding-thumb--equal {
   display: grid;
   grid-template-columns: repeat(var(--sliding-thumb-count, 1), 1fr);
   align-items: stretch;
+  padding: 2px;
 }
 
 .sliding-thumb--equal .sliding-thumb__thumb {
@@ -37,7 +46,9 @@
   transform: translateX(calc(var(--sliding-thumb-index, 0) * 100%));
 }
 
-/* ——— Measured mode ——— */
+/* ——— Measured mode ———
+   Hosts should set padding equal to --sliding-thumb-inset-y so the
+   measured thumb (inset from the padding edge) lines up with options. */
 
 .sliding-thumb--measured .sliding-thumb__thumb {
   top: var(--sliding-thumb-inset-y, 0px);

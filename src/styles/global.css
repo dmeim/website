@@ -75,7 +75,7 @@
   --space-4xl: 8rem;
 
   --measure: 65ch;
-  --site-max: 90rem;
+  --site-max: 80rem;
   --header-height: 4.25rem;
   --radius: 2px;
 
@@ -374,23 +374,28 @@ p {
 /* Desktop nav — measured sliding thumb (default chrome; selection-only; hover = color) */
 .site-nav {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-self: center;
   gap: var(--space-xl);
-  padding-inline: 0.25em;
-  padding-block: 0.1em;
-  --sliding-thumb-inset-y: 0.15em;
+  /* Padding matches --sliding-thumb-inset-y so options share the thumb box */
+  padding: 2px;
+  --sliding-thumb-inset-y: 2px;
 }
 
 .site-nav .sliding-thumb__option {
   display: inline-flex;
   align-items: center;
-  padding-inline: 0.35em;
+  justify-content: center;
+  /* letter-spacing adds trailing space after the last glyph — bias padding
+     so the visual label stays centered inside the measured thumb */
+  padding-inline-start: calc(0.35em + 0.06em);
+  padding-inline-end: calc(0.35em - 0.06em);
   padding-block: 0.2em;
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 500;
   letter-spacing: 0.12em;
+  line-height: 1;
   text-transform: uppercase;
   color: var(--color-ink-muted);
   text-decoration: none;
@@ -550,6 +555,7 @@ p {
   cursor: pointer;
   position: relative;
   z-index: 1;
+  line-height: 1;
   color: inherit;
   opacity: 0.55;
   transition:
@@ -574,6 +580,10 @@ p {
 
 .theme-toggle .sliding-thumb__option svg {
   display: block;
+  width: 16px;
+  height: 16px;
+  max-width: none;
+  flex-shrink: 0;
 }
 
 /* ——— Main & footer ——— */
