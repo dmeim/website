@@ -26,16 +26,24 @@ export type SlidingThumbMountOptions = SlidingThumbSyncOptions;
 
 /**
  * Pure geometry for measured-mode CSS vars.
- * `x` / `w` are relative to the root’s left edge.
+ *
+ * `x` / `w` are relative to the root’s **padding edge** (abspos containing
+ * block origin), not the border box. Callers must pass `clientLeft` (border +
+ * scrollbar gutter on the left) so a bordered track does not shift the thumb
+ * right by the border width — which reads as left-biased label text inside
+ * the pill.
  */
 export function computeMeasuredThumbVars(
   rootBox: RectLike,
   optionBox: RectLike,
   inset = 0,
+  clientLeft = 0,
 ): MeasuredThumbVars {
   const safeInset = Math.max(0, inset);
+  const safeClientLeft = Math.max(0, clientLeft);
   const rawW = Math.max(0, optionBox.width - safeInset * 2);
-  const x = optionBox.left - rootBox.left + safeInset;
+  const x =
+    optionBox.left - rootBox.left - safeClientLeft + safeInset;
   return { x, w: rawW };
 }
 
@@ -77,6 +85,7 @@ export function syncSlidingThumb(
     rootBox,
     optionBox,
     options.inset ?? 0,
+    root.clientLeft,
   );
 
   root.style.setProperty("--sliding-thumb-x", `${x}px`);

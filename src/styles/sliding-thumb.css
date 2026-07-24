@@ -48,7 +48,9 @@
 
 /* ——— Measured mode ———
    Hosts should set padding equal to --sliding-thumb-inset-y so the
-   measured thumb (inset from the padding edge) lines up with options. */
+   measured thumb (inset from the padding edge) lines up with options.
+   --sliding-thumb-x is relative to the padding edge (abspos origin);
+   the JS helper subtracts root.clientLeft so bordered tracks stay aligned. */
 
 .sliding-thumb--measured .sliding-thumb__thumb {
   top: var(--sliding-thumb-inset-y, 0px);

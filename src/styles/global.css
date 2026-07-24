@@ -377,7 +377,8 @@ p {
   align-items: stretch;
   justify-self: center;
   gap: var(--space-xl);
-  /* Padding matches --sliding-thumb-inset-y so options share the thumb box */
+  /* Match theme-toggle track height; padding = thumb inset-y */
+  min-height: 36px;
   padding: 2px;
   --sliding-thumb-inset-y: 2px;
 }
@@ -386,11 +387,11 @@ p {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* letter-spacing adds trailing space after the last glyph — bias padding
-     so the visual label stays centered inside the measured thumb */
-  padding-inline-start: calc(0.35em + 0.06em);
-  padding-inline-end: calc(0.35em - 0.06em);
-  padding-block: 0.2em;
+  /* letter-spacing adds trailing space after the last glyph — pad_start −
+     pad_end = letter-spacing so ink (not the layout box) is centered */
+  padding-inline-start: calc(0.55em + 0.06em);
+  padding-inline-end: calc(0.55em - 0.06em);
+  padding-block: 0;
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 500;
