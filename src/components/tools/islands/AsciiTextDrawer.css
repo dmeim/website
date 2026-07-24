@@ -11,8 +11,8 @@
 }
 
 .ascii-drawer-output {
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   line-height: 1.2;
   white-space: pre;
   overflow-x: auto;

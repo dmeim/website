@@ -15,7 +15,7 @@
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
 }
 
 .ipv6ula-table th,

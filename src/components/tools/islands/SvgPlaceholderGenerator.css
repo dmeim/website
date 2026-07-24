@@ -23,8 +23,8 @@
 }
 
 .sp-color-value {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   color: var(--color-stone);
   text-transform: uppercase;
 }

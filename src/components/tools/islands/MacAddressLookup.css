@@ -13,7 +13,7 @@
 
 .maclookup-vendor__label {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--color-ink);
@@ -27,7 +27,7 @@
   background: color-mix(in srgb, var(--color-surface) 88%, transparent);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   line-height: 1.45;
 }
 

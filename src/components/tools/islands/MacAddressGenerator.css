@@ -23,7 +23,7 @@
   background: color-mix(in srgb, var(--color-ground) 82%, transparent);
   color: var(--color-stone);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   letter-spacing: 0.02em;
   cursor: pointer;
 }

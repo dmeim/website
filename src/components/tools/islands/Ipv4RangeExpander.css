@@ -19,7 +19,7 @@
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
 }
 
 .ipv4re-table th,
@@ -32,7 +32,7 @@
 
 .ipv4re-table thead th {
   font-weight: 600;
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--color-stone) 70%, var(--color-ink));

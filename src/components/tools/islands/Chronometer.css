@@ -9,9 +9,8 @@
 .chrono-duration {
   margin: var(--space-md) 0;
   text-align: center;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
-  font-size: clamp(2rem, 8vw, 2.5rem);
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: var(--color-ink);

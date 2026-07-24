@@ -32,7 +32,7 @@
   border-radius: var(--radius-sm, 4px);
   background: color-mix(in srgb, var(--color-surface) 88%, var(--color-border));
   color: var(--color-muted, var(--color-text-muted));
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

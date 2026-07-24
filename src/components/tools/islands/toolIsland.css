@@ -55,20 +55,20 @@
   margin: 0;
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: var(--text-xl);
   line-height: 1.15;
   color: var(--color-ink);
 }
 
 .tool-nested h3 {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   margin-bottom: var(--space-sm);
 }
 
 .tool-hint {
   margin: 0;
   max-width: none;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   line-height: 1.55;
   color: var(--color-stone);
 }
@@ -102,7 +102,7 @@
 }
 
 .tool-field label {
-  font-size: 0.6875rem;
+  font-size: var(--text-xs);
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -121,7 +121,7 @@
   background: transparent;
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: var(--text-md);
   line-height: 1.5;
   transition:
     border-color var(--duration) var(--ease-out),
@@ -165,20 +165,20 @@
 .tool-code {
   resize: vertical;
   min-height: 6rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
 }
 
 .tool-field textarea:not(.tool-code) {
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: var(--text-md);
 }
 
 .tool-check {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   color: var(--color-ink);
   cursor: pointer;
 }
@@ -195,7 +195,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   color: var(--color-ink);
   cursor: pointer;
 }
@@ -275,7 +275,7 @@
 .tool-status {
   margin: 0;
   max-width: none;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   line-height: 1.5;
   color: var(--color-stone);
 }
@@ -297,7 +297,7 @@
   padding: var(--space-xl);
   text-align: center;
   color: var(--color-stone);
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
 }
 
 @media (max-width: 900px) {

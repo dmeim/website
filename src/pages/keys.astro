@@ -75,7 +75,7 @@ import { keys, connect } from "../content/site";
 
   .keys-note__label {
     margin: 0;
-    font-size: 0.6875rem;
+    font-size: var(--text-xs);
     font-weight: 500;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -85,12 +85,12 @@ import { keys, connect } from "../content/site";
   .keys-note p {
     margin: 0;
     color: var(--color-stone);
-    font-size: 0.9875rem;
+    font-size: var(--text-md);
     line-height: 1.6;
   }
 
   .keys-note code {
-    font-size: 0.9em;
+    font-size: var(--text-sm);
     color: var(--color-ink);
   }
 
@@ -123,7 +123,7 @@ import { keys, connect } from "../content/site";
 
   .key-block__kind {
     margin: 0;
-    font-size: 0.6875rem;
+    font-size: var(--text-xs);
     font-weight: 500;
     letter-spacing: 0.16em;
     text-transform: uppercase;
@@ -134,7 +134,7 @@ import { keys, connect } from "../content/site";
     margin: 0;
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+    font-size: var(--text-lg);
     letter-spacing: -0.01em;
   }
 
@@ -145,7 +145,7 @@ import { keys, connect } from "../content/site";
   }
 
   .key-block__meta dt {
-    font-size: 0.6875rem;
+    font-size: var(--text-xs);
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -156,13 +156,13 @@ import { keys, connect } from "../content/site";
   .key-block__meta dd {
     margin: 0;
     color: var(--color-stone);
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
     word-break: break-word;
   }
 
   .key-block__meta code {
     color: var(--color-ink);
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
   }
 
   .key-block__body {
@@ -172,12 +172,12 @@ import { keys, connect } from "../content/site";
     border: 1px solid var(--color-border);
     background: color-mix(in srgb, var(--color-ground) 70%, transparent);
     color: var(--color-stone);
-    font-size: 0.8125rem;
+    font-size: var(--text-sm);
     line-height: 1.55;
   }
 
   .key-block__body code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: var(--font-mono);
   }
 
   @media (max-width: 700px) {

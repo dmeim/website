@@ -23,7 +23,7 @@
   background: color-mix(in srgb, var(--color-ground) 82%, transparent);
   color: var(--color-stone);
   font: inherit;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   letter-spacing: 0.02em;
   cursor: pointer;
 }
@@ -54,8 +54,8 @@
 }
 
 .ug-namespace-input {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
 }
 
 .ug-output {

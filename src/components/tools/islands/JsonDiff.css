@@ -20,8 +20,8 @@
 
 .jd-viewer {
   color: var(--color-stone);
-  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   line-height: 1.55;
   overflow-x: auto;
 }

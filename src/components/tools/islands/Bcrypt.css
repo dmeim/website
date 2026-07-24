@@ -72,7 +72,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: var(--space-xs);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: var(--color-stone);
 }
 
@@ -89,7 +89,7 @@
 }
 
 .bc-compare-label {
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--color-stone);
@@ -98,6 +98,6 @@
 .bc-compare-result {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 1.125rem;
+  font-size: var(--text-md);
   font-weight: 600;
 }

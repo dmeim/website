@@ -45,8 +45,8 @@
   border: 1px solid transparent;
   background: transparent;
   color: var(--color-ink);
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -84,7 +84,7 @@
   min-height: 14rem;
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: var(--text-md);
   line-height: 1.6;
 }
 
@@ -115,32 +115,32 @@
 }
 
 .wysiwyg-prose h1 {
-  font-size: 1.85rem;
+  font-size: var(--text-xl);
 }
 
 .wysiwyg-prose h2 {
-  font-size: 1.55rem;
+  font-size: var(--text-lg);
 }
 
 .wysiwyg-prose h3 {
-  font-size: 1.3rem;
+  font-size: var(--text-lg);
 }
 
 .wysiwyg-prose h4 {
-  font-size: 1.1rem;
+  font-size: var(--text-md);
 }
 
 .wysiwyg-prose code {
   background: color-mix(in srgb, var(--color-ink) 8%, var(--color-surface));
   padding: 0.1em 0.35em;
   border-radius: 0.25rem;
-  font-size: 0.875em;
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
 }
 
 .wysiwyg-prose pre {
   background: color-mix(in srgb, var(--color-ink) 8%, var(--color-surface));
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-family: var(--font-mono);
   padding: 0.75rem 1rem;
   border-radius: 0.35rem;
   overflow-x: auto;
@@ -150,7 +150,7 @@
   color: inherit;
   padding: 0;
   background: none;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .wysiwyg-prose blockquote {

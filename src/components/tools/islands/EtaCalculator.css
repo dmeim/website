@@ -16,7 +16,7 @@
 .eta-rate__in {
   padding-bottom: 0.85rem;
   color: var(--color-stone);
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
 }
 
 .eta-results {
@@ -37,7 +37,7 @@
 
 .eta-stat__label {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--color-stone);
@@ -46,7 +46,7 @@
 .eta-stat__value {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  font-size: var(--text-lg);
   line-height: 1.25;
   color: var(--color-ink);
   font-variant-numeric: tabular-nums;
