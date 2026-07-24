@@ -371,12 +371,14 @@ p {
   color: var(--color-accent);
 }
 
-/* Desktop nav — measured sliding thumb (selection-only; hover = color) */
+/* Desktop nav — measured sliding thumb (default chrome; selection-only; hover = color) */
 .site-nav {
   display: flex;
   align-items: center;
   justify-self: center;
   gap: var(--space-xl);
+  padding-inline: 0.25em;
+  padding-block: 0.1em;
   --sliding-thumb-inset-y: 0.15em;
 }
 
