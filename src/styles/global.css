@@ -45,9 +45,22 @@
   --color-overlay: color-mix(in srgb, var(--color-night) 75%, transparent);
   --color-spot: color-mix(in srgb, var(--color-gold) 12%, transparent);
 
+  /* Previous faces (kept for reference):
   --font-display: "Syne", system-ui, sans-serif;
   --font-serif: "Instrument Serif", Georgia, serif;
   --font-sans: "Manrope", system-ui, sans-serif;
+  */
+  --font-display: "JetBrains Mono", ui-monospace, monospace;
+  --font-serif: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --text-xs: 0.6875rem;   /* tiny labels / meta */
+  --text-sm: 0.8125rem;   /* captions, chrome */
+  --text-md: 1rem;        /* body */
+  --text-lg: clamp(1.25rem, 2.2vw, 1.5rem);
+  --text-xl: clamp(1.75rem, 3.8vw, 2.5rem);
+  --text-2xl: clamp(2.75rem, 6vw, 4rem);
 
   --space-3xs: 0.125rem;
   --space-2xs: 0.25rem;
@@ -230,7 +243,7 @@ body {
   background-attachment: fixed;
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: 1.0625rem;
+  font-size: var(--text-md);
   line-height: 1.65;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
@@ -300,15 +313,15 @@ h4 {
 }
 
 h1 {
-  font-size: clamp(2.5rem, 6vw, 4.25rem);
+  font-size: var(--text-2xl);
 }
 
 h2 {
-  font-size: clamp(1.85rem, 3.8vw, 2.75rem);
+  font-size: var(--text-xl);
 }
 
 h3 {
-  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  font-size: var(--text-lg);
   letter-spacing: -0.01em;
 }
 
@@ -344,7 +357,7 @@ p {
 .site-brand {
   justify-self: start;
   font-family: var(--font-display);
-  font-size: 1.125rem;
+  font-size: var(--text-md);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--color-ink);
@@ -368,7 +381,7 @@ p {
 .site-nav a {
   position: relative;
   font-family: var(--font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -504,7 +517,7 @@ p {
 
 .mobile-nav a {
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-size: var(--text-xl);
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--color-ink-muted);
@@ -637,7 +650,7 @@ p {
   margin: 0;
   max-width: none;
   color: var(--color-ink-muted);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   letter-spacing: 0.02em;
   text-align: center;
 }
@@ -655,7 +668,7 @@ p {
   background: transparent;
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -702,7 +715,7 @@ p {
 .eyebrow {
   margin: 0 0 var(--space-sm);
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -745,7 +758,7 @@ p {
   }
 
   .site-brand {
-    font-size: 1rem;
+    font-size: var(--text-md);
   }
 
   .site-main {
