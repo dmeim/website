@@ -1,11 +1,26 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type TouchEvent,
+  type WheelEvent,
+} from "react";
 
-const NEAR_BOTTOM_PX = 48;
+/** Must be essentially at the bottom to re-engage stickiness. */
+const LOCK_BOTTOM_PX = 8;
+/** Any scroll farther than this from the bottom releases stickiness. */
+const UNLOCK_BOTTOM_PX = 16;
 
 type ThinkingBlockProps = {
   text: string;
   streaming?: boolean;
 };
+
+function distanceFromBottom(el: HTMLElement): number {
+  return el.scrollHeight - el.scrollTop - el.clientHeight;
+}
 
 export function ThinkingBlock({ text, streaming = false }: ThinkingBlockProps) {
   const panelId = useId();
@@ -13,6 +28,7 @@ export function ThinkingBlock({ text, streaming = false }: ThinkingBlockProps) {
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const stickToBottomRef = useRef(true);
   const wasStreamingRef = useRef(streaming);
+  const touchYRef = useRef<number | null>(null);
 
   useEffect(() => {
     const wasStreaming = wasStreamingRef.current;
@@ -37,11 +53,42 @@ export function ThinkingBlock({ text, streaming = false }: ThinkingBlockProps) {
     el.scrollTop = el.scrollHeight;
   }, [text, open, streaming]);
 
-  const onBodyScroll = () => {
+  const syncStickFromScroll = () => {
     const el = bodyRef.current;
     if (!el) return;
-    const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
-    stickToBottomRef.current = distance < NEAR_BOTTOM_PX;
+    const distance = distanceFromBottom(el);
+    if (distance <= LOCK_BOTTOM_PX) {
+      stickToBottomRef.current = true;
+    } else if (distance > UNLOCK_BOTTOM_PX) {
+      stickToBottomRef.current = false;
+    }
+  };
+
+  const onWheel = (event: WheelEvent<HTMLDivElement>) => {
+    // Unlock immediately on upward intent so the next stream tick can't yank back.
+    if (event.deltaY < 0) {
+      stickToBottomRef.current = false;
+    }
+  };
+
+  const onTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    touchYRef.current = event.touches[0]?.clientY ?? null;
+  };
+
+  const onTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+    const y = event.touches[0]?.clientY;
+    const prev = touchYRef.current;
+    if (y == null || prev == null) return;
+    // Finger moving down → content scrolls up → release stick.
+    if (y > prev + 2) {
+      stickToBottomRef.current = false;
+    }
+    touchYRef.current = y;
+  };
+
+  const onTouchEnd = () => {
+    touchYRef.current = null;
+    syncStickFromScroll();
   };
 
   if (!text.trim()) return null;
@@ -73,7 +120,12 @@ export function ThinkingBlock({ text, streaming = false }: ThinkingBlockProps) {
           id={panelId}
           ref={bodyRef}
           className="chat-thinking-block__body"
-          onScroll={onBodyScroll}
+          onScroll={syncStickFromScroll}
+          onWheel={onWheel}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onTouchCancel={onTouchEnd}
         >
           <pre className="chat-thinking-block__text">{text}</pre>
         </div>
