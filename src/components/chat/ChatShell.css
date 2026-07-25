@@ -898,12 +898,82 @@
 
 /* Scoped through the wrapper so only the message's outer edges are trimmed —
    an unscoped :first-child/:last-child now matches inside every block. */
-.chat-bubble__md > .chat-md-block:first-child > :is(p, ul, ol, pre, blockquote) {
+.chat-bubble__md > .chat-md-block:first-child > * {
   margin-block-start: 0;
 }
 
-.chat-bubble__md > .chat-md-block:last-child > :is(p, ul, ol, pre, blockquote) {
+.chat-bubble__md > .chat-md-block:last-child > * {
   margin-block-end: 0;
+}
+
+/* The site's h1–h4 rules are sized for page titles and scale with the viewport.
+   Inside a reply, headings should scale with the message instead, so this is a
+   self-contained em-based scale. It also covers h5/h6, which had no rules at
+   all and fell back to UA sizes *smaller* than the surrounding prose. */
+.chat-bubble__md :is(h1, h2, h3, h4, h5, h6) {
+  margin-block: 1.2em 0.4em;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.chat-bubble__md h1 {
+  font-size: 1.5em;
+}
+
+.chat-bubble__md h2 {
+  font-size: 1.3em;
+}
+
+.chat-bubble__md h3 {
+  font-size: 1.15em;
+}
+
+.chat-bubble__md h4 {
+  font-size: 1.05em;
+}
+
+.chat-bubble__md :is(h5, h6) {
+  font-size: 1em;
+}
+
+.chat-bubble__md h6 {
+  color: var(--color-ink-muted);
+}
+
+/* Site-wide prose is capped at --measure, which leaked in and stopped
+   paragraphs short of the code blocks and tables beside them. */
+.chat-bubble__md p {
+  max-width: none;
+}
+
+.chat-bubble__md :is(ul, ol) {
+  /* UA default is 40px, which eats a third of a phone-width bubble */
+  padding-inline-start: 1.4em;
+}
+
+.chat-bubble__md li + li {
+  margin-block-start: 0.25em;
+}
+
+.chat-bubble__md li > :is(ul, ol) {
+  margin-block: 0.25em;
+}
+
+.chat-bubble__md blockquote {
+  /* UA default indents by 40px on both sides */
+  margin-inline: 0;
+  padding-inline-start: 0.9em;
+  border-inline-start: 2px solid
+    color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  color: var(--color-ink-muted);
+}
+
+.chat-bubble__md hr {
+  margin-block: 1em;
+  border: 0;
+  border-top: 1px solid var(--color-border);
 }
 
 .chat-bubble__md pre {
