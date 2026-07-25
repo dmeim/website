@@ -602,6 +602,69 @@
   font-size: var(--text-sm);
 }
 
+/* Syntax highlighting — built from the site's own theme tokens instead of a
+   stock highlight.js theme, so code stays on-palette in both light and dark and
+   reads as four deliberate hues rather than a rainbow. */
+.chat-bubble__md :is(.hljs-comment, .hljs-quote) {
+  color: var(--color-ink-muted);
+  font-style: italic;
+}
+
+.chat-bubble__md
+  :is(
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-section,
+    .hljs-doctag,
+    .hljs-meta .hljs-keyword,
+    .hljs-built_in
+  ) {
+  color: var(--color-accent);
+}
+
+.chat-bubble__md
+  :is(.hljs-string, .hljs-regexp, .hljs-addition, .hljs-char.escape_) {
+  color: var(--color-accent-soft);
+}
+
+.chat-bubble__md
+  :is(.hljs-number, .hljs-literal, .hljs-symbol, .hljs-bullet, .hljs-link) {
+  color: var(--color-blue);
+}
+
+.chat-bubble__md
+  :is(
+    .hljs-title,
+    .hljs-title.class_,
+    .hljs-title.function_,
+    .hljs-attr,
+    .hljs-attribute,
+    .hljs-variable,
+    .hljs-template-variable,
+    .hljs-type,
+    .hljs-name,
+    .hljs-selector-id,
+    .hljs-selector-class
+  ) {
+  color: color-mix(in srgb, var(--color-accent) 55%, var(--color-ink));
+}
+
+.chat-bubble__md :is(.hljs-meta, .hljs-punctuation, .hljs-operator) {
+  color: color-mix(in srgb, var(--color-ink-muted) 80%, var(--color-ink));
+}
+
+.chat-bubble__md .hljs-deletion {
+  color: color-mix(in srgb, #c45b5b 80%, var(--color-ink));
+}
+
+.chat-bubble__md .hljs-emphasis {
+  font-style: italic;
+}
+
+.chat-bubble__md .hljs-strong {
+  font-weight: 600;
+}
+
 .chat-thread {
   flex: 1;
   min-height: 0;

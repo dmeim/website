@@ -95,3 +95,36 @@ describe("renderMarkdown", () => {
     expect(html).toContain("&lt;img");
   });
 });
+
+describe("syntax highlighting", () => {
+  it("tokenizes a known language", () => {
+    const html = renderMarkdown("```ts\nconst x: number = 1;\n```");
+    expect(html).toContain("hljs-keyword");
+  });
+
+  it("resolves language aliases", () => {
+    expect(renderMarkdown("```py\nimport os\n```")).toContain("hljs-keyword");
+    expect(renderMarkdown("```sh\necho hi\n```")).toContain("hljs-");
+  });
+
+  it("leaves unknown languages as escaped plain text", () => {
+    const html = renderMarkdown("```notalanguage\na < b && c\n```");
+    expect(html).not.toContain("hljs-");
+    expect(html).toContain("a &lt; b &amp;&amp; c");
+  });
+
+  it("escapes fence content that is not highlighted", () => {
+    const html = renderMarkdown("```\n<script>alert(1)</script>\n```");
+    expect(html).not.toContain("<script>");
+    expect(html).toContain("&lt;script&gt;");
+  });
+
+  it("survives syntactically incomplete code mid-stream", () => {
+    // Every prefix of a fence gets highlighted while the reply streams, so an
+    // unterminated string or brace must not throw.
+    const source = '```ts\nfunction f() {\n  const s = "unterminated';
+    for (let i = 1; i <= source.length; i += 3) {
+      expect(() => renderMarkdown(source.slice(0, i))).not.toThrow();
+    }
+  });
+});
