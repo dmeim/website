@@ -605,7 +605,10 @@
 .chat-thread {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  /* Vertical only — code blocks and tables carry their own horizontal
+     scrollers, so nothing here should ever pan the thread sideways. */
+  overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
   padding: var(--space-lg);
   display: grid;
@@ -663,6 +666,9 @@
 
 .chat-bubble {
   max-width: min(48rem, 100%);
+  /* As a grid item the bubble's floor is min-content, which beats max-width
+     when a child is intrinsically wide. min-width:0 restores the cap. */
+  min-width: 0;
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--color-border);
   background: color-mix(in srgb, var(--color-surface) 80%, transparent);
@@ -681,6 +687,7 @@
 .chat-bubble__text {
   margin: 0;
   white-space: pre-wrap;
+  overflow-wrap: break-word;
   line-height: 1.55;
 }
 
@@ -836,6 +843,46 @@
 .chat-bubble__md {
   line-height: 1.6;
   font-size: var(--text-md);
+  /* Long URLs and hashes have no break opportunity, so they would otherwise
+     push the bubble wider than the thread. */
+  overflow-wrap: break-word;
+}
+
+.chat-table {
+  margin-block: 0.55em;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-ground) 70%, transparent);
+}
+
+.chat-table table {
+  border-collapse: collapse;
+  /* max-content keeps columns on one line; min-width stops a narrow table
+     from leaving a gap. The wrapper scrolls when the result is too wide. */
+  width: max-content;
+  min-width: 100%;
+  font-size: var(--text-sm);
+}
+
+.chat-table :is(th, td) {
+  padding: 0.4rem 0.65rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  /* Ceiling so one prose-heavy cell can't produce a mile-wide table */
+  max-width: 20rem;
+  overflow-wrap: break-word;
+}
+
+.chat-table th {
+  font-weight: 600;
+  background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+}
+
+.chat-table tr:last-child :is(th, td) {
+  border-bottom: 0;
 }
 
 .chat-bubble__md :is(p, ul, ol, pre, blockquote) {

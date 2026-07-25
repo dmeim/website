@@ -59,9 +59,14 @@
   --text-xs: 0.6875rem;   /* tiny labels / meta */
   --text-sm: 0.8125rem;   /* captions, chrome */
   --text-md: 1rem;        /* body */
-  --text-lg: clamp(1.25rem, 2.2vw, 1.5rem);
-  --text-xl: clamp(1.75rem, 3.8vw, 2.5rem);
-  --text-2xl: clamp(2.75rem, 6vw, 4rem);
+  /* Fluid across 360px–1280px. The preferred term must cross the whole range,
+     otherwise the clamp pins to its floor on phones and never scales down —
+     which is what made response headings enormous on mobile. Max values are
+     unchanged, so desktop rendering is identical. The rem term keeps these
+     responsive to browser font-size, not viewport width alone. */
+  --text-lg: clamp(1.125rem, 0.978rem + 0.65vw, 1.5rem);
+  --text-xl: clamp(1.375rem, 0.935rem + 1.96vw, 2.5rem);
+  --text-2xl: clamp(1.75rem, 0.87rem + 3.91vw, 4rem);
 
   --space-3xs: 0.125rem;
   --space-2xs: 0.25rem;

@@ -21,6 +21,15 @@ md.renderer.rules.fence = (tokens, idx, options, env, self) => {
   return `<div class="chat-code" data-lang="${md.utils.escapeHtml(label)}"><div class="chat-code__bar"><span class="chat-code__lang">${md.utils.escapeHtml(label)}</span><button type="button" class="chat-code__copy" data-chat-copy>Copy</button></div>${raw}</div>`;
 };
 
+// A bare <table> won't shrink below its min-content width, so a wide one
+// overflows the bubble and makes the whole thread scroll sideways. Wrap it in
+// its own scroll container, the same way fenced code blocks are handled.
+// tabindex on the wrapper (the element that actually scrolls) so the table is
+// reachable by keyboard, not just touch.
+md.renderer.rules.table_open = () =>
+  '<div class="chat-table" tabindex="0"><table>';
+md.renderer.rules.table_close = () => "</table></div>";
+
 type Props = {
   text: string;
   className?: string;
