@@ -10,6 +10,7 @@ import {
 } from "react";
 import type { UIMessage } from "ai";
 import {
+  ArrowDown,
   Brain,
   Check,
   Download,
@@ -93,6 +94,9 @@ type ChatPaneProps = {
   onRefreshLibrary: () => Promise<void>;
   onAttachFromLibrary: (assets: LibraryAssetSummary[]) => void;
   onRemoveAttachment: (id: string) => void;
+  /** Reader has scrolled away from the live reply. */
+  showJumpToLatest?: boolean;
+  onJumpToLatest?: () => void;
   threadRef: RefObject<HTMLDivElement | null>;
   threadEndRef: RefObject<HTMLDivElement | null>;
   composerRef: RefObject<HTMLTextAreaElement | null>;
@@ -140,6 +144,8 @@ export function ChatPane({
   onRefreshLibrary,
   onAttachFromLibrary,
   onRemoveAttachment,
+  showJumpToLatest = false,
+  onJumpToLatest,
   threadRef,
   threadEndRef,
   composerRef,
@@ -249,6 +255,21 @@ export function ChatPane({
       handleComposerSubmit();
     }
   };
+
+  // Announce completion once instead of live-narrating the reply as it streams:
+  // an aria-live region around the thread re-reads the whole growing message.
+  const [announcement, setAnnouncement] = useState("");
+  const wasGeneratingRef = useRef(false);
+
+  useEffect(() => {
+    const isGenerating = streaming || generating;
+    const wasGenerating = wasGeneratingRef.current;
+    wasGeneratingRef.current = isGenerating;
+    if (!wasGenerating || isGenerating) return;
+    setAnnouncement("Response complete");
+    const timer = window.setTimeout(() => setAnnouncement(""), 2000);
+    return () => window.clearTimeout(timer);
+  }, [streaming, generating]);
 
   const composerBusy = streaming || generating;
   const showStop = streaming || generating;
@@ -459,7 +480,11 @@ export function ChatPane({
         </div>
       ) : null}
 
-      <div className="chat-thread" ref={threadRef} aria-live="polite">
+      <p className="visually-hidden" role="status" aria-live="polite">
+        {announcement}
+      </p>
+
+      <div className="chat-thread" ref={threadRef}>
         {loadingThread ? (
           <p className="chat-empty">Loading…</p>
         ) : messages.length === 0 ? (
@@ -644,6 +669,17 @@ export function ChatPane({
       </div>
 
       <form className="chat-composer" onSubmit={handleComposerSubmit}>
+        {showJumpToLatest && onJumpToLatest ? (
+          <button
+            type="button"
+            className="chat-jump"
+            onClick={onJumpToLatest}
+            title="Jump to latest"
+          >
+            <LucideIcon icon={ArrowDown} size={14} />
+            <span>Latest</span>
+          </button>
+        ) : null}
         {pendingAttachments.length > 0 ? (
           <ul className="chat-composer__attachments">
             {pendingAttachments.map((attachment) => (

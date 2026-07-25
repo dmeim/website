@@ -96,6 +96,28 @@ describe("renderMarkdown", () => {
   });
 });
 
+describe("links", () => {
+  it("opens markdown links in a new tab safely", () => {
+    const html = renderMarkdown("[docs](https://example.com/docs)");
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('rel="noopener noreferrer"');
+  });
+
+  it("applies the same treatment to auto-linked bare URLs", () => {
+    const html = renderMarkdown("see https://example.com for details");
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('rel="noopener noreferrer"');
+  });
+
+  it("still refuses javascript: URLs", () => {
+    // markdown-it's validateLink rejects the scheme, so no anchor is produced
+    // and the source stays inert literal text.
+    const html = renderMarkdown("[x](javascript:alert(1))");
+    expect(html).not.toContain("<a ");
+    expect(html).not.toContain("href");
+  });
+});
+
 describe("syntax highlighting", () => {
   it("tokenizes a known language", () => {
     const html = renderMarkdown("```ts\nconst x: number = 1;\n```");

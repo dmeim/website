@@ -142,6 +142,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
   const streamingRef = useRef(false);
   const idlePollsLeftRef = useRef(0);
   const stickToBottomRef = useRef(true);
+  const [atBottom, setAtBottom] = useState(true);
   /** Chat id pinned for the in-flight send/regenerate body (not live active id). */
   const sendChatIdRef = useRef<string | null>(null);
   /** Monotonic generation so stale selectChat fetches can't clear newer loads. */
@@ -470,13 +471,29 @@ export default function ChatShell({ initialChatId = null }: Props) {
   useEffect(() => {
     const el = threadRef.current;
     if (!el) return;
+    // A freshly opened thread is pinned to the latest message. Measuring here
+    // instead would unpin it immediately, since it has not been scrolled down
+    // yet, and that would suppress the initial scroll to the newest reply.
+    stickToBottomRef.current = true;
+    setAtBottom(true);
+
     const onScroll = () => {
       const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
-      stickToBottomRef.current = distance < NEAR_BOTTOM_PX;
+      const near = distance < NEAR_BOTTOM_PX;
+      stickToBottomRef.current = near;
+      // Mirrored into state for the jump-to-latest affordance; React bails out
+      // when the value is unchanged, so this does not re-render per scroll tick.
+      setAtBottom((prev) => (prev === near ? prev : near));
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
   }, [activeChatId, view, loadingThread]);
+
+  const jumpToLatest = useCallback(() => {
+    stickToBottomRef.current = true;
+    setAtBottom(true);
+    threadEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, []);
 
   const needsPoll =
     Object.values(awaitingByChat).some(Boolean) ||
@@ -1225,6 +1242,8 @@ export default function ChatShell({ initialChatId = null }: Props) {
             onRemoveAttachment={(id) =>
               setPendingAttachments((prev) => prev.filter((a) => a.id !== id))
             }
+            showJumpToLatest={!atBottom && messages.length > 0}
+            onJumpToLatest={jumpToLatest}
             threadRef={threadRef}
             threadEndRef={threadEndRef}
             composerRef={composerRef}

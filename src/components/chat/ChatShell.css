@@ -727,6 +727,13 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .chat-status-spinner {
+    /* The adjacent "Generating…" text still carries the state */
+    animation: none;
+  }
+}
+
 .chat-bubble {
   max-width: min(48rem, 100%);
   /* As a grid item the bubble's floor is min-content, which beats max-width
@@ -1074,6 +1081,37 @@
   gap: var(--space-xs);
   background: color-mix(in srgb, var(--color-ground) 70%, transparent);
   flex-shrink: 0;
+  /* Anchor for the jump-to-latest button, which floats above the composer */
+  position: relative;
+}
+
+.chat-jump {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  inset-inline: 0;
+  z-index: 10;
+  margin-inline: auto;
+  width: max-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  font: inherit;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-black) 22%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.chat-jump:hover {
+  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
 }
 
 .chat-composer__status {

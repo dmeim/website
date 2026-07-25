@@ -109,6 +109,20 @@ md.renderer.rules.table_open = () =>
   '<div class="chat-table" tabindex="0"><table>';
 md.renderer.rules.table_close = () => "</table></div>";
 
+const defaultLinkOpen =
+  md.renderer.rules.link_open ??
+  ((tokens, idx, options, _env, self) =>
+    self.renderToken(tokens, idx, options));
+
+// Following a citation in place would discard the composer draft and the
+// thread's scroll position, so replies open links in a new tab.
+md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+  const token = tokens[idx]!;
+  token.attrSet("target", "_blank");
+  token.attrSet("rel", "noopener noreferrer");
+  return defaultLinkOpen(tokens, idx, options, env, self);
+};
+
 type MdToken = ReturnType<MarkdownIt["parse"]>[number];
 
 /** Render a whole message to one HTML string. */
