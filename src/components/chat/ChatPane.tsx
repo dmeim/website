@@ -767,7 +767,7 @@ export function ChatPane({
             {mcpMenuOpen ? (
               <div
                 id={mcpMenuId}
-                className="chat-attach-menu chat-attach-menu--settings chat-attach-menu--end"
+                className="chat-attach-menu chat-attach-menu--settings"
                 role="dialog"
                 aria-label="MCP tools"
               >

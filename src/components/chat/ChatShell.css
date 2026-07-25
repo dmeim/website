@@ -1221,11 +1221,6 @@
   gap: var(--space-sm);
 }
 
-.chat-attach-menu--end {
-  left: auto;
-  right: 0;
-}
-
 .chat-model-settings {
   display: grid;
   gap: var(--space-sm);
