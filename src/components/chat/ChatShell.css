@@ -885,15 +885,24 @@
   border-bottom: 0;
 }
 
+/* One wrapper per top-level markdown block (see MarkdownBody). display:contents
+   keeps it out of layout so margins between blocks collapse exactly as they did
+   when the message was a single innerHTML blob. */
+.chat-md-block {
+  display: contents;
+}
+
 .chat-bubble__md :is(p, ul, ol, pre, blockquote) {
   margin-block: 0.55em;
 }
 
-.chat-bubble__md :is(p, ul, ol, pre, blockquote):first-child {
+/* Scoped through the wrapper so only the message's outer edges are trimmed —
+   an unscoped :first-child/:last-child now matches inside every block. */
+.chat-bubble__md > .chat-md-block:first-child > :is(p, ul, ol, pre, blockquote) {
   margin-block-start: 0;
 }
 
-.chat-bubble__md :is(p, ul, ol, pre, blockquote):last-child {
+.chat-bubble__md > .chat-md-block:last-child > :is(p, ul, ol, pre, blockquote) {
   margin-block-end: 0;
 }
 

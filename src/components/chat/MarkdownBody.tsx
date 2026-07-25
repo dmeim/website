@@ -1,34 +1,6 @@
-import { useEffect, useMemo, useRef } from "react";
-import MarkdownIt from "markdown-it";
+import { useDeferredValue, useEffect, useMemo, useRef } from "react";
 
-const md = new MarkdownIt({
-  html: false,
-  linkify: true,
-  breaks: true,
-});
-
-const defaultFence =
-  md.renderer.rules.fence ??
-  ((tokens, idx, options, _env, self) =>
-    self.renderToken(tokens, idx, options));
-
-md.renderer.rules.fence = (tokens, idx, options, env, self) => {
-  const token = tokens[idx]!;
-  const info = (token.info || "").trim();
-  const lang = info.split(/\s+/g)[0] || "";
-  const raw = defaultFence(tokens, idx, options, env, self);
-  const label = lang || "code";
-  return `<div class="chat-code" data-lang="${md.utils.escapeHtml(label)}"><div class="chat-code__bar"><span class="chat-code__lang">${md.utils.escapeHtml(label)}</span><button type="button" class="chat-code__copy" data-chat-copy>Copy</button></div>${raw}</div>`;
-};
-
-// A bare <table> won't shrink below its min-content width, so a wide one
-// overflows the bubble and makes the whole thread scroll sideways. Wrap it in
-// its own scroll container, the same way fenced code blocks are handled.
-// tabindex on the wrapper (the element that actually scrolls) so the table is
-// reachable by keyboard, not just touch.
-md.renderer.rules.table_open = () =>
-  '<div class="chat-table" tabindex="0"><table>';
-md.renderer.rules.table_close = () => "</table></div>";
+import { renderMarkdownBlocks } from "@/lib/chat/markdown";
 
 type Props = {
   text: string;
@@ -37,7 +9,13 @@ type Props = {
 
 export default function MarkdownBody({ text, className }: Props) {
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const html = useMemo(() => md.render(text || ""), [text]);
+  // Tokens arrive faster than a frame while streaming; deferring lets React
+  // drop intermediate values instead of parsing every single chunk.
+  const deferredText = useDeferredValue(text);
+  const blocks = useMemo(
+    () => renderMarkdownBlocks(deferredText),
+    [deferredText],
+  );
 
   useEffect(() => {
     const root = rootRef.current;
@@ -69,13 +47,19 @@ export default function MarkdownBody({ text, className }: Props) {
 
     root.addEventListener("click", onClick);
     return () => root.removeEventListener("click", onClick);
-  }, [html]);
+    // Delegated from the stable root, so it survives block-level updates.
+  }, []);
 
   return (
-    <div
-      ref={rootRef}
-      className={className}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div ref={rootRef} className={className}>
+      {blocks.map((html, index) => (
+        <div
+          // Blocks are append-only while streaming, so the index is stable.
+          key={index}
+          className="chat-md-block"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      ))}
+    </div>
   );
 }
