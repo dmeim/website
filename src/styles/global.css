@@ -605,8 +605,27 @@ p {
   padding-block: 0;
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - var(--header-height));
+  /* Fill remaining body flex space after the in-flow header.
+     Do not use 100dvh - header here — that double-counts the header
+     against the viewport and overflows on mobile Safari. */
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: hidden;
+}
+
+/* Immersive shells (chat/tools): lock the page to the dynamic viewport so
+   only inner panes scroll. Body is a flex column; header stays in flow. */
+html:has(body.is-immersive),
+body.is-immersive {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.is-immersive {
+  /* min-height alone still allows growth; height locks the flex shell */
+  min-height: 0;
 }
 
 .site-footer {
