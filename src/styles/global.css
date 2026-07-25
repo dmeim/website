@@ -338,6 +338,9 @@ p {
   top: 0;
   z-index: 50;
   height: var(--header-height);
+  /* Body is a flex column; without this the header gets squeezed below
+     --header-height and everything anchored to that variable drifts. */
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--color-border);
@@ -752,7 +755,9 @@ body.is-immersive {
     font-size: var(--text-md);
   }
 
-  .site-main {
+  /* :not() keeps this from re-adding block padding that .site-main--immersive
+     zeroes out — it is declared earlier, so an unscoped rule here wins. */
+  .site-main:not(.site-main--immersive) {
     padding-block: var(--space-xl);
   }
 
