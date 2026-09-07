@@ -2,21 +2,25 @@
 
 @import "./toolIsland.css";
 
-.ht-tool__panel {
-  max-width: 42rem;
+.ht-workspace {
+  grid-template-columns: minmax(16rem, 0.7fr) minmax(0, 1.3fr);
 }
+
+.ht-tool__input textarea { min-height: 14rem; }
 
 .ht-digests {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: 0;
 }
 
 .ht-digest {
   display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+  grid-template-columns: 5rem minmax(0, 1fr) auto;
   gap: var(--space-sm);
-  align-items: center;
+  align-items: start;
+  padding-block: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .ht-digest__algo {
@@ -29,6 +33,7 @@
 
 .ht-digest .tool-field {
   gap: 0;
+  grid-column: auto;
 }
 
 .ht-digest .tool-field label {
@@ -43,13 +48,15 @@
   border: 0;
 }
 
-.ht-digest__value {
+.ht-digest .ht-digest__value {
   word-break: break-all;
-  min-height: 2.75rem;
+  min-height: 3.5rem;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.75rem;
   resize: vertical;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 600px) {
   .ht-digest {
     grid-template-columns: 1fr;
     gap: var(--space-xs);
@@ -59,4 +66,8 @@
   .ht-digest__actions {
     justify-content: flex-start;
   }
+}
+
+@container (max-width: 760px) {
+  .ht-workspace { grid-template-columns: 1fr; }
 }

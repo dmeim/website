@@ -248,7 +248,7 @@ export default function QRCodeGenerator() {
       <ToolWorkspace>
         <ToolPanel labelledBy="qr-settings-heading">
           <ToolSectionHeading
-            title="QR Content"
+            title="Content"
             titleId="qr-settings-heading"
             description={
               <ToolHint>
@@ -747,7 +747,6 @@ export default function QRCodeGenerator() {
 
           <ToolActionRow>
             <ToolButton
-              variant="primary"
               disabled={!payloadResult.isValid}
               onClick={() => void copyPayload()}
             >
@@ -761,9 +760,9 @@ export default function QRCodeGenerator() {
           {actionStatus ? <ToolStatus>{actionStatus}</ToolStatus> : null}
         </ToolPanel>
 
-        <ToolPanel labelledBy="qr-preview-heading">
+        <ToolPanel className="qr-preview-panel" labelledBy="qr-preview-heading">
           <ToolSectionHeading
-            title="Preview & Export"
+            title="Preview & export"
             titleId="qr-preview-heading"
             description={
               <ToolStatus tone={previewStatusType || "default"}>{previewStatus}</ToolStatus>
@@ -789,14 +788,8 @@ export default function QRCodeGenerator() {
         </ToolPanel>
       </ToolWorkspace>
 
-      <ToolPanel labelledBy="qr-svg-heading">
-        <ToolSectionHeading
-          title="SVG Output"
-          titleId="qr-svg-heading"
-          description={
-            <ToolHint>Useful for auditing, embedding, or copying into design files.</ToolHint>
-          }
-        />
+      <details className="tool-disclosure">
+        <summary>SVG source</summary>
         <textarea
           className="tool-code"
           readOnly
@@ -804,7 +797,7 @@ export default function QRCodeGenerator() {
           value={qrSvg || "Generate a QR code to see SVG output."}
           aria-label="Generated SVG markup"
         />
-      </ToolPanel>
+      </details>
     </ToolIsland>
   );
 }

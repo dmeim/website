@@ -41,7 +41,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "word-code-generator",
           title: "WordCode Generator",
-          description: "Generate friendly word + number codes from JSON-backed word categories.",
+          description: "Generate friendly word and number codes from a selection of word categories.",
           status: "available",
           route: "/tools/word-code-generator",
           tags: ["passwords", "students", "word lists"],

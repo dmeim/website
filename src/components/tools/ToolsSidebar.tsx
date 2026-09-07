@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Toolbox, X } from "lucide";
 import {
   getCategoryForTool,
@@ -31,22 +31,19 @@ export function ToolsSidebar({
   onSelectTool,
 }: Props) {
   const [query, setQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const activeCategoryId = activeSlug
     ? getCategoryForTool(activeSlug)?.id
     : undefined;
 
-  useEffect(() => {
-    if (searchOpen) {
-      searchInputRef.current?.focus();
-    }
-  }, [searchOpen]);
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    () => new Set(activeCategoryId ? [activeCategoryId] : []),
+  );
 
-  const closeSearch = () => {
-    setSearchOpen(false);
-    setQuery("");
-  };
+  useEffect(() => {
+    if (activeCategoryId) {
+      setExpandedCategories((current) => new Set(current).add(activeCategoryId));
+    }
+  }, [activeCategoryId]);
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -92,47 +89,33 @@ export function ToolsSidebar({
       </div>
 
       <div className="tools-sidebar__section">
+        <div className="tools-sidebar__search-field">
+          <LucideIcon icon={Search} size={16} />
+          <label className="visually-hidden" htmlFor="tools-sidebar-search">
+            Search tools
+          </label>
+          <input
+            id="tools-sidebar-search"
+            type="search"
+            className="tools-sidebar__search-input"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search tools…"
+            autoComplete="off"
+          />
+          {query ? (
+            <button
+              type="button"
+              className="tools-sidebar__search-close"
+              onClick={() => setQuery("")}
+              aria-label="Clear search"
+            >
+              <LucideIcon icon={X} size={14} />
+            </button>
+          ) : null}
+        </div>
         <div className="tools-sidebar__section-head">
-          {searchOpen ? (
-            <div className="tools-sidebar__search-field">
-              <label className="visually-hidden" htmlFor="tools-sidebar-search">
-                Search tools
-              </label>
-              <input
-                ref={searchInputRef}
-                id="tools-sidebar-search"
-                type="search"
-                className="tools-sidebar__search-input"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search tools…"
-                autoComplete="off"
-              />
-              <button
-                type="button"
-                className="tools-sidebar__search-close"
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={closeSearch}
-                aria-label="Close search"
-                title="Close"
-              >
-                <LucideIcon icon={X} size={16} />
-              </button>
-            </div>
-          ) : (
-            <>
-              <h2 className="tools-sidebar__heading">Categories</h2>
-              <button
-                type="button"
-                className="tools-sidebar__search-btn"
-                onClick={() => setSearchOpen(true)}
-                aria-label="Search tools"
-                title="Search tools"
-              >
-                <LucideIcon icon={Search} size={16} />
-              </button>
-            </>
-          )}
+          <h2 className="tools-sidebar__heading">Categories</h2>
         </div>
 
         <nav className="tools-sidebar__nav" aria-label="Categories">
@@ -142,12 +125,23 @@ export function ToolsSidebar({
             filteredCategories.map((category) => {
               const hasWip = categoryHasWip(category);
               const forceOpen =
-                Boolean(normalizedQuery) || activeCategoryId === category.id;
+                Boolean(normalizedQuery) || expandedCategories.has(category.id);
               return (
                 <details
-                  key={`${category.id}:${normalizedQuery ? "q" : "n"}:${forceOpen ? "open" : "shut"}`}
+                  key={category.id}
                   className="tools-sidebar__category"
-                  defaultOpen={forceOpen}
+                  open={forceOpen}
+                  onToggle={(event) => {
+                    if (normalizedQuery) return;
+                    const open = event.currentTarget.open;
+                    setExpandedCategories((current) => {
+                      if (current.has(category.id) === open) return current;
+                      const next = new Set(current);
+                      if (open) next.add(category.id);
+                      else next.delete(category.id);
+                      return next;
+                    });
+                  }}
                 >
                   <summary>
                     <span className="tools-sidebar__category-name">

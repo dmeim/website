@@ -27,7 +27,7 @@
 
 .page-intro__lede {
   margin: 0;
-  max-width: 36ch;
+  max-width: 52ch;
   font-family: var(--font-sans);
   font-size: var(--text-md);
   line-height: 1.65;

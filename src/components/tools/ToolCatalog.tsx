@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   plannedTools,
   toolCategories,
@@ -66,6 +67,16 @@ function categoryHasWip(category: ToolCategory): boolean {
 }
 
 export function ToolCatalog({ onOpenTool, onOpenSidebar }: Props) {
+  const [query, setQuery] = useState("");
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(() => new Set(["personal"]));
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleCategories = toolCategories.map((category) => ({
+    ...category,
+    tools: category.tools.filter((tool) =>
+      `${tool.title} ${tool.description} ${(tool.tags ?? []).join(" ")}`.toLowerCase().includes(normalizedQuery),
+    ),
+  })).filter((category) => category.tools.length > 0);
+  const matchingCount = visibleCategories.reduce((sum, category) => sum + category.tools.length, 0);
   const total = toolCategories.reduce(
     (sum, category) => sum + category.tools.length,
     0,
@@ -99,18 +110,41 @@ export function ToolCatalog({ onOpenTool, onOpenSidebar }: Props) {
 
       <div className="tools-catalog__body">
         <p className="tools-catalog__lede">
-          Local-first utilities inspired by it-tools — ready tools open here;
-          everything else stays visible as WIP until it ships.
+          A collection of practical utilities for everyday work. Find a tool or browse by category.
         </p>
 
+        <div className="tools-catalog__search">
+          <label htmlFor="tools-catalog-search">Find a tool</label>
+          <input
+            id="tools-catalog-search"
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search by name or task…"
+            autoComplete="off"
+          />
+          {normalizedQuery ? <p role="status">{matchingCount} matching {matchingCount === 1 ? "tool" : "tools"}</p> : null}
+        </div>
         <div className="tools-catalog__stack">
-          {toolCategories.map((category) => {
+          {visibleCategories.map((category) => {
             const hasWip = categoryHasWip(category);
             return (
               <details
                 key={category.id}
                 className="tools-catalog__category"
                 id={`category-${category.id}`}
+                open={Boolean(normalizedQuery) || expandedCategories.has(category.id)}
+                onToggle={(event) => {
+                  if (normalizedQuery) return;
+                  const open = event.currentTarget.open;
+                  setExpandedCategories((current) => {
+                    if (current.has(category.id) === open) return current;
+                    const next = new Set(current);
+                    if (open) next.add(category.id);
+                    else next.delete(category.id);
+                    return next;
+                  });
+                }}
               >
                 <summary>
                   <span className="tools-catalog__category-title">

@@ -3,30 +3,46 @@
 .tool-island {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: 0;
   width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.tool-island:has(> .tool-panel:only-child) {
+  max-width: 64rem;
+}
+
+.tool-island > .tool-panel:only-child {
+  max-width: none;
 }
 
 .tool-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: var(--space-lg);
-  align-items: start;
+  gap: 0;
+  align-items: stretch;
 }
 
 .tool-panel {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
-  padding: var(--space-xl);
-  border: 1px solid var(--color-border);
-  background:
-    radial-gradient(
-      ellipse 80% 60% at 0% 0%,
-      var(--color-spot),
-      transparent 55%
-    ),
-    color-mix(in srgb, var(--color-surface) 88%, transparent);
+  min-width: 0;
+  padding: clamp(1rem, 2vw, 2rem);
+  border: 0;
+  background: transparent;
+}
+
+.tool-workspace > .tool-panel + .tool-panel {
+  border-left: 1px solid var(--color-border);
+}
+
+.tool-island > .tool-panel + .tool-panel,
+.tool-island > .tool-workspace + .tool-panel {
+  border-top: 1px solid var(--color-border);
 }
 
 .tool-section-heading {
@@ -54,14 +70,14 @@
 .tool-panel > h2 {
   margin: 0;
   font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: var(--text-xl);
-  line-height: 1.15;
+  font-weight: 500;
+  font-size: 1.125rem;
+  line-height: 1.4;
   color: var(--color-ink);
 }
 
 .tool-nested h3 {
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
   margin-bottom: var(--space-sm);
 }
 
@@ -95,6 +111,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  min-width: 0;
 }
 
 .tool-field--full {
@@ -102,26 +119,24 @@
 }
 
 .tool-field label {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-gold);
+  letter-spacing: 0;
+  color: var(--color-ink-muted);
 }
 
-.tool-field input,
+.tool-field input:not([type="range"]),
 .tool-field select,
 .tool-field textarea,
 .tool-code {
   width: 100%;
-  padding: 0.85rem 0;
-  border: none;
-  border-bottom: 1px solid var(--color-border);
-  border-radius: 0;
-  background: transparent;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 20%, transparent);
+  border-radius: var(--radius);
+  background: var(--color-ground);
   color: var(--color-ink);
   font-family: var(--font-sans);
-  font-size: var(--text-md);
+  font-size: 0.875rem;
   line-height: 1.5;
   transition:
     border-color var(--duration) var(--ease-out),
@@ -145,14 +160,13 @@
   border-bottom-color: color-mix(in srgb, var(--color-gold) 40%, var(--color-border));
 }
 
-.tool-field input:focus,
+.tool-field input:not([type="range"]):focus,
 .tool-field select:focus,
 .tool-field textarea:focus,
 .tool-code:focus {
-  outline: none;
-  border-bottom-color: var(--color-gold);
-  background: color-mix(in srgb, var(--color-spot) 35%, transparent);
-  padding-inline: 0.5rem;
+  outline: 1px solid var(--color-gold);
+  outline-offset: 1px;
+  border-color: var(--color-gold);
 }
 
 .tool-field input:disabled,
@@ -171,7 +185,7 @@
 
 .tool-field textarea:not(.tool-code) {
   font-family: var(--font-sans);
-  font-size: var(--text-md);
+  font-size: 0.875rem;
 }
 
 .tool-check {
@@ -261,6 +275,34 @@
   cursor: not-allowed;
 }
 
+.tool-island .btn {
+  min-height: 2.5rem;
+  padding: 0.55rem 1rem;
+  letter-spacing: 0.025em;
+  text-transform: none;
+}
+
+.tool-island input::placeholder,
+.tool-island textarea::placeholder {
+  color: var(--color-ink-muted);
+  opacity: 0.75;
+}
+
+.tool-disclosure {
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-lg);
+}
+
+.tool-disclosure > summary {
+  cursor: pointer;
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+}
+
+.tool-disclosure[open] > summary {
+  margin-bottom: var(--space-md);
+}
+
 .tool-btn--danger {
   border-color: color-mix(in srgb, #c45c4a 55%, var(--color-border));
   color: color-mix(in srgb, #c45c4a 85%, var(--color-ink));
@@ -300,10 +342,18 @@
   font-size: var(--text-sm);
 }
 
-@media (max-width: 900px) {
+@container (max-width: 760px) {
   .tool-workspace {
     grid-template-columns: 1fr;
   }
+
+  .tool-workspace > .tool-panel + .tool-panel {
+    border-left: 0;
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+@media (max-width: 600px) {
 
   .tool-form-grid,
   .tool-form-grid--export {
@@ -313,4 +363,11 @@
   .tool-panel {
     padding: var(--space-lg);
   }
+}
+
+@media (max-width: 600px) {
+  .tool-field input:not([type="range"]),
+  .tool-field select,
+  .tool-field textarea,
+  .tool-code { font-size: 1rem; }
 }

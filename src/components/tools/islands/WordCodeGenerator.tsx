@@ -4,7 +4,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ChangeEvent,
   type CSSProperties,
 } from "react";
 
@@ -52,11 +51,12 @@ export default function WordCodeGenerator() {
   const [categories, setCategories] = useState<WordCategory[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [loadStatusMessage, setLoadStatusMessage] = useState("Loading Category JSON Files…");
+  const [loadStatusMessage, setLoadStatusMessage] = useState("Loading word categories…");
   const [loadStatusType, setLoadStatusType] = useState<"success" | "error" | "">("");
 
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [extraWordsText, setExtraWordsText] = useState("");
+  const [categoryQuery, setCategoryQuery] = useState("");
   const [lengthMin, setLengthMin] = useState(1);
   const [lengthMax, setLengthMax] = useState(10);
 
@@ -74,15 +74,36 @@ export default function WordCodeGenerator() {
 
   const [lastCodes, setLastCodes] = useState<GeneratedCode[]>([]);
   const [lastPosition, setLastPosition] = useState<DigitPosition>("end");
-  const [lastOutputMeta, setLastOutputMeta] = useState("Generated Codes Will Appear Here.");
-  const [outputMetaText, setOutputMetaText] = useState("Generated Codes Will Appear Here.");
+  const [lastOutputMeta, setLastOutputMeta] = useState("Your generated codes will appear here.");
+  const [outputMetaText, setOutputMetaText] = useState("Your generated codes will appear here.");
   const [outputMessage, setOutputMessage] = useState("");
 
+  const outputHeadingRef = useRef<HTMLDivElement>(null);
   const previousBoundsMax = useRef<number | null>(null);
   const lengthMinRef = useRef(lengthMin);
   const lengthMaxRef = useRef(lengthMax);
   lengthMinRef.current = lengthMin;
   lengthMaxRef.current = lengthMax;
+
+  const visibleCategories = useMemo(() => {
+    const query = categoryQuery.trim().toLowerCase();
+    return categories.filter((category) =>
+      `${category.name} ${category.description} ${category.words.join(" ")}`
+        .toLowerCase().includes(query),
+    );
+  }, [categories, categoryQuery]);
+
+  useEffect(() => {
+    if (!lastCodes.length && !outputMessage) return;
+    const heading = outputHeadingRef.current;
+    const bounds = heading?.getBoundingClientRect();
+    const viewport = heading?.closest(".tools-stage__body")?.getBoundingClientRect();
+    if (bounds && viewport && bounds.top >= viewport.top && bounds.bottom <= viewport.bottom) return;
+    heading?.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    });
+  }, [lastCodes, outputMessage]);
 
   const extraWords = useMemo(() => parseExtraWords(extraWordsText), [extraWordsText]);
 
@@ -127,25 +148,25 @@ export default function WordCodeGenerator() {
 
   const poolSummary = useMemo(() => {
     if (!selectedWordsUnfiltered.length) {
-      return "No Words Selected. Choose At Least One Category Or Add Optional Extra Words.";
+      return "Choose at least one category or add your own words.";
     }
 
     const selectedCount = selectedCategoryIds.length;
     const extraCount = extraWords.length;
-    const categoryText = `${selectedCount} ${selectedCount === 1 ? "Category" : "Categories"} Selected`;
+    const categoryText = `${selectedCount} ${selectedCount === 1 ? "category" : "categories"} selected`;
     const extraText = extraCount
-      ? ` + ${extraCount} Extra ${extraCount === 1 ? "Word" : "Words"}`
+      ? ` + ${extraCount} extra ${extraCount === 1 ? "word" : "words"}`
       : "";
 
     if (!selectedWords.length) {
-      return `${categoryText}${extraText} • No Words Match The ${lengthLabel} Length Filter.`;
+      return `${categoryText}${extraText} • No words match the ${lengthLabel} length filter.`;
     }
 
     if (selectedWords.length === selectedWordsUnfiltered.length) {
-      return `${categoryText}${extraText} • ${selectedWords.length} Unique Words Available.`;
+      return `${categoryText}${extraText} • ${selectedWords.length} words available.`;
     }
 
-    return `${categoryText}${extraText} • ${selectedWords.length} Of ${selectedWordsUnfiltered.length} Words Match The ${lengthLabel} Length Filter.`;
+    return `${categoryText}${extraText} • ${selectedWords.length} of ${selectedWordsUnfiltered.length} words match the ${lengthLabel} length filter.`;
   }, [
     selectedWordsUnfiltered,
     selectedCategoryIds.length,
@@ -183,13 +204,12 @@ export default function WordCodeGenerator() {
     });
   }, [lastCodes, outputFormat, separator, customSeparator, addSpaces, lastPosition, wordCase]);
 
-  const outputText = lastCodes.length ? lastOutput : outputMessage;
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadCategories() {
-      setLoadStatusMessage("Loading Category JSON Files…");
+      setLoadStatusMessage("Loading word categories…");
       setLoadStatusType("");
       setIsLoading(true);
 
@@ -205,7 +225,7 @@ export default function WordCodeGenerator() {
             .map((category) => category.id),
         );
         setLoadStatusMessage(
-          `Loaded ${loaded.categories.length} Categories / ${loaded.totalUniqueWords} Unique Words.`,
+          `Loaded ${loaded.categories.length} categories / ${loaded.totalUniqueWords} unique words.`,
         );
         setLoadStatusType("success");
         setIsLoading(false);
@@ -329,24 +349,24 @@ export default function WordCodeGenerator() {
 
     if (!selectedWordsUnfiltered.length) {
       showOutputMessage(
-        "Select At Least One Word Category Or Add Optional Extra Words.",
-        "No Codes Generated.",
+        "Select at least one category or add your own words.",
+        "No codes generated.",
       );
       return;
     }
 
     if (!selectedWords.length) {
       showOutputMessage(
-        `No Selected Words Match The ${lengthLabel} Length Filter.`,
-        "No Codes Generated.",
+        `No selected words match the ${lengthLabel} length filter.`,
+        "No codes generated.",
       );
       return;
     }
 
     if (!allowRepeats && requested > selectedWords.length) {
       showOutputMessage(
-        "Cannot Generate More Results Than Unique Words When Repeats Are Off.",
-        "No Codes Generated.",
+        "The requested count exceeds the available words. Allow repeats or request fewer codes.",
+        "No codes generated.",
       );
       return;
     }
@@ -359,7 +379,7 @@ export default function WordCodeGenerator() {
       allowRepeats,
     });
 
-    const meta = `${codes.length} Codes Generated From ${selectedWords.length} Available Words.`;
+    const meta = `${codes.length} codes generated from ${selectedWords.length} available words.`;
     setLastPosition(position);
     setLastCodes(codes);
     setLastOutputMeta(meta);
@@ -378,116 +398,78 @@ export default function WordCodeGenerator() {
 
   const copyOutput = useCallback(async () => {
     if (!lastOutput.trim()) {
-      setOutputMetaText("Nothing Generated Yet.");
+      setOutputMetaText("Nothing generated yet.");
       return;
     }
 
     try {
       await copyTextToClipboard(lastOutput);
-      setOutputMetaText("Copied To Clipboard.");
+      setOutputMetaText("Copied to clipboard.");
     } catch {
-      setOutputMetaText("Copy Failed. Select The Output And Copy It Manually.");
+      setOutputMetaText("Copy failed. Select the output and copy it manually.");
     }
   }, [lastOutput]);
 
   return (
     <ToolIsland className="wc-tool">
       <ToolWorkspace className="wc-tool__layout">
-        <ToolPanel labelledBy="wc-categories-heading">
-          <ToolSectionHeading
-            title="Word Categories"
-            titleId="wc-categories-heading"
-            description={
-              <ToolStatus tone={loadStatusType || "default"}>{loadStatusMessage}</ToolStatus>
-            }
-          />
+        <ToolPanel className="wc-panel--settings" labelledBy="wc-settings-heading">
+          <ToolSectionHeading title="Settings" titleId="wc-settings-heading" />
 
-          <ToolActionRow className="wc-toolbar" aria-label="Category actions">
-            <ToolButton onClick={selectAllCategories}>Select All</ToolButton>
-            <ToolButton onClick={selectNoCategories}>Select None</ToolButton>
-            <p className="wc-pool-summary">{poolSummary}</p>
-          </ToolActionRow>
-
-          <div className="wc-category-wrap" aria-live="polite">
-            {!categories.length ? (
-              <ToolHint>No Categories Loaded Yet.</ToolHint>
-            ) : (
-              <table className="wc-category-table">
-                <thead>
-                  <tr>
-                    <th className="wc-category-table__name" scope="col">
-                      Name
-                    </th>
-                    <th className="wc-category-table__count" scope="col">
-                      Count
-                    </th>
-                    <th className="wc-category-table__desc" scope="col">
-                      Description
-                    </th>
-                    <th className="wc-category-table__preview" scope="col">
-                      Preview
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {categories.map((category) => (
-                    <tr key={category.id}>
-                      <td>
-                        <label className="wc-category-name" htmlFor={`wc-category-${category.id}`}>
-                          <input
-                            id={`wc-category-${category.id}`}
-                            type="checkbox"
-                            checked={selectedCategoryIds.includes(category.id)}
-                            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                              toggleCategory(category.id, event.target.checked)
-                            }
-                          />
-                          <span>{category.name}</span>
-                        </label>
-                      </td>
-                      <td>
-                        <span className="wc-count-pill">{category.words.length}</span>
-                      </td>
-                      <td>
-                        <p className="wc-category-description">
-                          {category.description || `Loaded From ${category.file}`}
-                        </p>
-                      </td>
-                      <td>
-                        <div className="wc-word-preview">{previewWords(category)}</div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-
-          {warnings.length > 0 ? (
-            <p className="wc-warning">
-              Some Category Files Were Skipped: {warnings.join(" ")}
-            </p>
-          ) : null}
-
-          <details className="wc-details">
-            <summary>Optional Extra Words</summary>
-            <ToolHint>
-              Use This Only For One-Off Additions. Put Each Word On Its Own Line Or Separate Words
-              With Commas.
-            </ToolHint>
-            <ToolTextarea
-              label="Extra Words"
-              id="wc-extra-words"
-              spellCheck={false}
-              placeholder={"sunflower\nmoonbeam"}
-              value={extraWordsText}
-              onChange={(event) => setExtraWordsText(event.target.value)}
-            />
+          <details className="wc-categories">
+            <summary>
+              <span>Word selection</span>
+              <span className="wc-categories__count">{selectedCategoryIds.length} of {categories.length} categories</span>
+            </summary>
+            <div className="wc-categories__body">
+              <ToolInput
+                label="Find a category"
+                id="wc-category-search"
+                type="search"
+                value={categoryQuery}
+                placeholder="Animals, nature, music…"
+                onChange={(event) => setCategoryQuery(event.target.value)}
+              />
+              <ToolActionRow aria-label="Category actions">
+                <ToolButton onClick={selectAllCategories}>Select all</ToolButton>
+                <ToolButton onClick={selectNoCategories}>Clear selection</ToolButton>
+              </ToolActionRow>
+              <div className="wc-category-list">
+                {visibleCategories.map((category) => (
+                  <label className="wc-category" key={category.id}>
+                    <input
+                      type="checkbox"
+                      aria-label={category.name}
+                      checked={selectedCategoryIds.includes(category.id)}
+                      onChange={(event) => toggleCategory(category.id, event.target.checked)}
+                    />
+                    <span className="wc-category__copy">
+                      <span className="wc-category__name">{category.name}</span>
+                      <span className="wc-category__preview">{previewWords(category)}</span>
+                    </span>
+                    <span className="wc-category__count">{category.words.length}</span>
+                  </label>
+                ))}
+                {categories.length > 0 && !visibleCategories.length ? <ToolHint>No matching categories.</ToolHint> : null}
+              </div>
+              <ToolTextarea
+                label="Extra words"
+                id="wc-extra-words"
+                rows={3}
+                spellCheck={false}
+                placeholder={"sunflower\nmoonbeam"}
+                value={extraWordsText}
+                onChange={(event) => setExtraWordsText(event.target.value)}
+              />
+              <ToolHint>Add your own words, separated by commas or new lines.</ToolHint>
+            </div>
           </details>
-        </ToolPanel>
-
-        <ToolPanel labelledBy="wc-settings-heading">
-          <ToolSectionHeading title="Generation Settings" titleId="wc-settings-heading" />
+          <ToolStatus tone={loadStatusType === "error" ? "error" : "default"}>
+            {isLoading || loadStatusType === "error" ? loadStatusMessage : poolSummary}
+          </ToolStatus>
+          {warnings.length > 0 ? (
+            <ToolStatus tone="error">Some categories could not be loaded: {warnings.join(" ")}</ToolStatus>
+          ) : null}
 
           <ToolFormGrid className="wc-settings-grid">
             <ToolInput
@@ -501,27 +483,27 @@ export default function WordCodeGenerator() {
             />
 
             <ToolSelect
-              label="Digits Position"
+              label="Digit position"
               id="wc-position"
               value={position}
               onChange={(event) => setPosition(event.target.value as DigitPosition)}
             >
-              <option value="end">At End: Word00</option>
-              <option value="start">At Start: 00Word</option>
+              <option value="end">After word</option>
+              <option value="start">Before word</option>
             </ToolSelect>
 
             <ToolField full className="wc-length-field">
               <div className="wc-length-heading">
                 <span className="wc-length-label-row">
                   <span className="wc-field-label" id="wc-length-label">
-                    Word Length
+                    Word length
                   </span>
                   {isLengthFiltered ? (
                     <button
                       type="button"
                       className="wc-length-reset"
-                      aria-label="Reset Word Length"
-                      title="Reset Word Length"
+                      aria-label="Reset word length"
+                      title="Reset word length"
                       onClick={resetLengthFilter}
                     >
                       ↻
@@ -540,7 +522,7 @@ export default function WordCodeGenerator() {
                   min={lengthBounds.min}
                   max={lengthBounds.max}
                   value={lengthMin}
-                  aria-label="Minimum Word Length"
+                  aria-label="Minimum word length"
                   style={{ zIndex: lengthMin >= lengthMax - 1 ? 3 : 2 }}
                   onChange={(event) => handleLengthInput("min", Number(event.target.value))}
                 />
@@ -550,7 +532,7 @@ export default function WordCodeGenerator() {
                   min={lengthBounds.min}
                   max={lengthBounds.max}
                   value={lengthMax}
-                  aria-label="Maximum Word Length"
+                  aria-label="Maximum word length"
                   onChange={(event) => handleLengthInput("max", Number(event.target.value))}
                 />
               </div>
@@ -564,32 +546,32 @@ export default function WordCodeGenerator() {
 
           <div className="wc-checks">
             <ToolCheck
-              label="Randomize Word Order"
+              label="Randomize word order"
               checked={randomize}
               onChange={(event) => setRandomize(event.target.checked)}
             />
             <ToolCheck
-              label="Allow Words To Repeat"
+              label="Allow words to repeat"
               checked={allowRepeats}
               onChange={(event) => setAllowRepeats(event.target.checked)}
             />
           </div>
 
           <ToolSelect
-            label="Word Case"
+            label="Word case"
             id="wc-word-case"
             value={wordCase}
             onChange={(event) => setWordCase(event.target.value as WordCase)}
           >
-            <option value="normal">As Listed</option>
-            <option value="capitalize">First Letter Capitalized</option>
+            <option value="normal">As listed</option>
+            <option value="capitalize">First letter capitalized</option>
             <option value="uppercase">Uppercase</option>
             <option value="lowercase">Lowercase</option>
-            <option value="random">Random Letter Capitalization</option>
+            <option value="random">Random capitalization</option>
           </ToolSelect>
 
           <ToolInput
-            label="Results"
+            label="Number of codes"
             id="wc-results"
             type="number"
             min={1}
@@ -608,78 +590,88 @@ export default function WordCodeGenerator() {
             </ToolButton>
           </ToolActionRow>
         </ToolPanel>
-      </ToolWorkspace>
-
-      <ToolPanel className="wc-panel--output" labelledBy="wc-output-heading">
-        <div className="wc-output-header">
-          <ToolSectionHeading title="Output" titleId="wc-output-heading" />
-          <div className="wc-format-options" role="radiogroup" aria-label="Output Format">
-            <label className="wc-radio-row">
-              <input
-                type="radio"
-                name="wc-out-format"
-                value="column"
-                checked={outputFormat === "column"}
-                onChange={() => setOutputFormat("column")}
-              />
-              Column / Newline
-            </label>
-            <label className="wc-radio-row">
-              <input
-                type="radio"
-                name="wc-out-format"
-                value="line"
-                checked={outputFormat === "line"}
-                onChange={() => setOutputFormat("line")}
-              />
-              Single Line With Separator
-            </label>
-
-            {outputFormat === "line" ? (
-              <div className="wc-line-controls">
-                <ToolSelect
-                  label="Separator"
-                  id="wc-sep"
-                  value={separator}
-                  onChange={(event) => setSeparator(event.target.value as SeparatorOption)}
-                >
-                  <option value=",">Comma</option>
-                  <option value=";">Semicolon</option>
-                  <option value=".">Period</option>
-                  <option value=" ">Space</option>
-                  <option value="custom">Custom</option>
-                </ToolSelect>
-
-                {separator === "custom" ? (
-                  <ToolInput
-                    label="Custom"
-                    id="wc-custom-sep"
-                    type="text"
-                    maxLength={12}
-                    value={customSeparator}
-                    onChange={(event) => setCustomSeparator(event.target.value)}
-                  />
-                ) : null}
-
-                <ToolCheck
-                  label="Add Spaces After Separators"
-                  checked={addSpaces}
-                  onChange={(event) => setAddSpaces(event.target.checked)}
+        <ToolPanel className="wc-panel--output" labelledBy="wc-output-heading">
+          <div className="wc-output-header" ref={outputHeadingRef}>
+            <div className="wc-output-title">
+              <ToolSectionHeading title="Generated codes" titleId="wc-output-heading" />
+              <ToolButton disabled={!lastOutput.trim()} onClick={() => void copyOutput()}>Copy codes</ToolButton>
+            </div>
+            <div className="wc-format-options" role="radiogroup" aria-label="Output Format">
+              <label className="wc-radio-row">
+                <input
+                  type="radio"
+                  name="wc-out-format"
+                  value="column"
+                  checked={outputFormat === "column"}
+                  onChange={() => setOutputFormat("column")}
                 />
-              </div>
-            ) : null}
+                One per line
+              </label>
+              <label className="wc-radio-row">
+                <input
+                  type="radio"
+                  name="wc-out-format"
+                  value="line"
+                  checked={outputFormat === "line"}
+                  onChange={() => setOutputFormat("line")}
+                />
+                Separated line
+              </label>
+
+              {outputFormat === "line" ? (
+                <div className="wc-line-controls">
+                  <ToolSelect
+                    label="Separator"
+                    id="wc-sep"
+                    value={separator}
+                    onChange={(event) => setSeparator(event.target.value as SeparatorOption)}
+                  >
+                    <option value=",">Comma</option>
+                    <option value=";">Semicolon</option>
+                    <option value=".">Period</option>
+                    <option value=" ">Space</option>
+                    <option value="custom">Custom</option>
+                  </ToolSelect>
+
+                  {separator === "custom" ? (
+                    <ToolInput
+                      label="Custom"
+                      id="wc-custom-sep"
+                      type="text"
+                      maxLength={12}
+                      value={customSeparator}
+                      onChange={(event) => setCustomSeparator(event.target.value)}
+                    />
+                  ) : null}
+
+                  <ToolCheck
+                    label="Spaces after separators"
+                    checked={addSpaces}
+                    onChange={(event) => setAddSpaces(event.target.checked)}
+                  />
+                </div>
+              ) : null}
+            </div>
+
           </div>
 
-          <ToolActionRow>
-            <ToolButton onClick={() => void copyOutput()}>Copy To Clipboard</ToolButton>
-          </ToolActionRow>
-        </div>
-
-        <ToolStatus live="off">{outputMetaText}</ToolStatus>
-        <div className="wc-output-area" aria-live="polite">
-          {outputText}
-        </div>
-      </ToolPanel>
+          <ToolStatus tone={outputMessage ? "error" : "default"}>{outputMetaText}</ToolStatus>
+          {lastCodes.length ? (
+            <textarea
+              className="tool-code wc-output-area"
+              aria-label="Generated codes"
+              value={lastOutput}
+              readOnly
+              spellCheck={false}
+            />
+          ) : (
+            <div className="wc-output-empty">
+              <span className="wc-output-empty__sample" aria-hidden="true">word00</span>
+              <p>{outputMessage || "Choose your settings and generate a batch of codes."}</p>
+            </div>
+          )}
+        </ToolPanel>
+      </ToolWorkspace>
     </ToolIsland>
   );
 }

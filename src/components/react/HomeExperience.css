@@ -34,7 +34,7 @@
 }
 
 .he {
-  --he-pad: clamp(4rem, 12vh, 8rem);
+  --he-pad: clamp(3rem, 8vh, 6rem);
   --he-gutter: 1rem;
   --he-max: var(--site-max);
   --he-hero-ink: var(--color-cream-light);
@@ -260,7 +260,8 @@
     display: grid;
     align-items: center;
     /* No block padding — padding here shifts the visual center */
-    padding-block: 0;
+    padding-block: 3rem;
+    min-height: min(48rem, calc(100svh - var(--header-height)));
   }
 
   .he-hero__layout {
@@ -461,8 +462,8 @@
 
 .he-venues {
   --he-venues-gap: clamp(1.5rem, 2.5vw, 2.5rem);
-  /* Target ~2.5 cards in view: stride = card + gap = 100vw / 2.5 */
-  --he-venues-card: calc(100vw / 2.5 - var(--he-venues-gap));
+  /* Smaller supporting images keep the highlights subordinate to selected work. */
+  --he-venues-card: clamp(14rem, 24vw, 22rem);
   padding-block: clamp(2.5rem, 7vh, 4.5rem);
   border-bottom: 1px solid var(--color-border);
   overflow: hidden;

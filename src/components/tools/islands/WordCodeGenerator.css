@@ -1,134 +1,67 @@
 @import "./toolIsland.css";
 
 .wc-tool__layout {
-  grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.85fr);
+  grid-template-columns: minmax(19rem, 0.8fr) minmax(0, 1.2fr);
 }
 
-.wc-toolbar {
+.wc-panel--settings {
+  gap: var(--space-md);
+}
+
+.wc-categories {
+  border-block: 1px solid var(--color-border);
+}
+
+.wc-categories > summary {
+  display: flex;
   align-items: center;
-}
-
-.wc-pool-summary {
-  margin: 0;
-  flex: 1 1 12rem;
-  font-size: var(--text-sm);
-  line-height: 1.45;
-  color: var(--color-stone);
-}
-
-.wc-category-wrap {
-  overflow-x: auto;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.wc-category-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-sm);
-}
-
-.wc-category-table th {
-  padding: var(--space-sm) var(--space-xs);
-  text-align: left;
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-gold);
-  border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
-}
-
-.wc-category-table td {
-  padding: var(--space-sm) var(--space-xs);
-  vertical-align: top;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
-}
-
-.wc-category-table__count {
-  width: 4.5rem;
-}
-
-.wc-category-table__preview {
-  min-width: 8rem;
-}
-
-.wc-category-name {
-  display: inline-flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
   gap: var(--space-xs);
+  padding-block: var(--space-sm);
   cursor: pointer;
-  color: var(--color-ink);
-  font-weight: 500;
-}
-
-.wc-category-name input {
-  margin-top: 0.2em;
-  accent-color: var(--color-gold);
-}
-
-.wc-count-pill {
-  display: inline-block;
-  padding: 0.15rem 0.45rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  font-size: var(--text-xs);
-  font-variant-numeric: tabular-nums;
-  color: var(--color-stone);
-}
-
-.wc-category-description,
-.wc-word-preview {
-  margin: 0;
-  max-width: none;
   font-size: var(--text-sm);
-  line-height: 1.5;
-  color: var(--color-stone);
-}
-
-.wc-word-preview {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-}
-
-.wc-warning {
-  margin: 0;
-  padding: var(--space-sm) 0;
-  border-top: 1px solid color-mix(in srgb, #c45c4a 45%, var(--color-border));
-  font-size: var(--text-sm);
-  color: var(--color-ink);
-}
-
-.wc-details {
-  border-top: 1px solid var(--color-border);
-  padding-top: var(--space-md);
-}
-
-.wc-details summary {
-  cursor: pointer;
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-gold);
   list-style: none;
 }
 
-.wc-details summary::-webkit-details-marker {
-  display: none;
+.wc-categories > summary::-webkit-details-marker { display: none; }
+.wc-categories > summary::after { content: "+"; margin-left: auto; color: var(--color-gold); }
+.wc-categories[open] > summary::after { content: "−"; }
+.wc-categories__count { color: var(--color-stone); font-size: var(--text-xs); }
+
+.wc-categories__body {
+  display: grid;
+  gap: var(--space-md);
+  padding-block: var(--space-xs) var(--space-md);
 }
 
-.wc-details[open] summary {
-  margin-bottom: var(--space-sm);
+.wc-category-list {
+  max-height: 20rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-block: 1px solid var(--color-border);
 }
+
+.wc-category {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-xs);
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  font-size: var(--text-sm);
+}
+
+.wc-category:last-child { border-bottom: 0; }
+.wc-category:hover { background: color-mix(in srgb, var(--color-ink) 3%, transparent); }
+.wc-category input { accent-color: var(--color-gold); margin-top: 0.25rem; }
+.wc-category__copy { display: grid; gap: 0.25rem; flex: 1; min-width: 0; }
+.wc-category__preview { color: var(--color-stone); font-size: var(--text-xs); }
+.wc-category__count { color: var(--color-stone); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
 
 .wc-field-label {
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-gold);
+  color: var(--color-ink-muted);
 }
 
 .wc-length-heading {
@@ -242,41 +175,64 @@
   accent-color: var(--color-gold);
 }
 
-.wc-output-header {
-  display: grid;
-  gap: var(--space-md);
+
+.wc-panel--output {
+  min-height: 34rem;
 }
 
-.wc-format-options {
-  display: grid;
+.wc-output-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: var(--space-sm);
 }
 
+.wc-output-header { display: grid; gap: var(--space-lg); }
+.wc-format-options { display: flex; flex-wrap: wrap; gap: var(--space-md); }
 .wc-line-controls {
   display: grid;
+  width: 100%;
   gap: var(--space-md);
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  padding-top: var(--space-xs);
 }
 
-.wc-output-area {
-  min-height: 10rem;
+.wc-panel--output .wc-output-area {
+  flex: 1;
+  min-height: 25rem;
+  max-height: 38rem;
   padding: var(--space-md);
-  overflow: auto;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--color-ground) 70%, transparent);
-  color: var(--color-stone);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  line-height: 1.55;
+  line-height: 1.8;
+  resize: vertical;
   white-space: pre-wrap;
-  word-break: break-word;
+  overflow-wrap: anywhere;
+  color: var(--color-ink);
 }
 
-@media (max-width: 700px) {
-  .wc-category-table__desc,
-  .wc-category-table__preview {
-    display: none;
-  }
+.wc-output-empty {
+  display: flex;
+  flex: 1;
+  min-height: 22rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  text-align: center;
+  border: 1px dashed var(--color-border);
+}
+
+.wc-output-empty__sample {
+  color: var(--color-stone);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  letter-spacing: -0.04em;
+}
+
+.wc-output-empty p { margin: 0; max-width: 32ch; color: var(--color-stone); font-size: var(--text-sm); }
+
+@container (max-width: 760px) {
+  .wc-tool__layout { grid-template-columns: 1fr; }
+  .wc-panel--output { min-height: 24rem; }
+  .wc-output-empty { min-height: 16rem; }
+  .wc-panel--output .wc-output-area { min-height: 20rem; }
 }
