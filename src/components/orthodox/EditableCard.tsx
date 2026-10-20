@@ -23,6 +23,13 @@ type EditableCardProps = {
 
 const LOCK_ICONS = { any: Shuffle, collection: Layers, icon: Pin } as const;
 
+/** Stable 0/1 from the card id, so a card keeps its tilt direction. */
+function phaseOf(id: string): 0 | 1 {
+  let sum = 0;
+  for (const char of id) sum += char.charCodeAt(0);
+  return sum % 2 === 0 ? 0 : 1;
+}
+
 /**
  * A custom-wall card. While editing it jiggles and gains remove, lock and
  * resize controls; otherwise it is a plain board.
@@ -55,6 +62,7 @@ export function EditableCard({
       edit={{
         label: `Card showing ${lock.text}. Arrow keys move, Shift and arrows resize, Enter chooses what it shows, Delete removes.`,
         dragging: active,
+        phase: phaseOf(card.id),
         handlers,
       }}
     >

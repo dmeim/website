@@ -475,17 +475,11 @@ body:has(.ow-stage) .mobile-nav {
   cursor: default;
 }
 
+/* The jiggle itself is a motion animation in IconBoard.tsx. */
 .ow-board[data-editing] {
   cursor: grab;
   touch-action: none;
   outline: none;
-  animation: ow-jiggle 0.26s ease-in-out infinite alternate;
-}
-
-/* Neighbours wobble out of step, like the iOS home screen. */
-.ow-board[data-editing]:nth-child(even) {
-  animation-delay: -0.13s;
-  animation-direction: alternate-reverse;
 }
 
 .ow-board[data-editing]:focus-visible {
@@ -495,22 +489,11 @@ body:has(.ow-stage) .mobile-nav {
 .ow-board[data-dragging] {
   z-index: 5;
   cursor: grabbing;
-  animation: none;
-  scale: 1.03;
 }
 
-@keyframes ow-jiggle {
-  from {
-    rotate: -0.9deg;
-  }
-  to {
-    rotate: 0.9deg;
-  }
-}
-
+/* Motion skips the jiggle for reduced motion; mark editable cards instead. */
 @media (prefers-reduced-motion: reduce) {
   .ow-board[data-editing] {
-    animation: none;
     outline: 2px dashed rgba(245, 238, 225, 0.6);
     outline-offset: 4px;
   }
