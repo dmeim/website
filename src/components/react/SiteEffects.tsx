@@ -18,9 +18,14 @@ function normalizePath(pathname: string): string {
   return trimmed.length === 0 ? "/" : trimmed;
 }
 
-/** Ambient Life stays off on the dedicated simulator so it doesn't compete. */
+/** Full-screen pages where the ambient field would compete or sit hidden. */
+const AMBIENT_FREE_PATHS = new Set([
+  "/game-of-life/simulation",
+  "/orthodox/screensaver",
+]);
+
 function shouldHideLifeAmbient(pathname: string): boolean {
-  return normalizePath(pathname) === "/game-of-life/simulation";
+  return AMBIENT_FREE_PATHS.has(normalizePath(pathname));
 }
 
 /** Root motion config + ambient field (lightbox lives with page islands). */

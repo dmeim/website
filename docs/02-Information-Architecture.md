@@ -4,6 +4,8 @@
 
 - `/` — Home/About
   - Short bio, key highlights, primary calls to action
+- `/orthodox` — Orthodox icons landing (nav item ☦, between Home and Projects)
+  - `/orthodox/screensaver` — full-screen wall of icons; tap the wall for settings (collection, count, layout, border, rotation, background); the panel closes after 12s idle
 - `/resume` — Resume details
   - Experience, skills, education, contact
 - `/keys` — Public keys and usage

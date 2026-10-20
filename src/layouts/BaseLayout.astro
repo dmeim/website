@@ -20,13 +20,15 @@ const pageTitle = title === "dmeim.com" ? title : `${title} · dmeim.com`;
 
 const pathname = Astro.url.pathname;
 
-const nav = [
+// U+FE0E keeps the cross as a text glyph instead of an emoji on iOS.
+const nav: { href: string; label: string; glyph?: string }[] = [
   { href: "/", label: "Home" },
+  { href: "/orthodox", label: "Orthodox", glyph: "☦︎" },
   { href: "/projects", label: "Projects" },
   { href: "/tools", label: "Tools" },
   { href: "/keys", label: "Keys" },
   { href: "/connect", label: "Connect" },
-] as const;
+];
 
 function isCurrent(href: string): boolean {
   if (href === "/") return pathname === "/" || pathname === "";
@@ -96,13 +98,15 @@ const year = new Date().getFullYear();
         >
           <span class="sliding-thumb__thumb" aria-hidden="true"></span>
           {
-            nav.map(({ href, label }) => (
+            nav.map(({ href, label, glyph }) => (
               <a
-                class="sliding-thumb__option"
+                class:list={["sliding-thumb__option", { "site-nav__glyph": glyph }]}
                 href={href}
                 aria-current={isCurrent(href) ? "page" : undefined}
+                aria-label={glyph ? label : undefined}
+                title={glyph ? label : undefined}
               >
-                {label}
+                {glyph ?? label}
               </a>
             ))
           }
@@ -136,9 +140,9 @@ const year = new Date().getFullYear();
       data-open="false"
     >
       {
-        nav.map(({ href, label }) => (
+        nav.map(({ href, label, glyph }) => (
           <a href={href} aria-current={isCurrent(href) ? "page" : undefined}>
-            {label}
+            {glyph ? `${glyph} ${label}` : label}
           </a>
         ))
       }

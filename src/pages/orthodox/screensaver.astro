@@ -1,0 +1,15 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import OrthodoxScreensaver from "../../components/orthodox/OrthodoxScreensaver";
+import { loadCatalog } from "../../lib/orthodox/assets";
+
+const catalog = loadCatalog();
+---
+
+<BaseLayout
+  title="Orthodox — Screensaver"
+  description="A full-screen wall of Orthodox icons that changes slowly through the day."
+  immersive
+>
+  <OrthodoxScreensaver client:load {...catalog} />
+</BaseLayout>

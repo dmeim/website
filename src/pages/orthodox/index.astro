@@ -1,0 +1,178 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageIntro from "../../components/react/PageIntro";
+import { loadCatalog } from "../../lib/orthodox/assets";
+
+const { images, collections } = loadCatalog();
+---
+
+<BaseLayout
+  title="Orthodox"
+  description="Orthodox icons on a quiet wall — a full-screen screensaver."
+>
+  <section class="orthodox-landing">
+    <div class="orthodox-landing__copy">
+      <PageIntro
+        client:visible
+        title="Orthodox"
+        lede="Icons for the wall — a quiet screensaver of holy images, hung the way they would be at home."
+      />
+
+      <article class="orthodox-landing__writeup">
+        <p>
+          In Orthodox homes, icons hang together in a prayer corner, often on
+          the east wall, with a lampada burning before them. This screensaver
+          brings that wall to a screen: icons on their wooden panels, changing
+          slowly through the day.
+        </p>
+        <p>
+          Tap the wall at any time to choose a collection, how many icons hang,
+          how they are arranged, their borders, how often they change, and the
+          wall behind them. The settings fade away on their own.
+        </p>
+      </article>
+    </div>
+
+    <aside class="orthodox-landing__cta" aria-label="Launch the screensaver">
+      <div class="orthodox-landing__cta-panel">
+        <p class="orthodox-landing__cta-eyebrow">Screensaver</p>
+        <h2 class="orthodox-landing__cta-title">Hang the icons</h2>
+        <p class="orthodox-landing__cta-lede">
+          Opens full screen. Best on a spare tablet or a TV browser, left
+          running.
+        </p>
+        <p class="orthodox-landing__cta-meta">
+          {images.length} icons · {collections.length}
+          {collections.length === 1 ? " collection" : " collections"}
+        </p>
+        <a
+          class="btn btn--primary orthodox-landing__cta-btn"
+          href="/orthodox/screensaver"
+          data-orthodox-launch
+        >
+          Launch screensaver
+        </a>
+      </div>
+    </aside>
+  </section>
+</BaseLayout>
+
+<script>
+  // Request fullscreen while the click still counts as a user gesture; the
+  // client router keeps the document, so it carries over to the screensaver.
+  function bindLaunch() {
+    const link = document.querySelector<HTMLAnchorElement>(
+      "[data-orthodox-launch]",
+    );
+    if (!link || link.dataset.bound === "1") return;
+    link.dataset.bound = "1";
+    link.addEventListener("click", () => {
+      const root = document.documentElement;
+      if (!document.fullscreenEnabled || document.fullscreenElement) return;
+      root.requestFullscreen().catch((error: unknown) => {
+        console.warn("[orthodox] fullscreen request failed", error);
+      });
+    });
+  }
+
+  bindLaunch();
+  document.addEventListener("astro:page-load", bindLaunch);
+</script>
+
+<style>
+  .orthodox-landing {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(16rem, 0.65fr);
+    gap: var(--space-xl);
+    align-items: start;
+  }
+
+  .orthodox-landing__copy {
+    display: grid;
+    gap: var(--space-xl);
+    min-width: 0;
+  }
+
+  .orthodox-landing__copy :global(.page-intro) {
+    margin-bottom: 0;
+  }
+
+  .orthodox-landing__writeup {
+    display: grid;
+    gap: var(--space-md);
+    max-width: 42rem;
+  }
+
+  .orthodox-landing__writeup p {
+    margin: 0;
+    color: var(--color-stone);
+    font-size: var(--text-md);
+    line-height: 1.65;
+  }
+
+  .orthodox-landing__cta {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-lg));
+  }
+
+  .orthodox-landing__cta-panel {
+    display: grid;
+    gap: var(--space-md);
+    padding: var(--space-xl) var(--space-lg);
+    border: 1px solid var(--color-border);
+    background:
+      linear-gradient(
+        160deg,
+        color-mix(in srgb, var(--color-spot) 55%, transparent),
+        transparent 55%
+      ),
+      var(--color-surface);
+  }
+
+  .orthodox-landing__cta-eyebrow {
+    margin: 0;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+
+  .orthodox-landing__cta-title {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: var(--text-xl);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--color-ink);
+  }
+
+  .orthodox-landing__cta-lede,
+  .orthodox-landing__cta-meta {
+    margin: 0;
+    color: var(--color-stone);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+  }
+
+  .orthodox-landing__cta-meta {
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+  }
+
+  .orthodox-landing__cta-btn {
+    justify-self: start;
+    margin-top: var(--space-xs);
+  }
+
+  @media (max-width: 900px) {
+    .orthodox-landing {
+      grid-template-columns: 1fr;
+    }
+
+    .orthodox-landing__cta {
+      position: static;
+      order: -1;
+    }
+  }
+</style>

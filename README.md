@@ -23,6 +23,8 @@ npm run deploy   # requires Wrangler auth
 | Path | Page |
 | --- | --- |
 | `/` | Home |
+| `/orthodox` | Orthodox icons (landing; ☦ in the nav) |
+| `/orthodox/screensaver` | Full-screen icon-wall screensaver |
 | `/projects` | Project portfolio |
 | `/tools` | Tools (catalogue + tool pages) |
 | `/keys` | SSH / GPG keys |
@@ -30,6 +32,10 @@ npm run deploy   # requires Wrangler auth
 | `/game-of-life` | Conway's Game of Life (landing) |
 | `/game-of-life/simulation` | Full-page Game of Life simulator |
 | `/chat` | Private AI chat (Access-gated; OpenCode Go; Library + Archive panes) |
+
+### Orthodox screensaver images
+
+Drop icons into `src/assets/orthodox/icons/<collection>/` and wall photos into `src/assets/orthodox/backgrounds/`. They are picked up at build time. Folder and file naming rules are in `src/assets/orthodox/README.md`.
 
 ### Private chat (local)
 

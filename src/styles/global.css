@@ -410,6 +410,13 @@ p {
   transition: color var(--duration) var(--ease-out);
 }
 
+/* Icon-only nav item (☦): no letter-spacing, so no optical padding offset */
+.site-nav .sliding-thumb__option.site-nav__glyph {
+  padding-inline: 0.55em;
+  font-size: calc(var(--text-sm) * 1.35);
+  letter-spacing: 0;
+}
+
 .site-nav .sliding-thumb__option:hover,
 .site-nav .sliding-thumb__option[aria-current="page"] {
   color: var(--color-ink);
