@@ -24,3 +24,6 @@ dist/
 
 # Local reference clones (do not commit)
 reference/
+
+# Claude Code worktrees
+.claude/worktrees/
