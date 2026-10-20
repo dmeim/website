@@ -5,7 +5,7 @@
 - `/` — Home/About
   - Short bio, key highlights, primary calls to action
 - `/orthodox` — Orthodox icons landing (nav item ☦, between Home and Projects)
-  - `/orthodox/screensaver` — full-screen wall of icons; tap the wall for settings (collection, count, layout, border, rotation, background); the panel closes after 12s idle
+  - `/orthodox/screensaver` — full-screen wall of icons; tap the wall for settings (collection, count, layout, border, rotation, background); the panel closes after 12s idle. The Custom layout has an arranging mode (drag, resize, add, and remove cards, and lock a card to an icon or a group)
 - `/resume` — Resume details
   - Experience, skills, education, contact
 - `/keys` — Public keys and usage

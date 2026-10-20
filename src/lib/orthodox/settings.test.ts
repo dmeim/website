@@ -34,7 +34,50 @@ describe("parseSettings", () => {
       border: "gold",
       rotationSeconds: 60,
       background: "ochre",
+      customCards: [],
     });
+  });
+
+  it("keeps custom cards and drops locks on removed collections", () => {
+    const parsed = parseSettings(
+      {
+        layout: "custom",
+        customCards: [
+          {
+            id: "a",
+            x: 1,
+            y: 2,
+            w: 8,
+            h: 12,
+            lock: { kind: "collection", collection: "feasts" },
+          },
+          {
+            id: "b",
+            x: 0,
+            y: 0,
+            w: 8,
+            h: 12,
+            lock: { kind: "collection", collection: "gone" },
+          },
+          {
+            id: "c",
+            x: 0,
+            y: 0,
+            w: 8,
+            h: 12,
+            lock: { kind: "icon", imageId: "saints/missing" },
+          },
+          { id: "d", x: "left" },
+        ],
+      },
+      known,
+    );
+    expect(parsed.layout).toBe("custom");
+    expect(parsed.customCards.map((card) => card.lock)).toEqual([
+      { kind: "collection", collection: "feasts" },
+      { kind: "any" },
+      { kind: "icon", imageId: "saints/missing" },
+    ]);
   });
 
   it("rejects out-of-range counts", () => {

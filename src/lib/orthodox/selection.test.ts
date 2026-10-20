@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 
+import type { CustomCard } from "./custom";
 import {
   ALL_COLLECTIONS,
+  fillCards,
   pickImages,
   poolFor,
   resizeSelection,
+  rotateCard,
   rotateOne,
 } from "./selection";
 import type { OrthodoxImage } from "./types";
@@ -13,6 +16,7 @@ function image(collection: string, n: number): OrthodoxImage {
   return {
     id: `${collection}/${n}`,
     src: `/${collection}/${n}.jpg`,
+    thumb: `/${collection}/${n}.thumb.jpg`,
     title: `${n}`,
     collection,
   };
@@ -73,5 +77,76 @@ describe("rotateOne", () => {
 
   it("holds when every image is already shown", () => {
     expect(rotateOne(feasts, feasts)).toBe(feasts);
+  });
+});
+
+function slot(
+  id: string,
+  lock: CustomCard["lock"] = { kind: "any" },
+): CustomCard {
+  return { id, x: 0, y: 0, w: 8, h: 12, lock };
+}
+
+describe("fillCards", () => {
+  it("honours icon and group locks and avoids repeating a locked icon", () => {
+    const cards = [
+      slot("pinned", { kind: "icon", imageId: "saints/2" }),
+      slot("group", { kind: "collection", collection: "feasts" }),
+      slot("free1"),
+      slot("free2"),
+    ];
+    for (let seed = 0; seed < 20; seed += 1) {
+      const filled = fillCards(cards, {}, all, saints, () => (seed % 10) / 10);
+      expect(filled.pinned.id).toBe("saints/2");
+      expect(filled.group.collection).toBe("feasts");
+      expect([filled.free1.id, filled.free2.id]).not.toContain("saints/2");
+      expect(filled.free1.id).not.toBe(filled.free2.id);
+    }
+  });
+
+  it("keeps what a card shows while it still fits", () => {
+    const cards = [slot("a"), slot("b")];
+    const current = { a: saints[2], b: saints[0] };
+    expect(fillCards(cards, current, all, saints)).toEqual(current);
+  });
+
+  it("redraws a card whose image no longer fits its lock", () => {
+    const cards = [slot("a", { kind: "collection", collection: "feasts" })];
+    const filled = fillCards(cards, { a: saints[0] }, all, saints);
+    expect(filled.a.collection).toBe("feasts");
+  });
+
+  it("treats an icon lock on a missing file as unlocked", () => {
+    const cards = [slot("a", { kind: "icon", imageId: "saints/99" })];
+    expect(fillCards(cards, {}, all, saints).a.collection).toBe("saints");
+  });
+
+  it("repeats images only when a card's pool runs out", () => {
+    const cards = [1, 2, 3].map((n) =>
+      slot(`${n}`, { kind: "collection", collection: "feasts" }),
+    );
+    const filled = fillCards(cards, {}, all, saints);
+    expect(Object.keys(filled)).toHaveLength(3);
+  });
+});
+
+describe("rotateCard", () => {
+  it("never changes an icon-locked card", () => {
+    const cards = [
+      slot("pinned", { kind: "icon", imageId: "saints/1" }),
+      slot("free"),
+    ];
+    const current = { pinned: saints[0], free: saints[1] };
+    for (let i = 0; i < 10; i += 1) {
+      const next = rotateCard(cards, current, all, saints, () => i / 10);
+      expect(next.pinned).toBe(saints[0]);
+      expect(next.free.id).toBe("saints/3");
+    }
+  });
+
+  it("returns the same object when nothing is left to show", () => {
+    const cards = [slot("a"), slot("b"), slot("c")];
+    const current = { a: saints[0], b: saints[1], c: saints[2] };
+    expect(rotateCard(cards, current, all, saints)).toBe(current);
   });
 });

@@ -26,6 +26,7 @@ const backgroundModules = import.meta.glob<ImageMetadata>(
 
 // Originals stay full-size in the repo; the wall never needs more than this.
 const ICON_WIDTH = 1200;
+const ICON_THUMB_WIDTH = 240;
 const BACKGROUND_WIDTH = 2560;
 
 export type OrthodoxCatalog = {
@@ -58,8 +59,21 @@ async function optimizeAll(
   return Object.fromEntries(entries);
 }
 
+async function optimizeIcons() {
+  const entries = await Promise.all(
+    Object.entries(iconModules).map(async ([path, image]) => {
+      const [src, thumb] = await Promise.all([
+        optimizedUrl(image, ICON_WIDTH),
+        optimizedUrl(image, ICON_THUMB_WIDTH),
+      ]);
+      return [path, { src, thumb }] as const;
+    }),
+  );
+  return Object.fromEntries(entries);
+}
+
 export async function loadCatalog(): Promise<OrthodoxCatalog> {
-  const images = imagesFromGlob(await optimizeAll(iconModules, ICON_WIDTH));
+  const images = imagesFromGlob(await optimizeIcons());
   const backgroundUrls = await optimizeAll(backgroundModules, BACKGROUND_WIDTH);
   const uploaded = Object.entries(backgroundUrls)
     .map(([path, src]) => {

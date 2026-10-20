@@ -1,6 +1,10 @@
 import type { Box, Size } from "./types";
 
-export const LAYOUTS = ["iconostasis", "row", "grid", "salon"] as const;
+export const PRESET_LAYOUTS = ["iconostasis", "row", "grid", "salon"] as const;
+export type PresetLayout = (typeof PRESET_LAYOUTS)[number];
+
+/** "custom" is hand-built cards (see custom.ts); the presets are computed here. */
+export const LAYOUTS = [...PRESET_LAYOUTS, "custom"] as const;
 export type WallLayout = (typeof LAYOUTS)[number];
 
 export const LAYOUT_LABELS: Record<WallLayout, string> = {
@@ -8,6 +12,7 @@ export const LAYOUT_LABELS: Record<WallLayout, string> = {
   row: "Row",
   grid: "Grid",
   salon: "Salon",
+  custom: "Custom",
 };
 
 /** Icon boards are portrait panels; height = width × BOARD_ASPECT. */
@@ -201,7 +206,7 @@ function salonLayout(count: number, size: Size): Box[] {
 
 /** Pixel boxes for `count` boards hung on a wall of `size`. */
 export function computeLayout(
-  layout: WallLayout,
+  layout: PresetLayout,
   count: number,
   size: Size,
 ): Box[] {

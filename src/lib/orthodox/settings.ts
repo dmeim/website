@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { parseCards, type CustomCard } from "./custom";
 import { LAYOUTS, type WallLayout } from "./layout";
 import { ALL_COLLECTIONS } from "./selection";
 
@@ -28,6 +29,7 @@ export type ScreensaverSettings = {
   border: BoardBorder;
   rotationSeconds: number;
   background: string;
+  customCards: CustomCard[];
 };
 
 export function defaultSettings(backgroundIds: string[]): ScreensaverSettings {
@@ -38,6 +40,7 @@ export function defaultSettings(backgroundIds: string[]): ScreensaverSettings {
     border: "red",
     rotationSeconds: 60,
     background: backgroundIds[0] ?? "",
+    customCards: [],
   };
 }
 
@@ -69,7 +72,7 @@ export function parseSettings(raw: unknown, known: Known): ScreensaverSettings {
     background: z.string().refine((v) => known.backgroundIds.includes(v)),
   };
 
-  function pick<K extends keyof ScreensaverSettings>(
+  function pick<K extends keyof typeof fields>(
     key: K,
   ): ScreensaverSettings[K] {
     const result = fields[key].safeParse(source.data?.[key]);
@@ -85,5 +88,6 @@ export function parseSettings(raw: unknown, known: Known): ScreensaverSettings {
     border: pick("border"),
     rotationSeconds: pick("rotationSeconds"),
     background: pick("background"),
+    customCards: parseCards(source.data.customCards, known.collectionIds),
   };
 }

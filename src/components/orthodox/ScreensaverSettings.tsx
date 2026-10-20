@@ -24,6 +24,7 @@ type ScreensaverSettingsProps = {
   poolSize: number;
   fullscreen: { supported: boolean; active: boolean; toggle: () => void };
   onShuffle: () => void;
+  onArrange: () => void;
   onClose: () => void;
   onActivity: () => void;
   timer: { cycle: number; ms: number };
@@ -51,10 +52,12 @@ export function ScreensaverSettings({
   poolSize,
   fullscreen,
   onShuffle,
+  onArrange,
   onClose,
   onActivity,
   timer,
 }: ScreensaverSettingsProps) {
+  const custom = settings.layout === "custom";
   return (
     <motion.aside
       id="ow-settings"
@@ -105,24 +108,26 @@ export function ScreensaverSettings({
         </select>
       </label>
 
-      <label className="ow-field">
-        <span className="ow-field__label">
-          Icons <output className="ow-field__value">{settings.count}</output>
-        </span>
-        <input
-          className="ow-range"
-          type="range"
-          min={MIN_COUNT}
-          max={MAX_COUNT}
-          value={settings.count}
-          onChange={(e) => onChange({ count: Number(e.target.value) })}
-        />
-        {poolSize < settings.count ? (
-          <span className="ow-field__note">
-            Only {poolSize} in this collection.
+      {custom ? null : (
+        <label className="ow-field">
+          <span className="ow-field__label">
+            Icons <output className="ow-field__value">{settings.count}</output>
           </span>
-        ) : null}
-      </label>
+          <input
+            className="ow-range"
+            type="range"
+            min={MIN_COUNT}
+            max={MAX_COUNT}
+            value={settings.count}
+            onChange={(e) => onChange({ count: Number(e.target.value) })}
+          />
+          {poolSize < settings.count ? (
+            <span className="ow-field__note">
+              Only {poolSize} in this collection.
+            </span>
+          ) : null}
+        </label>
+      )}
 
       <SegmentedChoice
         legend="Layout"
@@ -130,6 +135,18 @@ export function ScreensaverSettings({
         value={settings.layout}
         onChange={(layout) => onChange({ layout })}
       />
+
+      {custom ? (
+        <div className="ow-field">
+          <button type="button" className="btn btn--ghost" onClick={onArrange}>
+            Arrange wall
+          </button>
+          <span className="ow-field__note">
+            {settings.customCards.length} cards. Unlocked cards draw from the
+            collection above.
+          </span>
+        </div>
+      ) : null}
 
       <SegmentedChoice
         legend="Border"

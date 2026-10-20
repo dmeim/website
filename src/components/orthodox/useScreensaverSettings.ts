@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import type { CustomCard } from "@/lib/orthodox/custom";
 import {
   SETTINGS_STORAGE_KEY,
   defaultSettings,
@@ -50,5 +51,15 @@ export function useScreensaverSettings(
     setSettings((prev) => ({ ...prev, ...patch }));
   }, []);
 
-  return { settings, update };
+  const updateCards = useCallback(
+    (change: (cards: CustomCard[]) => CustomCard[]) => {
+      setSettings((prev) => ({
+        ...prev,
+        customCards: change(prev.customCards),
+      }));
+    },
+    [],
+  );
+
+  return { settings, update, updateCards };
 }

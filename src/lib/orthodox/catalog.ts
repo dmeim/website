@@ -12,14 +12,15 @@ export function titleFromFilename(file: string): string {
 
 /** Build the image list from `import.meta.glob` entries keyed by `…/<collection>/<file>`. */
 export function imagesFromGlob(
-  entries: Record<string, string>,
+  entries: Record<string, { src: string; thumb: string }>,
 ): OrthodoxImage[] {
   return Object.entries(entries)
-    .map(([path, src]) => {
+    .map(([path, { src, thumb }]) => {
       const [collection, file] = path.split("/").slice(-2);
       return {
         id: `${collection}/${file.replace(/\.[^.]+$/, "")}`,
         src,
+        thumb,
         title: titleFromFilename(file),
         collection,
       };

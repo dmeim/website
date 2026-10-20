@@ -2,6 +2,8 @@ export type OrthodoxImage = {
   /** Stable id: `<collection>/<file stem>`. */
   id: string;
   src: string;
+  /** Small preview for pickers. */
+  thumb: string;
   title: string;
   collection: string;
 };

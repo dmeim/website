@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { LAYOUTS, computeLayout, iconostasisTiers } from "./layout";
+import { PRESET_LAYOUTS, computeLayout, iconostasisTiers } from "./layout";
 import type { Box } from "./types";
 
 const SIZES = [
@@ -20,7 +20,7 @@ function overlaps(a: Box, b: Box): boolean {
 }
 
 describe("computeLayout", () => {
-  for (const layout of LAYOUTS) {
+  for (const layout of PRESET_LAYOUTS) {
     for (const size of SIZES) {
       it(`${layout} fits 1–12 boards on ${size.width}×${size.height} without overlap`, () => {
         for (let count = 1; count <= 12; count += 1) {
@@ -48,7 +48,10 @@ describe("computeLayout", () => {
   });
 
   it("puts the enlarged focal icon in slot 0 of the iconostasis", () => {
-    const boxes = computeLayout("iconostasis", 5, { width: 1920, height: 1080 });
+    const boxes = computeLayout("iconostasis", 5, {
+      width: 1920,
+      height: 1080,
+    });
     const widest = Math.max(...boxes.map((b) => b.w));
     expect(boxes[0].w).toBe(widest);
     expect(Math.abs(boxes[0].x + boxes[0].w / 2 - 960)).toBeLessThanOrEqual(1);
