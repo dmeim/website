@@ -35,7 +35,7 @@ npm run deploy   # requires Wrangler auth
 
 ### Orthodox screensaver images
 
-Drop icons into `src/assets/orthodox/icons/<collection>/` and wall photos into `src/assets/orthodox/backgrounds/`. They are picked up at build time. Folder and file naming rules are in `src/assets/orthodox/README.md`.
+Drop icons into `src/assets/orthodox/icons/<collection>/` and wall photos into `src/assets/orthodox/backgrounds/`. They are picked up at build time, with no per-file registration. Collections are currently month folders (`January/` … `December/`). Full-size originals are fine: the build resizes them to WebP with sharp (`imageService: "compile"` in `astro.config.ts`). Folder and file naming rules are in `src/assets/orthodox/README.md`.
 
 ### Private chat (local)
 

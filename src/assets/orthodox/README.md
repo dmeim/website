@@ -9,11 +9,11 @@ icons/<collection>/<file>.{jpg,jpeg,png,webp,avif,svg}
 ```
 
 - Each folder is a collection, listed in the screensaver's **Collection** picker. **All** combines every folder.
+- The current collections are the months (`January/` … `December/`), shown in calendar order via `collectionOrder` in `src/content/orthodox.ts`. Any other folder is listed alphabetically after them.
 - The folder name becomes the label (`great-feasts` → "Great Feasts"). Override it in `collectionLabels` in `src/content/orthodox.ts`.
-- The file name becomes the alt text. A leading number is dropped, so `03-st-nicholas.jpg` reads "St Nicholas". Use the number to keep files in order.
+- The file name becomes the alt text. Underscores, dashes, and a leading number are dropped, so `03-St_Nicholas.jpg` reads "St Nicholas".
 - Boards are 3:4 portrait. Other shapes are cropped from the bottom (`object-position: center top`), so leave room under the figure.
-- Keep files reasonably sized (about 1200px on the long edge, WebP or JPEG). They are served as-is and not resized.
-- `placeholder-saints/` and `placeholder-feasts/` are generated stand-ins. Delete them once real collections exist.
+- Full-size originals are fine. At build, each raster icon is resized to at most 1200px wide and converted to WebP; SVGs are served as-is.
 
 ## Backgrounds
 
@@ -21,5 +21,5 @@ icons/<collection>/<file>.{jpg,jpeg,png,webp,avif,svg}
 backgrounds/<file>.{jpg,jpeg,png,webp,avif}
 ```
 
-- Each file becomes a wall option (`cover`, centered), listed before the painted presets in `src/content/orthodox.ts`.
+- Each file becomes a wall option (`cover`, centered), listed before the painted presets in `src/content/orthodox.ts`. Resized to at most 2560px wide at build.
 - The first background in the list is the default for new visitors.

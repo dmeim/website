@@ -5,10 +5,23 @@ import type { WallBackground } from "../lib/orthodox/types";
  * `src/assets/orthodox/icons/`; folders without an entry here get a title
  * derived from the folder name ("great-feasts" → "Great Feasts").
  */
-export const collectionLabels: Record<string, string> = {
-  "placeholder-saints": "Saints (placeholder)",
-  "placeholder-feasts": "Feasts (placeholder)",
-};
+export const collectionLabels: Record<string, string> = {};
+
+/** Picker order for collections; folders not listed sort alphabetically after these. */
+export const collectionOrder: readonly string[] = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 /**
  * Painted-wall presets that need no image. Uploaded photos in

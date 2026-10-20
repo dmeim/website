@@ -58,7 +58,9 @@ function optimizeCloudflareSsrDeps(): Plugin {
 // Preserve Cloudflare Workers adapter (current dmeim stack).
 // React islands + Framer Motion borrowed from Midnight Concert Hall reference.
 export default defineConfig({
-  adapter: cloudflare(),
+  // Resize images with sharp at build (prerendered pages only) instead of the
+  // default runtime Cloudflare Images binding, which is metered per transform.
+  adapter: cloudflare({ imageService: "compile" }),
   site: "https://dmeim.com",
   integrations: [react()],
   vite: {

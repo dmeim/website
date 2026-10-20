@@ -3,7 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageIntro from "../../components/react/PageIntro";
 import { loadCatalog } from "../../lib/orthodox/assets";
 
-const { images, collections } = loadCatalog();
+const { images, collections } = await loadCatalog();
 ---
 
 <BaseLayout

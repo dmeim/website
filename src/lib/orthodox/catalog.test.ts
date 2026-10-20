@@ -46,4 +46,17 @@ describe("collectionsFrom", () => {
       { id: "saints", count: 2, label: "Holy Saints" },
     ]);
   });
+
+  it("puts ordered collections first, then the rest alphabetically", () => {
+    const images = imagesFromGlob({
+      "/x/December/a.jpg": "a",
+      "/x/zebra/b.jpg": "b",
+      "/x/April/c.jpg": "c",
+      "/x/apples/d.jpg": "d",
+    });
+    const ids = collectionsFrom(images, {}, ["April", "December"]).map(
+      (collection) => collection.id,
+    );
+    expect(ids).toEqual(["April", "December", "apples", "zebra"]);
+  });
 });

@@ -3,7 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import OrthodoxScreensaver from "../../components/orthodox/OrthodoxScreensaver";
 import { loadCatalog } from "../../lib/orthodox/assets";
 
-const catalog = loadCatalog();
+const catalog = await loadCatalog();
 ---
 
 <BaseLayout
