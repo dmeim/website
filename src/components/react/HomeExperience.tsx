@@ -181,15 +181,6 @@ function HeroSection({
 }) {
   const ref = useRef<HTMLElement>(null);
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-
-  /* y drifts down; scale grows from top (CSS transform-origin) so the frame top stays pinned */
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "8%"]);
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
-
   return (
     <section
       ref={ref}
@@ -285,12 +276,12 @@ function HeroSection({
           <button
             type="button"
             className="he-photo-trigger he-photo-trigger--fill"
-            aria-label={`View portrait atmosphere for ${hero.name}`}
+            aria-label={`View portrait of ${hero.name}`}
             onClick={(event) => {
               const layoutId = photoLayoutId(portraitSrc, "hero");
               openPhotoFromEvent(event, {
                 src: portraitSrc,
-                alt: `${hero.name} — atmosphere`,
+                alt: `${hero.name} wearing a black suit and holding his jacket`,
                 layoutId,
               });
             }}
@@ -321,17 +312,7 @@ function HeroSection({
                 }
                 transition={{ duration: 1.25, ease: EASE, delay: 0.22 }}
               >
-                <motion.div
-                  className="he-hero__image-wrap"
-                  style={
-                    reduced
-                      ? undefined
-                      : {
-                          y: imageY,
-                          scale: imageScale,
-                        }
-                  }
-                >
+                <motion.div className="he-hero__image-wrap">
                   <img
                     className="he-hero__image"
                     src={portraitSrc}

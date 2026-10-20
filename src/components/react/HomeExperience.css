@@ -120,19 +120,13 @@
 
 .he-hero__image-wrap {
   position: absolute;
-  /* Slight top overshoot (option D); rest of oversize goes down for parallax */
-  top: -4%;
-  right: 0;
-  bottom: -16%;
-  left: 0;
-  transform-origin: center top;
-  will-change: transform;
+  inset: 0;
 }
 
 .he-hero__image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center top;
   max-width: none;
 }
@@ -265,9 +259,9 @@
   }
 
   .he-hero__layout {
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
     align-items: center;
-    gap: clamp(2rem, 5vw, 4.75rem);
+    gap: clamp(1.5rem, 3vw, 3rem);
     /* Shrink-wrap height so the parent grid can truly center this block */
     min-height: 0;
     padding-block: 0;
@@ -276,6 +270,8 @@
   }
 
   .he-hero__content {
+    grid-column: 2;
+    grid-row: 1;
     width: auto;
     max-width: 36rem;
     margin-inline: 0;
@@ -306,14 +302,15 @@
   }
 
   .he-hero__media {
+    grid-column: 1;
+    grid-row: 1;
     position: relative;
     inset: auto;
     z-index: 1;
     width: 100%;
     max-width: 28rem;
     justify-self: end;
-    aspect-ratio: 4 / 5;
-    max-height: min(72vh, 38rem);
+    aspect-ratio: 1198 / 1313;
     overflow: visible;
     pointer-events: auto;
   }
@@ -323,16 +320,7 @@
     inset: auto;
     width: 100%;
     height: 100%;
-    border-radius: var(--he-frame-radius);
     overflow: hidden;
-    box-shadow: var(--he-frame-shadow);
-  }
-
-  .he-hero__image-wrap {
-    top: -4%;
-    right: 0;
-    bottom: -14%;
-    left: 0;
   }
 
   .he-hero__veil {
