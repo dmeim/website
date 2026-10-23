@@ -1,6 +1,17 @@
 ---
 import ThemePair from "./ThemePair.astro";
 import { Badge, Card, Figure, Quote, StatusDot, Swatch } from "@/ui/components/groups/display";
+import {
+  Disclosure,
+  KeyValue,
+  List,
+  ListRow,
+  Panel,
+  StatGrid,
+  Table,
+} from "@/ui/components/groups/display";
+import Button from "@/ui/components/Button.astro";
+import IconButton from "@/ui/components/IconButton.astro";
 import { DisplayShowcase } from "@/ui/react/showcase/DisplayShowcase";
 
 const tones = ["neutral", "accent", "success", "warning", "danger", "info"] as const;
@@ -80,6 +91,72 @@ const figureSrc = "/gpt-photoshoot/gpt-jackethold-transparent.png";
       </div>
     </div>
   </ThemePair>
+  <h3 class="ui-showcase-sub">Astro: data display</h3>
+  <div class="ui-showcase-pair">
+    {
+      (["light", "dark"] as const).map((theme) => (
+        <div class="ui-showcase-pair__col" data-theme={theme}>
+          <p class="ui-showcase-pair__label">{theme === "light" ? "Light" : "Dark"}</p>
+          <div style="display: grid; gap: var(--ui-space-sm)">
+            <Panel title="Panel" titleId={`a-panel-${theme}`} description="Boxless work area with a hairline top rule.">
+              <Button slot="actions" size="sm" variant="ghost" iconStart="copy">Action</Button>
+              <p style="margin: 0">Panel body content.</p>
+            </Panel>
+            <h4 class="ui-showcase-sub">List / ListRow</h4>
+            <List label="Projects">
+              <ListRow label="2025" title="Linked row" description="Hover: surface fill, gold arrow." href="#display" meta="Live" />
+              <ListRow label="2024" title="Current row" description="Gold marker at the left edge." href="#display" current />
+              <ListRow label="2023" title="External row" href="https://example.com" status={{ status: "live", label: "Live" }} />
+              <ListRow label="2022" title="Static row with badge" description="No link." badge={{ label: "WIP", tone: "warning" }} />
+              <ListRow label="2021" title="Disabled" href="#display" disabled />
+              <ListRow title="Mono, icon, actions" description="SHA256:abc123def456" icon="key" mono>
+                <IconButton slot="actions" icon="copy" label="Copy" size="sm" />
+              </ListRow>
+            </List>
+            <List density="compact" divided={false} as="ol">
+              <ListRow title="Compact, undivided" meta="1" />
+              <ListRow title="Second" meta="2" />
+            </List>
+            <h4 class="ui-showcase-sub">KeyValue</h4>
+            <KeyValue
+              items={[
+                { label: "Host", value: "dmeim.com", mono: true, copy: true },
+                { label: "Status", value: "Valid", tone: "success", hint: "Checked just now" },
+                { label: "Error", value: "Expired", tone: "danger" },
+                { label: "Note", value: "Muted value", tone: "muted" },
+              ]}
+            />
+            <KeyValue layout="grid" items={[{ label: "Width", value: "1200px" }, { label: "Height", value: "630px" }, { label: "Ratio", value: "1.91" }]} />
+            <KeyValue layout="inline" items={[{ label: "Words", value: 120 }, { label: "Chars", value: 640 }]} />
+            <h4 class="ui-showcase-sub">StatGrid</h4>
+            <StatGrid
+              items={[
+                { label: "Generation", value: 128, size: "lg" },
+                { label: "Population", value: "4,096", size: "lg", hint: "cells alive" },
+                { label: "Code", value: "404", size: "xl", mono: true },
+              ]}
+            />
+            <h4 class="ui-showcase-sub">Table</h4>
+            <Table caption="MIME types" striped>
+              <thead><tr><th>Extension</th><th>Type</th><th data-align="end">Size</th></tr></thead>
+              <tbody>
+                <tr><td data-mono>.png</td><td>image/png</td><td data-align="end">12 KB</td></tr>
+                <tr><td data-mono>.svg</td><td>image/svg+xml</td><td data-align="end" data-tone="success">2 KB</td></tr>
+                <tr><td data-mono>.exe</td><td>application/octet-stream</td><td data-align="end" data-tone="danger">9 MB</td></tr>
+              </tbody>
+            </Table>
+            <h4 class="ui-showcase-sub">Disclosure</h4>
+            <Disclosure summary="Section disclosure" meta="3" defaultOpen>
+              <p style="margin: 0">Open by default.</p>
+            </Disclosure>
+            <Disclosure summary="Inline advanced options" level="inline">
+              <p style="margin: 0">Hidden content.</p>
+            </Disclosure>
+          </div>
+        </div>
+      ))
+    }
+  </div>
   <h3 class="ui-showcase-sub">React</h3>
   <DisplayShowcase client:visible />
 </section>

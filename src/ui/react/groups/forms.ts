@@ -9,3 +9,5 @@ export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } fr
 export { Slider, type SliderProps, type SliderValue } from "../Slider";
 export { FormGrid, type FormGridProps } from "../FormGrid";
 export { Fieldset, type FieldsetProps } from "../Fieldset";
+export { ColorInput, type ColorInputProps } from "../ColorInput";
+export { FileDrop, type FileDropProps } from "../FileDrop";

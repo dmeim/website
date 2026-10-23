@@ -1,0 +1,20 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  label: string;
+  value: string | number;
+  size?: "md" | "lg" | "xl";
+  mono?: boolean;
+  hint?: string;
+  live?: boolean;
+}
+
+const { label, value, size = "md", mono, hint, live, class: className, ...rest } = Astro.props;
+---
+
+<div {...rest} class:list={["ui-stat", className]} data-size={size} data-mono={mono ? "true" : undefined}>
+  <p class="ui-stat__label">{label}</p>
+  <p class="ui-stat__value" aria-live={live ? "polite" : undefined}>{value}</p>
+  {hint && <p class="ui-stat__hint">{hint}</p>}
+</div>

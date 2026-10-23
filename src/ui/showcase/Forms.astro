@@ -1,5 +1,6 @@
 ---
 import Field from "@/ui/components/Field.astro";
+import ColorInput from "@/ui/components/ColorInput.astro";
 import Input from "@/ui/components/Input.astro";
 import Textarea from "@/ui/components/Textarea.astro";
 import Select from "@/ui/components/Select.astro";
@@ -146,6 +147,10 @@ const pct = (n: number) => `${n}%`;
                 <input id={`a-raw-${theme}`} class="ui-input__control" style="border-bottom: 1px solid var(--ui-line)" />
               </Field>
             </FormGrid>
+
+            <h4 class="ui-showcase-sub">ColorInput</h4>
+            <ColorInput id={`a-color-${theme}`} label="Background" value="#f6f4ef" hint="Swatch and hex stay in sync." />
+            <ColorInput id={`a-color2-${theme}`} label="Swatch only" value="#3d6b48" allowText={false} />
           </div>
         </div>
       ))

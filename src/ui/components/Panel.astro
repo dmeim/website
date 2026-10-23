@@ -1,0 +1,35 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { createId } from "@/ui/lib/ids";
+
+interface Props extends HTMLAttributes<"section"> {
+  title?: string;
+  titleId?: string;
+  description?: string;
+  headingLevel?: 2 | 3;
+}
+
+const { title, titleId, description, headingLevel = 2, class: className, ...rest } = Astro.props;
+const headingId = title ? (titleId ?? createId("panel")) : titleId;
+const Heading = `h${headingLevel}` as "h2" | "h3";
+const hasActions = Astro.slots.has("actions");
+---
+
+<section {...rest} class:list={["ui-panel", className]} aria-labelledby={headingId}>
+  {
+    (title || description || hasActions) && (
+      <header class="ui-panel__header">
+        <div class="ui-panel__heading">
+          {title && <Heading id={headingId} class="ui-panel__title">{title}</Heading>}
+          {description && <p class="ui-panel__description">{description}</p>}
+        </div>
+        {hasActions && (
+          <div class="ui-panel__actions">
+            <slot name="actions" />
+          </div>
+        )}
+      </header>
+    )
+  }
+  <div class="ui-panel__body"><slot /></div>
+</section>

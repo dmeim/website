@@ -1,0 +1,94 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { describedBy } from "@/ui/lib/field";
+import { createId } from "@/ui/lib/ids";
+import Field from "./Field.astro";
+
+interface Props extends HTMLAttributes<"div"> {
+  label: string;
+  value: string;
+  hint?: string;
+  error?: string;
+  allowText?: boolean;
+  disabled?: boolean;
+  /** Form name for the hex value. */
+  name?: string;
+}
+
+const { label, value, hint, error, allowText = true, disabled, name, id, class: className, ...rest } = Astro.props;
+const baseId = id ?? createId("color");
+const textId = `${baseId}-text`;
+const pickerId = allowText ? `${baseId}-picker` : baseId;
+const described = describedBy(allowText ? textId : pickerId, hint, error);
+---
+
+<Field label={label} htmlFor={allowText ? textId : pickerId} hint={hint} error={error}>
+  <div {...rest} class:list={["ui-color-input", className]} data-ui-color-input data-disabled={disabled ? "true" : undefined}>
+    <span class="ui-color-input__swatch" style={`background-color: ${value}`}>
+      <input
+        id={pickerId}
+        type="color"
+        class="ui-color-input__picker"
+        value={value}
+        disabled={disabled}
+        name={allowText ? undefined : name}
+        aria-label={allowText ? `${label} picker` : undefined}
+        aria-describedby={allowText ? undefined : described}
+        aria-invalid={!allowText && error ? "true" : undefined}
+      />
+    </span>
+    {
+      allowText && (
+        <span class="ui-input ui-color-input__text" data-mono="true" data-size="md">
+          <input
+            id={textId}
+            type="text"
+            class="ui-input__control"
+            value={value}
+            name={name}
+            disabled={disabled}
+            spellcheck="false"
+            autocomplete="off"
+            maxlength={7}
+            aria-describedby={described}
+            aria-invalid={error ? "true" : undefined}
+          />
+        </span>
+      )
+    }
+  </div>
+</Field>
+
+<script>
+  const HEX = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+
+  function normalize(input: string): string | null {
+    const match = HEX.exec(input.trim());
+    if (!match) return null;
+    const raw = match[1].length === 3 ? [...match[1]].map((c) => c + c).join("") : match[1];
+    return `#${raw.toLowerCase()}`;
+  }
+
+  function bind(): void {
+    document.querySelectorAll<HTMLElement>("[data-ui-color-input]").forEach((root) => {
+      if (root.dataset.bound === "1") return;
+      root.dataset.bound = "1";
+      const swatch = root.querySelector<HTMLElement>(".ui-color-input__swatch");
+      const picker = root.querySelector<HTMLInputElement>(".ui-color-input__picker");
+      const text = root.querySelector<HTMLInputElement>(".ui-color-input__text input");
+      picker?.addEventListener("input", () => {
+        if (swatch) swatch.style.backgroundColor = picker.value;
+        if (text) text.value = picker.value;
+      });
+      text?.addEventListener("input", () => {
+        const hex = normalize(text.value);
+        if (!hex || !picker) return;
+        picker.value = hex;
+        if (swatch) swatch.style.backgroundColor = hex;
+      });
+    });
+  }
+
+  bind();
+  document.addEventListener("astro:page-load", bind);
+</script>

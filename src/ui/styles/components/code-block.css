@@ -1,0 +1,72 @@
+.ui-code-block {
+  position: relative;
+  margin: 0;
+  border-radius: var(--ui-radius-panel);
+  background: var(--ui-bg-inset);
+  min-width: 0;
+}
+
+.ui-code-block__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-xs);
+  min-height: var(--ui-control-sm);
+  padding: var(--ui-space-2xs) var(--ui-space-2xs) 0 var(--ui-space-sm);
+}
+
+.ui-code-block__label {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ui-text-muted);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Without a label the copy button floats over the code. */
+.ui-code-block:not([data-labelled]) .ui-code-block__head {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  padding: var(--ui-space-2xs);
+}
+
+.ui-code-block__copy {
+  margin-inline-start: auto;
+}
+
+.ui-code-block__pre {
+  margin: 0;
+  padding: var(--ui-space-sm);
+  overflow: auto;
+  background: none;
+  border: 0;
+  color: var(--ui-text);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-normal);
+  tab-size: 2;
+}
+
+.ui-code-block[data-labelled] .ui-code-block__pre {
+  padding-block-start: var(--ui-space-2xs);
+}
+
+.ui-code-block:not([data-labelled]) .ui-code-block__pre {
+  padding-inline-end: calc(var(--ui-control-sm) + var(--ui-space-xs));
+}
+
+.ui-code-block__pre code {
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.ui-code-block[data-wrap="true"] .ui-code-block__pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

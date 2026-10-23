@@ -9,3 +9,4 @@ export { default as SegmentedControl } from "../SegmentedControl.astro";
 export { default as Slider } from "../Slider.astro";
 export { default as FormGrid } from "../FormGrid.astro";
 export { default as Fieldset } from "../Fieldset.astro";
+export { default as ColorInput } from "../ColorInput.astro";

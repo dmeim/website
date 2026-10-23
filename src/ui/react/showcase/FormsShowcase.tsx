@@ -1,7 +1,9 @@
 import { useState } from "react";
 import {
   Checkbox,
+  ColorInput,
   Field,
+  FileDrop,
   Fieldset,
   FormGrid,
   Input,
@@ -187,6 +189,25 @@ function Specimens({ theme }: { theme: string }) {
   );
 }
 
+function PickerSpecimens({ theme }: { theme: string }) {
+  const [color, setColor] = useState("#8a6d3b");
+  const [files, setFiles] = useState<string[]>([]);
+  return (
+    <div style={{ display: "grid", gap: "var(--ui-space-md)" }}>
+      <h4 className="ui-showcase-sub">ColorInput</h4>
+      <ColorInput id={`r-color-${theme}`} label="Foreground" value={color} onChange={setColor} hint={`Value: ${color}`} />
+      <ColorInput id={`r-color2-${theme}`} label="Swatch only" value={color} onChange={setColor} allowText={false} />
+      <ColorInput id={`r-color3-${theme}`} label="Invalid" value="#a3442c" onChange={() => {}} error="Contrast too low." />
+      <h4 className="ui-showcase-sub">FileDrop</h4>
+      <FileDrop label="Upload a file" hint="Any file, read locally." onFiles={(list) => setFiles(list.map((f) => f.name))}>
+        {files.length > 0 && <p style={{ margin: 0 }}>{files.join(", ")}</p>}
+      </FileDrop>
+      <FileDrop label="Certificates" multiple compact accept=".pem,.crt" onFiles={(list) => setFiles(list.map((f) => f.name))} />
+      <FileDrop label="Disabled" disabled onFiles={() => {}} error="Uploads are disabled." />
+    </div>
+  );
+}
+
 export function FormsShowcase() {
   return (
     <div className="ui-showcase-pair">
@@ -194,6 +215,7 @@ export function FormsShowcase() {
         <div key={theme} className="ui-showcase-pair__col" data-theme={theme}>
           <p className="ui-showcase-pair__label">{theme === "light" ? "Light" : "Dark"}</p>
           <Specimens theme={theme} />
+          <PickerSpecimens theme={theme} />
         </div>
       ))}
     </div>

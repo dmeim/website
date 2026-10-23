@@ -1,0 +1,105 @@
+.ui-table {
+  --ui-cell-pad-block: var(--ui-space-xs);
+  --ui-cell-pad-inline: var(--ui-space-sm);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ui-table[data-scroll="true"] {
+  overflow: auto;
+}
+
+.ui-table[data-density="compact"] {
+  --ui-cell-pad-block: var(--ui-space-2xs);
+  --ui-cell-pad-inline: var(--ui-space-xs);
+}
+
+.ui-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ui-fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-table__caption {
+  padding-block-end: var(--ui-space-xs);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-medium);
+  text-align: start;
+}
+
+.ui-table__table :is(th, td) {
+  padding: var(--ui-cell-pad-block) var(--ui-cell-pad-inline);
+  text-align: start;
+  vertical-align: baseline;
+}
+
+.ui-table__table :is(th, td):first-child {
+  padding-inline-start: 0;
+}
+
+.ui-table__table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.ui-table__table thead th {
+  border-bottom: var(--ui-border-width) solid var(--ui-line-strong);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-medium);
+  white-space: nowrap;
+}
+
+.ui-table__table tbody tr + tr > :is(th, td),
+.ui-table__table tbody + tbody tr:first-child > :is(th, td) {
+  border-top: var(--ui-border-width) solid var(--ui-line);
+}
+
+.ui-table__table tbody th {
+  font-weight: var(--ui-fw-medium);
+}
+
+.ui-table[data-striped="true"] tbody tr:nth-child(even) > :is(th, td) {
+  background: var(--ui-bg-inset);
+}
+
+.ui-table[data-striped="true"] .ui-table__table :is(th, td):first-child {
+  padding-inline-start: var(--ui-cell-pad-inline);
+}
+
+.ui-table[data-striped="true"] .ui-table__table :is(th, td):last-child {
+  padding-inline-end: var(--ui-cell-pad-inline);
+}
+
+.ui-table[data-sticky="true"] thead th {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  background: var(--ui-bg);
+}
+
+.ui-table__table [data-mono] {
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-xs);
+}
+
+.ui-table__table [data-align="end"] {
+  text-align: end;
+}
+
+.ui-table__table [data-tone="muted"] {
+  color: var(--ui-text-muted);
+}
+
+.ui-table__table [data-tone="success"] {
+  color: var(--ui-success);
+}
+
+.ui-table__table [data-tone="danger"] {
+  color: var(--ui-danger);
+}
+
+.ui-table__table [data-tone="warning"] {
+  color: var(--ui-warning);
+}

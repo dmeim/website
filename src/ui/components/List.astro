@@ -1,0 +1,21 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"ul"> {
+  as?: "ul" | "ol" | "div";
+  divided?: boolean;
+  density?: "compact" | "normal";
+  label?: string;
+}
+
+const { as: Tag = "ul", divided = true, density = "normal", label, class: className, ...rest } = Astro.props;
+---
+
+<Tag
+  {...rest}
+  class:list={["ui-list", className]}
+  role={Tag === "div" ? "list" : undefined}
+  aria-label={label}
+  data-divided={divided ? "true" : "false"}
+  data-density={density}
+><slot /></Tag>

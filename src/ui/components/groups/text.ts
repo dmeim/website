@@ -6,3 +6,4 @@ export { default as Kbd } from "../Kbd.astro";
 export { default as VisuallyHidden } from "../VisuallyHidden.astro";
 export { default as SkipLink } from "../SkipLink.astro";
 export { default as Divider } from "../Divider.astro";
+export { default as CodeBlock } from "../CodeBlock.astro";

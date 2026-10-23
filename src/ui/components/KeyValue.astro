@@ -1,0 +1,42 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import CopyButton from "./CopyButton.astro";
+
+interface Item {
+  label: string;
+  value: string | number;
+  mono?: boolean;
+  copy?: boolean | string;
+  tone?: "default" | "muted" | "success" | "danger";
+  hint?: string;
+}
+
+interface Props extends HTMLAttributes<"dl"> {
+  items: Item[];
+  layout?: "rows" | "grid" | "inline";
+  density?: "compact" | "normal";
+}
+
+const { items, layout = "rows", density = "normal", class: className, ...rest } = Astro.props;
+const copyText = (item: Item) => (typeof item.copy === "string" ? item.copy : item.copy ? String(item.value) : null);
+---
+
+<dl {...rest} class:list={["ui-key-value", className]} data-layout={layout} data-density={density}>
+  {
+    items.map((item) => {
+      const text = copyText(item);
+      return (
+        <div class="ui-key-value__item" data-tone={item.tone ?? "default"}>
+          <dt class="ui-key-value__label">{item.label}</dt>
+          <dd class="ui-key-value__value">
+            <span class="ui-key-value__text" data-mono={item.mono ? "true" : undefined}>{item.value}</span>
+            {text !== null && (
+              <CopyButton class="ui-key-value__copy" appearance="icon" size="sm" value={text} label={`Copy ${item.label}`} />
+            )}
+            {item.hint && <span class="ui-key-value__hint">{item.hint}</span>}
+          </dd>
+        </div>
+      );
+    })
+  }
+</dl>

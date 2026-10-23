@@ -1,0 +1,58 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+
+interface Props extends HTMLAttributes<"figure"> {
+  code?: string;
+  label?: string;
+  language?: string;
+  copy?: boolean;
+  wrap?: boolean;
+  maxHeight?: string;
+}
+
+const { code, label, language, copy = true, wrap, maxHeight, class: className, ...rest } = Astro.props;
+const preStyle = maxHeight ? `max-height: ${maxHeight}` : undefined;
+---
+
+<figure
+  {...rest}
+  class:list={["ui-code-block", className]}
+  data-language={language}
+  data-wrap={wrap ? "true" : undefined}
+  data-labelled={label ? "true" : undefined}
+>
+  {
+    (label || copy) && (
+      <figcaption class="ui-code-block__head">
+        {label && <span class="ui-code-block__label">{label}</span>}
+        {copy && (
+          <button
+            type="button"
+            class="ui-copy-button ui-icon-button ui-code-block__copy"
+            data-copy=""
+            data-label="Copy code"
+            data-copied-label="Copied"
+            data-appearance="icon"
+            data-variant="ghost"
+            data-size="sm"
+            data-state="idle"
+            aria-label="Copy code"
+          >
+            <span class="ui-copy-button__icon" data-when="idle"><Icon name="copy" /></span>
+            <span class="ui-copy-button__icon" data-when="copied"><Icon name="check" /></span>
+            <span class="ui-copy-button__live ui-visually-hidden" aria-live="polite"></span>
+          </button>
+        )}
+      </figcaption>
+    )
+  }
+  <pre class="ui-code-block__pre" style={preStyle} tabindex={maxHeight ? 0 : undefined}><code data-language={language}>{code ?? <slot />}</code></pre>
+</figure>
+
+<script>
+  import { bindCopyDelegate } from "@/ui/lib/copy-delegate";
+
+  bindCopyDelegate();
+  document.addEventListener("astro:page-load", bindCopyDelegate);
+</script>

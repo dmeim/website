@@ -1,0 +1,38 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"table"> {
+  caption?: string;
+  captionHidden?: boolean;
+  density?: "compact" | "normal";
+  stickyHeader?: boolean;
+  striped?: boolean;
+  scroll?: boolean;
+}
+
+const {
+  caption,
+  captionHidden,
+  density = "normal",
+  stickyHeader,
+  striped,
+  scroll = true,
+  class: className,
+  ...rest
+} = Astro.props;
+const regionAttrs = scroll ? { tabindex: 0, role: "region", "aria-label": caption } : {};
+---
+
+<div
+  class:list={["ui-table", className]}
+  data-density={density}
+  data-sticky={stickyHeader ? "true" : undefined}
+  data-striped={striped ? "true" : undefined}
+  data-scroll={scroll ? "true" : "false"}
+  {...regionAttrs}
+>
+  <table {...rest} class="ui-table__table">
+    {caption && <caption class:list={["ui-table__caption", captionHidden && "ui-visually-hidden"]}>{caption}</caption>}
+    <slot />
+  </table>
+</div>

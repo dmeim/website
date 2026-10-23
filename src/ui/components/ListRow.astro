@@ -1,0 +1,104 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import type { IconName } from "@/ui/icons";
+import Icon from "@/ui/icons/Icon.astro";
+import Badge from "./Badge.astro";
+import StatusDot from "./StatusDot.astro";
+
+type BadgeTone = "neutral" | "accent" | "success" | "warning" | "danger" | "info";
+
+interface Props extends Omit<HTMLAttributes<"li">, "title"> {
+  title: string;
+  description?: string;
+  label?: string;
+  icon?: IconName;
+  meta?: string;
+  status?: {
+    status: "live" | "wip" | "archived" | "idle" | "busy" | "success" | "error";
+    pulse?: boolean;
+    label?: string;
+    labelHidden?: boolean;
+  };
+  badge?: { tone?: BadgeTone; variant?: "soft" | "outline" | "solid"; size?: "sm" | "md"; icon?: IconName; label: string };
+  href?: string;
+  current?: boolean;
+  selected?: boolean;
+  disabled?: boolean;
+  mono?: boolean;
+  arrow?: boolean;
+}
+
+const {
+  title,
+  description,
+  label,
+  icon,
+  meta,
+  status,
+  badge,
+  href,
+  current,
+  selected,
+  disabled,
+  mono,
+  arrow,
+  class: className,
+  ...rest
+} = Astro.props;
+const external = href?.startsWith("http") ?? false;
+const isLink = Boolean(href) && !disabled;
+const showArrow = arrow ?? Boolean(href);
+const hasMedia = Astro.slots.has("media");
+const hasMeta = Boolean(meta) || Astro.slots.has("meta");
+const Body = href ? "a" : "div";
+const bodyAttrs = href
+  ? {
+      href: isLink ? href : undefined,
+      "aria-current": current ? "page" : undefined,
+      "aria-disabled": disabled ? "true" : undefined,
+      ...(external ? { target: "_blank", rel: "noopener noreferrer" } : {}),
+    }
+  : { "aria-current": current ? "true" : undefined };
+const badgeProps = badge ? { ...badge, label: undefined } : undefined;
+---
+
+<li
+  {...rest}
+  class:list={["ui-list-row", className]}
+  data-interactive={isLink ? "true" : undefined}
+  data-current={current ? "true" : undefined}
+  data-selected={selected ? "true" : undefined}
+  data-disabled={disabled ? "true" : undefined}
+  data-mono={mono ? "true" : undefined}
+  data-labelled={label ? "true" : undefined}
+>
+  <Body class="ui-list-row__body" {...bodyAttrs}>
+    {label && <span class="ui-list-row__label">{label}</span>}
+    <span class="ui-list-row__main">
+      {icon && <Icon name={icon} class="ui-list-row__icon" />}
+      {hasMedia && <span class="ui-list-row__media"><slot name="media" /></span>}
+      <span class="ui-list-row__text">
+        <span class="ui-list-row__title">
+          {title}
+          {external && <span class="ui-visually-hidden"> (opens in new tab)</span>}
+        </span>
+        {description && <span class="ui-list-row__desc">{description}</span>}
+      </span>
+    </span>
+    {
+      (status || badge || hasMeta || showArrow) && (
+        <span class="ui-list-row__trail">
+          {status && <StatusDot {...status} />}
+          {badge && badgeProps && <Badge size="sm" {...badgeProps}>{badge.label}</Badge>}
+          {hasMeta && <span class="ui-list-row__meta"><slot name="meta">{meta}</slot></span>}
+          {showArrow && (
+            <span class="ui-list-row__arrow" aria-hidden="true">
+              <Icon name={external ? "arrow-up-right" : "arrow-right"} />
+            </span>
+          )}
+        </span>
+      )
+    }
+  </Body>
+  {Astro.slots.has("actions") && <div class="ui-list-row__actions"><slot name="actions" /></div>}
+</li>

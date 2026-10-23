@@ -1,0 +1,24 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+
+interface Props extends Omit<HTMLAttributes<"details">, "open"> {
+  summary: string;
+  meta?: string | number;
+  open?: boolean;
+  defaultOpen?: boolean;
+  level?: "section" | "inline";
+}
+
+const { summary, meta, open, defaultOpen, level = "section", class: className, ...rest } = Astro.props;
+const hasMeta = meta !== undefined || Astro.slots.has("meta");
+---
+
+<details {...rest} class:list={["ui-disclosure", className]} data-level={level} open={open ?? defaultOpen}>
+  <summary class="ui-disclosure__summary">
+    <span class="ui-disclosure__title"><slot name="summary">{summary}</slot></span>
+    {hasMeta && <span class="ui-disclosure__meta"><slot name="meta">{meta}</slot></span>}
+    <Icon name="caret-down" class="ui-disclosure__caret" weight="bold" />
+  </summary>
+  <div class="ui-disclosure__body"><slot /></div>
+</details>

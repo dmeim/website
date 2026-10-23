@@ -17,6 +17,7 @@
 @import "./styles/components/visually-hidden.css";
 @import "./styles/components/skip-link.css";
 @import "./styles/components/divider.css";
+@import "./styles/components/code-block.css";
 
 /* group: actions */
 @import "./styles/components/button.css";
@@ -37,6 +38,8 @@
 @import "./styles/components/slider.css";
 @import "./styles/components/form-grid.css";
 @import "./styles/components/fieldset.css";
+@import "./styles/components/color-input.css";
+@import "./styles/components/file-drop.css";
 
 /* group: display */
 @import "./styles/components/badge.css";
@@ -45,6 +48,12 @@
 @import "./styles/components/quote.css";
 @import "./styles/components/figure.css";
 @import "./styles/components/swatch.css";
+@import "./styles/components/panel.css";
+@import "./styles/components/list.css";
+@import "./styles/components/key-value.css";
+@import "./styles/components/stat.css";
+@import "./styles/components/table.css";
+@import "./styles/components/disclosure.css";
 
 /* group: feedback */
 @import "./styles/components/spinner.css";

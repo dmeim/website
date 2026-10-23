@@ -1,4 +1,5 @@
 import { Code, Divider, Eyebrow, Kbd, Link, Prose, VisuallyHidden } from "@/ui/react/groups/text";
+import { CodeBlock } from "@/ui/react/groups/text";
 import { ThemePair } from "./ThemePair";
 
 const stack = { display: "grid", gap: "var(--ui-space-sm)" } as const;
@@ -36,6 +37,11 @@ export function TextShowcase() {
         <h4 className="ui-showcase-sub">Prose (html, sm)</h4>
         <Prose html={proseHtml} />
         <Prose size="sm"><p>Small prose paragraph for dense contexts.</p></Prose>
+        <h4 className="ui-showcase-sub">CodeBlock</h4>
+        <CodeBlock label="install.sh" language="bash" code={"npm install\nnpm run dev"} />
+        <CodeBlock code={"const answer = 42; // no label: floating copy"} />
+        <CodeBlock wrap copy={false} code={"A wrapped line without copy button that keeps going and going until it has to wrap onto the next line in narrow columns."} />
+        <CodeBlock label="long.txt" maxHeight="6rem" code={Array.from({ length: 12 }, (_, i) => `line ${i + 1}`).join("\n")} />
       </div>
     </ThemePair>
   );

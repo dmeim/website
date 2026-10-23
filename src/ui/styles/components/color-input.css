@@ -1,0 +1,55 @@
+.ui-color-input {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-xs);
+  min-width: 0;
+}
+
+.ui-color-input__swatch {
+  position: relative;
+  flex: none;
+  width: var(--ui-control-md);
+  height: var(--ui-control-md);
+  border: var(--ui-border-width) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-control);
+  overflow: hidden;
+  transition: border-color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-color-input__swatch:hover {
+  border-color: color-mix(in srgb, var(--ui-text) 35%, transparent);
+}
+
+.ui-color-input__swatch:has(:focus-visible) {
+  outline: var(--ui-focus-width) solid var(--ui-focus-ring);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-color-input__picker {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.ui-color-input__picker:focus-visible {
+  outline: none;
+}
+
+.ui-color-input__text {
+  flex: 1 1 8rem;
+  max-width: 10rem;
+}
+
+.ui-color-input[data-disabled="true"] {
+  opacity: 0.5;
+}
+
+.ui-color-input[data-disabled="true"] .ui-color-input__picker {
+  cursor: not-allowed;
+}

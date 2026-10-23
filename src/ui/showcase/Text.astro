@@ -1,6 +1,7 @@
 ---
 import ThemePair from "./ThemePair.astro";
 import { Code, Divider, Eyebrow, Kbd, Link, Prose, SkipLink, VisuallyHidden } from "@/ui/components/groups/text";
+import CodeBlock from "@/ui/components/CodeBlock.astro";
 import { TextShowcase } from "@/ui/react/showcase/TextShowcase";
 ---
 
@@ -44,6 +45,14 @@ import { TextShowcase } from "@/ui/react/showcase/TextShowcase";
         <p>After the rule.</p>
       </Prose>
       <Prose size="sm"><p>Small prose paragraph for dense contexts.</p></Prose>
+    </div>
+  </ThemePair>
+  <h3 class="ui-showcase-sub">Astro: CodeBlock</h3>
+  <ThemePair>
+    <div style="display: grid; gap: var(--ui-space-sm)">
+      <CodeBlock label="fingerprint.txt" code="SHA256:abc123def456 dimitri@example" />
+      <CodeBlock language="ts" code={"const x = 1;\nconst y = 2;"} />
+      <CodeBlock wrap label="wrapped" code="A long wrapped line that keeps going until it needs to wrap onto the next line in a narrow column." />
     </div>
   </ThemePair>
   <h3 class="ui-showcase-sub">React</h3>

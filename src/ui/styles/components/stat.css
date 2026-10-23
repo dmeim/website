@@ -1,0 +1,77 @@
+.ui-stat {
+  display: grid;
+  align-content: start;
+  gap: var(--ui-space-3xs);
+  min-width: 0;
+}
+
+.ui-stat__label,
+.ui-stat__value,
+.ui-stat__hint {
+  margin: 0;
+}
+
+.ui-stat__label {
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+}
+
+.ui-stat__value {
+  color: var(--ui-text);
+  font-size: var(--ui-fs-xl);
+  font-weight: var(--ui-fw-medium);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ui-tracking-tight);
+  line-height: var(--ui-lh-tight);
+  overflow-wrap: anywhere;
+}
+
+.ui-stat[data-size="lg"] .ui-stat__value {
+  font-size: var(--ui-fs-2xl);
+}
+
+.ui-stat[data-size="xl"] .ui-stat__value {
+  font-size: var(--ui-fs-3xl);
+}
+
+.ui-stat[data-mono="true"] .ui-stat__value {
+  font-family: var(--ui-font-mono);
+  letter-spacing: var(--ui-tracking-normal);
+}
+
+.ui-stat__hint {
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+}
+
+/* Hairline-separated cells: the 1px gap shows the line colour behind. */
+.ui-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--ui-border-width);
+  border-block: var(--ui-border-width) solid var(--ui-line);
+  background: var(--ui-line);
+}
+
+.ui-stat-grid[data-columns="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ui-stat-grid[data-columns="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ui-stat-grid[data-columns="4"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ui-stat-grid > .ui-stat {
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  background: var(--ui-bg);
+}
+
+@media (max-width: 479px) {
+  .ui-stat-grid:is([data-columns="3"], [data-columns="4"]) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

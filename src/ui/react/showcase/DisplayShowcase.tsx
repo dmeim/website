@@ -1,5 +1,20 @@
 import { useState } from "react";
-import { Badge, Card, Figure, StatusDot, Swatch } from "@/ui/react/groups/display";
+import {
+  Badge,
+  Card,
+  Disclosure,
+  Figure,
+  KeyValue,
+  List,
+  ListRow,
+  Panel,
+  Stat,
+  StatGrid,
+  StatusDot,
+  Swatch,
+  Table,
+} from "@/ui/react/groups/display";
+import { IconButton } from "@/ui/react/IconButton";
 import { ThemePair } from "./ThemePair";
 
 const stack = { display: "grid", gap: "var(--ui-space-sm)" } as const;
@@ -79,6 +94,47 @@ export function DisplayShowcase() {
           <Swatch color="#4a5a6b" label="Static" code="--ui-info" size="lg" />
           <Swatch color="#171614" size="sm" />
         </div>
+        <Panel title="Panel (animated)" description="Fade-up on mount." actions={<IconButton icon="copy" label="Copy" size="sm" />}>
+          <p style={{ margin: 0 }}>Body.</p>
+        </Panel>
+        <h4 className="ui-showcase-sub">List / ListRow</h4>
+        <List label="Picker">
+          {["Gold", "Green", "Rust"].map((name) => (
+            <ListRow
+              key={name}
+              title={name}
+              description="Select with onSelect (aria-pressed)."
+              selected={picked === name}
+              onSelect={() => setPicked(name)}
+              actions={<IconButton icon="copy" label={`Copy ${name}`} size="sm" />}
+            />
+          ))}
+          <ListRow label="Link" title="Linked with badge" href="#display" badge={{ children: "New", tone: "accent" }} meta="2d" current />
+          <ListRow title="Media row" media={<img src={figureSrc} alt="" />} status={{ status: "busy", label: "Busy" }} />
+        </List>
+        <h4 className="ui-showcase-sub">KeyValue</h4>
+        <KeyValue items={[{ label: "Fingerprint", value: "SHA256:abc123", mono: true, copy: true }, { label: "Node", value: <Badge size="sm">node</Badge> }]} density="compact" />
+        <h4 className="ui-showcase-sub">Stat</h4>
+        <StatGrid columns={3}>
+          <Stat label="Words" value={1204} />
+          <Stat label="Port" value={49152} size="lg" mono live />
+          <Stat label="Score" value="Strong" size="xl" />
+        </StatGrid>
+        <h4 className="ui-showcase-sub">Table (compact, sticky)</h4>
+        <div style={{ maxHeight: "10rem", display: "grid" }}>
+          <Table caption="Subnets" captionHidden density="compact" stickyHeader>
+            <thead><tr><th>CIDR</th><th data-align="end">Hosts</th></tr></thead>
+            <tbody>
+              {[8, 16, 24, 28, 30, 32].map((n) => (
+                <tr key={n}><td data-mono>10.0.0.0/{n}</td><td data-align="end">{Math.max(1, 2 ** (32 - n) - 2)}</td></tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+        <h4 className="ui-showcase-sub">Disclosure</h4>
+        <Disclosure summary="Controlled section" meta={<Badge size="sm">2</Badge>} onToggle={() => {}}>
+          <p style={{ margin: 0 }}>Content.</p>
+        </Disclosure>
       </div>
     </ThemePair>
   );
