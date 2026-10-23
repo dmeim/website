@@ -1,0 +1,22 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  title: string;
+  titleId?: string;
+  description?: string;
+  level?: 2 | 3 | 4;
+}
+
+const { title, titleId, description, level = 2, class: className, ...rest } = Astro.props;
+const Heading = `h${level}` as "h2" | "h3" | "h4";
+const hasTrailing = Astro.slots.has("trailing");
+---
+
+<div class:list={["ui-section-heading", className]} {...rest}>
+  <div class="ui-section-heading__text">
+    <Heading class="ui-section-heading__title" id={titleId}>{title}</Heading>
+    {description && <p class="ui-section-heading__description">{description}</p>}
+  </div>
+  {hasTrailing && <div class="ui-section-heading__trailing"><slot name="trailing" /></div>}
+</div>

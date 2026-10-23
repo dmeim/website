@@ -1,0 +1,44 @@
+.ui-stack { display: flex; flex-direction: column; gap: var(--ui-stack-gap, var(--ui-space-md)); }
+.ui-stack[data-align="start"] { align-items: flex-start; }
+.ui-stack[data-align="center"] { align-items: center; }
+.ui-stack[data-align="end"] { align-items: flex-end; }
+.ui-stack[data-align="stretch"] { align-items: stretch; }
+
+.ui-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-stack-gap, var(--ui-space-sm)); }
+.ui-cluster[data-wrap="false"] { flex-wrap: nowrap; }
+.ui-cluster[data-align="start"] { align-items: flex-start; }
+.ui-cluster[data-align="center"] { align-items: center; }
+.ui-cluster[data-align="end"] { align-items: flex-end; }
+.ui-cluster[data-align="baseline"] { align-items: baseline; }
+.ui-cluster[data-align="stretch"] { align-items: stretch; }
+.ui-cluster[data-justify="start"] { justify-content: flex-start; }
+.ui-cluster[data-justify="center"] { justify-content: center; }
+.ui-cluster[data-justify="end"] { justify-content: flex-end; }
+.ui-cluster[data-justify="between"] { justify-content: space-between; }
+
+.ui-grid {
+  display: grid;
+  gap: var(--ui-stack-gap, var(--ui-space-md));
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--ui-grid-min, 14rem), 100%), 1fr));
+}
+
+.ui-grid[data-columns] {
+  grid-template-columns: repeat(var(--ui-grid-columns), minmax(0, 1fr));
+}
+
+@media (max-width: 639px) {
+  .ui-grid[data-columns] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="3xs"] { --ui-stack-gap: var(--ui-space-3xs); }
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="2xs"] { --ui-stack-gap: var(--ui-space-2xs); }
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="xs"] { --ui-stack-gap: var(--ui-space-xs); }
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="sm"] { --ui-stack-gap: var(--ui-space-sm); }
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="md"] { --ui-stack-gap: var(--ui-space-md); }
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="lg"] { --ui-stack-gap: var(--ui-space-lg); }
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="xl"] { --ui-stack-gap: var(--ui-space-xl); }
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="2xl"] { --ui-stack-gap: var(--ui-space-2xl); }
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="3xl"] { --ui-stack-gap: var(--ui-space-3xl); }
+:is(.ui-stack, .ui-cluster, .ui-grid)[data-gap="4xl"] { --ui-stack-gap: var(--ui-space-4xl); }

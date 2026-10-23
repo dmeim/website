@@ -1,0 +1,26 @@
+.ui-container {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(var(--ui-content) + 2 * var(--ui-gutter));
+  margin-inline: auto;
+  padding-inline: var(--ui-gutter);
+}
+
+.ui-container[data-width="narrow"] {
+  max-width: calc(var(--ui-content-narrow) + 2 * var(--ui-gutter));
+}
+
+.ui-container[data-width="wide"] {
+  max-width: calc(var(--ui-content-wide) + 2 * var(--ui-gutter));
+}
+
+.ui-container[data-width="full"] {
+  max-width: none;
+}
+
+/* Content pages sit beside the 320px identity rail at >=960px, so the column reads from the rail edge rather than floating centred. */
+@media (min-width: 960px) {
+  .ui-container {
+    margin-inline: 0 auto;
+  }
+}

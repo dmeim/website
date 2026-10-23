@@ -1,0 +1,18 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  /** Stagger direct `[data-reveal]` descendants instead of revealing this element itself. */
+  group?: boolean;
+  as?: "div" | "section" | "ul" | "ol" | "li" | "article" | "span";
+}
+
+const { group = false, as: Tag = "div", class: className, ...rest } = Astro.props;
+---
+
+<Tag class={className} data-reveal={group ? undefined : ""} data-reveal-group={group ? "" : undefined} {...rest}><slot /></Tag>
+
+<script>
+  import { initReveals } from "@/ui/lib/reveal";
+  initReveals();
+</script>

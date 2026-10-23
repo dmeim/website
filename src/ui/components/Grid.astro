@@ -1,0 +1,16 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import type { SpaceStep } from "@/ui/lib/space";
+
+interface Props extends HTMLAttributes<"div"> {
+  min?: string;
+  columns?: number;
+  gap?: SpaceStep;
+}
+
+const { min, columns, gap, class: className, style, ...rest } = Astro.props;
+const vars = [min && `--ui-grid-min: ${min}`, columns && `--ui-grid-columns: ${columns}`].filter(Boolean).join("; ");
+const mergedStyle = [vars, typeof style === "string" ? style : ""].filter(Boolean).join("; ") || undefined;
+---
+
+<div class:list={["ui-grid", className]} data-gap={gap} data-columns={columns} style={mergedStyle} {...rest}><slot /></div>

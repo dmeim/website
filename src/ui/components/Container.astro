@@ -1,0 +1,12 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  width?: "narrow" | "default" | "wide" | "full";
+  as?: "div" | "section" | "main" | "header" | "footer" | "article";
+}
+
+const { width = "default", as: Tag = "div", class: className, ...rest } = Astro.props;
+---
+
+<Tag class:list={["ui-container", className]} data-width={width} {...rest}><slot /></Tag>

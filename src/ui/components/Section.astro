@@ -1,0 +1,57 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Eyebrow from "./Eyebrow.astro";
+import Link from "./Link.astro";
+
+interface Props extends HTMLAttributes<"section"> {
+  id?: string;
+  title?: string;
+  eyebrow?: string;
+  intro?: string;
+  link?: { label: string; href: string };
+  headingLevel?: 2 | 3;
+  spy?: boolean;
+  as?: "section" | "div" | "article" | "aside";
+}
+
+const {
+  id: idProp,
+  title,
+  eyebrow,
+  intro,
+  link,
+  headingLevel = 2,
+  spy = false,
+  as: Tag = "section",
+  class: className,
+  ...rest
+} = Astro.props;
+
+const slug = title?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+// Spy sections need an id for the rail to link to.
+const id = idProp ?? (spy && slug ? slug : undefined);
+const headingId = title ? `${id ?? slug ?? "section"}-title` : undefined;
+const Heading = `h${headingLevel}` as "h2" | "h3";
+const hasHead = Boolean(title || eyebrow || intro || link);
+---
+
+<Tag
+  class:list={["ui-section", className]}
+  id={id}
+  aria-labelledby={headingId}
+  data-ui-spy-section={spy ? "" : undefined}
+  data-ui-spy-label={spy ? title : undefined}
+  {...rest}
+>
+  {hasHead && (
+    <header class="ui-section__head">
+      <div class="ui-section__titles">
+        {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+        {title && <Heading class="ui-section__title" id={headingId}>{title}</Heading>}
+      </div>
+      {link && <Link class="ui-section__link" href={link.href} tone="quiet" arrow="right">{link.label}</Link>}
+      {intro && <p class="ui-section__intro">{intro}</p>}
+    </header>
+  )}
+  <slot />
+</Tag>

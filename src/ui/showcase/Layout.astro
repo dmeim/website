@@ -1,10 +1,51 @@
 ---
 import ThemePair from "./ThemePair.astro";
+import { Cluster, Container, Grid, PageHeader, Reveal, Section, SectionHeading, Stack } from "@/ui/components/groups/layout";
+import { Link } from "@/ui/components/groups/text";
+import { LayoutShowcase } from "@/ui/react/showcase/LayoutShowcase";
+
+const tile = "background: var(--ui-surface); border-radius: var(--ui-radius-control); padding: var(--ui-space-sm); font-size: var(--ui-fs-sm)";
 ---
 
 <section id="layout" class="ui-showcase-section" aria-labelledby="layout-title">
   <h2 id="layout-title" class="ui-showcase-section__title">Layout</h2>
+  <h3 class="ui-showcase-sub">Astro</h3>
   <ThemePair>
-    <p class="ui-showcase-empty">No layout components yet.</p>
+    <Stack gap="lg">
+      <h4 class="ui-showcase-sub">PageHeader</h4>
+      <PageHeader eyebrow="Projects" title="Things I have built" lede="Small, focused tools and experiments. Most run entirely in the browser and keep nothing.">
+        <Fragment slot="meta"><span>12 projects</span><span>Updated October 2026</span></Fragment>
+        <Fragment slot="actions"><Link href="#layout" arrow="right">Browse tools</Link><Link href="#layout" tone="quiet">GitHub</Link></Fragment>
+      </PageHeader>
+      <PageHeader title="Page not found" lede="The page moved or never existed." align="center" reveal={false} />
+
+      <h4 class="ui-showcase-sub">Section (spy)</h4>
+      <Section title="Experience" eyebrow="Since 2014" intro="Roles where I shipped things people still use." link={{ label: "Full CV", href: "#layout" }} spy id="showcase-experience">
+        <p>Section body content sits here.</p>
+      </Section>
+      <Section title="Writing" headingLevel={3}><p>Section with only a title.</p></Section>
+
+      <h4 class="ui-showcase-sub">SectionHeading</h4>
+      <SectionHeading title="Output" description="Updates as you type" level={3}>
+        <Link slot="trailing" href="#layout" tone="quiet">Reset</Link>
+      </SectionHeading>
+
+      <h4 class="ui-showcase-sub">Container (narrow, outlined)</h4>
+      <Container width="narrow" style="outline: 1px dashed var(--ui-line-strong)"><p>Narrow container content.</p></Container>
+
+      <h4 class="ui-showcase-sub">Stack / Cluster / Grid</h4>
+      <Stack gap="xs"><div style={tile}>Stack xs</div><div style={tile}>Second</div></Stack>
+      <Cluster gap="sm" justify="between"><div style={tile}>Cluster</div><div style={tile}>between</div></Cluster>
+      <Grid min="8rem" gap="sm">{["Astro", "React", "CSS", "Workers", "TypeScript"].map((t) => <div style={tile}>{t}</div>)}</Grid>
+      <Grid columns={3} gap="xs">{[1, 2, 3].map((n) => <div style={tile}>Column {n}</div>)}</Grid>
+
+      <h4 class="ui-showcase-sub">Reveal</h4>
+      <Reveal group as="ul" style="display: grid; gap: var(--ui-space-xs); padding: 0; list-style: none">
+        <li data-reveal style={tile}>Revealed first</li>
+        <li data-reveal style={tile}>Then second</li>
+      </Reveal>
+    </Stack>
   </ThemePair>
+  <h3 class="ui-showcase-sub">React</h3>
+  <LayoutShowcase client:visible />
 </section>

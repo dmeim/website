@@ -1,0 +1,35 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Eyebrow from "./Eyebrow.astro";
+import Cluster from "./Cluster.astro";
+
+interface Props extends HTMLAttributes<"header"> {
+  eyebrow?: string;
+  title: string;
+  titleId?: string;
+  lede?: string;
+  align?: "start" | "center";
+  reveal?: boolean;
+}
+
+const { eyebrow, title, titleId, lede, align = "start", reveal = true, class: className, ...rest } = Astro.props;
+const r = reveal ? "" : undefined;
+const hasMeta = Astro.slots.has("meta");
+const hasActions = Astro.slots.has("actions");
+---
+
+<header class:list={["ui-page-header", className]} data-align={align} data-reveal-group={r} {...rest}>
+  {eyebrow && <Eyebrow data-reveal={r}>{eyebrow}</Eyebrow>}
+  <h1 class="ui-page-header__title" id={titleId} data-reveal={r}>{title}</h1>
+  {lede && <p class="ui-page-header__lede" data-reveal={r}>{lede}</p>}
+  {hasMeta && <div class="ui-page-header__meta" data-reveal={r}><slot name="meta" /></div>}
+  {hasActions && <Cluster class="ui-page-header__actions" data-reveal={r}><slot name="actions" /></Cluster>}
+  <slot />
+</header>
+
+{reveal && (
+  <script>
+    import { initReveals } from "@/ui/lib/reveal";
+    initReveals();
+  </script>
+)}

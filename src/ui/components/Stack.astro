@@ -1,0 +1,14 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import type { SpaceStep } from "@/ui/lib/space";
+
+interface Props extends HTMLAttributes<"div"> {
+  gap?: SpaceStep;
+  as?: "div" | "ul" | "ol" | "section" | "article" | "nav";
+  align?: "start" | "center" | "end" | "stretch";
+}
+
+const { gap, as: Tag = "div", align, class: className, ...rest } = Astro.props;
+---
+
+<Tag class:list={["ui-stack", className]} data-gap={gap} data-align={align} {...rest}><slot /></Tag>
