@@ -7,14 +7,17 @@ import HomePrinciples from "@/components/home/HomePrinciples.astro";
 import HomeKeys from "@/components/home/HomeKeys.astro";
 import HomeContact from "@/components/home/HomeContact.astro";
 import { meta } from "@/content/site";
+import { Container } from "@/ui/components";
 import "@/components/home/home.css";
 ---
 
 <BaseLayout title="dmeim.com" description={meta.description}>
-  <HomeIntro />
-  <HomeWork />
-  <HomeTools />
-  <HomePrinciples />
-  <HomeKeys />
-  <HomeContact />
+  <Container width="narrow">
+    <HomeIntro />
+    <HomeWork />
+    <HomeTools />
+    <HomePrinciples />
+    <HomeKeys />
+    <HomeContact />
+  </Container>
 </BaseLayout>

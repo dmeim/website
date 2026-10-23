@@ -48,3 +48,23 @@
     scroll-padding-top: var(--ui-space-md);
   }
 }
+
+/* Beside the rail the shell already supplies the gutter; containers only cap the measure. */
+@media (min-width: 960px) {
+  .ui-site-shell[data-shell="rail"] .ui-container {
+    max-width: var(--ui-content);
+    padding-inline: 0;
+  }
+
+  .ui-site-shell[data-shell="rail"] .ui-container[data-width="narrow"] {
+    max-width: var(--ui-content-narrow);
+  }
+
+  .ui-site-shell[data-shell="rail"] .ui-container[data-width="wide"] {
+    max-width: var(--ui-content-wide);
+  }
+
+  .ui-site-shell[data-shell="rail"] .ui-container[data-width="full"] {
+    max-width: none;
+  }
+}
