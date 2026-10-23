@@ -1,24 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
-  ToolActionRow,
-  ToolButton,
-  ToolCheck,
-  ToolEmpty,
-  ToolField,
-  ToolFormGrid,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolNested,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolSelect,
-  ToolStatus,
-  ToolTextarea,
-  ToolWorkspace,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+  Button,
+  ButtonGroup,
+  Checkbox,
+  ColorInput,
+  CopyButton,
+  Disclosure,
+  EmptyState,
+  Fieldset,
+  FormGrid,
+  Input,
+  Notice,
+  OutputField,
+  Panel,
+  Select,
+  Textarea,
+  ToolFrame,
+} from "@/ui/react";
 import { downloadDataUrl, downloadTextFile } from "@/lib/tools/download";
 import {
   QR_ERROR_CORRECTION_LEVELS,
@@ -75,7 +74,11 @@ function syncTypeToUrl(type: QrContentType) {
   }
 
   url.searchParams.set("type", type);
-  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  window.history.replaceState(
+    {},
+    "",
+    `${url.pathname}${url.search}${url.hash}`,
+  );
 }
 
 export default function QRCodeGenerator() {
@@ -92,7 +95,9 @@ export default function QRCodeGenerator() {
   const [qrPng, setQrPng] = useState("");
   const [qrSvg, setQrSvg] = useState("");
   const [previewStatus, setPreviewStatus] = useState("");
-  const [previewStatusType, setPreviewStatusType] = useState<"success" | "error" | "">("");
+  const [previewStatusType, setPreviewStatusType] = useState<
+    "success" | "error" | ""
+  >("");
   const [actionStatus, setActionStatus] = useState("");
   const renderRequestRef = useRef(0);
 
@@ -112,12 +117,15 @@ export default function QRCodeGenerator() {
   const exportBaseName = getQrExportBaseName(payloadText);
   const showPayloadAsGenerated = content.type !== "text";
 
-  const updateContent = useCallback(<K extends keyof QrContentFormState>(
-    key: K,
-    value: QrContentFormState[K],
-  ) => {
-    setContent((prev) => ({ ...prev, [key]: value }));
-  }, []);
+  const updateContent = useCallback(
+    <K extends keyof QrContentFormState>(
+      key: K,
+      value: QrContentFormState[K],
+    ) => {
+      setContent((prev) => ({ ...prev, [key]: value }));
+    },
+    [],
+  );
 
   useEffect(() => {
     syncTypeToUrl(content.type);
@@ -143,7 +151,8 @@ export default function QRCodeGenerator() {
       setQrPng("");
       setQrSvg("");
       setPreviewStatus(
-        payloadResult.errors[0] || "Complete the selected preset to generate a QR code.",
+        payloadResult.errors[0] ||
+          "Complete the selected preset to generate a QR code.",
       );
       setPreviewStatusType(payloadResult.errors.length ? "error" : "");
       return;
@@ -182,7 +191,9 @@ export default function QRCodeGenerator() {
         setQrPng("");
         setQrSvg("");
         setPreviewStatus(
-          error instanceof Error ? error.message : "Could not render this QR code.",
+          error instanceof Error
+            ? error.message
+            : "Could not render this QR code.",
         );
         setPreviewStatusType("error");
       });
@@ -198,33 +209,6 @@ export default function QRCodeGenerator() {
     normalizedMargin,
   ]);
 
-  async function copyWithStatus(value: string, successMessage: string) {
-    try {
-      await copyTextToClipboard(value);
-      setActionStatus(successMessage);
-    } catch {
-      setActionStatus("Copy failed. Select the output and copy it manually.");
-    }
-  }
-
-  async function copyPayload() {
-    if (!payloadResult.isValid) {
-      setActionStatus("No valid payload to copy yet.");
-      return;
-    }
-
-    await copyWithStatus(payloadText, "Payload copied.");
-  }
-
-  async function copySvg() {
-    if (!qrSvg) {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-
-    await copyWithStatus(qrSvg, "SVG copied.");
-  }
-
   function downloadPng() {
     if (!qrPng) {
       return;
@@ -239,565 +223,584 @@ export default function QRCodeGenerator() {
       return;
     }
 
-    downloadTextFile(`${exportBaseName}.svg`, qrSvg, "image/svg+xml;charset=utf-8");
+    downloadTextFile(
+      `${exportBaseName}.svg`,
+      qrSvg,
+      "image/svg+xml;charset=utf-8",
+    );
     setActionStatus("SVG download started.");
   }
 
   return (
-    <ToolIsland className="qr-island">
-      <ToolWorkspace>
-        <ToolPanel labelledBy="qr-settings-heading">
-          <ToolSectionHeading
-            title="Content"
-            titleId="qr-settings-heading"
-            description={
-              <ToolHint>
-                Choose a preset, fill in its fields, then audit the generated payload before
-                exporting.
-              </ToolHint>
+    <ToolFrame>
+      <ToolFrame layout="split">
+        <Panel
+          title="Content"
+          titleId="qr-settings-heading"
+          description="Choose a preset, fill in its fields, then audit the generated payload before exporting."
+        >
+          <Select
+            label="QR type"
+            id="qr-content-type"
+            value={content.type}
+            options={QR_CONTENT_TYPES.map((type) => ({
+              value: type.value,
+              label: type.label,
+            }))}
+            onChange={(event) =>
+              updateContent("type", event.target.value as QrContentType)
             }
           />
 
-          <ToolSelect
-            label="QR type"
-            id="qr-content-type"
-            full
-            value={content.type}
-            onChange={(event) => updateContent("type", event.target.value as QrContentType)}
-          >
-            {QR_CONTENT_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </ToolSelect>
-
           {content.type !== "text" && (
-            <ToolNested title="Preset Options">
-
+            <Fieldset legend="Preset Options">
               {content.type === "website" && (
-                <div className="tool-form-grid">
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-website-url">Website URL</label>
-                    <input
-                      id="qr-website-url"
-                      type="text"
-                      value={content.websiteUrl}
-                      placeholder="https://example.com"
-                      onChange={(event) => updateContent("websiteUrl", event.target.value)}
-                    />
-                  </div>
-                </div>
+                <FormGrid columns={2}>
+                  <Input
+                    label="Website URL"
+                    span="full"
+                    id="qr-website-url"
+                    type="text"
+                    value={content.websiteUrl}
+                    placeholder="https://example.com"
+                    onChange={(event) =>
+                      updateContent("websiteUrl", event.target.value)
+                    }
+                  />
+                </FormGrid>
               )}
 
               {content.type === "social" && (
-                <div className="tool-form-grid">
-                  <div className="tool-field">
-                    <label htmlFor="qr-social-platform">Platform</label>
-                    <select
-                      id="qr-social-platform"
-                      value={content.socialPlatform}
-                      onChange={(event) =>
-                        updateContent(
-                          "socialPlatform",
-                          event.target.value as QrContentFormState["socialPlatform"],
-                        )
-                      }
-                    >
-                      {SOCIAL_PLATFORMS.map((platform) => (
-                        <option key={platform.value} value={platform.value}>
-                          {platform.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="tool-field">
-                    <label htmlFor="qr-social-value">Handle or full URL</label>
-                    <input
-                      id="qr-social-value"
-                      type="text"
-                      value={content.socialValue}
-                      placeholder="@username or https://..."
-                      onChange={(event) => updateContent("socialValue", event.target.value)}
-                    />
-                  </div>
-                </div>
+                <FormGrid columns={2}>
+                  <Select
+                    label="Platform"
+                    id="qr-social-platform"
+                    value={content.socialPlatform}
+                    onChange={(event) =>
+                      updateContent(
+                        "socialPlatform",
+                        event.target
+                          .value as QrContentFormState["socialPlatform"],
+                      )
+                    }
+                  >
+                    {SOCIAL_PLATFORMS.map((platform) => (
+                      <option key={platform.value} value={platform.value}>
+                        {platform.label}
+                      </option>
+                    ))}
+                  </Select>
+                  <Input
+                    label="Handle or full URL"
+                    id="qr-social-value"
+                    type="text"
+                    value={content.socialValue}
+                    placeholder="@username or https://..."
+                    onChange={(event) =>
+                      updateContent("socialValue", event.target.value)
+                    }
+                  />
+                </FormGrid>
               )}
 
               {content.type === "contact" && (
-                <div className="tool-form-grid">
-                  <div className="tool-field">
-                    <label htmlFor="qr-contact-first-name">First name</label>
-                    <input
-                      id="qr-contact-first-name"
-                      type="text"
-                      autoComplete="given-name"
-                      value={content.contactFirstName}
-                      onChange={(event) => updateContent("contactFirstName", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field">
-                    <label htmlFor="qr-contact-last-name">Last name</label>
-                    <input
-                      id="qr-contact-last-name"
-                      type="text"
-                      autoComplete="family-name"
-                      value={content.contactLastName}
-                      onChange={(event) => updateContent("contactLastName", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field">
-                    <label htmlFor="qr-contact-organization">Organization</label>
-                    <input
-                      id="qr-contact-organization"
-                      type="text"
-                      autoComplete="organization"
-                      value={content.contactOrganization}
-                      onChange={(event) =>
-                        updateContent("contactOrganization", event.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="tool-field">
-                    <label htmlFor="qr-contact-title">Title</label>
-                    <input
-                      id="qr-contact-title"
-                      type="text"
-                      autoComplete="organization-title"
-                      value={content.contactTitle}
-                      onChange={(event) => updateContent("contactTitle", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field">
-                    <label htmlFor="qr-contact-phone">Phone</label>
-                    <input
-                      id="qr-contact-phone"
-                      type="tel"
-                      autoComplete="tel"
-                      value={content.contactPhone}
-                      onChange={(event) => updateContent("contactPhone", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field">
-                    <label htmlFor="qr-contact-email">Email</label>
-                    <input
-                      id="qr-contact-email"
-                      type="email"
-                      autoComplete="email"
-                      value={content.contactEmail}
-                      onChange={(event) => updateContent("contactEmail", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-contact-website">Website</label>
-                    <input
-                      id="qr-contact-website"
-                      type="text"
-                      autoComplete="url"
-                      placeholder="https://example.com"
-                      value={content.contactWebsite}
-                      onChange={(event) => updateContent("contactWebsite", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-contact-address">Address</label>
-                    <input
-                      id="qr-contact-address"
-                      type="text"
-                      autoComplete="street-address"
-                      value={content.contactAddress}
-                      onChange={(event) => updateContent("contactAddress", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-contact-note">Note</label>
-                    <textarea
-                      id="qr-contact-note"
-                      rows={3}
-                      value={content.contactNote}
-                      onChange={(event) => updateContent("contactNote", event.target.value)}
-                    />
-                  </div>
-                </div>
+                <FormGrid columns={2}>
+                  <Input
+                    label="First name"
+                    id="qr-contact-first-name"
+                    type="text"
+                    autoComplete="given-name"
+                    value={content.contactFirstName}
+                    onChange={(event) =>
+                      updateContent("contactFirstName", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Last name"
+                    id="qr-contact-last-name"
+                    type="text"
+                    autoComplete="family-name"
+                    value={content.contactLastName}
+                    onChange={(event) =>
+                      updateContent("contactLastName", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Organization"
+                    id="qr-contact-organization"
+                    type="text"
+                    autoComplete="organization"
+                    value={content.contactOrganization}
+                    onChange={(event) =>
+                      updateContent("contactOrganization", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Title"
+                    id="qr-contact-title"
+                    type="text"
+                    autoComplete="organization-title"
+                    value={content.contactTitle}
+                    onChange={(event) =>
+                      updateContent("contactTitle", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Phone"
+                    id="qr-contact-phone"
+                    type="tel"
+                    autoComplete="tel"
+                    value={content.contactPhone}
+                    onChange={(event) =>
+                      updateContent("contactPhone", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Email"
+                    id="qr-contact-email"
+                    type="email"
+                    autoComplete="email"
+                    value={content.contactEmail}
+                    onChange={(event) =>
+                      updateContent("contactEmail", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Website"
+                    span="full"
+                    id="qr-contact-website"
+                    type="text"
+                    autoComplete="url"
+                    placeholder="https://example.com"
+                    value={content.contactWebsite}
+                    onChange={(event) =>
+                      updateContent("contactWebsite", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Address"
+                    span="full"
+                    id="qr-contact-address"
+                    type="text"
+                    autoComplete="street-address"
+                    value={content.contactAddress}
+                    onChange={(event) =>
+                      updateContent("contactAddress", event.target.value)
+                    }
+                  />
+                  <Textarea
+                    label="Note"
+                    span="full"
+                    id="qr-contact-note"
+                    rows={3}
+                    value={content.contactNote}
+                    onChange={(event) =>
+                      updateContent("contactNote", event.target.value)
+                    }
+                  />
+                </FormGrid>
               )}
 
               {content.type === "wifi" && (
-                <div className="tool-form-grid">
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-wifi-ssid">SSID / network name</label>
-                    <input
-                      id="qr-wifi-ssid"
-                      type="text"
-                      autoComplete="off"
-                      placeholder="My WiFi Network"
-                      value={content.wifiSsid}
-                      onChange={(event) => updateContent("wifiSsid", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field">
-                    <label htmlFor="qr-wifi-encryption">Encryption</label>
-                    <select
-                      id="qr-wifi-encryption"
-                      value={content.wifiEncryption}
-                      onChange={(event) =>
-                        updateContent("wifiEncryption", event.target.value as WifiEncryption)
-                      }
-                    >
-                      {WIFI_ENCRYPTIONS.map((method) => (
-                        <option key={method} value={method}>
-                          {WIFI_ENCRYPTION_LABELS[method]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <ToolCheck
+                <FormGrid columns={2}>
+                  <Input
+                    label="SSID / network name"
+                    span="full"
+                    id="qr-wifi-ssid"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="My WiFi Network"
+                    value={content.wifiSsid}
+                    onChange={(event) =>
+                      updateContent("wifiSsid", event.target.value)
+                    }
+                  />
+                  <Select
+                    label="Encryption"
+                    id="qr-wifi-encryption"
+                    value={content.wifiEncryption}
+                    onChange={(event) =>
+                      updateContent(
+                        "wifiEncryption",
+                        event.target.value as WifiEncryption,
+                      )
+                    }
+                  >
+                    {WIFI_ENCRYPTIONS.map((method) => (
+                      <option key={method} value={method}>
+                        {WIFI_ENCRYPTION_LABELS[method]}
+                      </option>
+                    ))}
+                  </Select>
+                  <Checkbox
                     id="qr-wifi-hidden"
                     label="Hidden SSID"
                     checked={content.wifiHidden}
-                    onChange={(event) => updateContent("wifiHidden", event.target.checked)}
+                    onChange={(event) =>
+                      updateContent("wifiHidden", event.target.checked)
+                    }
                   />
                   {content.wifiEncryption !== "nopass" && (
-                    <div className="tool-field tool-field--full">
-                      <label htmlFor="qr-wifi-password">Password</label>
-                      <input
-                        id="qr-wifi-password"
-                        type="password"
-                        autoComplete="off"
-                        value={content.wifiPassword}
-                        onChange={(event) => updateContent("wifiPassword", event.target.value)}
-                      />
-                    </div>
+                    <Input
+                      label="Password"
+                      span="full"
+                      id="qr-wifi-password"
+                      type="password"
+                      autoComplete="off"
+                      value={content.wifiPassword}
+                      onChange={(event) =>
+                        updateContent("wifiPassword", event.target.value)
+                      }
+                    />
                   )}
                   {content.wifiEncryption === "WPA2-EAP" && (
                     <>
-                      <div className="tool-field">
-                        <label htmlFor="qr-wifi-eap-method">EAP method</label>
-                        <select
-                          id="qr-wifi-eap-method"
-                          value={content.wifiEapMethod}
-                          onChange={(event) =>
-                            updateContent(
-                              "wifiEapMethod",
-                              event.target.value as QrContentFormState["wifiEapMethod"],
-                            )
-                          }
-                        >
-                          {EAP_METHODS.map((method) => (
-                            <option key={method} value={method}>
-                              {method}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="tool-field">
-                        <label htmlFor="qr-wifi-eap-phase2">Phase 2 method</label>
-                        <select
-                          id="qr-wifi-eap-phase2"
-                          value={content.wifiEapPhase2Method}
-                          onChange={(event) =>
-                            updateContent(
-                              "wifiEapPhase2Method",
-                              event.target.value as QrContentFormState["wifiEapPhase2Method"],
-                            )
-                          }
-                        >
-                          {EAP_PHASE_2_METHODS.map((method) => (
-                            <option key={method} value={method}>
-                              {method}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="tool-field">
-                        <label htmlFor="qr-wifi-eap-identity">Identity</label>
-                        <input
-                          id="qr-wifi-eap-identity"
-                          type="text"
-                          disabled={content.wifiEapAnonymousIdentity}
-                          value={content.wifiEapIdentity}
-                          onChange={(event) =>
-                            updateContent("wifiEapIdentity", event.target.value)
-                          }
-                        />
-                      </div>
-                      <ToolCheck
+                      <Select
+                        label="EAP method"
+                        id="qr-wifi-eap-method"
+                        value={content.wifiEapMethod}
+                        onChange={(event) =>
+                          updateContent(
+                            "wifiEapMethod",
+                            event.target
+                              .value as QrContentFormState["wifiEapMethod"],
+                          )
+                        }
+                      >
+                        {EAP_METHODS.map((method) => (
+                          <option key={method} value={method}>
+                            {method}
+                          </option>
+                        ))}
+                      </Select>
+                      <Select
+                        label="Phase 2 method"
+                        id="qr-wifi-eap-phase2"
+                        value={content.wifiEapPhase2Method}
+                        onChange={(event) =>
+                          updateContent(
+                            "wifiEapPhase2Method",
+                            event.target
+                              .value as QrContentFormState["wifiEapPhase2Method"],
+                          )
+                        }
+                      >
+                        {EAP_PHASE_2_METHODS.map((method) => (
+                          <option key={method} value={method}>
+                            {method}
+                          </option>
+                        ))}
+                      </Select>
+                      <Input
+                        label="Identity"
+                        id="qr-wifi-eap-identity"
+                        type="text"
+                        disabled={content.wifiEapAnonymousIdentity}
+                        value={content.wifiEapIdentity}
+                        onChange={(event) =>
+                          updateContent("wifiEapIdentity", event.target.value)
+                        }
+                      />
+                      <Checkbox
                         id="qr-wifi-eap-anonymous"
                         label="Use anonymous identity"
                         checked={content.wifiEapAnonymousIdentity}
                         onChange={(event) =>
-                          updateContent("wifiEapAnonymousIdentity", event.target.checked)
+                          updateContent(
+                            "wifiEapAnonymousIdentity",
+                            event.target.checked,
+                          )
                         }
                       />
                     </>
                   )}
-                </div>
+                </FormGrid>
               )}
 
               {content.type === "email" && (
-                <div className="tool-form-grid">
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-email-to">Email address</label>
-                    <input
-                      id="qr-email-to"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="hello@example.com"
-                      value={content.emailTo}
-                      onChange={(event) => updateContent("emailTo", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-email-subject">Subject</label>
-                    <input
-                      id="qr-email-subject"
-                      type="text"
-                      value={content.emailSubject}
-                      onChange={(event) => updateContent("emailSubject", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-email-body">Body</label>
-                    <textarea
-                      id="qr-email-body"
-                      rows={3}
-                      value={content.emailBody}
-                      onChange={(event) => updateContent("emailBody", event.target.value)}
-                    />
-                  </div>
-                </div>
+                <FormGrid columns={2}>
+                  <Input
+                    label="Email address"
+                    span="full"
+                    id="qr-email-to"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="hello@example.com"
+                    value={content.emailTo}
+                    onChange={(event) =>
+                      updateContent("emailTo", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Subject"
+                    span="full"
+                    id="qr-email-subject"
+                    type="text"
+                    value={content.emailSubject}
+                    onChange={(event) =>
+                      updateContent("emailSubject", event.target.value)
+                    }
+                  />
+                  <Textarea
+                    label="Body"
+                    span="full"
+                    id="qr-email-body"
+                    rows={3}
+                    value={content.emailBody}
+                    onChange={(event) =>
+                      updateContent("emailBody", event.target.value)
+                    }
+                  />
+                </FormGrid>
               )}
 
               {content.type === "phone" && (
-                <div className="tool-form-grid">
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-phone-number">Phone number</label>
-                    <input
-                      id="qr-phone-number"
-                      type="tel"
-                      autoComplete="tel"
-                      placeholder="+1 555 0100"
-                      value={content.phoneNumber}
-                      onChange={(event) => updateContent("phoneNumber", event.target.value)}
-                    />
-                  </div>
-                </div>
+                <FormGrid columns={2}>
+                  <Input
+                    label="Phone number"
+                    span="full"
+                    id="qr-phone-number"
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="+1 555 0100"
+                    value={content.phoneNumber}
+                    onChange={(event) =>
+                      updateContent("phoneNumber", event.target.value)
+                    }
+                  />
+                </FormGrid>
               )}
 
               {content.type === "sms" && (
-                <div className="tool-form-grid">
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-sms-number">SMS number</label>
-                    <input
-                      id="qr-sms-number"
-                      type="tel"
-                      autoComplete="tel"
-                      placeholder="+1 555 0100"
-                      value={content.smsNumber}
-                      onChange={(event) => updateContent("smsNumber", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-sms-message">Message</label>
-                    <textarea
-                      id="qr-sms-message"
-                      rows={3}
-                      value={content.smsMessage}
-                      onChange={(event) => updateContent("smsMessage", event.target.value)}
-                    />
-                  </div>
-                </div>
+                <FormGrid columns={2}>
+                  <Input
+                    label="SMS number"
+                    span="full"
+                    id="qr-sms-number"
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="+1 555 0100"
+                    value={content.smsNumber}
+                    onChange={(event) =>
+                      updateContent("smsNumber", event.target.value)
+                    }
+                  />
+                  <Textarea
+                    label="Message"
+                    span="full"
+                    id="qr-sms-message"
+                    rows={3}
+                    value={content.smsMessage}
+                    onChange={(event) =>
+                      updateContent("smsMessage", event.target.value)
+                    }
+                  />
+                </FormGrid>
               )}
 
               {content.type === "location" && (
-                <div className="tool-form-grid">
-                  <div className="tool-field">
-                    <label htmlFor="qr-location-latitude">Latitude</label>
-                    <input
-                      id="qr-location-latitude"
-                      type="text"
-                      placeholder="40.7128"
-                      value={content.latitude}
-                      onChange={(event) => updateContent("latitude", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field">
-                    <label htmlFor="qr-location-longitude">Longitude</label>
-                    <input
-                      id="qr-location-longitude"
-                      type="text"
-                      placeholder="-74.0060"
-                      value={content.longitude}
-                      onChange={(event) => updateContent("longitude", event.target.value)}
-                    />
-                  </div>
-                  <div className="tool-field tool-field--full">
-                    <label htmlFor="qr-location-label">Optional label</label>
-                    <input
-                      id="qr-location-label"
-                      type="text"
-                      placeholder="Office, meetup spot, etc."
-                      value={content.locationLabel}
-                      onChange={(event) => updateContent("locationLabel", event.target.value)}
-                    />
-                  </div>
-                </div>
+                <FormGrid columns={2}>
+                  <Input
+                    label="Latitude"
+                    id="qr-location-latitude"
+                    type="text"
+                    placeholder="40.7128"
+                    value={content.latitude}
+                    onChange={(event) =>
+                      updateContent("latitude", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Longitude"
+                    id="qr-location-longitude"
+                    type="text"
+                    placeholder="-74.0060"
+                    value={content.longitude}
+                    onChange={(event) =>
+                      updateContent("longitude", event.target.value)
+                    }
+                  />
+                  <Input
+                    label="Optional label"
+                    span="full"
+                    id="qr-location-label"
+                    type="text"
+                    placeholder="Office, meetup spot, etc."
+                    value={content.locationLabel}
+                    onChange={(event) =>
+                      updateContent("locationLabel", event.target.value)
+                    }
+                  />
+                </FormGrid>
               )}
-            </ToolNested>
+            </Fieldset>
           )}
 
-          <ToolField
-            label={showPayloadAsGenerated ? "Generated QR payload" : "Text"}
-            htmlFor={showPayloadAsGenerated ? "qr-generated-payload" : "qr-text"}
-            full
-          >
-            {showPayloadAsGenerated ? (
-              <textarea
-                id="qr-generated-payload"
-                className="tool-code"
-                readOnly
-                rows={5}
-                value={payloadOutput}
-              />
-            ) : (
-              <textarea
-                id="qr-text"
-                rows={5}
-                placeholder="Any text to encode"
-                value={content.text}
-                onChange={(event) => updateContent("text", event.target.value)}
-              />
-            )}
-          </ToolField>
+          {showPayloadAsGenerated ? (
+            <OutputField
+              id="qr-generated-payload"
+              label="Generated QR payload"
+              multiline
+              rows={5}
+              copy={false}
+              value={payloadOutput}
+            />
+          ) : (
+            <Textarea
+              id="qr-text"
+              label="Text"
+              rows={5}
+              placeholder="Any text to encode"
+              value={content.text}
+              onChange={(event) => updateContent("text", event.target.value)}
+            />
+          )}
 
-          <ToolNested title="Colors">
-            <ToolFormGrid>
-              <div className="tool-field">
-                <label htmlFor="qr-foreground">Foreground color</label>
-                <input
-                  id="qr-foreground"
-                  type="color"
-                  value={foregroundColor}
-                  onChange={(event) => setForegroundColor(event.target.value)}
-                />
-              </div>
-              <div className="tool-field">
-                <label htmlFor="qr-background">Background color</label>
-                <input
-                  id="qr-background"
-                  type="color"
-                  value={backgroundColor}
-                  disabled={transparentBackground}
-                  onChange={(event) => setBackgroundColor(event.target.value)}
-                />
-              </div>
-              <ToolCheck
+          <Disclosure summary="Colors" level="inline">
+            <FormGrid columns={2}>
+              <ColorInput
+                id="qr-foreground"
+                label="Foreground color"
+                value={foregroundColor}
+                onChange={setForegroundColor}
+              />
+              <ColorInput
+                id="qr-background"
+                label="Background color"
+                value={backgroundColor}
+                disabled={transparentBackground}
+                onChange={setBackgroundColor}
+              />
+              <Checkbox
                 id="qr-transparent-background"
-                full
                 label="Transparent background for exports"
                 checked={transparentBackground}
-                onChange={(event) => setTransparentBackground(event.target.checked)}
+                onChange={(event) =>
+                  setTransparentBackground(event.target.checked)
+                }
               />
-            </ToolFormGrid>
-          </ToolNested>
+            </FormGrid>
+          </Disclosure>
 
-          <ToolNested title="Export Options">
-            <ToolFormGrid exportLayout>
-              <div className="tool-field">
-                <label htmlFor="qr-error-correction">Error resistance</label>
-                <select
-                  id="qr-error-correction"
-                  value={errorCorrectionLevel}
-                  onChange={(event) =>
-                    setErrorCorrectionLevel(event.target.value as QrErrorCorrectionLevel)
-                  }
-                >
-                  {QR_ERROR_CORRECTION_LEVELS.map((level) => (
-                    <option key={level.value} value={level.value}>
-                      {level.label} — {level.description}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="tool-field">
-                <label htmlFor="qr-margin">Quiet-zone margin</label>
-                <input
-                  id="qr-margin"
-                  type="number"
-                  min={0}
-                  max={10}
-                  step={1}
-                  value={margin}
-                  onChange={(event) => setMargin(Number(event.target.value))}
-                />
-              </div>
-              <div className="tool-field">
-                <label htmlFor="qr-size">PNG size</label>
-                <input
-                  id="qr-size"
-                  type="number"
-                  min={128}
-                  max={2048}
-                  step={64}
-                  value={size}
-                  onChange={(event) => setSize(Number(event.target.value))}
-                />
-              </div>
-            </ToolFormGrid>
-          </ToolNested>
+          <Disclosure summary="Export Options" level="inline">
+            <FormGrid columns={2}>
+              <Select
+                id="qr-error-correction"
+                label="Error resistance"
+                span="full"
+                value={errorCorrectionLevel}
+                options={QR_ERROR_CORRECTION_LEVELS.map((level) => ({
+                  value: level.value,
+                  label: `${level.label} — ${level.description}`,
+                }))}
+                onChange={(event) =>
+                  setErrorCorrectionLevel(
+                    event.target.value as QrErrorCorrectionLevel,
+                  )
+                }
+              />
+              <Input
+                id="qr-margin"
+                label="Quiet-zone margin"
+                type="number"
+                min={0}
+                max={10}
+                step={1}
+                value={margin}
+                onChange={(event) => setMargin(Number(event.target.value))}
+              />
+              <Input
+                id="qr-size"
+                label="PNG size"
+                type="number"
+                min={128}
+                max={2048}
+                step={64}
+                value={size}
+                onChange={(event) => setSize(Number(event.target.value))}
+              />
+            </FormGrid>
+          </Disclosure>
 
-          <ToolActionRow>
-            <ToolButton
-              disabled={!payloadResult.isValid}
-              onClick={() => void copyPayload()}
-            >
-              Copy payload
-            </ToolButton>
-            <ToolButton disabled={!canExport} onClick={() => void copySvg()}>
-              Copy SVG
-            </ToolButton>
-          </ToolActionRow>
+          <ButtonGroup>
+            {payloadResult.isValid ? (
+              <CopyButton value={payloadText} label="Copy payload" />
+            ) : (
+              <Button iconStart="copy" disabled>
+                Copy payload
+              </Button>
+            )}
+            {canExport ? (
+              <CopyButton value={qrSvg} label="Copy SVG" />
+            ) : (
+              <Button iconStart="copy" disabled>
+                Copy SVG
+              </Button>
+            )}
+          </ButtonGroup>
 
-          {actionStatus ? <ToolStatus>{actionStatus}</ToolStatus> : null}
-        </ToolPanel>
+          {actionStatus ? <Notice live="polite">{actionStatus}</Notice> : null}
+        </Panel>
 
-        <ToolPanel className="qr-preview-panel" labelledBy="qr-preview-heading">
-          <ToolSectionHeading
-            title="Preview & export"
-            titleId="qr-preview-heading"
-            description={
-              <ToolStatus tone={previewStatusType || "default"}>{previewStatus}</ToolStatus>
+        <Panel
+          className="qr-preview-panel"
+          title="Preview & export"
+          titleId="qr-preview-heading"
+        >
+          <Notice
+            tone={
+              previewStatusType === "error"
+                ? "danger"
+                : previewStatusType === "success"
+                  ? "success"
+                  : "neutral"
             }
-          />
+            live="polite"
+          >
+            {previewStatus}
+          </Notice>
 
           <div className="qr-preview">
             {qrPng ? (
               <img src={qrPng} alt="Generated QR code preview" />
             ) : (
-              <ToolEmpty>Your QR code will appear here.</ToolEmpty>
+              <EmptyState
+                icon="image"
+                size="sm"
+                title="Your QR code will appear here."
+              />
             )}
           </div>
 
-          <ToolActionRow>
-            <ToolButton variant="primary" disabled={!canExport} onClick={downloadPng}>
+          <ButtonGroup>
+            <Button
+              variant="primary"
+              iconStart="download-simple"
+              disabled={!canExport}
+              onClick={downloadPng}
+            >
               Download PNG
-            </ToolButton>
-            <ToolButton disabled={!canExport} onClick={downloadSvg}>
+            </Button>
+            <Button
+              iconStart="download-simple"
+              disabled={!canExport}
+              onClick={downloadSvg}
+            >
               Download SVG
-            </ToolButton>
-          </ToolActionRow>
-        </ToolPanel>
-      </ToolWorkspace>
+            </Button>
+          </ButtonGroup>
+        </Panel>
+      </ToolFrame>
 
-      <details className="tool-disclosure">
-        <summary>SVG source</summary>
-        <textarea
-          className="tool-code"
-          readOnly
+      <Disclosure summary="SVG source">
+        <OutputField
+          label="Generated SVG markup"
+          multiline
           rows={8}
+          copy={Boolean(qrSvg)}
           value={qrSvg || "Generate a QR code to see SVG output."}
-          aria-label="Generated SVG markup"
         />
-      </details>
-    </ToolIsland>
+      </Disclosure>
+    </ToolFrame>
   );
 }

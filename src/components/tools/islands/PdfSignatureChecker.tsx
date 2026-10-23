@@ -1,12 +1,16 @@
-import { useCallback, useId, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import {
-  ToolHint,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-} from "@/components/tools/ui";
+  Card,
+  CodeBlock,
+  Disclosure,
+  FileDrop,
+  KeyValue,
+  Notice,
+  Panel,
+  Stack,
+  ToolFrame,
+} from "@/ui/react";
 import {
   type SignatureCertificate,
   type SignatureInfo,
@@ -16,24 +20,25 @@ import {
   verifyPdfSignatures,
 } from "@/lib/tools/pdf-signature-checker";
 
-import "./PdfSignatureChecker.css";
-
 type Status = "idle" | "loading" | "parsed" | "error";
 
-function KeyValueList({ rows }: { rows: { label: string; value: string }[] }) {
-  if (rows.length === 0) {
-    return <p className="pdf-sig__muted">—</p>;
-  }
-
+function KeyValueList({
+  label,
+  rows,
+}: {
+  label: string;
+  rows: { label: string; value: string }[];
+}) {
   return (
-    <dl className="pdf-sig__kv">
-      {rows.map((row) => (
-        <div key={row.label} className="pdf-sig__kv-row">
-          <dt>{row.label}</dt>
-          <dd>{row.value}</dd>
-        </div>
-      ))}
-    </dl>
+    <KeyValue
+      aria-label={label}
+      density="compact"
+      items={
+        rows.length > 0
+          ? rows.map((row) => ({ label: row.label, value: row.value }))
+          : [{ label, value: "—", tone: "muted" }]
+      }
+    />
   );
 }
 
@@ -50,34 +55,26 @@ function CertificateCard({
   const notAfter = formatCertDate(certificate.validityPeriod.notAfter);
 
   return (
-    <article className="pdf-sig__cert">
-      <h4 className="pdf-sig__cert-title">Certificate {index + 1}</h4>
-
-      <div className="pdf-sig__cert-block">
-        <h5 className="pdf-sig__cert-label">Validity period</h5>
+    <Card as="article" title={`Certificate ${index + 1}`}>
+      <Stack gap="md">
         <KeyValueList
+          label="Validity period"
           rows={[
             { label: "Not before", value: notBefore },
             { label: "Not after", value: notAfter },
           ]}
         />
-      </div>
-
-      <div className="pdf-sig__cert-block">
-        <h5 className="pdf-sig__cert-label">Issued by</h5>
-        <KeyValueList rows={issuedBy} />
-      </div>
-
-      <div className="pdf-sig__cert-block">
-        <h5 className="pdf-sig__cert-label">Issued to</h5>
-        <KeyValueList rows={issuedTo} />
-      </div>
-
-      <details className="pdf-sig__pem">
-        <summary>View PEM certificate</summary>
-        <pre className="pdf-sig__pem-body">{certificate.pemCertificate}</pre>
-      </details>
-    </article>
+        <Disclosure summary="Issued by" level="inline" defaultOpen>
+          <KeyValueList label="Issued by" rows={issuedBy} />
+        </Disclosure>
+        <Disclosure summary="Issued to" level="inline" defaultOpen>
+          <KeyValueList label="Issued to" rows={issuedTo} />
+        </Disclosure>
+        <Disclosure summary="View PEM certificate" level="inline">
+          <CodeBlock code={certificate.pemCertificate} />
+        </Disclosure>
+      </Stack>
+    </Card>
   );
 }
 
@@ -89,11 +86,12 @@ function SignatureBlock({
   index: number;
 }) {
   return (
-    <section className="pdf-sig__signature" aria-labelledby={`pdf-sig-${index}`}>
-      <h3 id={`pdf-sig-${index}`} className="pdf-sig__signature-title">
-        Signature {index + 1} certificates
-      </h3>
-      <div className="pdf-sig__certs">
+    <Panel
+      title={`Signature ${index + 1} certificates`}
+      titleId={`pdf-sig-${index}`}
+      headingLevel={3}
+    >
+      <Stack gap="md">
         {signature.meta.certs.map((certificate, certIndex) => (
           <CertificateCard
             key={`${index}-${certIndex}-${certificate.pemCertificate.slice(0, 24)}`}
@@ -101,14 +99,12 @@ function SignatureBlock({
             index={certIndex}
           />
         ))}
-      </div>
-    </section>
+      </Stack>
+    </Panel>
   );
 }
 
 export default function PdfSignatureChecker() {
-  const inputId = useId();
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const runIdRef = useRef(0);
 
   const [file, setFile] = useState<File | null>(null);
@@ -145,9 +141,9 @@ export default function PdfSignatureChecker() {
     }
   }, []);
 
-  const onInputChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const next = event.target.files?.[0];
+  const onFiles = useCallback(
+    (files: File[]) => {
+      const next = files[0];
       if (next) {
         void onVerifyFile(next);
       }
@@ -156,65 +152,40 @@ export default function PdfSignatureChecker() {
   );
 
   return (
-    <ToolIsland className="pdf-sig">
-      <ToolPanel labelledBy="pdf-sig-heading" className="pdf-sig__panel">
-        <ToolSectionHeading
-          title="PDF signatures"
-          titleId="pdf-sig-heading"
-          description={
-            <ToolHint>
-              Choose a PDF to inspect embedded digital signatures and certificate chains. All
-              parsing runs in your browser.
-            </ToolHint>
+    <ToolFrame>
+      <Panel
+        title="PDF signatures"
+        titleId="pdf-sig-heading"
+        description="Choose a PDF to inspect embedded digital signatures and certificate chains. All parsing runs in your browser."
+      >
+        <FileDrop
+          label="PDF file"
+          accept=".pdf,application/pdf"
+          onFiles={onFiles}
+          hint={
+            file ? `${file.name} · ${formatFileBytes(file.size)}` : undefined
           }
+          data-testid="pdf-file-drop"
         />
 
-        <div className="pdf-sig__upload">
-          <label className="pdf-sig__upload-label" htmlFor={inputId}>
-            <span className="pdf-sig__upload-title">PDF file</span>
-            <span className="pdf-sig__upload-hint">
-              Drag and drop a PDF here, or click to select a file
-            </span>
-          </label>
-          <input
-            ref={inputRef}
-            id={inputId}
-            className="pdf-sig__file-input"
-            type="file"
-            accept=".pdf,application/pdf"
-            onChange={onInputChange}
-            data-testid="pdf-file-input"
-          />
-        </div>
-
-        {file ? (
-          <p className="pdf-sig__file-meta">
-            <strong>{file.name}</strong>
-            <span aria-hidden="true"> · </span>
-            <span>{formatFileBytes(file.size)}</span>
-          </p>
-        ) : null}
-
         {status === "loading" ? (
-          <ToolStatus tone="default" live="polite">
+          <Notice tone="neutral" live="polite">
             Checking signatures…
-          </ToolStatus>
+          </Notice>
         ) : null}
 
         {status === "error" ? (
-          <ToolStatus tone="error" live="assertive">
+          <Notice tone="danger" live="assertive">
             {errorMessage}
-          </ToolStatus>
+          </Notice>
         ) : null}
-      </ToolPanel>
+      </Panel>
 
-      {status === "parsed" && signatures.length > 0 ? (
-        <div className="pdf-sig__results">
-          {signatures.map((signature, index) => (
+      {status === "parsed" && signatures.length > 0
+        ? signatures.map((signature, index) => (
             <SignatureBlock key={index} signature={signature} index={index} />
-          ))}
-        </div>
-      ) : null}
-    </ToolIsland>
+          ))
+        : null}
+    </ToolFrame>
   );
 }

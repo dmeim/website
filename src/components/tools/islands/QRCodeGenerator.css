@@ -1,36 +1,29 @@
-@import "./toolIsland.css";
-
 .qr-preview {
   display: grid;
   place-items: center;
   min-height: 18rem;
-  border: 1px solid var(--color-border);
-  padding: var(--space-xl);
-  background: var(--color-ground);
+  padding: var(--ui-space-xl);
+  border-radius: var(--ui-radius-panel);
+  background: var(--ui-surface);
 }
 
 .qr-preview img {
+  display: block;
   max-width: min(100%, 22rem);
   height: auto;
-  display: block;
 }
 
-.qr-preview-panel {
-  align-self: start;
-  position: sticky;
-  top: 0;
-}
-
-.qr-island .tool-form-grid--export {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.qr-island .tool-form-grid--export > :first-child { grid-column: 1 / -1; }
-
-@container (max-width: 760px) {
-  .qr-preview-panel { position: static; }
+@media (min-width: 960px) {
+  .qr-preview-panel {
+    position: sticky;
+    top: 0;
+    align-self: start;
+  }
 }
 
 @media (max-width: 600px) {
-  .qr-preview { padding: var(--space-md); min-height: 14rem; }
+  .qr-preview {
+    min-height: 14rem;
+    padding: var(--ui-space-md);
+  }
 }
