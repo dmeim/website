@@ -5,7 +5,7 @@ import { ThemePair } from "./ThemePair";
 
 const placements = ["top", "bottom", "start", "end"] as const;
 const tones = ["neutral", "info", "success", "warning", "danger", "accent"] as const;
-const stack = { display: "grid", gap: "var(--ui-space-sm)" } as const;
+const stack = { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: "var(--ui-space-sm)" } as const;
 
 export function FeedbackShowcase() {
   const [run, setRun] = useState(0);

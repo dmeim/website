@@ -2,7 +2,7 @@ import { Code, Divider, Eyebrow, Kbd, Link, Prose, VisuallyHidden } from "@/ui/r
 import { CodeBlock } from "@/ui/react/groups/text";
 import { ThemePair } from "./ThemePair";
 
-const stack = { display: "grid", gap: "var(--ui-space-sm)" } as const;
+const stack = { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: "var(--ui-space-sm)" } as const;
 const row = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "var(--ui-space-sm)" } as const;
 
 const proseHtml =

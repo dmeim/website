@@ -3,7 +3,7 @@ import { Button, ButtonGroup, IconButton } from "@/ui/react/groups/actions";
 import { Dialog, Drawer, Menu, Popover, Tabs } from "@/ui/react/groups/overlays";
 import { ThemePair } from "./ThemePair";
 
-const stack = { display: "grid", gap: "var(--ui-space-sm)" } as const;
+const stack = { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: "var(--ui-space-sm)" } as const;
 const tabItems = [
   { id: "encrypt", label: "Encrypt", icon: "lock" as const },
   { id: "decrypt", label: "Decrypt", icon: "lock-open" as const },

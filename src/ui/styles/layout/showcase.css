@@ -78,6 +78,11 @@
   color: var(--ui-text);
 }
 
+/* Wide demos (e.g. the horizontal SiteNav) must not widen the page on phones; clip x only so menus still drop below. */
+.ui-showcase-pair__col {
+  overflow-x: clip;
+}
+
 .ui-showcase-pair__label {
   margin-bottom: var(--ui-space-md);
   color: var(--ui-text-subtle);

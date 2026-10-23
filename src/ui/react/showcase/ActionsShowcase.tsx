@@ -4,7 +4,7 @@ import { ThemePair } from "./ThemePair";
 
 const variants = ["primary", "secondary", "ghost", "danger"] as const;
 const sizes = ["sm", "md", "lg"] as const;
-const stack = { display: "grid", gap: "var(--ui-space-sm)" } as const;
+const stack = { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: "var(--ui-space-sm)" } as const;
 const stage = {
   position: "relative",
   minHeight: "8rem",
