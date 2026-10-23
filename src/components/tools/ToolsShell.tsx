@@ -127,6 +127,11 @@ export default function ToolsShell({ initialSlug = null }: Props) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [sidebarOpen]);
 
+  // Tool islands (e.g. WordCodeGenerator) look up the stage's scroll viewport by this class.
+  useEffect(() => {
+    document.querySelector(".tools-shell .ui-app-shell__content")?.classList.add("tools-stage__body");
+  }, []);
+
   const activeTool = activeSlug ? getToolById(activeSlug) : null;
   const activeCategory = activeSlug ? getCategoryForTool(activeSlug) : undefined;
 
