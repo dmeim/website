@@ -46,7 +46,9 @@ import {
   shouldPreferLocalThread,
   textFromParts,
 } from "./messageUtils";
-import "./ChatShell.css";
+import "./chat-shell.css";
+import "./chat-thread.css";
+import "./chat-composer.css";
 
 type ViewMode = "chat" | "library" | "archive";
 

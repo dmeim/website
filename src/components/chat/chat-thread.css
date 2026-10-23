@@ -1,0 +1,602 @@
+.chat-empty__hints {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  opacity: 0.9;
+}
+
+.chat-bubble__regen {
+  font: inherit;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.chat-bubble__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: flex-end;
+}
+
+.chat-bubble__action {
+  font: inherit;
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.chat-bubble__attachments {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.chat-bubble__attachments li {
+  margin: 0.15rem 0;
+}
+
+.chat-bubble__attach-kind {
+  opacity: 0.85;
+}
+
+.chat-bubble__edit {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.chat-bubble__edit-input {
+  width: 100%;
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-ground) 55%, transparent);
+  border: 1px solid var(--color-border);
+  padding: 0.55rem 0.65rem;
+  resize: vertical;
+  min-height: 5.5rem;
+}
+
+.chat-bubble__edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.chat-bubble__edit-hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.chat-code {
+  margin-block: 0.55em;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-ground) 70%, transparent);
+  overflow: hidden;
+}
+
+.chat-code__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  padding: 0.35rem 0.55rem;
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+}
+
+.chat-code__lang {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.chat-code__copy {
+  font: inherit;
+  font-size: var(--text-xs);
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.chat-code pre {
+  margin: 0;
+  overflow: auto;
+  max-width: 100%;
+  padding: var(--space-sm);
+  border: 0;
+  background: transparent;
+  font-size: var(--text-sm);
+}
+
+/* Syntax highlighting — built from the site's own theme tokens instead of a
+   stock highlight.js theme, so code stays on-palette in both light and dark and
+   reads as four deliberate hues rather than a rainbow. */
+.chat-bubble__md :is(.hljs-comment, .hljs-quote) {
+  color: var(--color-ink-muted);
+  font-style: italic;
+}
+
+.chat-bubble__md
+  :is(
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-section,
+    .hljs-doctag,
+    .hljs-meta .hljs-keyword,
+    .hljs-built_in
+  ) {
+  color: var(--color-accent);
+}
+
+.chat-bubble__md
+  :is(.hljs-string, .hljs-regexp, .hljs-addition, .hljs-char.escape_) {
+  color: var(--color-accent-soft);
+}
+
+.chat-bubble__md
+  :is(.hljs-number, .hljs-literal, .hljs-symbol, .hljs-bullet, .hljs-link) {
+  color: var(--color-blue);
+}
+
+.chat-bubble__md
+  :is(
+    .hljs-title,
+    .hljs-title.class_,
+    .hljs-title.function_,
+    .hljs-attr,
+    .hljs-attribute,
+    .hljs-variable,
+    .hljs-template-variable,
+    .hljs-type,
+    .hljs-name,
+    .hljs-selector-id,
+    .hljs-selector-class
+  ) {
+  color: color-mix(in srgb, var(--color-accent) 55%, var(--color-ink));
+}
+
+.chat-bubble__md :is(.hljs-meta, .hljs-punctuation, .hljs-operator) {
+  color: color-mix(in srgb, var(--color-ink-muted) 80%, var(--color-ink));
+}
+
+.chat-bubble__md .hljs-deletion {
+  color: color-mix(in srgb, #c45b5b 80%, var(--color-ink));
+}
+
+.chat-bubble__md .hljs-emphasis {
+  font-style: italic;
+}
+
+.chat-bubble__md .hljs-strong {
+  font-weight: 600;
+}
+
+.chat-thread {
+  flex: 1;
+  min-height: 0;
+  /* Vertical only — code blocks and tables carry their own horizontal
+     scrollers, so nothing here should ever pan the thread sideways. */
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  padding: var(--space-lg);
+  display: grid;
+  gap: var(--space-md);
+  align-content: start;
+}
+
+.chat-empty {
+  margin: 0;
+  color: var(--color-ink-muted);
+  max-width: 36rem;
+}
+
+.chat-empty--hero {
+  margin-block: auto;
+  padding-block: var(--space-2xl);
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.chat-empty__brand {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+}
+
+.chat-generating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.35rem 0.15rem;
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+}
+
+.chat-status-spinner {
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  border-top-color: var(--color-accent);
+  animation: chat-gen-spin 0.8s linear infinite;
+}
+
+@keyframes chat-gen-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-status-spinner {
+    /* The adjacent "Generating…" text still carries the state */
+    animation: none;
+  }
+}
+
+.chat-bubble {
+  max-width: min(48rem, 100%);
+  /* As a grid item the bubble's floor is min-content, which beats max-width
+     when a child is intrinsically wide. min-width:0 restores the cap. */
+  min-width: 0;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+}
+
+.chat-bubble--user {
+  justify-self: end;
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 28%, var(--color-border));
+}
+
+.chat-bubble--assistant {
+  justify-self: start;
+}
+
+.chat-bubble__text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  line-height: 1.55;
+}
+
+.chat-bubble__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+  margin: 0.55rem 0 0;
+}
+
+.chat-bubble__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  font-size: var(--text-xs);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  color: var(--color-ink-muted);
+}
+
+.chat-bubble__metrics--empty {
+  flex: 1;
+  min-height: 0;
+}
+
+.chat-bubble__metric {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.chat-bubble__metric-sep {
+  opacity: 0.55;
+  user-select: none;
+}
+
+.chat-bubble__status-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin-inline-start: auto;
+  flex-shrink: 0;
+}
+
+.chat-bubble__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+}
+
+.chat-bubble__icon-btn:hover:not(:disabled) {
+  color: var(--color-ink);
+  border-color: var(--color-border);
+  background: color-mix(in srgb, var(--color-cream) 8%, transparent);
+}
+
+.chat-bubble__icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chat-thinking-block {
+  margin: 0 0 var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-ground) 70%, transparent);
+}
+
+.chat-thinking-block--streaming {
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+}
+
+.chat-thinking-block__toggle {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  cursor: pointer;
+  color: var(--color-ink-muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.chat-thinking-block__toggle:hover {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-cream) 5%, transparent);
+}
+
+.chat-thinking-block__toggle:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  outline-offset: -2px;
+}
+
+.chat-thinking-block__chevron {
+  width: 0.85rem;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.chat-thinking-block__spinner {
+  flex: 0 0 auto;
+  width: 0.65rem;
+  height: 0.65rem;
+}
+
+.chat-thinking-block__title {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--text-xs);
+}
+
+.chat-thinking-block--streaming .chat-thinking-block__title {
+  color: var(--color-accent);
+}
+
+.chat-thinking-block__body {
+  border-top: 1px solid var(--color-border);
+  padding: 0.55rem 0.7rem 0.7rem;
+  max-height: 14rem;
+  overflow: auto;
+}
+
+.chat-thinking-block__text {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--color-ink-muted);
+}
+
+.chat-bubble__md {
+  line-height: 1.6;
+  font-size: var(--text-md);
+  /* Long URLs and hashes have no break opportunity, so they would otherwise
+     push the bubble wider than the thread. */
+  overflow-wrap: break-word;
+}
+
+.chat-table {
+  margin-block: 0.55em;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-ground) 70%, transparent);
+}
+
+.chat-table table {
+  border-collapse: collapse;
+  /* max-content keeps columns on one line; min-width stops a narrow table
+     from leaving a gap. The wrapper scrolls when the result is too wide. */
+  width: max-content;
+  min-width: 100%;
+  font-size: var(--text-sm);
+}
+
+.chat-table :is(th, td) {
+  padding: 0.4rem 0.65rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  /* Ceiling so one prose-heavy cell can't produce a mile-wide table */
+  max-width: 20rem;
+  overflow-wrap: break-word;
+}
+
+.chat-table th {
+  font-weight: 600;
+  background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+}
+
+.chat-table tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+
+/* One wrapper per top-level markdown block (see MarkdownBody). display:contents
+   keeps it out of layout so margins between blocks collapse exactly as they did
+   when the message was a single innerHTML blob. */
+.chat-md-block {
+  display: contents;
+}
+
+.chat-bubble__md :is(p, ul, ol, pre, blockquote) {
+  margin-block: 0.55em;
+}
+
+/* Scoped through the wrapper so only the message's outer edges are trimmed —
+   an unscoped :first-child/:last-child now matches inside every block. */
+.chat-bubble__md > .chat-md-block:first-child > * {
+  margin-block-start: 0;
+}
+
+.chat-bubble__md > .chat-md-block:last-child > * {
+  margin-block-end: 0;
+}
+
+/* The site's h1–h4 rules are sized for page titles and scale with the viewport.
+   Inside a reply, headings should scale with the message instead, so this is a
+   self-contained em-based scale. It also covers h5/h6, which had no rules at
+   all and fell back to UA sizes *smaller* than the surrounding prose. */
+.chat-bubble__md :is(h1, h2, h3, h4, h5, h6) {
+  margin-block: 1.2em 0.4em;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--color-ink);
+}
+
+.chat-bubble__md h1 {
+  font-size: 1.5em;
+}
+
+.chat-bubble__md h2 {
+  font-size: 1.3em;
+}
+
+.chat-bubble__md h3 {
+  font-size: 1.15em;
+}
+
+.chat-bubble__md h4 {
+  font-size: 1.05em;
+}
+
+.chat-bubble__md :is(h5, h6) {
+  font-size: 1em;
+}
+
+.chat-bubble__md h6 {
+  color: var(--color-ink-muted);
+}
+
+/* Site-wide prose is capped at --measure, which leaked in and stopped
+   paragraphs short of the code blocks and tables beside them. */
+.chat-bubble__md p {
+  max-width: none;
+}
+
+.chat-bubble__md :is(ul, ol) {
+  /* UA default is 40px, which eats a third of a phone-width bubble */
+  padding-inline-start: 1.4em;
+}
+
+.chat-bubble__md li + li {
+  margin-block-start: 0.25em;
+}
+
+.chat-bubble__md li > :is(ul, ol) {
+  margin-block: 0.25em;
+}
+
+.chat-bubble__md blockquote {
+  /* UA default indents by 40px on both sides */
+  margin-inline: 0;
+  padding-inline-start: 0.9em;
+  border-inline-start: 2px solid
+    color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  color: var(--color-ink-muted);
+}
+
+.chat-bubble__md hr {
+  margin-block: 1em;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.chat-bubble__md pre {
+  overflow: auto;
+  max-width: 100%;
+  padding: var(--space-sm);
+  background: color-mix(in srgb, var(--color-ground) 70%, transparent);
+  border: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+}
+
+.chat-bubble__md .chat-code {
+  margin-block: 0.55em;
+}
+
+.chat-bubble__md .chat-code pre {
+  border: 0;
+  background: transparent;
+}
+
+.chat-bubble__md code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.chat-bubble__md a {
+  color: var(--color-accent);
+}
+
