@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
-import { Check, Plus } from "lucide";
 
-import { LucideIcon } from "@/components/chat/LucideIcon";
 import { MAX_CARDS } from "@/lib/orthodox/custom";
+import { Button, Toolbar } from "@/ui/react";
 
 type EditToolbarProps = {
   count: number;
@@ -11,37 +10,37 @@ type EditToolbarProps = {
 };
 
 export function EditToolbar({ count, onAdd, onDone }: EditToolbarProps) {
+  // Opacity only: a transform on this wrapper would re-anchor the floating toolbar.
   return (
     <motion.div
-      className="ow-toolbar"
-      role="toolbar"
-      aria-label="Arrange wall"
-      initial={{ opacity: 0, y: -12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -12 }}
+      className="ow-toolbar-fade"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      onClick={(event) => event.stopPropagation()}
     >
-      <span className="ow-toolbar__count">
-        {count} / {MAX_CARDS} cards
-      </span>
-      <button
-        type="button"
-        className="ow-toolbar__btn"
-        onClick={onAdd}
-        disabled={count >= MAX_CARDS}
+      <Toolbar
+        label="Arrange wall"
+        placement="floating-top"
+        className="ow-toolbar"
+        onClick={(event) => event.stopPropagation()}
       >
-        <LucideIcon icon={Plus} size={15} />
-        Add card
-      </button>
-      <button
-        type="button"
-        className="ow-toolbar__btn ow-toolbar__btn--done"
-        onClick={onDone}
-      >
-        <LucideIcon icon={Check} size={15} />
-        Done
-      </button>
+        <span className="ow-toolbar__count">
+          {count} / {MAX_CARDS} cards
+        </span>
+        <Button
+          size="sm"
+          variant="ghost"
+          iconStart="plus"
+          onClick={onAdd}
+          disabled={count >= MAX_CARDS}
+        >
+          Add card
+        </Button>
+        <Button size="sm" variant="primary" iconStart="check" onClick={onDone}>
+          Done
+        </Button>
+      </Toolbar>
     </motion.div>
   );
 }

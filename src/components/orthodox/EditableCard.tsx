@@ -1,9 +1,8 @@
-import { Layers, Pin, Shuffle, X } from "lucide";
-
-import { LucideIcon } from "@/components/chat/LucideIcon";
 import type { CustomCard } from "@/lib/orthodox/custom";
 import type { BoardBorder } from "@/lib/orthodox/settings";
 import type { Box, OrthodoxImage, Size } from "@/lib/orthodox/types";
+import { Icon } from "@/ui/icons";
+import { IconButton } from "@/ui/react";
 
 import { IconBoard } from "./IconBoard";
 import { useCardGesture } from "./useCardGesture";
@@ -21,7 +20,11 @@ type EditableCardProps = {
   onPick: () => void;
 };
 
-const LOCK_ICONS = { any: Shuffle, collection: Layers, icon: Pin } as const;
+const LOCK_ICONS = {
+  any: "shuffle",
+  collection: "stack",
+  icon: "push-pin",
+} as const;
 
 /** Stable 0/1 from the card id, so a card keeps its tilt direction. */
 function phaseOf(id: string): 0 | 1 {
@@ -67,24 +70,32 @@ export function EditableCard({
       }}
     >
       <div className="ow-card">
-        <button
-          type="button"
+        <IconButton
+          icon="x"
+          label="Remove card"
+          variant="primary"
+          size="sm"
+          tooltip={false}
           className="ow-card__remove"
-          aria-label="Remove card"
           tabIndex={-1}
           onClick={onRemove}
-        >
-          <LucideIcon icon={X} size={14} strokeWidth={2.5} />
-        </button>
+        />
         <button
           type="button"
-          className="ow-card__lock"
+          className="ui-badge ow-card__lock"
+          data-tone={lock.missing ? "danger" : card.lock.kind === "any" ? "neutral" : "accent"}
+          data-variant="solid"
+          data-size="md"
           data-kind={card.lock.kind}
           data-missing={lock.missing || undefined}
           tabIndex={-1}
           onClick={onPick}
         >
-          <LucideIcon icon={LOCK_ICONS[card.lock.kind]} size={13} />
+          <Icon
+            name={LOCK_ICONS[card.lock.kind]}
+            weight="bold"
+            className="ui-badge__icon"
+          />
           <span className="ow-card__lock-text">{lock.text}</span>
         </button>
         <span className="ow-card__resize" data-resize aria-hidden="true" />

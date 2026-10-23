@@ -11,6 +11,7 @@ import { MotionConfigProvider } from "@/components/motion";
 import type { OrthodoxCatalog } from "@/lib/orthodox/assets";
 import { addCard, describeLock, type CustomCard } from "@/lib/orthodox/custom";
 import type { ScreensaverSettings as Settings } from "@/lib/orthodox/settings";
+import { Button, ImmersiveStage } from "@/ui/react";
 
 import { CardLockPanel } from "./CardLockPanel";
 import { EditableCard } from "./EditableCard";
@@ -137,10 +138,42 @@ export function OrthodoxScreensaver({
 
   return (
     <MotionConfigProvider>
-      <div
+      <ImmersiveStage
+        label="Icon wall"
         className="ow-stage"
-        data-idle={idle && !panelOpen && !arranging}
+        idle={idle && !panelOpen && !arranging}
         data-arranging={arranging || undefined}
+        toolbar={
+          <>
+            {!arranging ? (
+              <Button
+                size="sm"
+                iconStart="gear"
+                className="ow-trigger"
+                aria-expanded={panelOpen}
+                aria-controls="ow-settings"
+                onClick={togglePanel}
+              >
+                Settings
+              </Button>
+            ) : null}
+
+            <AnimatePresence>
+              {hintVisible && !panelOpen && !arranging ? (
+                <motion.p
+                  className="ow-hint"
+                  role="status"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  Tap the wall to change the display
+                </motion.p>
+              ) : null}
+            </AnimatePresence>
+          </>
+        }
       >
         <div
           ref={wallRef}
@@ -198,32 +231,6 @@ export function OrthodoxScreensaver({
           ) : null}
         </AnimatePresence>
 
-        {!arranging ? (
-          <button
-            type="button"
-            className="ow-trigger"
-            aria-expanded={panelOpen}
-            aria-controls="ow-settings"
-            onClick={togglePanel}
-          >
-            Settings
-          </button>
-        ) : null}
-
-        <AnimatePresence>
-          {hintVisible && !panelOpen && !arranging ? (
-            <motion.p
-              className="ow-hint"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              Tap the wall to change the display
-            </motion.p>
-          ) : null}
-        </AnimatePresence>
-
         <AnimatePresence>
           {panelOpen ? (
             <ScreensaverSettings
@@ -256,7 +263,7 @@ export function OrthodoxScreensaver({
             />
           ) : null}
         </AnimatePresence>
-      </div>
+      </ImmersiveStage>
     </MotionConfigProvider>
   );
 }

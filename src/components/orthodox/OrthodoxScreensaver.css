@@ -8,16 +8,9 @@ body:has(.ow-stage) .mobile-nav {
 }
 
 .ow-stage {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  overflow: hidden;
-  background: #0b0806;
+  z-index: var(--ui-z-drawer);
+  font-family: var(--ui-font-body);
   -webkit-tap-highlight-color: transparent;
-}
-
-.ow-stage[data-idle="true"] {
-  cursor: none;
 }
 
 /* ——— Wall ——— */
@@ -29,89 +22,36 @@ body:has(.ow-stage) .mobile-nav {
   user-select: none;
 }
 
-/* Plaster texture + room light, beneath the boards */
-.ow-wall::before,
-.ow-wall::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.ow-wall::before {
-  opacity: 0.55;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.3 0 0 0 0 0.25 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
-}
-
-.ow-wall::after {
-  background:
-    radial-gradient(
-      ellipse 70% 55% at 50% 30%,
-      rgba(255, 226, 170, 0.12),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 110% 100% at 50% 45%,
-      transparent 55%,
-      rgba(0, 0, 0, 0.42) 100%
-    );
-}
-
-/* ——— Icon board (wooden panel with a recessed painted field) ——— */
+/* ——— Icon board: a flat frame around the painting ——— */
 
 .ow-board {
-  --edge: calc(var(--board-w) * 0.065);
+  --edge: calc(var(--board-w) * 0.05);
   position: absolute;
   top: 0;
   left: 0;
   z-index: 1;
   margin: 0;
   padding: var(--edge);
-  border-radius: calc(var(--board-w) * 0.012);
+  border-radius: var(--ui-radius-xs);
   background: var(--board-fill);
-  box-shadow:
-    0 calc(var(--board-w) * 0.015) calc(var(--board-w) * 0.035)
-      rgba(0, 0, 0, 0.38),
-    0 calc(var(--board-w) * 0.06) calc(var(--board-w) * 0.16)
-      rgba(0, 0, 0, 0.3),
-    inset 0 0 0 calc(var(--board-w) * 0.008) rgba(40, 22, 10, 0.55),
-    inset 1px 1px 0 rgba(255, 245, 225, 0.22);
 }
 
+/* Four frames, kept distinct: ink rail, gold rail, wide muted rail, bare. */
 .ow-board[data-border="red"] {
-  --board-fill: linear-gradient(
-    145deg,
-    #ad3421 0%,
-    #86210f 48%,
-    #5e140a 100%
-  );
+  --board-fill: var(--ui-danger);
 }
 
 .ow-board[data-border="gold"] {
-  --board-fill: linear-gradient(
-    135deg,
-    #f3db8e 0%,
-    #c8973c 28%,
-    #f1d27c 50%,
-    #a57623 76%,
-    #d8b257 100%
-  );
+  --board-fill: var(--ui-accent);
 }
 
 .ow-board[data-border="wood"] {
-  --board-fill:
-    repeating-linear-gradient(
-      172deg,
-      rgba(0, 0, 0, 0.07) 0 2px,
-      transparent 2px 9px
-    ),
-    linear-gradient(160deg, #906037, #6c4325 55%, #4a2b14);
+  --edge: calc(var(--board-w) * 0.08);
+  --board-fill: color-mix(in srgb, var(--ui-accent) 45%, var(--ui-ink));
 }
 
 .ow-board[data-border="none"] {
   padding: 0;
-  border-radius: 2px;
   background: none;
 }
 
@@ -120,33 +60,18 @@ body:has(.ow-stage) .mobile-nav {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border-radius: calc(var(--board-w) * 0.006);
-  background: #2a1d10;
+  border-radius: 2px;
+  background: var(--ui-canvas-bg);
 }
 
-/* Recess shadow + a faint varnish sheen over the painting */
+/* Hairline where painting meets frame */
 .ow-board__ark::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(
-    125deg,
-    rgba(255, 250, 235, 0.1) 0%,
-    transparent 32%,
-    transparent 72%,
-    rgba(255, 250, 235, 0.04) 100%
-  );
-  box-shadow:
-    inset 0 0 0 1px rgba(30, 15, 5, 0.6),
-    inset calc(var(--board-w) * 0.012) calc(var(--board-w) * 0.016)
-      calc(var(--board-w) * 0.03) rgba(0, 0, 0, 0.45),
-    inset calc(var(--board-w) * -0.006) calc(var(--board-w) * -0.006)
-      calc(var(--board-w) * 0.012) rgba(255, 240, 210, 0.12);
-}
-
-.ow-board[data-border="none"] .ow-board__ark::after {
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--ui-line-strong);
 }
 
 .ow-board__img {
@@ -161,47 +86,26 @@ body:has(.ow-stage) .mobile-nav {
 
 /* ——— Chrome: trigger, hint, empty state ——— */
 
-.ow-trigger,
+.ow-trigger {
+  position: absolute;
+  z-index: 3;
+  right: var(--ui-space-md);
+  bottom: var(--ui-space-md);
+}
+
 .ow-hint {
   position: absolute;
   z-index: 3;
-  font-family: var(--font-sans);
-  font-size: var(--text-xs);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(245, 238, 225, 0.85);
-  background: rgba(12, 9, 6, 0.55);
-  border: 1px solid rgba(245, 238, 225, 0.16);
-  border-radius: var(--radius);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.ow-trigger {
-  right: var(--space-md);
-  bottom: var(--space-md);
-  padding: 0.55rem 0.8rem;
-  cursor: pointer;
-  transition:
-    opacity var(--duration-slow) var(--ease-out),
-    border-color var(--duration) var(--ease-out);
-}
-
-.ow-trigger:hover {
-  border-color: rgba(212, 188, 138, 0.6);
-}
-
-.ow-stage[data-idle="true"] .ow-trigger:not(:focus-visible) {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.ow-hint {
   left: 50%;
-  bottom: var(--space-lg);
+  bottom: var(--ui-space-lg);
   margin: 0;
-  padding: 0.6rem 1rem;
+  padding: var(--ui-space-xs) var(--ui-space-sm);
   translate: -50% 0;
+  border: var(--ui-border-width) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-popover);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
   white-space: nowrap;
   pointer-events: none;
 }
@@ -211,12 +115,12 @@ body:has(.ow-stage) .mobile-nav {
   inset: 0;
   display: grid;
   place-content: center;
-  gap: var(--space-xs);
+  gap: var(--ui-space-xs);
   margin: 0;
-  padding: var(--space-lg);
+  padding: var(--ui-space-lg);
   text-align: center;
-  font-size: var(--text-sm);
-  color: rgba(30, 20, 10, 0.75);
+  font-size: var(--ui-fs-sm);
+  color: var(--ui-text-muted);
 }
 
 /* ——— Settings panel ——— */
@@ -453,7 +357,7 @@ body:has(.ow-stage) .mobile-nav {
 /* Bottom sheet on phones */
 @media (max-width: 640px) {
   .ow-hint {
-    bottom: calc(var(--space-md) + 3.25rem);
+    bottom: calc(var(--ui-space-md) + 3.25rem);
   }
 
   .ow-panel {
@@ -483,7 +387,8 @@ body:has(.ow-stage) .mobile-nav {
 }
 
 .ow-board[data-editing]:focus-visible {
-  box-shadow: 0 0 0 3px var(--color-accent);
+  outline: var(--ui-focus-width) solid var(--ui-focus-ring);
+  outline-offset: var(--ui-focus-offset);
 }
 
 .ow-board[data-dragging] {
@@ -493,9 +398,9 @@ body:has(.ow-stage) .mobile-nav {
 
 /* Motion skips the jiggle for reduced motion; mark editable cards instead. */
 @media (prefers-reduced-motion: reduce) {
-  .ow-board[data-editing] {
-    outline: 2px dashed rgba(245, 238, 225, 0.6);
-    outline-offset: 4px;
+  .ow-board[data-editing]:not(:focus-visible) {
+    outline: 1px dashed var(--ui-line-strong);
+    outline-offset: var(--ui-space-2xs);
   }
 }
 
@@ -513,65 +418,28 @@ body:has(.ow-stage) .mobile-nav {
 
 .ow-card__remove {
   position: absolute;
-  top: 0.35rem;
-  left: 0.35rem;
-  display: grid;
-  place-items: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  padding: 0;
-  border: 1px solid rgba(245, 238, 225, 0.35);
-  border-radius: 50%;
-  background: rgba(20, 15, 10, 0.88);
-  color: #f5eee1;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-}
-
-.ow-card__remove:hover {
-  background: #8a2416;
+  top: var(--ui-space-xs);
+  left: var(--ui-space-xs);
 }
 
 .ow-card__lock {
   position: absolute;
   left: 50%;
-  bottom: 0.6rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
+  bottom: var(--ui-space-sm);
+  min-width: 1.5rem;
   max-width: calc(100% - 4rem);
-  padding: 0.35rem 0.6rem;
   translate: -50% 0;
-  border: 1px solid rgba(245, 238, 225, 0.25);
-  border-radius: 999px;
-  background: rgba(12, 9, 6, 0.78);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: rgba(245, 238, 225, 0.92);
-  font: inherit;
-  font-size: 0.7rem;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+  font-family: inherit;
   cursor: pointer;
+  transition: background-color var(--ui-dur-fast) var(--ui-ease-out);
 }
 
-.ow-card__lock:hover {
-  border-color: var(--color-accent);
+.ow-card__lock[data-tone="neutral"]:hover {
+  background: var(--ui-ink-hover);
 }
 
-.ow-card__lock[data-kind="icon"],
-.ow-card__lock[data-kind="collection"] {
-  border-color: rgba(212, 188, 138, 0.7);
-  color: #f1dfb6;
-}
-
-.ow-card__lock[data-missing] {
-  border-color: #c0573f;
-  color: #f2b7a6;
-}
-
-.ow-card__lock svg {
-  flex: none;
+.ow-card__lock[data-tone="accent"]:hover {
+  background: var(--ui-accent-hover);
 }
 
 .ow-card__lock-text {
@@ -581,73 +449,31 @@ body:has(.ow-stage) .mobile-nav {
 
 .ow-card__resize {
   position: absolute;
-  right: 0.3rem;
-  bottom: 0.3rem;
-  width: 1.4rem;
-  height: 1.4rem;
-  border-right: 3px solid rgba(245, 238, 225, 0.9);
-  border-bottom: 3px solid rgba(245, 238, 225, 0.9);
-  border-bottom-right-radius: 4px;
+  right: var(--ui-space-xs);
+  bottom: var(--ui-space-xs);
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--ui-radius-xs);
+  background:
+    linear-gradient(var(--ui-on-ink), var(--ui-on-ink)) right 5px bottom 5px / 10px 2px no-repeat,
+    linear-gradient(var(--ui-on-ink), var(--ui-on-ink)) right 5px bottom 5px / 2px 10px no-repeat,
+    var(--ui-ink);
   cursor: nwse-resize;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
 }
 
 /* ——— Arranging toolbar ——— */
 
 .ow-toolbar {
-  position: absolute;
   z-index: 6;
-  top: var(--space-md);
-  left: 50%;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem;
-  translate: -50% 0;
-  border: 1px solid rgba(245, 238, 225, 0.16);
-  border-radius: 999px;
-  background: rgba(12, 9, 6, 0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  font-family: var(--font-sans);
+  gap: var(--ui-space-2xs);
   white-space: nowrap;
 }
 
 .ow-toolbar__count {
-  padding: 0 0.6rem;
-  font-size: var(--text-xs);
-  color: rgba(245, 238, 225, 0.65);
-}
-
-.ow-toolbar__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.5rem 0.85rem;
-  border: 1px solid rgba(245, 238, 225, 0.2);
-  border-radius: 999px;
-  background: transparent;
-  color: #f5eee1;
-  font: inherit;
-  font-size: var(--text-xs);
-  cursor: pointer;
-}
-
-.ow-toolbar__btn:hover:not(:disabled) {
-  border-color: var(--color-accent);
-}
-
-.ow-toolbar__btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.ow-toolbar__btn--done {
-  border-color: transparent;
-  background: var(--color-accent);
-  color: #15100a;
-  font-weight: 600;
+  padding: 0 var(--ui-space-sm);
+  font-size: var(--ui-fs-xs);
+  color: var(--ui-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ——— Card lock panel + icon picker ——— */
