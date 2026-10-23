@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import PageIntro from "../components/react/PageIntro";
+import { CodeBlock, Container, KeyValue, Link, Notice, PageHeader, Section, Stack } from "@/ui/components";
 import { keys, connect } from "../content/site";
 ---
 
@@ -8,181 +8,33 @@ import { keys, connect } from "../content/site";
   title="Keys"
   description="Public SSH and GPG keys for Dimitri / dmeim — fingerprints and import notes."
 >
-  <section class="keys-page">
-    <PageIntro
-      client:visible
+  <Container>
+    <PageHeader
       title="Keys"
       lede="Public SSH and GPG material for verifying identity and securing collaboration. Placeholder blocks below — replace with real keys before production."
     />
-
-    <aside class="keys-note">
-      <p class="keys-note__label">Notice</p>
-      <p>
-        Fingerprints and key bodies on this page are placeholders. Do not trust
-        them for production verification until real material is published from
-        <code>assets/keys/</code>.
-      </p>
-      <p>
-        Contact: <a href={`mailto:${connect.email}`}>{connect.email}</a>
-      </p>
-    </aside>
-
-    <ul class="keys-list" role="list">
-      {
-        keys.map((key) => (
-          <li class="key-block" id={key.id}>
-            <header class="key-block__header">
-              <p class="key-block__kind">{key.kind}</p>
-              <h2 class="key-block__title">{key.title}</h2>
-            </header>
-            <dl class="key-block__meta">
-              <div>
-                <dt>Fingerprint</dt>
-                <dd>
-                  <code>{key.fingerprint}</code>
-                </dd>
-              </div>
-              <div>
-                <dt>Usage</dt>
-                <dd>{key.usage}</dd>
-              </div>
-            </dl>
-            <pre class="key-block__body"><code>{key.body}</code></pre>
-          </li>
-        ))
-      }
-    </ul>
-  </section>
-</BaseLayout>
-
-<style>
-  .keys-page {
-    display: grid;
-    gap: var(--space-2xl);
-  }
-
-  .keys-page :global(.page-intro) {
-    margin-bottom: 0;
-  }
-
-  .keys-note {
-    display: grid;
-    gap: var(--space-sm);
-    max-width: 42rem;
-    padding-block: var(--space-lg);
-    border-block: 1px solid var(--color-border);
-  }
-
-  .keys-note__label {
-    margin: 0;
-    font-size: var(--text-xs);
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-gold);
-  }
-
-  .keys-note p {
-    margin: 0;
-    color: var(--color-stone);
-    font-size: var(--text-md);
-    line-height: 1.6;
-  }
-
-  .keys-note code {
-    font-size: var(--text-sm);
-    color: var(--color-ink);
-  }
-
-  .keys-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--space-2xl);
-  }
-
-  .key-block {
-    display: grid;
-    gap: var(--space-lg);
-    padding: var(--space-xl);
-    border: 1px solid var(--color-border);
-    background:
-      radial-gradient(
-        ellipse 80% 60% at 0% 0%,
-        var(--color-spot),
-        transparent 55%
-      ),
-      color-mix(in srgb, var(--color-surface) 88%, transparent);
-  }
-
-  .key-block__header {
-    display: grid;
-    gap: var(--space-2xs);
-  }
-
-  .key-block__kind {
-    margin: 0;
-    font-size: var(--text-xs);
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-gold);
-  }
-
-  .key-block__title {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-weight: 400;
-    font-size: var(--text-lg);
-    letter-spacing: -0.01em;
-  }
-
-  .key-block__meta {
-    margin: 0;
-    display: grid;
-    gap: var(--space-md);
-  }
-
-  .key-block__meta dt {
-    font-size: var(--text-xs);
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-gold);
-    margin-bottom: var(--space-2xs);
-  }
-
-  .key-block__meta dd {
-    margin: 0;
-    color: var(--color-stone);
-    font-size: var(--text-sm);
-    word-break: break-word;
-  }
-
-  .key-block__meta code {
-    color: var(--color-ink);
-    font-size: var(--text-sm);
-  }
-
-  .key-block__body {
-    margin: 0;
-    padding: var(--space-md);
-    overflow-x: auto;
-    border: 1px solid var(--color-border);
-    background: color-mix(in srgb, var(--color-ground) 70%, transparent);
-    color: var(--color-stone);
-    font-size: var(--text-sm);
-    line-height: 1.55;
-  }
-
-  .key-block__body code {
-    font-family: var(--font-mono);
-  }
-
-  @media (max-width: 700px) {
-    .key-block {
-      padding: var(--space-lg);
+    <Section>
+      <Notice tone="warning" variant="callout" title="Notice" live="off">
+        <p>
+          Fingerprints and key bodies on this page are placeholders. Do not trust
+          them for production verification until real material is published from
+          <code>assets/keys/</code>.
+        </p>
+        <p>
+          Contact: <Link href={`mailto:${connect.email}`}>{connect.email}</Link>
+        </p>
+      </Notice>
+    </Section>
+    {
+      keys.map((key) => (
+        <Section id={key.id} title={key.title} spy>
+          <Stack gap="md">
+            <KeyValue items={[{ label: "Usage", value: key.usage }]} />
+            <CodeBlock label="Fingerprint" code={key.fingerprint} wrap />
+            <CodeBlock label="Public key" code={key.body} wrap />
+          </Stack>
+        </Section>
+      ))
     }
-  }
-</style>
+  </Container>
+</BaseLayout>

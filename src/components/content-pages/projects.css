@@ -1,0 +1,17 @@
+.projects-list .ui-list-row__media > img {
+  width: 4rem;
+  height: 2.5rem;
+  border-radius: var(--ui-radius-control);
+}
+
+.projects-list__tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-2xs);
+}
+
+@media (max-width: 40rem) {
+  .projects-list__tags {
+    display: none;
+  }
+}

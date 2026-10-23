@@ -1,46 +1,18 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import PageIntro from "../components/react/PageIntro";
+import { Button, Container, PageHeader, Section, Stat } from "@/ui/components";
 ---
 
 <BaseLayout title="Page not found" description="This page could not be found.">
-  <section class="not-found">
-    <p class="not-found__code" aria-hidden="true">404</p>
-    <PageIntro
-      client:visible
+  <Container>
+    <Section>
+      <Stat size="xl" label="Error" value="404" mono />
+    </Section>
+    <PageHeader
       title="Page not found"
       lede="The page you are looking for does not exist or has moved."
-    />
-    <p class="not-found__action">
-      <a class="btn btn--primary" href="/">Return home</a>
-    </p>
-  </section>
+    >
+      <Button slot="actions" variant="primary" href="/" iconStart="house">Return home</Button>
+    </PageHeader>
+  </Container>
 </BaseLayout>
-
-<style>
-  .not-found {
-    display: grid;
-    gap: var(--space-xl);
-    padding-block: var(--space-2xl);
-    max-width: 36rem;
-  }
-
-  .not-found__code {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-size: var(--text-2xl);
-    font-weight: 400;
-    line-height: 0.9;
-    letter-spacing: -0.02em;
-    color: color-mix(in srgb, var(--color-gold) 55%, transparent);
-  }
-
-  .not-found :global(.page-intro) {
-    margin-bottom: 0;
-  }
-
-  .not-found__action {
-    margin: 0;
-    max-width: none;
-  }
-</style>

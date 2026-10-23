@@ -1,176 +1,74 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import PageIntro from "../components/react/PageIntro";
+import { Container, PageHeader, Section, Swatch } from "@/ui/components";
+import { uiColorTokenNames } from "@/ui";
+import "../components/content-pages/colors.css";
 
-/** Locked palette — each family light then dark (lighter → deeper step). */
-const families = [
-  {
-    name: "gold",
-    swatches: [
-      { token: "--color-gold-light", hex: "#d4bc8a" },
-      { token: "--color-gold-dark", hex: "#8a7349" },
-    ],
-  },
-  {
-    name: "cream",
-    swatches: [
-      { token: "--color-cream-light", hex: "#f3eee6" },
-      { token: "--color-cream-dark", hex: "#eceae6" },
-    ],
-  },
-  {
-    name: "night",
-    swatches: [
-      { token: "--color-night-light", hex: "#0e1014" },
-      { token: "--color-night-dark", hex: "#050607" },
-    ],
-  },
-  {
-    name: "black",
-    swatches: [
-      { token: "--color-black-light", hex: "#0c0e12" },
-      { token: "--color-black-dark", hex: "#000000" },
-    ],
-  },
-  {
-    name: "mist",
-    swatches: [
-      { token: "--color-mist-light", hex: "#e6e8ec" },
-      { token: "--color-mist-dark", hex: "#dfe3e8" },
-    ],
-  },
-  {
-    name: "stone",
-    swatches: [
-      { token: "--color-stone-light", hex: "#9aa0a8" },
-      { token: "--color-stone-dark", hex: "#4a5160" },
-    ],
-  },
-  {
-    name: "teal",
-    swatches: [
-      { token: "--color-teal-light", hex: "#8fa3b0" },
-      { token: "--color-teal-dark", hex: "#5c7385" },
-    ],
-  },
-  {
-    name: "blue",
-    swatches: [
-      { token: "--color-blue-light", hex: "#476f95" },
-      { token: "--color-blue-dark", hex: "#194a7a" },
-    ],
-  },
-] as const;
+type Token = (typeof uiColorTokenNames)[number];
+
+const groups: { title: string; match: (t: Token) => boolean }[] = [
+  { title: "Ground and surface", match: (t) => /^--ui-(bg|surface|field|popover|overlay)/.test(t) },
+  { title: "Lines", match: (t) => t.startsWith("--ui-line") },
+  { title: "Text", match: (t) => t.startsWith("--ui-text") },
+  { title: "Ink", match: (t) => /^--ui-(ink|on-ink)/.test(t) },
+  { title: "Accent", match: (t) => /^--ui-(accent|on-accent|focus-ring|selection|highlight)/.test(t) },
+  { title: "Tones", match: (t) => /^--ui-(success|warning|danger|info|live)/.test(t) },
+];
+const grouped = new Set<Token>();
+const sections = groups.map((g) => {
+  const tokens = uiColorTokenNames.filter((t) => !grouped.has(t) && g.match(t));
+  tokens.forEach((t) => grouped.add(t));
+  return { title: g.title, tokens };
+});
+sections.push({ title: "Diff and canvas", tokens: uiColorTokenNames.filter((t) => !grouped.has(t)) });
+const themes = ["light", "dark"] as const;
 ---
 
 <BaseLayout
   title="Colors"
-  description="Locked dmeim.com palette — gold primary, blue secondary, light/dark steps per family."
+  description="The dmeim.com colour tokens — every --ui-* colour with its light and dark value."
 >
-  <section class="colors-page">
-    <PageIntro
-      client:visible
+  <Container>
+    <PageHeader
       title="Colors"
-      lede="Locked palette by family. Light then dark is the lighter vs deeper step of that hue — theme picks the contrasting step automatically."
+      lede="Every colour token in the live design, shown in the light and dark theme. Values are read from the stylesheet, so this page always matches the site."
     />
-
-    <div class="colors-families">
-      {
-        families.map((family) => (
-          <section class="colors-family" aria-labelledby={`family-${family.name}`}>
-            <h2 class="colors-family__title" id={`family-${family.name}`}>
-              {family.name}
-            </h2>
-            <ul class="colors-grid" role="list">
-              {family.swatches.map((swatch) => (
-                <li class="color-swatch">
-                  <div
-                    class="color-swatch__frame"
-                    style={`background-color: ${swatch.hex}`}
-                    aria-hidden="true"
-                  />
-                  <p class="color-swatch__caption">
-                    <code>{swatch.token}</code>
-                    <span class="color-swatch__hex">{swatch.hex}</span>
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
-      }
-    </div>
-  </section>
+    {
+      sections.map((section) => (
+        <Section title={section.title} spy>
+          <ul class="colors-tokens" role="list">
+            {section.tokens.map((token) => (
+              <li class="colors-token">
+                <code class="colors-token__name">{token}</code>
+                <div class="colors-token__themes">
+                  {themes.map((theme) => (
+                    <div class="colors-token__theme" data-theme={theme}>
+                      <Swatch
+                        color={`var(${token})`}
+                        label={theme === "light" ? "Light" : "Dark"}
+                        value="—"
+                        data-color-token={token}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ))
+    }
+  </Container>
 </BaseLayout>
 
-<style>
-  .colors-page {
-    display: grid;
-    gap: var(--space-2xl);
+<script>
+  function resolveSwatches() {
+    document.querySelectorAll<HTMLElement>("[data-color-token]").forEach((swatch) => {
+      const token = swatch.dataset.colorToken;
+      const out = swatch.querySelector(".ui-swatch__value");
+      if (!token || !out) return;
+      out.textContent = getComputedStyle(swatch).getPropertyValue(token).trim() || "—";
+    });
   }
-
-  .colors-page :global(.page-intro) {
-    margin-bottom: 0;
-  }
-
-  .colors-families {
-    display: grid;
-    gap: var(--space-2xl);
-  }
-
-  .colors-family {
-    display: grid;
-    gap: var(--space-md);
-  }
-
-  .colors-family__title {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: var(--text-xs);
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-gold);
-  }
-
-  .colors-grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-lg);
-  }
-
-  .color-swatch {
-    display: grid;
-    gap: var(--space-sm);
-  }
-
-  .color-swatch__frame {
-    aspect-ratio: 16 / 10;
-    border-radius: var(--he-frame-radius, 1.15rem);
-    box-shadow: var(--he-frame-shadow);
-  }
-
-  .color-swatch__caption {
-    margin: 0;
-    display: grid;
-    gap: var(--space-3xs);
-    font-size: var(--text-sm);
-    letter-spacing: 0.04em;
-    color: var(--color-stone);
-  }
-
-  .color-swatch__caption code {
-    font-family: var(--font-mono);
-    font-size: inherit;
-    color: var(--color-ink);
-  }
-
-  .color-swatch__hex {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    color: var(--color-stone);
-  }
-</style>
+  resolveSwatches();
+</script>
