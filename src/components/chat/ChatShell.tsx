@@ -1253,7 +1253,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
         <input
           ref={imageInputRef}
           type="file"
-          className="visually-hidden"
+          className="ui-visually-hidden"
           accept="image/*"
           multiple
           onChange={(event) => void handleUpload(event.target.files)}
@@ -1261,7 +1261,7 @@ export default function ChatShell({ initialChatId = null }: Props) {
         <input
           ref={fileInputRef}
           type="file"
-          className="visually-hidden"
+          className="ui-visually-hidden"
           multiple
           onChange={(event) => void handleUpload(event.target.files)}
         />

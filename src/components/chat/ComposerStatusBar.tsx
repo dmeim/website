@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Brain } from "lucide";
+import { Icon, type IconName } from "@/ui/icons";
 import type { ChatProviderId } from "@/lib/chat/thinking";
 import {
   CHAT_PROVIDERS,
@@ -11,7 +11,6 @@ import {
   formatTokenCount,
 } from "@/lib/chat/message-metrics";
 import type { GoModelInfo, ThinkingLevel } from "@/lib/chat/types";
-import { LucideIcon } from "./LucideIcon";
 
 type ComposerStatusBarProps = {
   models: GoModelInfo[];
@@ -38,7 +37,7 @@ export function ComposerStatusBar({
   const totals = aggregateChatTokenTotals(generations);
   const tokenItems: Array<{
     key: string;
-    icon: typeof ArrowUp;
+    icon: IconName;
     label: string;
     value: string;
   }> = [];
@@ -47,7 +46,7 @@ export function ComposerStatusBar({
     if (totals.inputTokens > 0) {
       tokenItems.push({
         key: "input",
-        icon: ArrowUp,
+        icon: "arrow-up",
         label: "Total input tokens",
         value: formatTokenCount(totals.inputTokens),
       });
@@ -55,7 +54,7 @@ export function ComposerStatusBar({
     if (totals.outputTokens > 0) {
       tokenItems.push({
         key: "output",
-        icon: ArrowDown,
+        icon: "arrow-down",
         label: "Total output tokens",
         value: formatTokenCount(totals.outputTokens),
       });
@@ -63,7 +62,7 @@ export function ComposerStatusBar({
     if (totals.reasoningTokens > 0) {
       tokenItems.push({
         key: "reasoning",
-        icon: Brain,
+        icon: "brain",
         label: "Total reasoning tokens",
         value: formatTokenCount(totals.reasoningTokens),
       });
@@ -91,7 +90,7 @@ export function ComposerStatusBar({
               className="chat-composer__status-metric"
               title={item.label}
             >
-              <LucideIcon icon={item.icon} size={12} />
+              <Icon name={item.icon} size={12} weight="bold" />
               <span>{item.value}</span>
             </span>
           ))}

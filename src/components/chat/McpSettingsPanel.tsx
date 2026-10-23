@@ -1,11 +1,11 @@
-import { ChevronLeft, ChevronRight } from "lucide";
 import { MCP_SERVERS, type McpServerId } from "@/lib/chat/mcp/registry";
 import {
   defaultMcpSettings,
   parseMcpSettings,
   type ChatMcpSettings,
 } from "@/lib/chat/mcp/settings";
-import { LucideIcon } from "./LucideIcon";
+import { Icon } from "@/ui/icons";
+import { Button, Checkbox, Switch } from "@/ui/react";
 
 type McpSettingsPanelProps = {
   settings: ChatMcpSettings;
@@ -61,15 +61,16 @@ export function McpSettingsPanel({
     if (!server || !serverSettings) {
       return (
         <div className="chat-mcp-settings" role="group" aria-label="MCP tools">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
+            iconStart="caret-left"
             className="chat-mcp-settings__back"
             onClick={() => onDetailServerIdChange(null)}
             disabled={disabled}
           >
-            <LucideIcon icon={ChevronLeft} size={16} />
-            <span>Tools</span>
-          </button>
+            Tools
+          </Button>
           <p className="chat-mcp-settings__hint">Unknown server.</p>
         </div>
       );
@@ -83,41 +84,35 @@ export function McpSettingsPanel({
 
     return (
       <div className="chat-mcp-settings" role="group" aria-label={`${server.label} tools`}>
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
+          iconStart="caret-left"
           className="chat-mcp-settings__back"
           onClick={() => onDetailServerIdChange(null)}
           disabled={disabled}
         >
-          <LucideIcon icon={ChevronLeft} size={16} />
-          <span>Tools</span>
-        </button>
+          Tools
+        </Button>
         <p className="chat-mcp-settings__detail-title">{server.label}</p>
         <ul className="chat-mcp-settings__tools">
           {toolNames.map((toolName) => {
             const on = serverSettings.tools[toolName] === true;
             return (
               <li key={toolName} className="chat-mcp-settings__tool-row">
-                <span className="chat-mcp-settings__tool-name">
-                  {humanToolLabel(toolName)}
-                </span>
-                <label className="chat-mcp-settings__switch">
-                  <span className="visually-hidden">
-                    {on ? "Disable" : "Enable"} {toolName}
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={on}
-                    disabled={disabled || !serverSettings.enabled}
-                    onChange={(event) =>
-                      setToolEnabled(
-                        detailServerId,
-                        toolName,
-                        event.target.checked,
-                      )
-                    }
-                  />
-                </label>
+                <Checkbox
+                  className="chat-mcp-settings__tool"
+                  label={<span className="chat-mcp-settings__tool-name">{humanToolLabel(toolName)}</span>}
+                  checked={on}
+                  disabled={disabled || !serverSettings.enabled}
+                  onChange={(event) =>
+                    setToolEnabled(
+                      detailServerId,
+                      toolName,
+                      event.target.checked,
+                    )
+                  }
+                />
               </li>
             );
           })}
@@ -156,22 +151,18 @@ export function McpSettingsPanel({
                       : " · off"}
                   </span>
                 </span>
-                <LucideIcon icon={ChevronRight} size={16} />
+                <Icon name="caret-right" size={16} className="chat-mcp-settings__caret" />
               </button>
-              <label className="chat-mcp-settings__switch">
-                <span className="visually-hidden">
-                  {serverSettings.enabled ? "Disable" : "Enable"} {server.label}
-                </span>
-                <input
-                  type="checkbox"
-                  checked={serverSettings.enabled}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    setServerEnabled(server.id, event.target.checked)
-                  }
-                  onClick={(event) => event.stopPropagation()}
-                />
-              </label>
+              <Switch
+                label={`${serverSettings.enabled ? "Disable" : "Enable"} ${server.label}`}
+                labelHidden
+                checked={serverSettings.enabled}
+                disabled={disabled}
+                onChange={(event) =>
+                  setServerEnabled(server.id, event.target.checked)
+                }
+                onClick={(event) => event.stopPropagation()}
+              />
             </li>
           );
         })}

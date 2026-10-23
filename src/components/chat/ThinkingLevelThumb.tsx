@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { SegmentedControl } from "@/ui/react";
 import {
   THINKING_LEVELS,
   THINKING_LEVEL_LABELS,
@@ -18,48 +18,25 @@ export function ThinkingLevelThumb({
   onChange,
   disabled = false,
 }: ThinkingLevelThumbProps) {
-  const index = Math.max(0, THINKING_LEVELS.indexOf(value));
-
   return (
-    <div
-      className="chat-thinking-toggle sliding-thumb sliding-thumb--equal"
-      role="radiogroup"
-      aria-label="Thinking level"
+    <SegmentedControl
+      name="chat-thinking-level"
+      label="Thinking"
+      size="sm"
+      className="chat-thinking-toggle"
       data-thinking={value}
-      style={
-        {
-          ["--sliding-thumb-index" as string]: String(index),
-          ["--sliding-thumb-count" as string]: String(THINKING_LEVELS.length),
-        } as CSSProperties
-      }
-    >
-      <span className="sliding-thumb__thumb" aria-hidden="true" />
-      {THINKING_LEVELS.map((level) => {
-        const enabled = allowed.includes(level);
-        const selected = value === level;
-        return (
-          <button
-            key={level}
-            type="button"
-            className="sliding-thumb__option chat-thinking-toggle__option"
-            role="radio"
-            aria-label={THINKING_LEVEL_LABELS[level]}
-            aria-checked={selected}
-            aria-disabled={!enabled || disabled}
-            disabled={disabled || !enabled}
-            tabIndex={selected ? 0 : -1}
-            data-thinking-option={level}
-            onClick={() => {
-              if (!enabled || disabled) return;
-              onChange(level);
-            }}
-          >
-            <span className="chat-thinking-toggle__label">
-              {THINKING_LEVEL_LABELS[level]}
-            </span>
-          </button>
-        );
-      })}
-    </div>
+      disabled={disabled}
+      value={value}
+      options={THINKING_LEVELS.map((level) => ({
+        value: level,
+        label: THINKING_LEVEL_LABELS[level],
+        disabled: !allowed.includes(level),
+      }))}
+      onChange={(next) => {
+        const level = next as ThinkingLevel;
+        if (disabled || !allowed.includes(level)) return;
+        onChange(level);
+      }}
+    />
   );
 }

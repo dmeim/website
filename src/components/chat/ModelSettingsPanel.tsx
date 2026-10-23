@@ -6,6 +6,7 @@ import {
   thinkingLevelsForModel,
 } from "@/lib/chat/thinking";
 import type { GoModelInfo, ThinkingLevel } from "@/lib/chat/types";
+import { Select } from "@/ui/react";
 import { ThinkingLevelThumb } from "./ThinkingLevelThumb";
 
 type ModelSettingsPanelProps = {
@@ -41,56 +42,43 @@ export function ModelSettingsPanel({
   const allowed = thinkingLevelsForModel(modelId);
   const safeThinking = coerceThinkingLevel(modelId, thinkingLevel);
 
+  const modelValue = options.some((m) => m.id === modelId)
+    ? modelId
+    : (options[0]?.id ?? modelId);
+
   return (
     <div className="chat-model-settings" role="group" aria-label="Model settings">
-      <label className="chat-model-settings__field">
-        <span className="chat-model-settings__label">Provider</span>
-        <select
-          value={chatProvider}
-          disabled={disabled}
-          onChange={(event) => {
-            const next = event.target.value;
-            if (isChatProviderId(next)) onChatProviderChange(next);
-          }}
-        >
-          {CHAT_PROVIDERS.map((provider) => (
-            <option key={provider.id} value={provider.id}>
-              {provider.label}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="chat-model-settings__field">
-        <span className="chat-model-settings__label">Model</span>
-        <select
-          value={
-            options.some((m) => m.id === modelId)
-              ? modelId
-              : (options[0]?.id ?? modelId)
-          }
-          disabled={disabled || options.length === 0}
-          onChange={(event) => onModelChange(event.target.value)}
-        >
-          {options.map((model) => (
-            <option key={model.id} value={model.id}>
-              {model.name || model.id}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <div className="chat-model-settings__field">
-        <span className="chat-model-settings__label" id="chat-thinking-label">
-          Thinking
-        </span>
-        <ThinkingLevelThumb
-          value={safeThinking}
-          allowed={allowed}
-          disabled={disabled}
-          onChange={onThinkingChange}
-        />
-      </div>
+      <Select
+        label="Provider"
+        size="sm"
+        value={chatProvider}
+        disabled={disabled}
+        options={CHAT_PROVIDERS.map((provider) => ({
+          value: provider.id,
+          label: provider.label,
+        }))}
+        onChange={(event) => {
+          const next = event.target.value;
+          if (isChatProviderId(next)) onChatProviderChange(next);
+        }}
+      />
+      <Select
+        label="Model"
+        size="sm"
+        value={modelValue}
+        disabled={disabled || options.length === 0}
+        options={options.map((model) => ({
+          value: model.id,
+          label: model.name || model.id,
+        }))}
+        onChange={(event) => onModelChange(event.target.value)}
+      />
+      <ThinkingLevelThumb
+        value={safeThinking}
+        allowed={allowed}
+        disabled={disabled}
+        onChange={onThinkingChange}
+      />
     </div>
   );
 }

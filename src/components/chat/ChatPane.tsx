@@ -1,6 +1,5 @@
 import {
   useEffect,
-  useId,
   useLayoutEffect,
   useRef,
   useState,
@@ -9,16 +8,6 @@ import {
   type RefObject,
 } from "react";
 import type { UIMessage } from "ai";
-import {
-  Brain,
-  File,
-  Images,
-  Library,
-  Plus,
-  Send,
-  Wrench,
-  X,
-} from "lucide";
 import type { ChatProviderId } from "@/lib/chat/thinking";
 import type {
   ChatMcpSettings,
@@ -34,13 +23,14 @@ import {
   EmptyState,
   IconButton,
   Input,
+  Menu,
   Notice,
+  Popover,
   Spinner,
   Textarea,
   Toolbar,
 } from "@/ui/react";
 import { LibraryPickerModal } from "./LibraryPickerModal";
-import { LucideIcon } from "./LucideIcon";
 import MarkdownBody from "./MarkdownBody";
 import { McpSettingsPanel } from "./McpSettingsPanel";
 import { ModelSettingsPanel } from "./ModelSettingsPanel";
@@ -159,7 +149,6 @@ export function ChatPane({
   const [editDraft, setEditDraft] = useState("");
   const [renaming, setRenaming] = useState(false);
   const [titleDraft, setTitleDraft] = useState(title);
-  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
   const [modelMenuOpen, setModelMenuOpen] = useState(false);
   const [mcpMenuOpen, setMcpMenuOpen] = useState(false);
   const [mcpDetailServerId, setMcpDetailServerId] =
@@ -170,12 +159,8 @@ export function ChatPane({
   const mcpMenuRef = useRef<HTMLDivElement | null>(null);
   const titleInputRef = useRef<HTMLInputElement | null>(null);
   const titleSaveGuardRef = useRef(false);
-  const attachMenuId = useId();
-  const modelMenuId = useId();
-  const mcpMenuId = useId();
 
   const closeComposerMenus = () => {
-    setAttachMenuOpen(false);
     setModelMenuOpen(false);
     setMcpMenuOpen(false);
     setMcpDetailServerId(null);
@@ -201,13 +186,9 @@ export function ChatPane({
   }, [renaming]);
 
   useEffect(() => {
-    if (!attachMenuOpen && !modelMenuOpen && !mcpMenuOpen) return;
     const onPointerDown = (event: MouseEvent) => {
       const target = event.target;
       if (!(target instanceof Node)) return;
-      if (attachMenuOpen && !attachMenuRef.current?.contains(target)) {
-        setAttachMenuOpen(false);
-      }
       if (modelMenuOpen && !modelMenuRef.current?.contains(target)) {
         setModelMenuOpen(false);
       }
@@ -216,20 +197,27 @@ export function ChatPane({
         setMcpDetailServerId(null);
       }
     };
-    // Capture + stopImmediate so ChatShell Esc-to-stop does not also fire.
+    // Capture + preventDefault so ChatShell Esc-to-stop skips an Esc that
+    // closes a composer menu; the library overlays still see it and refocus.
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key !== "Escape") return;
+      const attachOpen = Boolean(
+        attachMenuRef.current?.querySelector("[aria-expanded='true']"),
+      );
+      if (!attachOpen && !modelMenuOpen && !mcpMenuOpen) return;
       event.preventDefault();
-      event.stopImmediatePropagation();
       closeComposerMenus();
     };
-    window.addEventListener("mousedown", onPointerDown);
     window.addEventListener("keydown", onKeyDown, true);
+    if (!modelMenuOpen && !mcpMenuOpen) {
+      return () => window.removeEventListener("keydown", onKeyDown, true);
+    }
+    window.addEventListener("mousedown", onPointerDown);
     return () => {
       window.removeEventListener("mousedown", onPointerDown);
       window.removeEventListener("keydown", onKeyDown, true);
     };
-  }, [attachMenuOpen, modelMenuOpen, mcpMenuOpen]);
+  }, [modelMenuOpen, mcpMenuOpen]);
 
   const openLibraryPicker = () => {
     closeComposerMenus();
@@ -241,7 +229,8 @@ export function ChatPane({
     const el = composerRef.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
+    // Border-box: add the borders so a single line does not overflow.
+    el.style.height = `${el.scrollHeight + el.offsetHeight - el.clientHeight}px`;
   }, [input, composerRef]);
 
   const handleComposerSubmit = (event?: FormEvent) => {
@@ -679,17 +668,22 @@ export function ChatPane({
           />
         ) : null}
         {pendingAttachments.length > 0 ? (
-          <ul className="chat-composer__attachments">
+          <ul className="chat-composer__attachments" aria-label="Attachments">
             {pendingAttachments.map((attachment) => (
               <li key={attachment.id}>
-                <span>{attachment.filename}</span>
-                <button
-                  type="button"
-                  aria-label={`Remove ${attachment.filename}`}
-                  onClick={() => onRemoveAttachment(attachment.id)}
-                >
-                  ×
-                </button>
+                <Badge className="chat-composer__attachment">
+                  <span className="chat-composer__attachment-name">
+                    {attachment.filename}
+                  </span>
+                  <IconButton
+                    icon="x"
+                    label={`Remove ${attachment.filename}`}
+                    size="sm"
+                    tooltip={false}
+                    className="chat-composer__attachment-remove"
+                    onClick={() => onRemoveAttachment(attachment.id)}
+                  />
+                </Badge>
               </li>
             ))}
           </ul>
@@ -703,146 +697,102 @@ export function ChatPane({
         />
         <div className="chat-composer__row">
           <div className="chat-composer__attach" ref={modelMenuRef}>
-            <button
-              type="button"
-              className="chat-btn chat-btn--ghost chat-btn--icon"
-              onClick={() => {
-                setModelMenuOpen((open) => !open);
-                setAttachMenuOpen(false);
-                setMcpMenuOpen(false);
-                setMcpDetailServerId(null);
+            <Popover
+              label="Model settings"
+              placement="top-start"
+              className="chat-composer__popover"
+              open={modelMenuOpen}
+              onOpenChange={(next) => {
+                setModelMenuOpen(next);
+                if (next) {
+                  setMcpMenuOpen(false);
+                  setMcpDetailServerId(null);
+                }
               }}
-              disabled={menusLocked && !modelMenuOpen}
-              aria-label={
-                modelMenuOpen ? "Close model settings" : "Model settings"
-              }
-              aria-expanded={modelMenuOpen}
-              aria-controls={modelMenuId}
-              title="Provider, model, and thinking level"
-            >
-              <LucideIcon icon={modelMenuOpen ? X : Brain} size={24} />
-            </button>
-            {modelMenuOpen ? (
-              <div
-                id={modelMenuId}
-                className="chat-attach-menu chat-attach-menu--settings"
-                role="dialog"
-                aria-label="Model settings"
-              >
-                <ModelSettingsPanel
-                  models={models}
-                  chatProvider={chatProvider}
-                  modelId={modelId}
-                  thinkingLevel={thinkingLevel}
-                  disabled={menusLocked}
-                  onChatProviderChange={onChatProviderChange}
-                  onModelChange={onModelChange}
-                  onThinkingChange={onThinkingChange}
+              trigger={
+                <IconButton
+                  icon={modelMenuOpen ? "x" : "brain"}
+                  label={
+                    modelMenuOpen ? "Close model settings" : "Model settings"
+                  }
+                  title="Provider, model, and thinking level"
+                  tooltip={false}
+                  disabled={menusLocked && !modelMenuOpen}
                 />
-              </div>
-            ) : null}
+              }
+            >
+              <ModelSettingsPanel
+                models={models}
+                chatProvider={chatProvider}
+                modelId={modelId}
+                thinkingLevel={thinkingLevel}
+                disabled={menusLocked}
+                onChatProviderChange={onChatProviderChange}
+                onModelChange={onModelChange}
+                onThinkingChange={onThinkingChange}
+              />
+            </Popover>
           </div>
           <div className="chat-composer__attach" ref={mcpMenuRef}>
-            <button
-              type="button"
-              className="chat-btn chat-btn--ghost chat-btn--icon"
-              onClick={() => {
-                setMcpMenuOpen((open) => {
-                  if (open) setMcpDetailServerId(null);
-                  return !open;
-                });
-                setModelMenuOpen(false);
-                setAttachMenuOpen(false);
+            <Popover
+              label="MCP tools"
+              placement="top-start"
+              className="chat-composer__popover"
+              open={mcpMenuOpen}
+              onOpenChange={(next) => {
+                setMcpMenuOpen(next);
+                if (!next) setMcpDetailServerId(null);
+                if (next) setModelMenuOpen(false);
               }}
-              disabled={menusLocked && !mcpMenuOpen}
-              aria-label={mcpMenuOpen ? "Close MCP tools" : "MCP tools"}
-              aria-expanded={mcpMenuOpen}
-              aria-controls={mcpMenuId}
-              title="MCP tools (Exa, Context7)"
-            >
-              <LucideIcon icon={mcpMenuOpen ? X : Wrench} size={24} />
-            </button>
-            {mcpMenuOpen ? (
-              <div
-                id={mcpMenuId}
-                className="chat-attach-menu chat-attach-menu--settings"
-                role="dialog"
-                aria-label="MCP tools"
-              >
-                <McpSettingsPanel
-                  settings={mcpSettings}
-                  disabled={menusLocked}
-                  detailServerId={mcpDetailServerId}
-                  onDetailServerIdChange={setMcpDetailServerId}
-                  onChange={onMcpSettingsChange}
+              trigger={
+                <IconButton
+                  icon={mcpMenuOpen ? "x" : "wrench"}
+                  label={mcpMenuOpen ? "Close MCP tools" : "MCP tools"}
+                  title="MCP tools (Exa, Context7)"
+                  tooltip={false}
+                  disabled={menusLocked && !mcpMenuOpen}
                 />
-              </div>
-            ) : null}
+              }
+            >
+              <McpSettingsPanel
+                settings={mcpSettings}
+                disabled={menusLocked}
+                detailServerId={mcpDetailServerId}
+                onDetailServerIdChange={setMcpDetailServerId}
+                onChange={onMcpSettingsChange}
+              />
+            </Popover>
           </div>
           <div className="chat-composer__attach" ref={attachMenuRef}>
-            <button
-              type="button"
-              className="chat-btn chat-btn--ghost chat-btn--icon"
-              onClick={() => {
-                setAttachMenuOpen((open) => !open);
-                setModelMenuOpen(false);
-                setMcpMenuOpen(false);
-                setMcpDetailServerId(null);
-              }}
-              disabled={menusLocked && !attachMenuOpen}
-              aria-label={attachMenuOpen ? "Close attach menu" : "Attach"}
-              aria-expanded={attachMenuOpen}
-              aria-controls={attachMenuId}
-              title="Attach images, files, or library items"
-            >
-              <LucideIcon icon={attachMenuOpen ? X : Plus} size={24} />
-            </button>
-            {attachMenuOpen ? (
-              <div
-                id={attachMenuId}
-                className="chat-attach-menu"
-                role="menu"
-                aria-label="Attach"
-              >
-                <button
-                  type="button"
-                  className="chat-attach-menu__item"
-                  role="menuitem"
+            <Menu
+              label="Attach"
+              placement="top-start"
+              items={[
+                { id: "images", label: "Images", icon: "images", onSelect: onPickImages },
+                { id: "files", label: "Files", icon: "file", onSelect: onPickFiles },
+                { id: "library", label: "From library", icon: "books", onSelect: openLibraryPicker },
+              ]}
+              trigger={
+                <IconButton
+                  icon="plus"
+                  label="Attach"
+                  title="Attach images, files, or library items"
+                  tooltip={false}
+                  disabled={menusLocked}
                   onClick={() => {
-                    setAttachMenuOpen(false);
-                    onPickImages();
+                    setModelMenuOpen(false);
+                    setMcpMenuOpen(false);
+                    setMcpDetailServerId(null);
                   }}
-                >
-                  <LucideIcon icon={Images} size={20} />
-                  <span>Images</span>
-                </button>
-                <button
-                  type="button"
-                  className="chat-attach-menu__item"
-                  role="menuitem"
-                  onClick={() => {
-                    setAttachMenuOpen(false);
-                    onPickFiles();
-                  }}
-                >
-                  <LucideIcon icon={File} size={20} />
-                  <span>Files</span>
-                </button>
-                <button
-                  type="button"
-                  className="chat-attach-menu__item"
-                  role="menuitem"
-                  onClick={openLibraryPicker}
-                >
-                  <LucideIcon icon={Library} size={20} />
-                  <span>From library</span>
-                </button>
-              </div>
-            ) : null}
+                />
+              }
+            />
           </div>
-          <textarea
+          <Textarea
             ref={composerRef}
             className="chat-composer__input"
+            aria-label="Message"
+            resize="none"
             rows={1}
             value={input}
             onChange={(event) => onInputChange(event.target.value)}
@@ -851,23 +801,25 @@ export function ChatPane({
             disabled={busy && !composerBusy}
           />
           {showStop ? (
-            <button type="button" className="chat-btn" onClick={onStop}>
-              Stop
-            </button>
+            <IconButton
+              icon="stop"
+              label="Stop"
+              variant="secondary"
+              iconWeight="fill"
+              onClick={onStop}
+            />
           ) : (
-            <button
+            <IconButton
               type="submit"
-              className="chat-btn chat-btn--icon"
+              icon="paper-plane-right"
+              label="Send"
+              variant="primary"
               disabled={
                 busy ||
                 generating ||
                 (!input.trim() && pendingAttachments.length === 0)
               }
-              aria-label="Send"
-              title="Send"
-            >
-              <LucideIcon icon={Send} size={24} />
-            </button>
+            />
           )}
         </div>
       </form>
