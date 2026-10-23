@@ -1,0 +1,152 @@
+---
+/** Pattern specimens: status badges, list row, card, tabs and links. */
+import Badge from "./Badge.astro";
+import Row from "./Row.astro";
+
+const tabs = [
+  { id: "overview", label: "Overview", body: "A calm summary of what the project is and who it is for." },
+  { id: "notes", label: "Notes", body: "Decisions, trade-offs, and anything worth remembering later." },
+  { id: "changes", label: "Changes", body: "A short, dated list of what shipped and when." },
+];
+---
+
+<div class="p-sys__group" data-reveal>
+  <h3 class="p-sys__label">Status</h3>
+  <div class="p-sys__body p-sys__wrap">
+    <Badge status="live" />
+    <Badge status="wip" />
+    <Badge status="archived" />
+  </div>
+</div>
+
+<div class="p-sys__group p-sys__group--full" data-reveal>
+  <h3 class="p-sys__label">List row</h3>
+  <ul class="p-sys__body p-list">
+    <Row label="2026" title="Linked row" desc="Whole row is the target; arrow nudges on hover." href="#system" status="live" />
+    <Row label="Ongoing" title="Static row" desc="Same rhythm without a link." />
+  </ul>
+</div>
+
+<div class="p-sys__group" data-reveal>
+  <h3 class="p-sys__label">Card</h3>
+  <div class="p-sys__body">
+    <article class="p-card">
+      <h4 class="p-card__title">Verification lab</h4>
+      <p class="p-card__body">Flat surface fill, no border, no shadow. Use for short grouped content.</p>
+      <a class="p-card__link" href="/keys">Open keys</a>
+    </article>
+  </div>
+</div>
+
+<div class="p-sys__group" data-reveal>
+  <h3 class="p-sys__label">Tabs</h3>
+  <div class="p-sys__body p-tabs" data-p-tabs>
+    <div class="p-tabs__list" role="tablist" aria-label="Project details">
+      {
+        tabs.map((t, i) => (
+          <button
+            type="button"
+            class="p-tabs__tab"
+            role="tab"
+            id={`p-tab-${t.id}`}
+            aria-controls={`p-panel-${t.id}`}
+            aria-selected={i === 0 ? "true" : "false"}
+            tabindex={i === 0 ? 0 : -1}
+          >
+            {t.label}
+          </button>
+        ))
+      }
+    </div>
+    {
+      tabs.map((t, i) => (
+        <div class="p-tabs__panel" role="tabpanel" id={`p-panel-${t.id}`} aria-labelledby={`p-tab-${t.id}`} hidden={i !== 0}>
+          {t.body}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<div class="p-sys__group" data-reveal>
+  <h3 class="p-sys__label">Link</h3>
+  <p class="p-sys__body p-sys__text">
+    Inline links read in gold with a soft underline, like <a href="#system">this one</a>.
+  </p>
+</div>
+
+<script>
+  import { initTabs } from "./tabs";
+  initTabs();
+</script>
+
+<style>
+  .p-card {
+    display: grid;
+    gap: 0.375rem;
+    max-width: 22rem;
+    padding: 1.25rem;
+    border-radius: var(--p-radius);
+    background: var(--p-surface);
+  }
+
+  .p-card__title {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .p-card__body {
+    color: var(--p-muted);
+    font-size: 0.875rem;
+  }
+
+  .p-card__link {
+    justify-self: start;
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+  }
+
+  .p-tabs__list {
+    display: flex;
+    gap: 1.25rem;
+    border-bottom: 1px solid var(--p-line);
+  }
+
+  .p-tabs__tab {
+    margin-bottom: -1px;
+    padding: 0.5rem 0;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--p-muted);
+    font-size: 0.875rem;
+    transition:
+      color var(--p-fast) var(--p-ease),
+      border-color var(--p-fast) var(--p-ease);
+  }
+
+  .p-tabs__tab:hover {
+    color: var(--p-ink);
+  }
+
+  .p-tabs__tab[aria-selected="true"] {
+    border-bottom-color: var(--p-ink);
+    color: var(--p-ink);
+  }
+
+  .p-tabs__panel {
+    padding-top: 0.875rem;
+    color: var(--p-muted);
+    font-size: 0.875rem;
+  }
+
+  .p-sys__group--full .p-list :global(.p-row:last-child) {
+    border-bottom: 0;
+  }
+
+  .p-sys__text {
+    padding-top: 0.4375rem;
+    color: var(--p-muted);
+  }
+</style>

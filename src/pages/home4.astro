@@ -1,0 +1,41 @@
+---
+/**
+ * Concept 4 — "Letter": a single typeset column where the writing carries the
+ * page. Review-only route; the live homepage is untouched.
+ */
+import ConceptLayout from "../layouts/ConceptLayout.astro";
+import "../components/concepts/letter/letter.css";
+import Masthead from "../components/concepts/letter/Masthead.astro";
+import Opening from "../components/concepts/letter/Opening.astro";
+import Now from "../components/concepts/letter/Now.astro";
+import Work from "../components/concepts/letter/Work.astro";
+import Tools from "../components/concepts/letter/Tools.astro";
+import Principles from "../components/concepts/letter/Principles.astro";
+import Quote from "../components/concepts/letter/Quote.astro";
+import Keys from "../components/concepts/letter/Keys.astro";
+import Contact from "../components/concepts/letter/Contact.astro";
+import SystemPreview from "../components/concepts/letter/SystemPreview.astro";
+import Footer from "../components/concepts/letter/Footer.astro";
+---
+
+<ConceptLayout
+  title="Letter"
+  description="Concept 4 for dmeim.com — a single typeset column, written like a letter."
+  concept={4}
+  fontsHref="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&display=swap"
+>
+  <a class="lt-skip" href="#main">Skip to content</a>
+  <Masthead />
+  <main id="main" class="lt-main lt-column">
+    <Opening />
+    <Now />
+    <Work />
+    <Tools />
+    <Principles />
+    <Quote />
+    <Keys />
+    <Contact />
+    <SystemPreview />
+  </main>
+  <Footer />
+</ConceptLayout>

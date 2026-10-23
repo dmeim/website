@@ -1,0 +1,11 @@
+---
+import { projects } from "../../../../content/site";
+import ProjectCard from "../ProjectCard.astro";
+import PreviewPanel from "./PreviewPanel.astro";
+
+const sample = projects.find((p) => p.status === "live") ?? projects[0];
+---
+
+<PreviewPanel title="Card" note="tile · project">
+  <ProjectCard project={sample} reveal={false} />
+</PreviewPanel>

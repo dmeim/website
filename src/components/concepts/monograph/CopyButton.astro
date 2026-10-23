@@ -1,0 +1,99 @@
+---
+import { Check, Copy } from "@lucide/astro";
+
+interface Props {
+  value: string;
+  /** Names what is copied, for screen readers: "Copy fingerprint". */
+  label?: string;
+}
+
+const { value, label = "Copy" } = Astro.props;
+---
+
+<button type="button" class="mg-btn mg-copy" data-mg-copy={value} aria-label={label}>
+  <span class="mg-copy__icons" aria-hidden="true">
+    <Copy class="mg-copy__icon mg-copy__icon--copy" />
+    <Check class="mg-copy__icon mg-copy__icon--check" />
+  </span>
+  <span class="mg-copy__text" aria-hidden="true" data-mg-copy-text>Copy</span>
+  <span class="mg-sr-only" role="status" data-mg-copy-status></span>
+</button>
+
+<style>
+  .mg-copy {
+    min-height: 44px;
+    padding-inline: 18px;
+    gap: 10px;
+  }
+
+  .mg-copy__icons {
+    position: relative;
+    width: 16px;
+    height: 16px;
+  }
+
+  .mg-copy :global(.mg-copy__icon) {
+    position: absolute;
+    inset: 0;
+    transition:
+      opacity var(--mg-dur-1) var(--mg-ease),
+      transform var(--mg-dur-2) var(--mg-ease);
+  }
+
+  .mg-copy :global(.mg-copy__icon--check) {
+    opacity: 0;
+    transform: scale(0.4) rotate(-45deg);
+    color: var(--mg-gold);
+  }
+
+  .mg-copy[data-state="copied"] :global(.mg-copy__icon--copy) {
+    opacity: 0;
+    transform: scale(0.4) rotate(45deg);
+  }
+
+  .mg-copy[data-state="copied"] :global(.mg-copy__icon--check) {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Base .mg-btn nudges icons on hover; the morph owns these. */
+  .mg-copy:hover :global(svg) {
+    transform: none;
+  }
+
+  .mg-copy:hover[data-state="copied"] :global(.mg-copy__icon--copy) {
+    transform: scale(0.4) rotate(45deg);
+  }
+</style>
+
+<script>
+  const RESET_MS = 2000;
+
+  document.querySelectorAll<HTMLButtonElement>("[data-mg-copy]").forEach((button) => {
+    const text = button.querySelector<HTMLElement>("[data-mg-copy-text]");
+    const status = button.querySelector<HTMLElement>("[data-mg-copy-status]");
+    let timer = 0;
+
+    const show = (state: "copied" | "failed", message: string): void => {
+      button.dataset.state = state;
+      if (text) text.textContent = state === "copied" ? "Copied" : "Select & copy";
+      if (status) status.textContent = message;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        delete button.dataset.state;
+        if (text) text.textContent = "Copy";
+        if (status) status.textContent = "";
+      }, RESET_MS);
+    };
+
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.mgCopy ?? "");
+        show("copied", "Copied to clipboard");
+      } catch (error) {
+        console.warn("[monograph] clipboard write failed", error);
+        show("failed", "Copy failed. Select the text and copy it manually.");
+      }
+    });
+  });
+</script>

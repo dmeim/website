@@ -1,0 +1,128 @@
+/* Card and tabs patterns from the system preview. */
+
+.mg-card {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  background: var(--mg-surface);
+  overflow: hidden;
+}
+
+.mg-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--mg-gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--mg-dur-3) var(--mg-ease);
+}
+
+.mg-card:hover::before,
+.mg-card:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.mg-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.mg-card__num {
+  font-size: 2.75rem;
+}
+
+.mg-card__title {
+  font-family: var(--mg-font-display);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.mg-card__body {
+  color: var(--mg-ink-muted);
+  font-size: var(--mg-text-sm);
+}
+
+.mg-card__foot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mg-ink);
+}
+
+.mg-card__foot svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.5;
+  transition: transform var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-card:hover .mg-card__foot svg {
+  transform: translate(2px, -2px);
+}
+
+/* ---------- Tabs ---------- */
+
+.mg-tabs__list {
+  position: relative;
+  display: flex;
+  gap: 28px;
+  border-bottom: 1px solid var(--mg-line);
+}
+
+.mg-tabs__tab {
+  min-height: 44px;
+  font-size: var(--mg-text-label);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mg-ink-muted);
+  transition: color var(--mg-dur-1) var(--mg-ease);
+}
+
+.mg-tabs__tab:hover,
+.mg-tabs__tab[aria-selected="true"] {
+  color: var(--mg-ink);
+}
+
+.mg-tabs__indicator {
+  --x: 0px;
+  --w: 0px;
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: var(--w);
+  height: 1px;
+  background: var(--mg-gold);
+  box-shadow: 0 0 0 0.5px var(--mg-gold);
+  transform: translateX(var(--x));
+  transition:
+    transform var(--mg-dur-2) var(--mg-ease),
+    width var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-tabs__panel {
+  padding-top: 20px;
+  font-family: var(--mg-font-display);
+  font-size: 1.375rem;
+  line-height: 1.3;
+  animation: mg-tab-in var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-tabs__panel:focus-visible {
+  outline-offset: 6px;
+}
+
+@keyframes mg-tab-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.mg-sys-acc {
+  border-top: 1px solid var(--mg-line);
+}

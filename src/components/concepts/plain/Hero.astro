@@ -1,0 +1,130 @@
+---
+import { Image } from "astro:assets";
+import { ArrowRight } from "@lucide/astro";
+import portrait from "../../../../assets/images/photoshoot/gpt-jackethold-transparent.png";
+import { currentChapter } from "../../../content/site";
+
+// Only the first sentence; the rest of the chapter copy describes an older design.
+const sub = currentChapter.body.split(/(?<=\.)\s/)[0];
+---
+
+<section class="pl-hero pl-container" aria-labelledby="pl-hero-title" data-reveal-group>
+  <div class="pl-hero__copy">
+    <p class="pl-hero__eyebrow" data-reveal>
+      <span class="pl-hero__dot" aria-hidden="true"></span>
+      Dimitri · dmeim
+    </p>
+    <h1 id="pl-hero-title" data-reveal>I build careful interfaces and trustworthy infrastructure.</h1>
+    <p class="pl-hero__sub" data-reveal>{sub}</p>
+    <div class="pl-hero__actions" data-reveal>
+      <a class="pl-btn pl-btn--primary" href="#work">
+        See the work
+        <ArrowRight aria-hidden="true" />
+      </a>
+      <a class="pl-btn" href="#contact">Get in touch</a>
+    </div>
+  </div>
+
+  <figure class="pl-hero__portrait pl-panel" data-reveal>
+    <Image
+      src={portrait}
+      alt="Dimitri in a black suit, one hand holding his jacket lapel, smiling at the camera."
+      widths={[360, 560, 800, 1100]}
+      sizes="(min-width: 1100px) 34rem, (min-width: 720px) 52vw, 100vw"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </figure>
+</section>
+
+<style>
+  .pl-hero {
+    display: grid;
+    gap: 40px;
+    padding-top: 40px;
+  }
+
+  .pl-hero__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pl-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--pl-muted);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  /* The page's one gold marker. */
+  .pl-hero__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--pl-gold);
+  }
+
+  .pl-hero h1 {
+    max-width: 15ch;
+    margin-top: 20px;
+    font-size: clamp(2.125rem, 1.5rem + 2.4vw, 3.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+
+  .pl-hero__sub {
+    max-width: 30rem;
+    margin-top: 20px;
+    color: var(--pl-muted);
+    font-size: 1.0625rem;
+  }
+
+  .pl-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .pl-hero__portrait {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    aspect-ratio: 1;
+    padding: 32px 24px 0;
+    overflow: hidden;
+  }
+
+  /* Size by the panel's height: the cut-out has wide transparent margins, so
+     letting it overflow sideways keeps the figure large without cropping the head. */
+  .pl-hero__portrait img {
+    flex: none;
+    width: auto;
+    height: 100%;
+    max-width: none;
+  }
+
+  @media (min-width: 720px) {
+    .pl-hero {
+      grid-template-columns: 1.1fr 1fr;
+      align-items: center;
+      gap: 48px;
+      padding-top: 72px;
+    }
+
+    .pl-hero__portrait {
+      aspect-ratio: 5 / 6;
+      padding: 40px 32px 0;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .pl-hero {
+      gap: 72px;
+      padding-top: 96px;
+    }
+  }
+</style>

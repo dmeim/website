@@ -1,0 +1,97 @@
+---
+import { ArrowRight } from "@lucide/astro";
+import { availableTools, toolCategories, toolRoute } from "../../../content/tools";
+import SectionHead from "./SectionHead.astro";
+
+const total = availableTools().length;
+
+const topCategories = toolCategories
+  .map((category) => ({
+    name: category.name,
+    count: category.tools.filter((tool) => toolRoute(tool)).length,
+  }))
+  .filter((category) => category.count > 0)
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 4);
+---
+
+<section id="tools" class="pl-section pl-container" aria-labelledby="pl-tools-title">
+  <SectionHead id="pl-tools-title" title="Tools" />
+
+  <div class="pl-panel pl-tools" data-reveal>
+    <div class="pl-tools__lead">
+      <p class="pl-tools__sentence">
+        {total} private, local-first utilities that run right in your browser.
+      </p>
+      <a class="pl-link" href="/tools">
+        Browse tools
+        <ArrowRight aria-hidden="true" />
+      </a>
+    </div>
+
+    <dl class="pl-tools__cats">
+      {
+        topCategories.map((category) => (
+          <div>
+            <dt>{category.name}</dt>
+            <dd>{category.count}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<style>
+  .pl-tools {
+    display: grid;
+    gap: 32px;
+  }
+
+  .pl-tools__lead {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .pl-tools__sentence {
+    max-width: 26rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  .pl-tools__cats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 24px;
+    align-content: start;
+  }
+
+  .pl-tools__cats div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pl-tools__cats dt {
+    color: var(--pl-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .pl-tools__cats dd {
+    font-size: 1.25rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (min-width: 720px) {
+    .pl-tools {
+      grid-template-columns: 1.2fr 1fr;
+      gap: 48px;
+    }
+  }
+</style>

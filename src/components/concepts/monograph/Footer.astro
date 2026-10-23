@@ -1,0 +1,99 @@
+---
+import { ArrowUp } from "@lucide/astro";
+
+const year = new Date().getFullYear();
+const links = [
+  { label: "Projects", href: "/projects" },
+  { label: "Tools", href: "/tools" },
+  { label: "Keys", href: "/keys" },
+  { label: "Connect", href: "/connect" },
+];
+---
+
+<footer class="mg-footer mg-invert" data-band="invert">
+  <div class="mg-container mg-footer__inner">
+    <p class="mg-footer__mark">dmeim<span aria-hidden="true">.</span></p>
+    <nav aria-label="Footer">
+      <ul class="mg-footer__links">
+        {links.map((l) => <li><a class="mg-link mg-link--bare mg-label" href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <p class="mg-label">© {year} Dimitri</p>
+    <a class="mg-footer__top mg-label" href="#top">
+      Back to top
+      <span class="mg-footer__top-icon" aria-hidden="true"><ArrowUp /></span>
+    </a>
+  </div>
+</footer>
+
+<style>
+  .mg-footer {
+    padding-bottom: 96px;
+  }
+
+  .mg-footer__inner {
+    display: grid;
+    gap: 28px;
+    align-items: center;
+    padding-top: 40px;
+    border-top: 1px solid var(--mg-line);
+  }
+
+  .mg-footer__mark {
+    font-family: var(--mg-font-display);
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .mg-footer__mark span {
+    color: var(--mg-gold);
+  }
+
+  .mg-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+  }
+
+  .mg-footer__links a {
+    color: var(--mg-ink);
+  }
+
+  .mg-footer__top {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--mg-ink);
+    justify-self: start;
+  }
+
+  .mg-footer__top-icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--mg-line-strong);
+    border-radius: 50%;
+    transition:
+      transform var(--mg-dur-2) var(--mg-ease),
+      border-color var(--mg-dur-2) var(--mg-ease);
+  }
+
+  .mg-footer__top-icon :global(svg) {
+    width: 16px;
+    height: 16px;
+    stroke-width: 1.5;
+  }
+
+  .mg-footer__top:hover .mg-footer__top-icon {
+    transform: translateY(-4px);
+    border-color: var(--mg-gold);
+  }
+
+  @media (min-width: 900px) {
+    .mg-footer__inner {
+      grid-template-columns: 1fr auto auto auto;
+      gap: 56px;
+    }
+  }
+</style>

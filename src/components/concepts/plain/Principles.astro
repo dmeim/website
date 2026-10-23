@@ -1,0 +1,86 @@
+---
+import { mentorQuote, pedagogy } from "../../../content/site";
+import SectionHead from "./SectionHead.astro";
+
+const rows = Math.ceil(pedagogy.length / 2);
+---
+
+<section id="principles" class="pl-section pl-container" aria-labelledby="pl-principles-title">
+  <SectionHead id="pl-principles-title" title="Principles" />
+
+  <ol class="pl-principles" style={`--pl-rows: ${rows}`} data-reveal-group>
+    {
+      pedagogy.map((item, index) => (
+        <li data-reveal>
+          <span class="pl-principles__n" aria-hidden="true">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          {item.title}
+        </li>
+      ))
+    }
+  </ol>
+
+  <figure class="pl-panel pl-quote" data-reveal>
+    <blockquote>
+      <p>{mentorQuote.text}</p>
+    </blockquote>
+    {mentorQuote.attribution && <figcaption>{mentorQuote.attribution}</figcaption>}
+  </figure>
+</section>
+
+<style>
+  .pl-principles {
+    display: grid;
+    gap: 4px 48px;
+  }
+
+  .pl-principles li {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    padding: 14px 0;
+    font-size: 1.0625rem;
+    font-weight: 500;
+  }
+
+  .pl-principles__n {
+    flex: none;
+    width: 2ch;
+    color: var(--pl-muted);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pl-quote {
+    margin-top: 48px;
+  }
+
+  .pl-quote p {
+    max-width: 40rem;
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+    font-weight: 500;
+    line-height: 1.45;
+    letter-spacing: -0.015em;
+  }
+
+  .pl-quote figcaption {
+    margin-top: 20px;
+    color: var(--pl-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  @media (min-width: 720px) {
+    .pl-principles {
+      grid-template-columns: 1fr 1fr;
+      /* Read down the first column, then the second. */
+      grid-template-rows: repeat(var(--pl-rows), auto);
+      grid-auto-flow: column;
+    }
+
+    .pl-quote {
+      padding: 48px;
+    }
+  }
+</style>

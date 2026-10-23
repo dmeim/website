@@ -1,0 +1,55 @@
+---
+import Tile from "../Tile.astro";
+
+interface Props {
+  title: string;
+  note?: string;
+  wide?: boolean;
+}
+
+const { title, note, wide = false } = Astro.props;
+---
+
+<Tile as="section" class:list={["preview-panel", wide && "preview-panel--wide"]} spotlight={false} aria-label={title}>
+  <header class="preview-panel__head">
+    <h3 class="mono preview-panel__title">{title}</h3>
+    {note && <span class="mono preview-panel__note">{note}</span>}
+  </header>
+  <div class="preview-panel__body">
+    <slot />
+  </div>
+</Tile>
+
+<style>
+  :global(.tile.preview-panel) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+    min-width: 0;
+  }
+
+  .preview-panel__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding-bottom: var(--s-3);
+    border-bottom: 1px dashed var(--border-strong);
+  }
+
+  .preview-panel__title {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .preview-panel__note {
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+
+  .preview-panel__body {
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+  }
+</style>

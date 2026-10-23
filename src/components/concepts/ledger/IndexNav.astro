@@ -1,0 +1,51 @@
+---
+/**
+ * Numbered table of contents with hairline rows; rows slide on hover.
+ */
+interface Props {
+  label: string;
+  items: { n: string; label: string; href: string }[];
+}
+
+const { label, items } = Astro.props;
+---
+
+<nav class="toc" aria-label={label}>
+  <p class="l-mono l-muted" aria-hidden="true">{label}</p>
+  <ol>
+    {
+      items.map((item) => (
+        <li>
+          <a href={item.href}>
+            <span class="l-mono l-gold">{item.n}</span>
+            <span>{item.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .toc ol {
+    margin-top: var(--l-space-3);
+    border-top: 1px solid var(--l-line);
+  }
+
+  .toc a {
+    display: flex;
+    align-items: baseline;
+    gap: var(--l-space-3);
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--l-line);
+    font-size: var(--l-text-sm);
+    transition:
+      padding var(--l-dur) var(--l-ease),
+      color var(--l-dur-fast) var(--l-ease);
+  }
+
+  .toc a:hover {
+    padding-left: var(--l-space-2);
+    color: var(--l-gold-ink);
+  }
+</style>

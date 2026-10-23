@@ -1,0 +1,25 @@
+---
+/** A headed passage of the letter: small-caps label, then prose or a list. */
+interface Props {
+  id: string;
+  label: string;
+}
+
+const { id, label } = Astro.props;
+---
+
+<section class="lt-section" id={id} aria-labelledby={`${id}-title`} data-reveal>
+  <h2 class="lt-label lt-section__title" id={`${id}-title`}>{label}</h2>
+  <slot />
+</section>
+
+<style>
+  .lt-section {
+    margin-top: clamp(3.5rem, 7vw, 4.75rem);
+    scroll-margin-top: 2rem;
+  }
+
+  .lt-section__title {
+    margin-bottom: 1rem;
+  }
+</style>

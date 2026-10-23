@@ -1,0 +1,61 @@
+---
+import { keys } from "../../../content/site";
+import Section from "./Section.astro";
+import TextLink from "./TextLink.astro";
+import CopyButton from "./CopyButton.astro";
+---
+
+<Section id="keys" label="Keys">
+  <p>
+    If something claims to be from me, you should be able to check. These are
+    the fingerprints I sign with.
+  </p>
+  <dl class="lt-keys">
+    {
+      keys.map((key) => (
+        <div class="lt-keys__row">
+          <dt class="lt-label">{key.title}</dt>
+          <dd>
+            <code class="lt-mono lt-keys__fp">{key.fingerprint}</code>
+            <CopyButton value={key.fingerprint} label={`Copy ${key.title} fingerprint`} />
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+  <p class="lt-keys__more">
+    <TextLink href="/keys" arrow>Full keys and import notes</TextLink>
+  </p>
+</Section>
+
+<style>
+  .lt-keys {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--lt-line);
+  }
+
+  .lt-keys__row {
+    display: grid;
+    gap: 0.2rem;
+    padding-block: 0.9rem;
+    border-bottom: 1px solid var(--lt-line);
+  }
+
+  .lt-keys__row dd {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .lt-keys__fp {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--lt-ink);
+  }
+
+  .lt-keys__more {
+    margin-top: 1.25rem;
+    font-size: var(--lt-small);
+  }
+</style>

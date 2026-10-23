@@ -1,0 +1,148 @@
+---
+/**
+ * Tab strip with a sliding underline. Follows the WAI-ARIA tabs pattern:
+ * roving tabindex, arrow/Home/End keys, automatic activation.
+ */
+interface Props {
+  id: string;
+  label: string;
+  tabs: { label: string; body: string }[];
+}
+
+const { id, label, tabs } = Astro.props;
+---
+
+<div class="tabs" data-tabs>
+  <div class="tabs__list" role="tablist" aria-label={label}>
+    {
+      tabs.map((tab, i) => (
+        <button
+          type="button"
+          role="tab"
+          class="tabs__tab"
+          id={`${id}-tab-${i}`}
+          aria-controls={`${id}-panel-${i}`}
+          aria-selected={i === 0 ? "true" : "false"}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          {tab.label}
+        </button>
+      ))
+    }
+    <span class="tabs__ink" aria-hidden="true"></span>
+  </div>
+  {
+    tabs.map((tab, i) => (
+      <div class="tabs__panel" role="tabpanel" id={`${id}-panel-${i}`} aria-labelledby={`${id}-tab-${i}`} tabindex="0" data-panel>
+        {tab.body}
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-tabs]").forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>("[role='tab']"));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>("[data-panel]"));
+    const ink = root.querySelector<HTMLElement>(".tabs__ink");
+
+    const moveInk = (tab: HTMLElement) => {
+      if (!ink) return;
+      ink.style.setProperty("--x", `${tab.offsetLeft}px`);
+      ink.style.setProperty("--w", `${tab.offsetWidth}px`);
+    };
+
+    const select = (index: number, focus = false) => {
+      tabs.forEach((tab, i) => {
+        const on = i === index;
+        tab.setAttribute("aria-selected", String(on));
+        tab.tabIndex = on ? 0 : -1;
+        panels[i].hidden = !on;
+      });
+      moveInk(tabs[index]);
+      if (focus) tabs[index].focus();
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => select(i));
+      tab.addEventListener("keydown", (event) => {
+        const last = tabs.length - 1;
+        const next: Record<string, number> = {
+          ArrowRight: i === last ? 0 : i + 1,
+          ArrowLeft: i === 0 ? last : i - 1,
+          Home: 0,
+          End: last,
+        };
+        if (!(event.key in next)) return;
+        event.preventDefault();
+        select(next[event.key], true);
+      });
+    });
+
+    root.setAttribute("data-ready", "");
+    select(0);
+    // Webfonts change tab widths after first paint.
+    document.fonts?.ready.then(() => moveInk(tabs.find((t) => t.tabIndex === 0) ?? tabs[0]));
+    window.addEventListener("resize", () => moveInk(tabs.find((t) => t.tabIndex === 0) ?? tabs[0]));
+  });
+</script>
+
+<style>
+  .tabs__list {
+    position: relative;
+    display: flex;
+    gap: var(--l-space-5);
+    border-bottom: 1px solid var(--l-line-strong);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs__tab {
+    padding: 0.75rem 0;
+    border: 0;
+    background: none;
+    font-size: var(--l-text-sm);
+    font-weight: 500;
+    color: var(--l-ink-muted);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--l-dur-fast) var(--l-ease);
+  }
+
+  .tabs__tab:hover,
+  .tabs__tab[aria-selected="true"] {
+    color: var(--l-ink);
+  }
+
+  .tabs__tab:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .tabs__ink {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: var(--w, 0);
+    height: 2px;
+    background: var(--l-gold);
+    transform: translateX(var(--x, 0));
+    transition:
+      transform var(--l-dur) var(--l-ease),
+      width var(--l-dur) var(--l-ease);
+  }
+
+  .tabs:not([data-ready]) .tabs__ink {
+    display: none;
+  }
+
+  .tabs__panel {
+    padding-top: var(--l-space-4);
+    font-size: var(--l-text-sm);
+    color: var(--l-ink-muted);
+    max-width: 52ch;
+  }
+
+  .tabs__panel:focus-visible {
+    outline-offset: 4px;
+  }
+</style>

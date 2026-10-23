@@ -1,0 +1,21 @@
+---
+import { connect } from "../../../content/site";
+import Section from "./Section.astro";
+import TextLink from "./TextLink.astro";
+---
+
+<Section id="contact" label="Contact">
+  <p>
+    Email is the simplest way to reach me:{" "}
+    <TextLink href={`mailto:${connect.email}`}>{connect.email}</TextLink>.
+    The code lives on <TextLink href={connect.socialUrl}>GitHub</TextLink>.
+  </p>
+  <p class="lt-contact__signoff">— Dimitri</p>
+</Section>
+
+<style>
+  .lt-contact__signoff {
+    margin-top: 1.75rem;
+    font-style: italic;
+  }
+</style>

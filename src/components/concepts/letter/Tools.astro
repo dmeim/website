@@ -1,0 +1,45 @@
+---
+import { availableTools, toolRoute } from "../../../content/tools";
+import Section from "./Section.astro";
+import TextLink from "./TextLink.astro";
+
+const picks = [
+  "word-code-generator",
+  "qrcode-generator",
+  "token-generator",
+  "hash-text",
+  "uuid-generator",
+  "password-strength-analyser",
+];
+
+const all = availableTools();
+const featured = picks
+  .map((id) => all.find((tool) => tool.id === id))
+  .filter((tool) => tool !== undefined)
+  .map((tool) => ({ title: tool.title, href: toolRoute(tool) ?? "/tools" }));
+---
+
+<Section id="tools" label="Tools">
+  <p>
+    I keep {all.length} small, private utilities here. They run entirely in
+    your browser, so your data stays with you. A few I reach for often:{" "}
+    {
+      featured.map((tool, i) => (
+        <>
+          <TextLink href={tool.href} quiet>{tool.title}</TextLink>
+          {i < featured.length - 2 ? ", " : i === featured.length - 2 ? ", and " : "."}
+        </>
+      ))
+    }
+  </p>
+  <p class="lt-tools__more">
+    <TextLink href="/tools" arrow>Browse all tools</TextLink>
+  </p>
+</Section>
+
+<style>
+  .lt-tools__more {
+    margin-top: 1.25rem;
+    font-size: var(--lt-small);
+  }
+</style>

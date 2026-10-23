@@ -1,0 +1,73 @@
+---
+import { Moon, Sun, SunMoon } from "@lucide/astro";
+
+const options = [
+  { value: "light", label: "Light theme", Icon: Sun },
+  { value: "system", label: "System theme", Icon: SunMoon },
+  { value: "dark", label: "Dark theme", Icon: Moon },
+] as const;
+---
+
+<div class="seg theme-switch" role="group" aria-label="Color theme">
+  <span class="seg__thumb" aria-hidden="true"></span>
+  {
+    options.map(({ value, label, Icon }) => (
+      <button
+        type="button"
+        class="seg__option theme-switch__option"
+        data-theme-set={value}
+        aria-label={label}
+        title={label}
+      >
+        <Icon aria-hidden="true" />
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  .theme-switch {
+    --i: 1;
+    gap: 2px;
+  }
+
+  :global(:root[data-theme-pref="light"]) .theme-switch {
+    --i: 0;
+  }
+
+  :global(:root[data-theme-pref="dark"]) .theme-switch {
+    --i: 2;
+  }
+
+  /* Driven by the pre-paint data-theme-pref attribute, so no JS measuring. */
+  .theme-switch .seg__thumb {
+    left: 3px;
+    width: 30px;
+    opacity: 1;
+    translate: calc(var(--i) * 32px) 0;
+    transition: translate var(--dur) var(--ease-spring);
+  }
+
+  .theme-switch__option {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+  }
+
+  .theme-switch__option[aria-pressed="true"] {
+    color: var(--gold-text);
+  }
+
+  .theme-switch__option :global(svg) {
+    transition: rotate var(--dur-slow) var(--ease);
+  }
+
+  .theme-switch__option[aria-pressed="true"] :global(svg) {
+    rotate: 45deg;
+  }
+
+  .theme-switch__option[data-theme-set="system"][aria-pressed="true"] :global(svg),
+  .theme-switch__option[data-theme-set="dark"][aria-pressed="true"] :global(svg) {
+    rotate: -15deg;
+  }
+</style>

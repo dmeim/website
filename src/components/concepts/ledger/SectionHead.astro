@@ -1,0 +1,67 @@
+---
+/**
+ * Section opener: a hairline that draws in on reveal, a mono index row,
+ * and an optional display title. Every Ledger section starts with one.
+ */
+interface Props {
+  index: string;
+  label: string;
+  /** Right-aligned mono meta, e.g. an entry count. */
+  meta?: string;
+  title?: string;
+  titleId?: string;
+}
+
+const { index, label, meta, title, titleId } = Astro.props;
+---
+
+<header class="head" data-reveal>
+  <div class="head__rule" aria-hidden="true"></div>
+  <div class="head__row l-mono">
+    <span><span class="l-gold">{index}</span> / {label}</span>
+    {meta && <span class="l-muted l-num">{meta}</span>}
+  </div>
+  {title && <h2 class="head__title" id={titleId}>{title}</h2>}
+  <slot />
+</header>
+
+<style>
+  .head {
+    position: relative;
+    padding-top: var(--l-space-4);
+    margin-bottom: clamp(2.5rem, 1.5rem + 3vw, 5rem);
+  }
+
+  .head__rule {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: var(--l-line-strong);
+    transform-origin: left;
+    transition: transform 1.1s var(--l-ease);
+  }
+
+  :global(html.js) .head:not([data-revealed="true"]) .head__rule {
+    transform: scaleX(0);
+  }
+
+  /* The head itself shouldn't slide; only its rule draws and the text fades. */
+  :global(html.js) .head[data-reveal]:not([data-revealed="true"]) {
+    transform: none;
+  }
+
+  .head__row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--l-space-4);
+  }
+
+  .head__title {
+    margin-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    max-width: 18ch;
+    font-size: var(--l-text-2xl);
+    font-weight: 450;
+    letter-spacing: var(--l-track-display);
+    line-height: 0.98;
+  }
+</style>

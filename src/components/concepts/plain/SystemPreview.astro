@@ -1,0 +1,115 @@
+---
+import { ArrowRight, Plus } from "@lucide/astro";
+import SpecRow from "./SpecRow.astro";
+import SystemChoices from "./SystemChoices.astro";
+import SystemFields from "./SystemFields.astro";
+import SystemNav from "./SystemNav.astro";
+---
+
+<section id="system" class="pl-section pl-container" aria-labelledby="pl-system-title">
+  <div class="pl-head" data-reveal>
+    <div>
+      <p class="pl-system__eyebrow">System</p>
+      <h2 id="pl-system-title">Component preview</h2>
+      <p>The flat vocabulary this page is built from. For review only.</p>
+    </div>
+  </div>
+
+  <div class="pl-system">
+    <SpecRow label="Buttons">
+      <div class="pl-system__row">
+        <button type="button" class="pl-btn pl-btn--primary">Primary</button>
+        <button type="button" class="pl-btn">Secondary</button>
+        <button type="button" class="pl-btn pl-btn--ghost">Ghost</button>
+        <button type="button" class="pl-btn pl-btn--icon" aria-label="Add item">
+          <Plus aria-hidden="true" />
+        </button>
+        <button type="button" class="pl-btn pl-btn--primary" disabled>Disabled</button>
+        <button type="button" class="pl-btn" disabled>Disabled</button>
+      </div>
+    </SpecRow>
+
+    <SystemFields />
+
+    <SystemChoices />
+
+    <SpecRow label="Status">
+      <div class="pl-system__row">
+        <span class="pl-badge pl-badge--live">Live</span>
+        <span class="pl-badge pl-badge--wip">In progress</span>
+        <span class="pl-badge pl-badge--archived">Archived</span>
+      </div>
+    </SpecRow>
+
+    <SystemNav />
+
+    <SpecRow label="Panels">
+      <div class="pl-system__panels">
+        <div class="pl-panel">
+          <h3 class="pl-system__panel-title">Panel</h3>
+          <p class="pl-muted">Static surface for grouped content.</p>
+        </div>
+        <a class="pl-panel pl-panel--link" href="#system">
+          <h3 class="pl-system__panel-title">Card</h3>
+          <p class="pl-muted">Interactive: shifts on hover, presses on click.</p>
+          <span class="pl-system__open" aria-hidden="true">Open <ArrowRight /></span>
+        </a>
+      </div>
+    </SpecRow>
+  </div>
+</section>
+
+<style>
+  .pl-system__eyebrow {
+    margin: 0 0 6px;
+    color: var(--pl-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .pl-system {
+    display: grid;
+    gap: 48px;
+  }
+
+  .pl-system :global(.pl-system__row) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pl-system__panels {
+    display: grid;
+    gap: var(--pl-gap);
+  }
+
+  .pl-system__panel-title {
+    font-size: 1.0625rem;
+  }
+
+  .pl-system__panels p {
+    margin-top: 6px;
+  }
+
+  .pl-system__open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    color: var(--pl-muted);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .pl-system__open :global(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media (min-width: 720px) {
+    .pl-system__panels {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

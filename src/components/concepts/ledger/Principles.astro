@@ -1,0 +1,125 @@
+---
+/**
+ * Working principles as a numbered ledger, opened by the mentor quote.
+ */
+import { mentorQuote, pedagogy } from "../../../content/site";
+import SectionHead from "./SectionHead.astro";
+
+// Placeholder bodies are long lorem; keep the list scannable.
+const firstSentence = (text: string) => text.split(/(?<=\.)\s/)[0];
+---
+
+<section class="pr l-section" id="principles" aria-labelledby="principles-title">
+  <div class="l-container">
+    <SectionHead index="05" label="Principles" meta={`${pedagogy.length} rules`} />
+    <h2 class="l-sr-only" id="principles-title">Principles</h2>
+
+    <figure class="pr__quote" data-reveal>
+      <blockquote>
+        <p>{mentorQuote.text}</p>
+      </blockquote>
+      {mentorQuote.attribution && <figcaption class="l-mono l-muted">— {mentorQuote.attribution}</figcaption>}
+    </figure>
+
+    <ol class="pr__list" data-reveal-group>
+      {
+        pedagogy.map((item, i) => (
+          <li class="pr__item" data-reveal>
+            <span class="pr__n l-mono l-gold l-num">{String(i + 1).padStart(2, "0")}</span>
+            <h3 class="pr__title">{item.title}</h3>
+            <p class="pr__body l-muted">{firstSentence(item.body)}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .pr__quote {
+    position: relative;
+    padding-left: clamp(1.25rem, 0.5rem + 2vw, 2.5rem);
+    margin-bottom: clamp(4rem, 2rem + 5vw, 7rem);
+  }
+
+  .pr__quote::before {
+    content: "";
+    position: absolute;
+    inset: 0.2em auto 0.2em 0;
+    width: 2px;
+    background: var(--l-gold);
+    transform-origin: top;
+    transition: transform 1.2s var(--l-ease) 200ms;
+  }
+
+  :global(html.js) .pr__quote:not([data-revealed="true"])::before {
+    transform: scaleY(0);
+  }
+
+  .pr__quote p {
+    max-width: 24ch;
+    font-size: var(--l-text-2xl);
+    letter-spacing: var(--l-track-display);
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+
+  .pr__quote figcaption {
+    margin-top: var(--l-space-5);
+  }
+
+  .pr__list {
+    border-top: 1px solid var(--l-line-strong);
+  }
+
+  .pr__item {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    column-gap: var(--l-space-3);
+    row-gap: var(--l-space-2);
+    padding: var(--l-space-5) 0;
+    border-bottom: 1px solid var(--l-line);
+  }
+
+  .pr__n {
+    padding-top: 0.35em;
+  }
+
+  .pr__title {
+    font-size: var(--l-text-lg);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  .pr__body {
+    grid-column: 2;
+    font-size: var(--l-text-sm);
+    max-width: 52ch;
+  }
+
+  @media (min-width: 900px) {
+    .pr__quote {
+      margin-left: calc((100% + var(--l-col-gap)) / 12 * 3);
+    }
+
+    .pr__item {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--l-col-gap);
+      align-items: baseline;
+      padding: var(--l-space-6) 0;
+    }
+
+    .pr__n {
+      grid-column: 1 / span 3;
+      padding-top: 0;
+    }
+
+    .pr__title {
+      grid-column: 4 / span 4;
+    }
+
+    .pr__body {
+      grid-column: 8 / span 5;
+    }
+  }
+</style>

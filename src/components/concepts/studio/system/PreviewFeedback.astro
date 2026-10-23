@@ -1,0 +1,58 @@
+---
+import { Bell, Info } from "@lucide/astro";
+import StatusBadge from "../StatusBadge.astro";
+import PreviewPanel from "./PreviewPanel.astro";
+---
+
+<PreviewPanel title="Feedback" note="badge · tooltip · toast · link">
+  <div class="row">
+    <StatusBadge status="live" />
+    <StatusBadge status="wip" />
+    <StatusBadge status="archived" />
+    <span class="chip chip--sm">Tag</span>
+    <span class="chip">Chip <span class="chip__meta">· meta</span></span>
+  </div>
+
+  <div class="row">
+    <button type="button" class="btn btn--secondary btn--sm tip-anchor" aria-describedby="pv-tip">
+      <Info aria-hidden="true" /> Hover or focus me
+      <span class="tip" role="tooltip" id="pv-tip">Tooltips use the inverse surface</span>
+    </button>
+    <button type="button" class="btn btn--primary btn--sm" data-toast-demo>
+      <Bell aria-hidden="true" /> Show toast
+    </button>
+  </div>
+
+  <p class="prose">
+    Inline links read as <a class="link" href="/keys">quiet underlines</a> that warm to gold on hover.
+    Shortcuts render as <kbd class="kbd">⌘</kbd> <kbd class="kbd">K</kbd>.
+  </p>
+</PreviewPanel>
+
+<script>
+  import { showToast } from "../scripts/toast";
+
+  document.querySelectorAll("[data-toast-demo]").forEach((button) => {
+    button.addEventListener("click", () =>
+      showToast({ title: "Fingerprint published", body: "SSH · Ed25519 is now listed on /keys." }),
+    );
+  });
+</script>
+
+<style>
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .row .tip {
+    font-size: 11px;
+  }
+
+  .prose {
+    font-size: 14.5px;
+    color: var(--ink-muted);
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+import "../components/concepts/plain/plain.css";
+import ConceptLayout from "../layouts/ConceptLayout.astro";
+import Contact from "../components/concepts/plain/Contact.astro";
+import Footer from "../components/concepts/plain/Footer.astro";
+import Header from "../components/concepts/plain/Header.astro";
+import Hero from "../components/concepts/plain/Hero.astro";
+import Keys from "../components/concepts/plain/Keys.astro";
+import Principles from "../components/concepts/plain/Principles.astro";
+import SystemPreview from "../components/concepts/plain/SystemPreview.astro";
+import Tools from "../components/concepts/plain/Tools.astro";
+import Work from "../components/concepts/plain/Work.astro";
+
+const fontsHref =
+  "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600&display=swap";
+---
+
+<ConceptLayout
+  title="Plain"
+  description="Concept 6 — Plain: a calm, centred, flat homepage for dmeim.com."
+  fontsHref={fontsHref}
+  concept={6}
+>
+  <!-- Marks JS before first paint so reveal states never flash. If the runtime
+       never reveals anything, show everything rather than leave the page blank. -->
+  <script is:inline>
+    document.documentElement.classList.add("js");
+    setTimeout(function () {
+      if (document.querySelector("[data-revealed]")) return;
+      document.querySelectorAll("[data-reveal]").forEach(function (el) {
+        el.setAttribute("data-revealed", "true");
+      });
+    }, 2500);
+  </script>
+  <div id="top"></div>
+  <a class="pl-skip" href="#main">Skip to content</a>
+  <Header />
+  <main id="main">
+    <Hero />
+    <Work />
+    <Tools />
+    <Principles />
+    <Keys />
+    <Contact />
+    <SystemPreview />
+  </main>
+  <Footer />
+</ConceptLayout>

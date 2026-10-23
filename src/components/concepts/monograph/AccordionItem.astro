@@ -1,0 +1,169 @@
+---
+import { Plus } from "@lucide/astro";
+
+interface Props {
+  id: string;
+  title: string;
+  /** Optional serif numeral shown before the title, e.g. "01". */
+  index?: string;
+  open?: boolean;
+  size?: "lg" | "sm";
+}
+
+const { id, title, index, open = false, size = "lg" } = Astro.props;
+---
+
+<div class:list={["mg-acc", `mg-acc--${size}`]} data-mg-acc data-open={open ? "" : undefined}>
+  <h3 class="mg-acc__heading">
+    <button
+      type="button"
+      class="mg-acc__trigger"
+      id={`${id}-trigger`}
+      aria-expanded={open ? "true" : "false"}
+      aria-controls={`${id}-panel`}
+      data-mg-acc-trigger
+    >
+      {index && <span class="mg-num mg-acc__num">{index}</span>}
+      <span class="mg-acc__title">{title}</span>
+      <span class="mg-acc__icon" aria-hidden="true"><Plus /></span>
+    </button>
+  </h3>
+  <div class="mg-acc__panel" id={`${id}-panel`} role="region" aria-labelledby={`${id}-trigger`}>
+    <div class="mg-acc__inner">
+      <div class="mg-acc__body"><slot /></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .mg-acc {
+    --acc-num: clamp(2.25rem, 1.5rem + 2.6vw, 4.5rem);
+    --acc-gap: clamp(16px, 3vw, 48px);
+    border-bottom: 1px solid var(--mg-line);
+  }
+
+  .mg-acc__trigger {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--acc-gap);
+    width: 100%;
+    padding-block: clamp(20px, 2.4vw, 32px);
+    text-align: left;
+  }
+
+  .mg-acc__num {
+    width: calc(var(--acc-num) * 1.1);
+    font-size: var(--acc-num);
+    transition: transform var(--mg-dur-3) var(--mg-ease);
+  }
+
+  .mg-acc__title {
+    font-family: var(--mg-font-display);
+    font-size: clamp(1.625rem, 1.1rem + 1.9vw, 3rem);
+    line-height: 1.05;
+    transition: transform var(--mg-dur-3) var(--mg-ease);
+  }
+
+  .mg-acc__trigger:hover .mg-acc__title {
+    transform: translateX(8px);
+  }
+
+  .mg-acc__icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--mg-line-strong);
+    border-radius: 50%;
+    transition:
+      transform var(--mg-dur-2) var(--mg-ease),
+      border-color var(--mg-dur-2) var(--mg-ease),
+      background-color var(--mg-dur-2) var(--mg-ease),
+      color var(--mg-dur-2) var(--mg-ease);
+  }
+
+  .mg-acc__icon :global(svg) {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.5;
+  }
+
+  .mg-acc__trigger:hover .mg-acc__icon {
+    border-color: var(--mg-gold);
+  }
+
+  .mg-acc__trigger[aria-expanded="true"] .mg-acc__icon {
+    transform: rotate(135deg);
+    background: var(--mg-ink);
+    border-color: var(--mg-ink);
+    color: var(--mg-ground);
+  }
+
+  .mg-acc__panel {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows var(--mg-dur-3) var(--mg-ease);
+  }
+
+  :global(html.js) .mg-acc:not([data-open]) .mg-acc__panel {
+    grid-template-rows: 0fr;
+  }
+
+  .mg-acc__inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .mg-acc__body {
+    padding-bottom: clamp(24px, 3vw, 40px);
+    max-width: 60ch;
+    color: var(--mg-ink-muted);
+    font-size: var(--mg-text-lg);
+    line-height: 1.65;
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--mg-dur-2) var(--mg-ease),
+      transform var(--mg-dur-3) var(--mg-ease);
+  }
+
+  :global(html.js) .mg-acc:not([data-open]) .mg-acc__body {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  .mg-acc--lg .mg-acc__body {
+    margin-left: calc(var(--acc-num) * 1.1 + var(--acc-gap));
+  }
+
+  .mg-acc--sm .mg-acc__trigger {
+    padding-block: 18px;
+  }
+
+  .mg-acc--sm .mg-acc__title {
+    font-size: 1.5rem;
+  }
+
+  .mg-acc--sm .mg-acc__body {
+    font-size: var(--mg-text-base);
+  }
+
+  @media (max-width: 640px) {
+    .mg-acc--lg .mg-acc__body {
+      margin-left: 0;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-mg-acc-trigger]").forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      const item = trigger.closest<HTMLElement>("[data-mg-acc]");
+      if (!item) return;
+      const open = trigger.getAttribute("aria-expanded") !== "true";
+      trigger.setAttribute("aria-expanded", String(open));
+      item.toggleAttribute("data-open", open);
+    });
+  });
+</script>

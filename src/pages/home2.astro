@@ -1,0 +1,36 @@
+---
+import ConceptLayout from "../layouts/ConceptLayout.astro";
+import BentoHero from "../components/concepts/studio/BentoHero.astro";
+import CommandPalette from "../components/concepts/studio/CommandPalette.astro";
+import Principles from "../components/concepts/studio/Principles.astro";
+import StudioFooter from "../components/concepts/studio/StudioFooter.astro";
+import StudioHeader from "../components/concepts/studio/StudioHeader.astro";
+import SystemPreview from "../components/concepts/studio/system/SystemPreview.astro";
+import Toaster from "../components/concepts/studio/Toaster.astro";
+import WorkSection from "../components/concepts/studio/WorkSection.astro";
+import "../components/concepts/studio/studio.css";
+
+const fontsHref =
+  "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap";
+---
+
+<ConceptLayout
+  title="Studio"
+  description="Concept 2 — Studio: a bento-grid, product-style homepage for dmeim.com."
+  fontsHref={fontsHref}
+  concept={2}
+>
+  <div id="top"></div>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <StudioHeader />
+  <main id="main">
+    <BentoHero />
+    <WorkSection />
+    <Principles />
+    <SystemPreview />
+  </main>
+  <StudioFooter />
+  <CommandPalette />
+  <Toaster />
+  <p id="studio-live" class="sr-only" role="status" aria-live="polite"></p>
+</ConceptLayout>

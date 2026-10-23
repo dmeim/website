@@ -1,0 +1,125 @@
+---
+import { ArrowUp } from "@lucide/astro";
+import { connect, endorsement } from "../../../content/site";
+import { navLinks } from "./nav";
+
+const year = new Date().getFullYear();
+const elsewhere = [
+  { label: "GitHub", href: endorsement.url },
+  { label: "Email", href: `mailto:${connect.email}` },
+  { label: "Orthodox", href: "/orthodox" },
+];
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__brand">
+      <p class="footer__mark display">dmeim</p>
+      <p class="footer__tag muted">Careful interfaces. Trustworthy infrastructure.</p>
+    </div>
+
+    <nav class="footer__cols" aria-label="Footer">
+      <div>
+        <p class="eyebrow footer__heading">Site</p>
+        <ul>
+          {navLinks.map((link) => <li><a class="footer__link" href={link.href}>{link.label}</a></li>)}
+        </ul>
+      </div>
+      <div>
+        <p class="eyebrow footer__heading">Elsewhere</p>
+        <ul>
+          {elsewhere.map((link) => <li><a class="footer__link" href={link.href}>{link.label}</a></li>)}
+        </ul>
+      </div>
+    </nav>
+
+    <div class="footer__bottom">
+      <p class="mono footer__meta">© {year} Dimitri · Astro on Cloudflare</p>
+      <a class="btn btn--secondary btn--sm footer__top" href="#top">
+        Back to top <ArrowUp class="footer__top-icon" aria-hidden="true" />
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: var(--s-16);
+    border-top: 1px solid var(--border);
+    padding-block: var(--s-12) 96px;
+  }
+
+  .footer__inner {
+    display: grid;
+    gap: var(--s-10);
+  }
+
+  .footer__mark {
+    font-size: 28px;
+    letter-spacing: -0.045em;
+  }
+
+  .footer__tag {
+    margin-top: var(--s-1);
+    font-size: 14px;
+  }
+
+  .footer__cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 160px));
+    gap: var(--s-8);
+  }
+
+  .footer__heading {
+    margin-bottom: var(--s-3);
+  }
+
+  .footer__cols ul {
+    display: grid;
+    gap: 6px;
+  }
+
+  .footer__link {
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--ink-muted);
+    transition: color var(--dur-fast) var(--ease);
+  }
+
+  .footer__link:hover {
+    color: var(--ink);
+  }
+
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--border);
+  }
+
+  .footer__meta {
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  .footer__top :global(.footer__top-icon) {
+    transition: translate var(--dur) var(--ease-spring);
+  }
+
+  .footer__top:hover :global(.footer__top-icon) {
+    translate: 0 -3px;
+  }
+
+  @media (min-width: 900px) {
+    .footer__inner {
+      grid-template-columns: 1fr auto;
+    }
+
+    .footer__bottom {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

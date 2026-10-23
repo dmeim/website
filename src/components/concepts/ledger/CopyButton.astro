@@ -1,0 +1,137 @@
+---
+/**
+ * Copy-to-clipboard control: Copy icon morphs to Check with a short
+ * "Copied" label, announced through a polite live region.
+ */
+import { Copy, Check } from "@lucide/astro";
+
+interface Props {
+  value: string;
+  label: string;
+}
+
+const { value, label } = Astro.props;
+---
+
+<span class="copy">
+  <button type="button" class="copy__btn" data-copy={value} aria-label={label}>
+    <span class="copy__icon copy__icon--copy" aria-hidden="true"><Copy size={16} stroke-width={1.75} /></span>
+    <span class="copy__icon copy__icon--check" aria-hidden="true"><Check size={16} stroke-width={2} /></span>
+  </button>
+  <span class="copy__status l-mono" role="status" aria-live="polite"></span>
+</span>
+
+<script>
+  const RESET_MS = 1800;
+
+  // Clipboard API is unavailable on insecure origins and some embedded views.
+  const legacyCopy = (text: string): boolean => {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.append(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  };
+
+  const copy = async (text: string): Promise<boolean> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      return legacyCopy(text);
+    }
+  };
+
+  document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((btn) => {
+    let timer = 0;
+    const status = btn.parentElement?.querySelector<HTMLElement>(".copy__status");
+
+    btn.addEventListener("click", async () => {
+      const ok = await copy(btn.dataset.copy ?? "");
+      if (!ok) console.error("ledger: clipboard write failed");
+      btn.toggleAttribute("data-copied", ok);
+      if (status) status.textContent = ok ? "Copied" : "Copy failed — select the text instead";
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        btn.removeAttribute("data-copied");
+        if (status) status.textContent = "";
+      }, ok ? RESET_MS : RESET_MS * 2);
+      btn.focus();
+    });
+  });
+</script>
+
+<style>
+  .copy {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+  }
+
+  .copy__btn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--l-line-strong);
+    background: var(--l-ground);
+    cursor: pointer;
+    transition:
+      background-color var(--l-dur-fast) var(--l-ease),
+      border-color var(--l-dur-fast) var(--l-ease);
+  }
+
+  .copy__btn:hover {
+    border-color: var(--l-ink);
+  }
+
+  .copy__btn[data-copied] {
+    background: var(--l-gold);
+    border-color: var(--l-gold);
+    color: var(--l-on-gold);
+  }
+
+  .copy__icon {
+    grid-area: 1 / 1;
+    display: grid;
+    transition:
+      opacity var(--l-dur) var(--l-ease),
+      transform var(--l-dur) var(--l-ease);
+  }
+
+  .copy__icon--check {
+    opacity: 0;
+    transform: scale(0.4) rotate(-30deg);
+  }
+
+  .copy__btn[data-copied] .copy__icon--copy {
+    opacity: 0;
+    transform: scale(0.4) rotate(30deg);
+  }
+
+  .copy__btn[data-copied] .copy__icon--check {
+    opacity: 1;
+    transform: none;
+  }
+
+  .copy__status {
+    position: absolute;
+    right: calc(100% + 0.6rem);
+    white-space: nowrap;
+    padding: 0.3rem 0.5rem;
+    background: var(--l-ink);
+    color: var(--l-ground);
+    pointer-events: none;
+  }
+
+  .copy__status:empty {
+    display: none;
+  }
+</style>

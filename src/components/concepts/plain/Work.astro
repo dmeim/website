@@ -1,0 +1,97 @@
+---
+import { ArrowRight } from "@lucide/astro";
+import { appointments } from "../../../content/site";
+import ProjectRows from "./ProjectRows.astro";
+import SectionHead from "./SectionHead.astro";
+---
+
+<section id="work" class="pl-section pl-container" aria-labelledby="pl-work-title">
+  <SectionHead
+    id="pl-work-title"
+    title="Work"
+    intro="Three surfaces, one platform."
+    link={{ label: "All projects", href: "/projects" }}
+  />
+
+  <ul class="pl-work__grid" data-reveal-group>
+    {
+      appointments.map((item) => (
+        <li data-reveal>
+          <a class="pl-panel pl-panel--link pl-work__card" href={item.url}>
+            <span class="pl-work__org">{item.organization}</span>
+            <h3>{item.title}</h3>
+            <p class="pl-muted">{item.bullets?.[0]}</p>
+            <span class="pl-work__open" aria-hidden="true">
+              Open <ArrowRight />
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <ProjectRows />
+</section>
+
+<style>
+  .pl-work__grid {
+    display: grid;
+    gap: var(--pl-gap);
+  }
+
+  .pl-work__grid > li {
+    display: flex;
+  }
+
+  .pl-work__card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .pl-work__org {
+    color: var(--pl-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .pl-work__card h3 {
+    margin-top: 6px;
+    font-size: 1.1875rem;
+  }
+
+  .pl-work__card p {
+    margin-top: 8px;
+  }
+
+  .pl-work__open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 24px;
+    color: var(--pl-muted);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: color var(--pl-fast) var(--pl-ease);
+  }
+
+  .pl-work__open :global(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .pl-work__card:hover .pl-work__open {
+    color: var(--pl-ink);
+  }
+
+  @media (min-width: 720px) {
+    .pl-work__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .pl-work__card {
+      min-height: 15rem;
+    }
+  }
+</style>

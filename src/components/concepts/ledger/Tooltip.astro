@@ -1,0 +1,72 @@
+---
+/**
+ * Hover/focus tooltip. The trigger inside the slot must reference `id`
+ * via aria-describedby. Escape dismisses it while the trigger keeps focus.
+ */
+interface Props {
+  id: string;
+  text: string;
+}
+
+const { id, text } = Astro.props;
+---
+
+<span class="tip" data-tip>
+  <slot />
+  <span class="tip__bubble l-mono" role="tooltip" id={id}>{text}</span>
+</span>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-tip]").forEach((tip) => {
+    tip.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") tip.setAttribute("data-dismissed", "");
+    });
+    tip.addEventListener("focusout", () => tip.removeAttribute("data-dismissed"));
+    tip.addEventListener("pointerleave", () => tip.removeAttribute("data-dismissed"));
+  });
+</script>
+
+<style>
+  .tip {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .tip__bubble {
+    position: absolute;
+    bottom: calc(100% + 0.6rem);
+    left: 50%;
+    z-index: 5;
+    padding: 0.45rem 0.6rem;
+    background: var(--l-ink);
+    color: var(--l-ground);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    translate: -50% 4px;
+    transition:
+      opacity var(--l-dur-fast) var(--l-ease),
+      translate var(--l-dur) var(--l-ease);
+  }
+
+  .tip__bubble::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 1px;
+    height: 0.6rem;
+    background: var(--l-ink);
+  }
+
+  .tip:hover .tip__bubble,
+  .tip:focus-within .tip__bubble {
+    opacity: 1;
+    translate: -50% 0;
+    transition-delay: 120ms;
+  }
+
+  .tip[data-dismissed] .tip__bubble {
+    opacity: 0;
+  }
+</style>

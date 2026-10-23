@@ -1,0 +1,58 @@
+---
+import { ChevronDown, CircleAlert } from "@lucide/astro";
+import PreviewPanel from "./PreviewPanel.astro";
+---
+
+<PreviewPanel title="Field" note="label · hint · error">
+  <div class="field">
+    <label class="field__label" for="pv-name">Name</label>
+    <input class="input" id="pv-name" type="text" placeholder="Ada Lovelace" aria-describedby="pv-name-hint" />
+    <p class="field__hint" id="pv-name-hint">How you'd like to be addressed.</p>
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="pv-email">Email</label>
+    <input
+      class="input"
+      id="pv-email"
+      type="email"
+      value="hello@dmeim"
+      aria-invalid="true"
+      aria-describedby="pv-email-error"
+      data-validate-email
+    />
+    <p class="field__error" id="pv-email-error" data-email-error>
+      <CircleAlert aria-hidden="true" />
+      <span>Add a domain, e.g. hello@dmeim.com</span>
+    </p>
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="pv-topic">Topic</label>
+    <div class="select-wrap">
+      <select class="select" id="pv-topic">
+        <option>Collaboration</option>
+        <option>Key verification</option>
+        <option>Just saying hello</option>
+      </select>
+      <ChevronDown class="select-wrap__icon" aria-hidden="true" />
+    </div>
+  </div>
+
+  <div class="field">
+    <label class="field__label" for="pv-message">Message</label>
+    <textarea class="textarea" id="pv-message" rows="3" placeholder="A few lines about what you're building…"></textarea>
+  </div>
+</PreviewPanel>
+
+<script>
+  // Live-validates the demo email so the error state can be toggled.
+  document.querySelectorAll<HTMLInputElement>("[data-validate-email]").forEach((input) => {
+    const error = document.querySelector<HTMLElement>("[data-email-error]");
+    input.addEventListener("input", () => {
+      const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(input.value);
+      input.setAttribute("aria-invalid", String(!valid));
+      if (error) error.hidden = valid;
+    });
+  });
+</script>

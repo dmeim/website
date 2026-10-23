@@ -1,0 +1,172 @@
+---
+import { ArrowRight } from "@lucide/astro";
+import { appointments, projects } from "../../../content/site";
+import ProjectCard from "./ProjectCard.astro";
+import SectionHead from "./SectionHead.astro";
+
+const filters = [
+  { value: "all", label: "All" },
+  { value: "live", label: "Live" },
+  { value: "wip", label: "In progress" },
+  { value: "archived", label: "Archive" },
+] as const;
+
+const countFor = (value: string) =>
+  value === "all" ? projects.length : projects.filter((p) => p.status === value).length;
+---
+
+<section class="section container work" id="work" aria-labelledby="work-title" data-work>
+  <SectionHead
+    index="01"
+    eyebrow="Selected work"
+    title="Things shipped, shipping, and shelved."
+    id="work-title"
+    lede="A small, honest portfolio. Filter by status — the grid reflows in place."
+  >
+    <div class="seg" role="group" aria-label="Filter projects by status" data-seg="select" data-work-filter>
+      <span class="seg__thumb" aria-hidden="true"></span>
+      {
+        filters.map((filter, i) => (
+          <button
+            type="button"
+            class="seg__option"
+            data-value={filter.value}
+            aria-pressed={i === 0 ? "true" : "false"}
+          >
+            {filter.label}
+            <span class="seg__count">{countFor(filter.value)}</span>
+          </button>
+        ))
+      }
+    </div>
+  </SectionHead>
+
+  <div class="work__grid" data-work-grid data-reveal-group>
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </div>
+
+  <div class="surfaces" data-reveal>
+    <h3 class="eyebrow surfaces__title">Surfaces</h3>
+    <ul class="surfaces__list">
+      {
+        appointments.map((item) => (
+          <li>
+            <a class="surface-row" href={item.url}>
+              <span class="surface-row__dates mono">{item.dates}</span>
+              <span class="surface-row__main">
+                <span class="surface-row__title">{item.title}</span>
+                <span class="surface-row__desc">{item.bullets?.[0]}</span>
+              </span>
+              <span class="surface-row__org mono">{item.organization}</span>
+              <ArrowRight class="surface-row__arrow" aria-hidden="true" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<script>
+  import { initSegmented } from "./scripts/interactions";
+  import { initWorkFilter } from "./scripts/work-filter";
+
+  initSegmented();
+  document.querySelectorAll<HTMLElement>("[data-work]").forEach(initWorkFilter);
+</script>
+
+<style>
+  .work__grid {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  @media (min-width: 720px) {
+    .work__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s-4);
+    }
+  }
+
+  .surfaces {
+    margin-top: var(--s-12);
+  }
+
+  .surfaces__title {
+    margin-bottom: var(--s-3);
+  }
+
+  .surfaces__list {
+    border-top: 1px solid var(--border);
+  }
+
+  .surface-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--s-1) var(--s-4);
+    padding: var(--s-4) var(--s-2);
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    transition: background-color var(--dur-fast) var(--ease);
+  }
+
+  .surface-row:hover {
+    background: var(--tile);
+  }
+
+  .surface-row__dates {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  .surface-row__main {
+    display: grid;
+    min-width: 0;
+  }
+
+  .surface-row__title {
+    font-weight: 500;
+  }
+
+  .surface-row__desc {
+    color: var(--ink-muted);
+    font-size: 14px;
+  }
+
+  .surface-row__org {
+    display: none;
+    font-size: 12px;
+    color: var(--ink-muted);
+  }
+
+  .surface-row :global(.surface-row__arrow) {
+    width: 16px;
+    height: 16px;
+    color: var(--ink-muted);
+    transition:
+      translate var(--dur) var(--ease-spring),
+      color var(--dur) var(--ease);
+  }
+
+  .surface-row:hover :global(.surface-row__arrow) {
+    translate: 4px 0;
+    color: var(--gold-text);
+  }
+
+  @media (min-width: 720px) {
+    .surface-row {
+      grid-template-columns: 140px minmax(0, 1fr) 140px auto;
+      padding-inline: var(--s-4);
+    }
+
+    .surface-row__dates {
+      grid-column: auto;
+    }
+
+    .surface-row__org {
+      display: block;
+    }
+  }
+</style>

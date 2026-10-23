@@ -1,0 +1,69 @@
+---
+const options = [
+  { value: "light", label: "Light" },
+  { value: "system", label: "Auto" },
+  { value: "dark", label: "Dark" },
+];
+---
+
+<div class="mg-theme" role="group" aria-label="Colour theme">
+  {
+    options.map((option, i) => (
+      <>
+        {i > 0 && <span class="mg-theme__dot" aria-hidden="true">·</span>}
+        <button type="button" class="mg-theme__btn" data-theme-set={option.value} aria-pressed="false">
+          {option.label}
+        </button>
+      </>
+    ))
+  }
+</div>
+
+<style>
+  .mg-theme {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mg-theme__dot {
+    color: var(--mg-ink-muted);
+    font-size: var(--mg-text-label);
+  }
+
+  .mg-theme__btn {
+    position: relative;
+    min-height: 32px;
+    padding-inline: 2px;
+    font-size: var(--mg-text-label);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mg-ink-muted);
+    transition: color var(--mg-dur-1) var(--mg-ease);
+  }
+
+  .mg-theme__btn::after {
+    content: "";
+    position: absolute;
+    left: 2px;
+    right: calc(2px + 0.14em);
+    bottom: 4px;
+    height: 1px;
+    background: var(--mg-gold);
+    transform: scaleX(0);
+    transition: transform var(--mg-dur-2) var(--mg-ease);
+  }
+
+  .mg-theme__btn:hover {
+    color: var(--mg-ink);
+  }
+
+  .mg-theme__btn[aria-pressed="true"] {
+    color: var(--mg-ink);
+  }
+
+  .mg-theme__btn[aria-pressed="true"]::after {
+    transform: scaleX(1);
+  }
+</style>

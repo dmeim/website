@@ -1,0 +1,67 @@
+---
+/** The salutation: a small round portrait, then the greeting written as prose. */
+import { Image } from "astro:assets";
+import portrait from "../../../../assets/images/photoshoot/gpt-unbuttoned-transparent.png";
+import TextLink from "./TextLink.astro";
+---
+
+<section class="lt-opening" aria-labelledby="opening-title" data-reveal-group>
+  <div class="lt-portrait" data-reveal>
+    <Image
+      src={portrait}
+      alt="Dimitri, smiling, in a black suit and open-collar shirt"
+      width={320}
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+  <h1 class="lt-opening__title" id="opening-title" data-reveal>Hi, I’m Dimitri.</h1>
+  <div class="lt-prose lt-opening__body" data-reveal>
+    <p>
+      I build careful interfaces and trustworthy infrastructure, and this is
+      where I keep the results: a handful of <TextLink href="/projects">projects</TextLink>,
+      a shelf of small <TextLink href="/tools">tools</TextLink> that run in your
+      browser, my <TextLink href="/keys">public keys</TextLink> so you can check
+      it’s really me, and an easy way to <TextLink href="/connect">get in touch</TextLink>.
+    </p>
+    <p class="lt-muted">
+      I favor clarity over spectacle — plain language, strong defaults, and
+      systems that stay out of the way until you need them.
+    </p>
+  </div>
+</section>
+
+<style>
+  .lt-opening__title {
+    margin-top: 1.75rem;
+    font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.012em;
+    font-variation-settings: "opsz" 72;
+  }
+
+  .lt-opening__body {
+    margin-top: 1.25rem;
+  }
+
+  .lt-portrait {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--lt-surface);
+    border: 1px solid var(--lt-line);
+  }
+
+  /* Crop the full-length cutout down to head and shoulders. */
+  .lt-portrait :global(img) {
+    position: absolute;
+    top: 3px;
+    left: 50%;
+    width: 220%;
+    max-width: none;
+    transform: translateX(-49%);
+  }
+</style>

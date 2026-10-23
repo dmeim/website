@@ -1,0 +1,30 @@
+---
+/** Keys: fingerprint rows with a copy control; full blocks live on /keys. */
+import { keys } from "../../../content/site";
+import Section from "./Section.astro";
+import Row from "./Row.astro";
+import CopyButton from "./CopyButton.astro";
+---
+
+<Section id="keys" title="Keys" spy="keys">
+  <ul class="p-list">
+    {
+      keys.map((key) => (
+        <Row label={key.kind} title={key.title} desc={key.fingerprint} mono>
+          <CopyButton slot="trail" value={key.fingerprint} label={`Copy ${key.title} fingerprint`} />
+        </Row>
+      ))
+    }
+  </ul>
+  <p class="p-keys__note" data-reveal>
+    Full public key blocks and import steps are on the <a href="/keys">keys page</a>.
+  </p>
+</Section>
+
+<style>
+  .p-keys__note {
+    margin-top: 1rem;
+    color: var(--p-muted);
+    font-size: 0.875rem;
+  }
+</style>

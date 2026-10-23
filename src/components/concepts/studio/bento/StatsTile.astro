@@ -1,0 +1,79 @@
+---
+import { keys } from "../../../../content/site";
+import { availableTools, plannedTools, toolCategories } from "../../../../content/tools";
+import Tile from "../Tile.astro";
+
+const planned = plannedTools().length;
+
+// The catalogue currently has nothing planned; a zero counter reads as broken.
+const stats = [
+  { value: availableTools().length, label: "Tools live" },
+  { value: toolCategories.length, label: "Categories" },
+  planned > 0
+    ? { value: planned, label: "Planned" }
+    : { value: keys.length, label: "Public keys" },
+];
+---
+
+<Tile as="section" class="bento__stats stats" aria-label="Site at a glance">
+  <p class="eyebrow">At a glance</p>
+  <dl class="stats__list">
+    {
+      stats.map((stat) => (
+        <div class="stats__item">
+          <dt class="stats__label mono">{stat.label}</dt>
+          <dd class="stats__value display" data-count-to={stat.value}>
+            {stat.value}
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+</Tile>
+
+<script>
+  import { initCountUp } from "../scripts/interactions";
+  initCountUp();
+</script>
+
+<style>
+  :global(.tile.stats) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  .stats__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-4);
+    margin: auto 0 0;
+  }
+
+  .stats__item {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 6px;
+    padding-left: var(--s-3);
+    border-left: 1px solid var(--border);
+  }
+
+  .stats__item:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .stats__value {
+    margin: 0;
+    font-size: clamp(2rem, 1.5rem + 1.6vw, 2.6rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stats__label {
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+</style>

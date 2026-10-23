@@ -1,0 +1,344 @@
+/*
+ * Monograph — tokens, base and shared primitives.
+ * Every colour comes from a token so `.mg-invert` can flip a band without
+ * per-component overrides.
+ */
+
+:root,
+:root[data-theme="dark"] {
+  --mg-ground: #0b0b0a;
+  --mg-surface: #131311;
+  --mg-ink: #efebe3;
+  --mg-ink-muted: #96928a;
+  --mg-line: rgb(239 235 227 / 11%);
+  --mg-line-strong: rgb(239 235 227 / 28%);
+  --mg-gold: #cdb07a;
+  --mg-gold-ink: #cdb07a;
+  --mg-plate: #e4ded3;
+  --mg-danger: #e09a8a;
+
+  --mg-band-ground: #efebe3;
+  --mg-band-surface: #e6e1d7;
+  --mg-band-ink: #0f0f0e;
+  --mg-band-ink-muted: #5f5b54;
+  --mg-band-line: rgb(15 15 14 / 13%);
+  --mg-band-line-strong: rgb(15 15 14 / 32%);
+  --mg-band-gold: #8e7040;
+  --mg-band-gold-ink: #6e5530;
+  --mg-band-danger: #a3412f;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --mg-ground: #f7f4ee;
+  --mg-surface: #efebe3;
+  --mg-ink: #0f0f0e;
+  --mg-ink-muted: #6a665e;
+  --mg-line: rgb(15 15 14 / 12%);
+  --mg-line-strong: rgb(15 15 14 / 30%);
+  --mg-gold: #9a7a45;
+  /* #9a7a45 is 3.6:1 on ivory; small gold text uses this deeper tone (5.4:1). */
+  --mg-gold-ink: #7a5f33;
+  --mg-plate: #e9e4da;
+  --mg-danger: #a3412f;
+
+  --mg-band-ground: #0f0f0e;
+  --mg-band-surface: #191917;
+  --mg-band-ink: #f2eee6;
+  --mg-band-ink-muted: #9a968e;
+  --mg-band-line: rgb(242 238 230 / 12%);
+  --mg-band-line-strong: rgb(242 238 230 / 30%);
+  --mg-band-gold: #cdb07a;
+  --mg-band-gold-ink: #cdb07a;
+  --mg-band-danger: #e09a8a;
+
+  color-scheme: light;
+}
+
+:root {
+  --mg-font-display: "Instrument Serif", "Iowan Old Style", "Times New Roman", serif;
+  --mg-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mg-font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  --mg-text-label: 0.71875rem;
+  --mg-text-sm: 0.875rem;
+  --mg-text-base: 1rem;
+  --mg-text-lg: 1.1875rem;
+  --mg-display-sm: clamp(1.75rem, 1.2rem + 1.8vw, 2.75rem);
+  --mg-display-md: clamp(2.75rem, 1.6rem + 4.6vw, 6rem);
+  --mg-display-lg: clamp(3.5rem, 1.5rem + 8.4vw, 10rem);
+
+  --mg-gutter: clamp(16px, 4.2vw, 64px);
+  --mg-max: 1520px;
+  --mg-header-h: 72px;
+  --mg-radius: 2px;
+
+  --mg-dur-1: 200ms;
+  --mg-dur-2: 500ms;
+  --mg-dur-3: 900ms;
+  --mg-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Inverted band: re-point the base tokens at the band pair. */
+.mg-invert,
+.mg-tokens-invert {
+  --mg-ground: var(--mg-band-ground);
+  --mg-surface: var(--mg-band-surface);
+  --mg-ink: var(--mg-band-ink);
+  --mg-ink-muted: var(--mg-band-ink-muted);
+  --mg-line: var(--mg-band-line);
+  --mg-line-strong: var(--mg-band-line-strong);
+  --mg-gold: var(--mg-band-gold);
+  --mg-gold-ink: var(--mg-band-gold-ink);
+  --mg-danger: var(--mg-band-danger);
+}
+
+.mg-invert {
+  background: var(--mg-ground);
+  color: var(--mg-ink);
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: var(--mg-header-h);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--mg-ground);
+  color: var(--mg-ink);
+  font-family: var(--mg-font-sans);
+  font-size: var(--mg-text-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+  transition: background-color var(--mg-dur-2) var(--mg-ease);
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ol,
+ul,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+}
+
+ol,
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+::selection {
+  background: var(--mg-gold);
+  color: var(--mg-ground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--mg-gold);
+  outline-offset: 3px;
+}
+
+.mg-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mg-skip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--mg-ink);
+  color: var(--mg-ground);
+  transform: translateY(-160%);
+  transition: transform var(--mg-dur-1) var(--mg-ease);
+}
+
+.mg-skip:focus-visible {
+  transform: none;
+}
+
+/* ---------- Layout ---------- */
+
+.mg-container {
+  width: 100%;
+  max-width: var(--mg-max);
+  margin-inline: auto;
+  padding-inline: var(--mg-gutter);
+}
+
+.mg-section {
+  padding-block: clamp(96px, 14vw, 200px);
+}
+
+.mg-section-head {
+  display: grid;
+  gap: 20px;
+  margin-bottom: clamp(48px, 7vw, 96px);
+}
+
+/* ---------- Type ---------- */
+
+.mg-label {
+  font-family: var(--mg-font-sans);
+  font-size: var(--mg-text-label);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mg-ink-muted);
+}
+
+.mg-label--gold {
+  color: var(--mg-gold-ink);
+}
+
+.mg-label__num {
+  color: var(--mg-gold-ink);
+  font-variant-numeric: tabular-nums;
+  margin-right: 0.9em;
+}
+
+.mg-display {
+  font-family: var(--mg-font-display);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.mg-display em,
+.mg-em {
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+.mg-display--lg {
+  font-size: var(--mg-display-lg);
+  line-height: 0.9;
+}
+
+.mg-display--md {
+  font-size: var(--mg-display-md);
+}
+
+.mg-display--sm {
+  font-size: var(--mg-display-sm);
+  line-height: 1.05;
+}
+
+.mg-lede {
+  font-size: var(--mg-text-lg);
+  line-height: 1.6;
+  color: var(--mg-ink-muted);
+  max-width: 44ch;
+  text-wrap: pretty;
+}
+
+.mg-num {
+  font-family: var(--mg-font-display);
+  color: var(--mg-gold);
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+}
+
+.mg-rule {
+  display: block;
+  height: 1px;
+  border: 0;
+  background: var(--mg-gold);
+  margin: 0;
+}
+
+/* ---------- Reveal (hooks provided by concept-runtime) ---------- */
+
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity var(--mg-dur-3) var(--mg-ease),
+    transform calc(var(--mg-dur-3) * 1.3) var(--mg-ease);
+  transition-delay: calc(var(--reveal-index, 0) * 90ms);
+}
+
+html.js [data-reveal][data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html.js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+

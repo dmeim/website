@@ -1,0 +1,249 @@
+/* Monograph form controls: hairline underline fields, sharp checkboxes and switch. */
+
+.mg-field {
+  display: grid;
+  gap: 8px;
+}
+
+.mg-field__label {
+  font-size: var(--mg-text-label);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mg-ink-muted);
+  transition: color var(--mg-dur-1) var(--mg-ease);
+}
+
+.mg-field:focus-within .mg-field__label {
+  color: var(--mg-gold-ink);
+}
+
+.mg-field__control {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--mg-line-strong);
+  border-radius: 0;
+  background: transparent;
+  font-size: var(--mg-text-base);
+  outline: none;
+  box-shadow: 0 1px 0 0 transparent;
+  transition:
+    border-color var(--mg-dur-2) var(--mg-ease),
+    box-shadow var(--mg-dur-2) var(--mg-ease);
+  appearance: none;
+}
+
+.mg-field__control::placeholder {
+  color: var(--mg-ink-muted);
+  opacity: 0.7;
+}
+
+.mg-field__control:hover {
+  border-bottom-color: var(--mg-ink-muted);
+}
+
+.mg-field__control:focus-visible,
+.mg-field__control:focus {
+  border-bottom-color: var(--mg-gold);
+  box-shadow: 0 1px 0 0 var(--mg-gold);
+}
+
+textarea.mg-field__control {
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.6;
+}
+
+.mg-field__hint,
+.mg-field__error {
+  font-size: 0.8125rem;
+  color: var(--mg-ink-muted);
+}
+
+.mg-field[data-invalid] .mg-field__control {
+  border-bottom-color: var(--mg-danger);
+  box-shadow: 0 1px 0 0 var(--mg-danger);
+}
+
+.mg-field[data-invalid] .mg-field__label,
+.mg-field__error {
+  color: var(--mg-danger);
+}
+
+.mg-field__select {
+  position: relative;
+}
+
+.mg-field__select select {
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.mg-field__select option {
+  background: var(--mg-surface);
+  color: var(--mg-ink);
+}
+
+.mg-field__select svg {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.5;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: transform var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-field__select:focus-within svg {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* ---------- Checkbox + switch ---------- */
+
+.mg-check {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 32px;
+  cursor: pointer;
+}
+
+.mg-check input {
+  position: relative;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 1px solid var(--mg-line-strong);
+  border-radius: var(--mg-radius);
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  transition:
+    background-color var(--mg-dur-1) var(--mg-ease),
+    border-color var(--mg-dur-1) var(--mg-ease);
+}
+
+.mg-check input:hover {
+  border-color: var(--mg-ink);
+}
+
+.mg-check input:not(.mg-switch)::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 11px;
+  border: solid var(--mg-ground);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-check input:not(.mg-switch):checked {
+  background: var(--mg-ink);
+  border-color: var(--mg-ink);
+}
+
+.mg-check input:not(.mg-switch):checked::after {
+  transform: rotate(45deg) scale(1);
+}
+
+.mg-check input.mg-switch {
+  width: 44px;
+  height: 24px;
+}
+
+.mg-check input.mg-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 1px;
+  background: var(--mg-ink-muted);
+  transition:
+    transform var(--mg-dur-2) var(--mg-ease),
+    background-color var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-check input.mg-switch:checked {
+  background: var(--mg-ink);
+  border-color: var(--mg-ink);
+}
+
+.mg-check input.mg-switch:checked::after {
+  background: var(--mg-gold);
+  transform: translateX(20px);
+}
+
+/* ---------- Segmented control ---------- */
+
+.mg-seg {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 3px;
+  min-width: 0;
+  border: 1px solid var(--mg-line-strong);
+  border-radius: 0;
+}
+
+.mg-seg__indicator {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / 3);
+  background: var(--mg-ink);
+  transition: transform var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-seg:has(label:nth-of-type(2) input:checked) .mg-seg__indicator {
+  transform: translateX(100%);
+}
+
+.mg-seg:has(label:nth-of-type(3) input:checked) .mg-seg__indicator {
+  transform: translateX(200%);
+}
+
+.mg-seg label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+.mg-seg input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.mg-seg span {
+  font-size: var(--mg-text-label);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mg-ink-muted);
+  transition: color var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-seg input:checked + span {
+  color: var(--mg-ground);
+}
+
+.mg-seg label:has(input:focus-visible) {
+  outline: 2px solid var(--mg-gold);
+  outline-offset: 2px;
+}

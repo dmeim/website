@@ -1,0 +1,67 @@
+---
+import { projects } from "../../../content/site";
+import Section from "./Section.astro";
+import StatusMark from "./StatusMark.astro";
+import TextLink from "./TextLink.astro";
+
+// Short, finished lines; several source summaries are still placeholder text.
+const lines: Record<string, string> = {
+  "dmeim-com": "This site — projects, keys and tools on the edge.",
+  "georgios-zerdalis": "Portfolio site for a timpanist and educator.",
+  "verification-lab": "In-browser PGP and SSH signature verification.",
+  "edge-experiments": "Small Workers utilities and binding experiments.",
+};
+
+const items = projects.map((p) => ({
+  ...p,
+  line: lines[p.slug] ?? p.summary,
+  href: p.href ?? "/projects",
+}));
+---
+
+<Section id="work" label="Selected work">
+  <ul class="lt-work">
+    {
+      items.map((item) => (
+        <li class="lt-work__item">
+          <p class="lt-work__head">
+            <TextLink href={item.href} arrow quiet>{item.title}</TextLink>
+            <StatusMark status={item.status} />
+          </p>
+          <p class="lt-work__line lt-muted">{item.line}</p>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="lt-work__more">
+    <TextLink href="/projects" arrow>All projects</TextLink>
+  </p>
+</Section>
+
+<style>
+  .lt-work {
+    border-top: 1px solid var(--lt-line);
+  }
+
+  .lt-work__item {
+    padding-block: 0.9rem;
+    border-bottom: 1px solid var(--lt-line);
+  }
+
+  .lt-work__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .lt-work__line {
+    margin-top: 0.15rem;
+    font-size: var(--lt-small);
+  }
+
+  .lt-work__more {
+    margin-top: 1.25rem;
+    font-size: var(--lt-small);
+  }
+</style>

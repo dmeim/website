@@ -1,0 +1,17 @@
+---
+import type { ProjectItem } from "../../../content/site";
+
+interface Props {
+  status: ProjectItem["status"];
+}
+
+const labels: Record<ProjectItem["status"], string> = {
+  live: "Live",
+  wip: "In progress",
+  archived: "Archived",
+};
+
+const { status } = Astro.props;
+---
+
+<span class={`badge badge--${status}`}>{labels[status]}</span>

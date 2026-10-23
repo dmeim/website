@@ -1,0 +1,45 @@
+---
+/** Principles as numbered rows (titles only), then the working quote. */
+import { mentorQuote, pedagogy } from "../../../content/site";
+import Section from "./Section.astro";
+import Row from "./Row.astro";
+---
+
+<Section id="principles" title="Principles" spy="principles">
+  <ol class="p-list">
+    {pedagogy.map((item, i) => <Row label={String(i + 1).padStart(2, "0")} title={item.title} />)}
+  </ol>
+</Section>
+
+<Section id="quote" title="Quote" spy="principles">
+  <figure class="p-quote" data-reveal>
+    <blockquote>
+      <p>{mentorQuote.text}</p>
+    </blockquote>
+    {mentorQuote.attribution && <figcaption>{mentorQuote.attribution}</figcaption>}
+  </figure>
+</Section>
+
+<style>
+  .p-quote {
+    max-width: 34rem;
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--p-line-strong);
+  }
+
+  .p-quote blockquote {
+    font-size: 1.0625rem;
+    font-style: italic;
+    line-height: 1.65;
+  }
+
+  .p-quote figcaption {
+    margin-top: 0.75rem;
+    color: var(--p-muted);
+    font-size: 0.8125rem;
+  }
+
+  .p-quote figcaption::before {
+    content: "— ";
+  }
+</style>

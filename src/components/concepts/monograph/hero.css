@@ -1,0 +1,184 @@
+/* Hero: giant wordmark behind a standing portrait. --p is scroll progress (0–1). */
+
+.mg-hero {
+  --p: 0;
+  position: relative;
+  height: 100svh;
+  min-height: 680px;
+  max-height: 1200px;
+  overflow: clip;
+}
+
+.mg-hero__stage {
+  position: absolute;
+  inset: 0;
+  opacity: calc(1 - var(--p) * 1.15);
+}
+
+.mg-hero__title {
+  position: absolute;
+  top: calc(var(--mg-header-h) + 2svh);
+  left: 0;
+  right: 0;
+  z-index: 1;
+  text-align: center;
+  font-family: var(--mg-font-display);
+  font-weight: 400;
+  font-size: min(40vw, 54svh);
+  line-height: 0.8;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  transform-origin: 50% 0;
+  transform: translate3d(0, calc(var(--p) * 12svh), 0) scale(calc(1 - var(--p) * 0.32));
+  will-change: transform;
+}
+
+.mg-hero__word {
+  display: inline-block;
+  overflow: clip;
+  padding: 0.08em 0.04em 0.02em;
+}
+
+.mg-hero__char {
+  display: inline-block;
+  transition: transform 1200ms var(--mg-ease);
+  transition-delay: calc(80ms + var(--i) * 60ms);
+}
+
+.mg-hero__figure {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  z-index: 2;
+  height: min(76svh, 900px);
+  aspect-ratio: 1106 / 1422;
+  transform: translate3d(-50%, calc(var(--p) * 26%), 0);
+  will-change: transform;
+  /* Ground-coloured knockout edge where the figure overlaps the letters, as on a magazine cover. */
+  filter: drop-shadow(3px 0 0 var(--mg-ground)) drop-shadow(-3px 0 0 var(--mg-ground))
+    drop-shadow(0 -3px 0 var(--mg-ground));
+}
+
+.mg-hero__figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  transition:
+    opacity 1400ms var(--mg-ease) 300ms,
+    transform 1600ms var(--mg-ease) 300ms;
+}
+
+.mg-hero__intro {
+  position: absolute;
+  right: var(--mg-gutter);
+  bottom: clamp(88px, 11svh, 120px);
+  z-index: 3;
+  display: grid;
+  gap: 18px;
+  width: min(360px, 27vw);
+}
+
+.mg-hero__sentence {
+  font-family: var(--mg-font-display);
+  font-size: clamp(1.375rem, 1rem + 0.8vw, 1.875rem);
+  line-height: 1.15;
+  text-wrap: pretty;
+}
+
+.mg-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  margin-top: 8px;
+}
+
+.mg-hero__index {
+  position: absolute;
+  left: var(--mg-gutter);
+  bottom: clamp(88px, 11svh, 120px);
+  z-index: 3;
+  display: grid;
+  gap: 14px;
+  width: min(240px, 22vw);
+}
+
+.mg-hero__index ol {
+  display: grid;
+  border-top: 1px solid var(--mg-line);
+}
+
+.mg-hero__index a {
+  display: block;
+  padding-block: 10px;
+  border-bottom: 1px solid var(--mg-line);
+  font-size: var(--mg-text-sm);
+  background-position: 0 calc(100% + 1px);
+}
+
+.mg-hero__intro,
+.mg-hero__index {
+  transition:
+    opacity 1000ms var(--mg-ease) 700ms,
+    transform 1200ms var(--mg-ease) 700ms;
+}
+
+/* Load choreography, held until fonts are ready so letters don't re-flow mid-rise. */
+html.js .mg-hero:not([data-loaded]) .mg-hero__char {
+  transform: translate3d(0, 108%, 0);
+}
+
+html.js .mg-hero:not([data-loaded]) .mg-hero__figure img {
+  opacity: 0;
+  transform: translate3d(0, 5%, 0);
+}
+
+html.js .mg-hero:not([data-loaded]) .mg-hero__intro,
+html.js .mg-hero:not([data-loaded]) .mg-hero__index {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+}
+
+/* ---------- Narrow: stack the layers ---------- */
+
+@media (max-width: 899px) {
+  .mg-hero {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  /* Intro and CTA sit below the fold here, so they must not fade with scroll. */
+  .mg-hero__stage {
+    position: relative;
+    padding-top: calc(var(--mg-header-h) + 8px);
+    opacity: 1;
+  }
+
+  .mg-hero__title {
+    position: relative;
+    top: 0;
+  }
+
+  .mg-hero__figure {
+    position: relative;
+    left: auto;
+    height: auto;
+    width: min(92vw, 560px);
+    margin: -15vw auto 0;
+    transform: none;
+    border-bottom: 1px solid var(--mg-line-strong);
+  }
+
+  .mg-hero__intro {
+    position: relative;
+    inset: auto;
+    width: auto;
+    padding: 32px var(--mg-gutter) 72px;
+  }
+
+  .mg-hero__index {
+    display: none;
+  }
+}

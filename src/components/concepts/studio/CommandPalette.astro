@@ -1,0 +1,135 @@
+---
+import { ArrowRight, AtSign, CornerDownLeft, FileText, Moon, Search, Sun, SunMoon, Wrench } from "@lucide/astro";
+import { connect } from "../../../content/site";
+import { toolCategories, toolRoute } from "../../../content/tools";
+import { palettePages } from "./nav";
+import "./palette.css";
+
+const tools = toolCategories.flatMap((category) =>
+  category.tools
+    .filter((tool) => toolRoute(tool))
+    .map((tool) => ({
+      id: tool.id,
+      label: tool.title,
+      href: toolRoute(tool) as string,
+      meta: category.name,
+      keywords: [category.name, ...(tool.tags ?? [])].join(" "),
+    })),
+);
+
+const actions = [
+  { id: "theme-light", label: "Switch to light theme", theme: "light", Icon: Sun },
+  { id: "theme-dark", label: "Switch to dark theme", theme: "dark", Icon: Moon },
+  { id: "theme-system", label: "Use system theme", theme: "system", Icon: SunMoon },
+] as const;
+---
+
+<dialog class="palette" aria-label="Command palette" data-palette>
+  <div class="palette__search">
+    <Search class="palette__search-icon" aria-hidden="true" />
+    <input
+      class="palette__input"
+      type="text"
+      role="combobox"
+      aria-expanded="true"
+      aria-controls="palette-list"
+      aria-autocomplete="list"
+      aria-label="Search pages and tools"
+      placeholder="Search pages, tools, actions…"
+      autocomplete="off"
+      spellcheck="false"
+      data-palette-input
+    />
+    <kbd class="kbd">Esc</kbd>
+  </div>
+
+  <div class="palette__body" data-palette-scroll>
+    <span class="palette__highlight" aria-hidden="true" data-palette-highlight></span>
+    <div class="palette__list" id="palette-list" role="listbox" aria-label="Results" data-palette-list>
+      <div class="palette__group" role="group" aria-labelledby="pg-pages">
+        <p class="palette__heading mono" id="pg-pages" role="presentation">Pages</p>
+        {
+          palettePages.map((page) => (
+            <div
+              class="palette__option"
+              role="option"
+              id={`po-page-${page.label.toLowerCase()}`}
+              aria-selected="false"
+              data-href={page.href}
+              data-search={`${page.label} ${page.hint} ${page.keywords}`.toLowerCase()}
+            >
+              <FileText class="palette__icon" aria-hidden="true" />
+              <span class="palette__label">{page.label}</span>
+              <span class="palette__meta">{page.hint}</span>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="palette__group" role="group" aria-labelledby="pg-actions">
+        <p class="palette__heading mono" id="pg-actions" role="presentation">Actions</p>
+        {
+          actions.map(({ id, label, theme, Icon }) => (
+            <div
+              class="palette__option"
+              role="option"
+              id={`po-${id}`}
+              aria-selected="false"
+              data-theme-action={theme}
+              data-search={`${label} theme appearance mode`.toLowerCase()}
+            >
+              <Icon class="palette__icon" aria-hidden="true" />
+              <span class="palette__label">{label}</span>
+            </div>
+          ))
+        }
+        <div
+          class="palette__option"
+          role="option"
+          id="po-copy-email"
+          aria-selected="false"
+          data-copy-action={connect.email}
+          data-search="copy email contact address mail"
+        >
+          <AtSign class="palette__icon" aria-hidden="true" />
+          <span class="palette__label">Copy email address</span>
+          <span class="palette__meta mono">{connect.email}</span>
+        </div>
+      </div>
+
+      <div class="palette__group" role="group" aria-labelledby="pg-tools">
+        <p class="palette__heading mono" id="pg-tools" role="presentation">Tools · {tools.length}</p>
+        {
+          tools.map((tool) => (
+            <div
+              class="palette__option"
+              role="option"
+              id={`po-tool-${tool.id}`}
+              aria-selected="false"
+              data-href={tool.href}
+              data-search={`${tool.label} ${tool.keywords}`.toLowerCase()}
+            >
+              <Wrench class="palette__icon" aria-hidden="true" />
+              <span class="palette__label">{tool.label}</span>
+              <span class="palette__meta">{tool.meta}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+    <p class="palette__empty" hidden data-palette-empty>
+      No matches. Try “keys”, “json” or “qr”.
+    </p>
+  </div>
+
+  <footer class="palette__footer mono" aria-hidden="true">
+    <span><kbd class="kbd">↑</kbd><kbd class="kbd">↓</kbd> navigate</span>
+    <span><kbd class="kbd"><CornerDownLeft /></kbd> open</span>
+    <span class="palette__footer-end">dmeim <ArrowRight /> anywhere</span>
+  </footer>
+</dialog>
+
+<script>
+  import { initCommandPalette } from "./scripts/command-palette";
+  initCommandPalette();
+</script>

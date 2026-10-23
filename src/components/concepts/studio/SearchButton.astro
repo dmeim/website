@@ -1,0 +1,71 @@
+---
+import { Search } from "@lucide/astro";
+---
+
+<button type="button" class="search-btn" data-palette-open aria-haspopup="dialog">
+  <Search aria-hidden="true" />
+  <span class="search-btn__label">Search</span>
+  <span class="search-btn__keys" aria-hidden="true">
+    <kbd class="kbd" data-mod-key>⌘</kbd><kbd class="kbd">K</kbd>
+  </span>
+  <span class="sr-only">(Command or Control + K)</span>
+</button>
+
+<style>
+  .search-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 11px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    background: var(--tile);
+    color: var(--ink-muted);
+    font-size: 13.5px;
+    transition:
+      border-color var(--dur-fast) var(--ease),
+      color var(--dur-fast) var(--ease);
+  }
+
+  .search-btn:hover {
+    border-color: var(--border-strong);
+    color: var(--ink);
+  }
+
+  .search-btn :global(svg) {
+    width: 16px;
+    height: 16px;
+  }
+
+  .search-btn__label,
+  .search-btn__keys {
+    display: none;
+  }
+
+  .search-btn__keys {
+    gap: 3px;
+  }
+
+  .search-btn__keys .kbd {
+    height: 20px;
+    min-width: 20px;
+    font-size: 10.5px;
+  }
+
+  @media (min-width: 1000px) {
+    .search-btn {
+      padding: 0 6px 0 12px;
+      min-width: 180px;
+    }
+
+    .search-btn__label {
+      display: inline;
+      margin-right: auto;
+    }
+
+    .search-btn__keys {
+      display: inline-flex;
+    }
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+import "../components/concepts/monograph/monograph.css";
+import "../components/concepts/monograph/monograph-primitives.css";
+import ConceptLayout from "../layouts/ConceptLayout.astro";
+import About from "../components/concepts/monograph/About.astro";
+import Contact from "../components/concepts/monograph/Contact.astro";
+import Footer from "../components/concepts/monograph/Footer.astro";
+import Header from "../components/concepts/monograph/Header.astro";
+import Hero from "../components/concepts/monograph/Hero.astro";
+import Keys from "../components/concepts/monograph/Keys.astro";
+import Principles from "../components/concepts/monograph/Principles.astro";
+import Statement from "../components/concepts/monograph/Statement.astro";
+import SystemPreview from "../components/concepts/monograph/SystemPreview.astro";
+import WorkGallery from "../components/concepts/monograph/WorkGallery.astro";
+
+const fontsHref =
+  "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap";
+---
+
+<ConceptLayout
+  title="Monograph"
+  description="Concept 3 — Monograph: a serif-led, editorial homepage for dmeim.com."
+  fontsHref={fontsHref}
+  concept={3}
+>
+  <!-- Set before first paint so hidden-until-revealed states never flash; the timeout
+       guarantees the hero shows even if the module script never runs. -->
+  <script is:inline>
+    document.documentElement.classList.add("js");
+    setTimeout(function () {
+      var hero = document.querySelector("[data-mg-hero]");
+      if (hero) hero.setAttribute("data-loaded", "");
+    }, 2500);
+  </script>
+  <a class="mg-skip" href="#main">Skip to content</a>
+  <Header />
+  <main id="main">
+    <Hero />
+    <Statement />
+    <WorkGallery />
+    <About />
+    <Principles />
+    <Keys />
+    <SystemPreview />
+    <Contact />
+  </main>
+  <Footer />
+</ConceptLayout>

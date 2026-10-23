@@ -1,0 +1,170 @@
+---
+import { ArrowRight, ArrowUpRight } from "@lucide/astro";
+import { hero } from "../../../../content/site";
+import Tile from "../Tile.astro";
+
+const lines = ["Careful interfaces.", "Trustworthy infrastructure."];
+---
+
+<Tile as="section" class="bento__intro intro" aria-labelledby="hero-title">
+  <div class="intro__top">
+    <span class="status-pill">
+      <span class="status-pill__dot" aria-hidden="true"></span>
+      Available for select work
+    </span>
+    <span class="eyebrow intro__handle">{hero.role}</span>
+  </div>
+
+  <div class="intro__body">
+    <h1 id="hero-title" class="display intro__title">
+      {
+        lines.map((line, i) => (
+          <span class="intro__line" style={`--line: ${i}`}>
+            <span class:list={["intro__line-inner", i > 0 && "intro__line-inner--muted"]}>
+              {line}
+            </span>
+          </span>
+        ))
+      }
+    </h1>
+    <p class="intro__lede">{hero.sentence}</p>
+  </div>
+
+  <div class="intro__ctas">
+    <a class="btn btn--primary" href="/connect">
+      Start a conversation
+      <ArrowRight class="btn__arrow" aria-hidden="true" />
+    </a>
+    <a class="btn btn--secondary" href="/projects">
+      View work
+      <ArrowUpRight class="btn__arrow--diag" aria-hidden="true" />
+    </a>
+  </div>
+</Tile>
+
+<style>
+  :global(.tile.intro) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-8);
+    padding: var(--s-6);
+  }
+
+  @media (min-width: 720px) {
+    :global(.tile.intro) {
+      gap: var(--s-10);
+      padding: var(--s-10);
+    }
+  }
+
+  .intro__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    height: 30px;
+    padding: 0 12px 0 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    background: var(--ground);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .status-pill__dot {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  .status-pill__dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: ping 2.4s var(--ease) infinite;
+  }
+
+  @keyframes ping {
+    0% {
+      opacity: 0.6;
+      scale: 1;
+    }
+    70%,
+    100% {
+      opacity: 0;
+      scale: 2.6;
+    }
+  }
+
+  .intro__body {
+    display: grid;
+    gap: var(--s-5);
+    margin-top: auto;
+  }
+
+  .intro__title {
+    font-size: clamp(2.35rem, 1.2rem + 4.2vw, 4.6rem);
+    line-height: 1;
+    letter-spacing: -0.042em;
+  }
+
+  .intro__line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  .intro__line-inner {
+    display: inline-block;
+  }
+
+  .intro__line-inner--muted {
+    color: var(--ink-muted);
+  }
+
+  /* Headline lines rise out of a mask once the tile reveals. */
+  :global(html.js) .intro__line-inner {
+    translate: 0 105%;
+    transition: translate 900ms var(--ease) calc(150ms + var(--line) * 110ms);
+  }
+
+  :global(html.js .intro[data-revealed="true"]) .intro__line-inner {
+    translate: 0 0;
+  }
+
+  .intro__lede {
+    max-width: 46ch;
+    color: var(--ink-muted);
+    font-size: clamp(15px, 0.9rem + 0.25vw, 17px);
+  }
+
+  .intro__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  @media (max-width: 420px) {
+    .intro__ctas .btn {
+      flex: 1 1 100%;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .intro__handle {
+      display: none;
+    }
+  }
+</style>

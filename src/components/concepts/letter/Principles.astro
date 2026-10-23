@@ -1,0 +1,32 @@
+---
+import { pedagogy } from "../../../content/site";
+import Section from "./Section.astro";
+---
+
+<Section id="principles" label="Principles">
+  <ol class="lt-principles">
+    {
+      pedagogy.map((item, i) => (
+        <li>
+          <span class="lt-principles__n" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+          {item.title}
+        </li>
+      ))
+    }
+  </ol>
+</Section>
+
+<style>
+  .lt-principles li {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    align-items: baseline;
+    padding-block: 0.2rem;
+  }
+
+  .lt-principles__n {
+    color: var(--lt-muted);
+    font-size: var(--lt-small);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+</style>

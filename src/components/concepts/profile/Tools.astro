@@ -1,0 +1,115 @@
+---
+/** Tools (six common picks + index link) and the stack it all runs on. */
+import { ArrowRight } from "@lucide/astro";
+import { venues } from "../../../content/site";
+import { availableTools, toolCategories, toolRoute } from "../../../content/tools";
+import Section from "./Section.astro";
+import Row from "./Row.astro";
+
+const POPULAR = ["qrcode-generator", "token-generator", "hash-text", "uuid-generator", "jwt-parser", "json-prettify"];
+const available = availableTools();
+const picked = POPULAR.map((id) => available.find((t) => t.id === id)).filter((t) => t !== undefined);
+const tools = (picked.length === POPULAR.length ? picked : available).slice(0, 6);
+
+// Framer Motion is no longer part of the stack.
+const stack = venues.filter((v) => v.name !== "Framer Motion");
+const stackRole: Record<string, string> = {
+  "Astro 7": "Framework",
+  Cloudflare: "Hosting",
+  "Open keys": "Identity",
+};
+---
+
+<Section id="tools" title="Tools" spy="tools">
+  <p class="p-tools__intro" data-reveal>
+    {available.length} private, local-first utilities across {toolCategories.length} categories, all running in your
+    browser.
+  </p>
+  <ul class="p-tools" data-reveal>
+    {
+      tools.map((tool) => (
+        <li>
+          <a class="p-tools__link" href={toolRoute(tool)}>
+            {tool.title}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <a class="p-tools__all" href="/tools" data-reveal>
+    All tools <ArrowRight size={14} stroke-width={1.75} aria-hidden="true" />
+  </a>
+</Section>
+
+<Section id="stack" title="Stack" spy="tools">
+  <ul class="p-list">
+    {stack.map((v) => <Row label={stackRole[v.name]} title={v.name} desc={v.place} />)}
+  </ul>
+</Section>
+
+<style>
+  .p-tools__intro {
+    max-width: 34rem;
+    margin-bottom: 1.25rem;
+    color: var(--p-muted);
+  }
+
+  .p-tools {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 2rem;
+  }
+
+  .p-tools li {
+    border-bottom: 1px solid var(--p-line);
+  }
+
+  .p-tools li:first-child {
+    border-top: 1px solid var(--p-line);
+  }
+
+  .p-tools__link {
+    display: block;
+    margin-inline: -0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--p-radius);
+    color: var(--p-ink);
+    text-decoration: none;
+    transition: background-color var(--p-fast) var(--p-ease);
+  }
+
+  .p-tools__link:hover {
+    background: var(--p-surface);
+  }
+
+  .p-tools__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  .p-tools__all :global(svg) {
+    transition: transform var(--p-fast) var(--p-ease);
+  }
+
+  .p-tools__all:hover :global(svg) {
+    transform: translateX(2px);
+  }
+
+  @media (min-width: 560px) {
+    .p-tools {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .p-tools li:nth-child(2) {
+      border-top: 1px solid var(--p-line);
+    }
+
+    .p-tools__link {
+      margin-inline: -0.75rem 0;
+    }
+  }
+</style>

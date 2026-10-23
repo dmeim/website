@@ -1,0 +1,10 @@
+---
+interface Props {
+  status: "live" | "wip" | "archived";
+}
+
+const labels = { live: "Live", wip: "In progress", archived: "Archived" } as const;
+const { status } = Astro.props;
+---
+
+<span class={`mg-badge mg-badge--${status}`}>{labels[status]}</span>

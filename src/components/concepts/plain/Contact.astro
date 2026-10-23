@@ -1,0 +1,55 @@
+---
+import { ArrowUpRight, Mail } from "@lucide/astro";
+import { connect } from "../../../content/site";
+---
+
+<section id="contact" class="pl-section pl-container" aria-labelledby="pl-contact-title">
+  <div class="pl-panel pl-contact" data-reveal>
+    <div>
+      <h2 id="pl-contact-title">Get in touch</h2>
+      <p class="pl-muted">Collaboration, keys, or just hello.</p>
+    </div>
+    <div class="pl-contact__actions">
+      <a class="pl-btn pl-btn--primary" href={`mailto:${connect.email}`}>
+        <Mail aria-hidden="true" />
+        {connect.email}
+      </a>
+      <a class="pl-btn" href={connect.socialUrl} rel="me noopener" target="_blank">
+        {connect.socialLabel}
+        <span class="pl-sr-only">(opens in a new tab)</span>
+        <ArrowUpRight aria-hidden="true" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pl-contact {
+    display: grid;
+    gap: 28px;
+    padding-block: 40px;
+  }
+
+  .pl-contact h2 {
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
+  }
+
+  .pl-contact p {
+    margin-top: 8px;
+  }
+
+  .pl-contact__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  @media (min-width: 720px) {
+    .pl-contact {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 32px;
+      padding: 56px 48px;
+    }
+  }
+</style>

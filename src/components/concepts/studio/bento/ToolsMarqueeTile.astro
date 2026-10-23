@@ -1,0 +1,130 @@
+---
+import { ArrowRight } from "@lucide/astro";
+import { availableTools, toolRoute } from "../../../../content/tools";
+import Tile from "../Tile.astro";
+
+const tools = availableTools();
+const half = Math.ceil(tools.length / 2);
+const rows = [tools.slice(0, half), tools.slice(half)];
+---
+
+<Tile as="section" class="bento__tools toolsbar" aria-labelledby="tools-title">
+  <div class="toolsbar__head">
+    <div>
+      <p class="eyebrow">Toolbox</p>
+      <h2 class="display toolsbar__title" id="tools-title">
+        {tools.length} private, local-first tools
+      </h2>
+    </div>
+    <a class="btn btn--secondary btn--sm" href="/tools">
+      Browse all <ArrowRight class="btn__arrow" aria-hidden="true" />
+    </a>
+  </div>
+
+  <!-- Decorative sampler: the full list is reachable via /tools and the ⌘K palette. -->
+  <div class="marquee" aria-hidden="true">
+    {
+      rows.map((row, i) => (
+        <div class:list={["marquee__row", i === 1 && "marquee__row--reverse"]}>
+          <div class="marquee__track" style={`--duration: ${row.length * 2.6}s`}>
+            {[0, 1].map((copy) =>
+              row.map((tool) => (
+                <a
+                  class="chip marquee__chip"
+                  href={toolRoute(tool)}
+                  tabindex="-1"
+                  data-copy-index={copy}
+                >
+                  {tool.title}
+                </a>
+              )),
+            )}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</Tile>
+
+<style>
+  :global(.tile.toolsbar) {
+    display: grid;
+    gap: var(--s-6);
+    overflow: hidden;
+    padding-inline: 0;
+  }
+
+  .toolsbar__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding-inline: var(--s-6);
+  }
+
+  @media (min-width: 1100px) {
+    .toolsbar__head {
+      padding-inline: 28px;
+    }
+  }
+
+  .toolsbar__title {
+    margin-top: var(--s-2);
+    font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.75rem);
+    letter-spacing: -0.03em;
+  }
+
+  .marquee {
+    display: grid;
+    gap: var(--s-2);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .marquee__row {
+    overflow: hidden;
+  }
+
+  .marquee__track {
+    display: flex;
+    gap: var(--s-2);
+    width: max-content;
+    animation: marquee var(--duration, 120s) linear infinite;
+  }
+
+  .marquee__row--reverse .marquee__track {
+    animation-direction: reverse;
+  }
+
+  .marquee:hover .marquee__track {
+    animation-play-state: paused;
+  }
+
+  .marquee__chip {
+    background: var(--ground);
+  }
+
+  /* Track holds two identical copies; -50% (plus half a gap) loops seamlessly. */
+  @keyframes marquee {
+    to {
+      translate: calc(-50% - var(--s-1)) 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+
+    .marquee__row {
+      overflow-x: auto;
+      padding-inline: var(--s-6);
+      scrollbar-width: none;
+    }
+
+    .marquee__chip[data-copy-index="1"] {
+      display: none;
+    }
+  }
+</style>

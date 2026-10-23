@@ -1,0 +1,91 @@
+---
+import { ArrowUpRight } from "@lucide/astro";
+import { appointments, projects } from "../../../content/site";
+import { availableTools } from "../../../content/tools";
+import StatusBadge from "./StatusBadge.astro";
+import "./work-gallery.css";
+
+const total = appointments.length + 1;
+const pad = (n: number) => String(n).padStart(2, "0");
+const toolCount = availableTools().length;
+---
+
+<section class="mg-work" id="work" aria-labelledby="mg-work-title" data-mg-work>
+  <div class="mg-work__sticky" data-mg-work-sticky>
+    <div class="mg-work__bar mg-container">
+      <p class="mg-label"><span class="mg-label__num">02</span>Selected work</p>
+      <p class="mg-label mg-work__count" aria-hidden="true">
+        <span data-mg-work-current>01</span> / {pad(total)}
+      </p>
+      <span class="mg-work__progress" aria-hidden="true"><span data-mg-work-progress></span></span>
+    </div>
+
+    <ol class="mg-work__track" data-mg-work-track>
+      <li class="mg-work__intro">
+        <h2 class="mg-display mg-display--lg" id="mg-work-title">Selected <em>work</em></h2>
+        <p class="mg-lede">
+          A small, deliberate body of work: a personal platform, experiments, and the public keys that let you
+          verify all of it.
+        </p>
+        <p class="mg-label mg-work__hint" aria-hidden="true">Scroll to browse →</p>
+      </li>
+
+      {
+        appointments.map((item, i) => (
+          <li class="mg-work__panel">
+            <article class="mg-work__card" aria-labelledby={`mg-work-${i}`}>
+              <div class="mg-work__top">
+                <span class="mg-num mg-work__num">{pad(i + 1)}</span>
+                <p class="mg-label">
+                  {item.organization}
+                  <span aria-hidden="true"> · </span>
+                  {item.dates}
+                  {item.location && <span class="mg-work__loc"> · {item.location}</span>}
+                </p>
+              </div>
+              <h3 class="mg-display mg-work__title" id={`mg-work-${i}`}>{item.title}</h3>
+              {item.bullets && (
+                <ul class="mg-work__bullets">
+                  {item.bullets.map((b) => <li>{b}</li>)}
+                </ul>
+              )}
+              <a class="mg-work__link" href={item.url}>
+                <span class="mg-link mg-link--bare">Open {item.organization}</span>
+                <span class="mg-work__arrow" aria-hidden="true"><ArrowUpRight /></span>
+              </a>
+            </article>
+          </li>
+        ))
+      }
+
+      <li class="mg-work__panel">
+        <article class="mg-work__card mg-work__card--index" aria-labelledby="mg-work-index">
+          <div class="mg-work__top">
+            <span class="mg-num mg-work__num">{pad(total)}</span>
+            <p class="mg-label">Index · Projects &amp; tools</p>
+          </div>
+          <h3 class="mg-display mg-work__title" id="mg-work-index">The <em>index</em></h3>
+          <ul class="mg-work__projects">
+            {
+              projects.map((p) => (
+                <li>
+                  <span class="mg-work__project-title">{p.title}</span>
+                  <StatusBadge status={p.status} />
+                </li>
+              ))
+            }
+          </ul>
+          <div class="mg-work__index-links">
+            <a class="mg-link" href="/projects">All projects</a>
+            <a class="mg-link" href="/tools">{toolCount} browser tools</a>
+          </div>
+        </article>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<script>
+  import { initWorkGallery } from "./work-gallery";
+  initWorkGallery();
+</script>

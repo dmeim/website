@@ -1,0 +1,215 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+
+const nav = [
+  { label: "Work", href: "/projects" },
+  { label: "Tools", href: "/tools" },
+  { label: "Keys", href: "/keys" },
+  { label: "Connect", href: "/connect" },
+];
+---
+
+<header class="mg-header" data-mg-header>
+  <div class="mg-header__bar">
+    <a class="mg-header__mark" href="#top" aria-label="dmeim — back to top">
+      dmeim<span aria-hidden="true">.</span>
+    </a>
+
+    <nav class="mg-header__nav" aria-label="Primary">
+      <ul>
+        {nav.map((item) => <li><a class="mg-link mg-link--bare" href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="mg-header__theme">
+      <ThemeToggle />
+    </div>
+
+    <button
+      class="mg-header__menu-btn"
+      type="button"
+      aria-expanded="false"
+      aria-controls="mg-menu"
+      data-mg-menu-toggle
+    >
+      <span class="mg-header__menu-label" data-label-closed>Menu</span>
+      <span class="mg-header__menu-label" data-label-open>Close</span>
+    </button>
+  </div>
+
+  <div class="mg-menu mg-invert" id="mg-menu" data-mg-menu hidden>
+    <nav aria-label="Primary mobile">
+      <ol class="mg-menu__list">
+        {
+          nav.map((item, i) => (
+            <li style={`--i: ${i}`}>
+              <a href={item.href}>
+                <span class="mg-num">{String(i + 1).padStart(2, "0")}</span>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+    <div class="mg-menu__foot">
+      <span class="mg-label">Appearance</span>
+      <ThemeToggle />
+    </div>
+  </div>
+</header>
+
+<style>
+  .mg-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    color: var(--mg-ink);
+    transition: color var(--mg-dur-2) var(--mg-ease);
+  }
+
+  .mg-header__bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: clamp(20px, 3vw, 48px);
+    height: var(--mg-header-h);
+    padding-inline: var(--mg-gutter);
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition:
+      background-color var(--mg-dur-2) var(--mg-ease),
+      border-color var(--mg-dur-2) var(--mg-ease),
+      transform var(--mg-dur-2) var(--mg-ease);
+  }
+
+  .mg-header[data-scrolled] .mg-header__bar {
+    background: var(--mg-ground);
+    border-bottom-color: var(--mg-line);
+  }
+
+  .mg-header[data-hidden] .mg-header__bar {
+    transform: translateY(-100%);
+  }
+
+  .mg-header__mark {
+    font-family: var(--mg-font-display);
+    font-size: 1.75rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    margin-right: auto;
+  }
+
+  .mg-header__mark span {
+    color: var(--mg-gold);
+  }
+
+  .mg-header__nav ul {
+    display: flex;
+    gap: clamp(20px, 2.6vw, 40px);
+  }
+
+  .mg-header__nav a {
+    font-size: var(--mg-text-label);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .mg-header__theme {
+    padding-left: clamp(20px, 2.6vw, 40px);
+    border-left: 1px solid var(--mg-line);
+  }
+
+  .mg-header__menu-btn {
+    display: none;
+    font-size: var(--mg-text-label);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    min-height: 44px;
+    padding-inline: 4px;
+  }
+
+  [data-label-open],
+  .mg-header__menu-btn[aria-expanded="true"] [data-label-closed] {
+    display: none;
+  }
+
+  .mg-header__menu-btn[aria-expanded="true"] [data-label-open] {
+    display: inline;
+  }
+
+  .mg-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: calc(var(--mg-header-h) + 32px) var(--mg-gutter) 96px;
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path var(--mg-dur-3) var(--mg-ease);
+  }
+
+  .mg-menu[data-open] {
+    clip-path: inset(0);
+  }
+
+  .mg-menu__list a {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding-block: 10px;
+    border-bottom: 1px solid var(--mg-line);
+    font-family: var(--mg-font-display);
+    font-size: clamp(2.75rem, 13vw, 4.5rem);
+    line-height: 1;
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity var(--mg-dur-2) var(--mg-ease),
+      transform var(--mg-dur-3) var(--mg-ease);
+    transition-delay: calc(120ms + var(--i) * 60ms);
+  }
+
+  .mg-menu[data-open] .mg-menu__list a {
+    opacity: 1;
+    transform: none;
+  }
+
+  .mg-menu__list .mg-num {
+    font-size: 1.1rem;
+  }
+
+  .mg-menu__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  @media (max-width: 860px) {
+    .mg-header__nav,
+    .mg-header__theme {
+      display: none;
+    }
+
+    .mg-header__menu-btn {
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
+  /* While the menu is open the bar sits on the inverted menu band. */
+  :global(html[data-mg-menu-open]) .mg-header .mg-header__bar {
+    background: transparent;
+    border-bottom-color: transparent;
+  }
+</style>
+
+<script>
+  import { initHeader } from "./header";
+  initHeader();
+</script>

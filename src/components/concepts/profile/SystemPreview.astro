@@ -1,0 +1,97 @@
+---
+/**
+ * Component preview for the Profile vocabulary. Same row rhythm as the
+ * content above: muted label column, specimens on the right.
+ */
+import { ArrowRight, Plus, Settings } from "@lucide/astro";
+import Section from "./Section.astro";
+import SystemFields from "./SystemFields.astro";
+import SystemChoices from "./SystemChoices.astro";
+import SystemPatterns from "./SystemPatterns.astro";
+import Tooltip from "./Tooltip.astro";
+---
+
+<Section id="system" title="System — component preview" note="Reference only">
+  <div class="p-sys">
+    <div class="p-sys__group" data-reveal>
+      <h3 class="p-sys__label">Buttons</h3>
+      <div class="p-sys__body p-sys__wrap">
+        <button type="button" class="p-btn p-btn--primary">Primary</button>
+        <button type="button" class="p-btn p-btn--secondary">Secondary</button>
+        <button type="button" class="p-btn p-btn--ghost">
+          Ghost <ArrowRight size={14} stroke-width={1.75} aria-hidden="true" />
+        </button>
+        <button type="button" class="p-icon-btn" aria-label="Add item">
+          <Plus size={16} stroke-width={1.75} aria-hidden="true" />
+        </button>
+        <Tooltip text="Settings" id="p-tip-settings">
+          <button type="button" class="p-icon-btn" aria-label="Settings" aria-describedby="p-tip-settings">
+            <Settings size={16} stroke-width={1.75} aria-hidden="true" />
+          </button>
+        </Tooltip>
+        <button type="button" class="p-btn p-btn--primary" disabled>Disabled</button>
+      </div>
+    </div>
+
+    <SystemFields />
+    <SystemChoices />
+    <SystemPatterns />
+  </div>
+</Section>
+
+<style>
+  .p-sys {
+    display: grid;
+    border-top: 1px solid var(--p-line);
+  }
+
+  .p-sys :global(.p-sys__group) {
+    display: grid;
+    gap: 0.75rem;
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--p-line);
+  }
+
+  .p-sys :global(.p-sys__label) {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--p-muted);
+  }
+
+  .p-sys :global(.p-sys__body) {
+    min-width: 0;
+  }
+
+  .p-sys :global(.p-sys__wrap) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .p-sys :global(.p-sys__stack) {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 24rem;
+  }
+
+  @media (min-width: 560px) {
+    .p-sys :global(.p-sys__group) {
+      grid-template-columns: var(--p-label-col) minmax(0, 1fr);
+      column-gap: 1rem;
+    }
+
+    .p-sys :global(.p-sys__label) {
+      padding-top: 0.5rem;
+    }
+
+    /* A list row brings its own label column, so it takes the full width. */
+    .p-sys :global(.p-sys__group--full) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .p-sys :global(.p-sys__group--full .p-sys__label) {
+      padding-top: 0;
+    }
+  }
+</style>

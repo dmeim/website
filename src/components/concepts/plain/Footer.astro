@@ -1,0 +1,45 @@
+---
+import { ArrowUp } from "@lucide/astro";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="pl-footer pl-container">
+  <p>© {year} Dimitri · dmeim.com</p>
+  <a class="pl-footer__top" href="#top">
+    Back to top
+    <ArrowUp aria-hidden="true" />
+  </a>
+</footer>
+
+<style>
+  .pl-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding-top: 64px;
+    /* Leaves the fixed review switcher a clear corner at the end of the page. */
+    padding-bottom: 96px;
+    color: var(--pl-muted);
+    font-size: 0.875rem;
+  }
+
+  .pl-footer__top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    transition: color var(--pl-fast) var(--pl-ease);
+  }
+
+  .pl-footer__top:hover {
+    color: var(--pl-ink);
+  }
+
+  .pl-footer__top :global(svg) {
+    width: 14px;
+    height: 14px;
+  }
+</style>

@@ -1,0 +1,243 @@
+/* Selected work. Stacked by default; work-gallery.ts adds [data-pinned] on wide, motion-OK screens. */
+
+.mg-work {
+  position: relative;
+  padding-block: clamp(72px, 10vw, 140px);
+}
+
+.mg-work__bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 20px;
+  margin-bottom: 40px;
+}
+
+.mg-work__count {
+  font-variant-numeric: tabular-nums;
+  display: none;
+}
+
+.mg-work__progress {
+  position: absolute;
+  left: var(--mg-gutter);
+  right: var(--mg-gutter);
+  bottom: 0;
+  height: 1px;
+  background: var(--mg-line);
+}
+
+.mg-work__progress span {
+  position: absolute;
+  inset: 0;
+  background: var(--mg-gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.mg-work__track {
+  display: grid;
+  gap: 16px;
+  padding-inline: var(--mg-gutter);
+  max-width: var(--mg-max);
+  margin-inline: auto;
+}
+
+.mg-work__intro {
+  display: grid;
+  gap: 24px;
+  align-content: end;
+  padding-bottom: 32px;
+}
+
+.mg-work__hint {
+  display: none;
+}
+
+.mg-work__card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 28px;
+  height: 100%;
+  padding: clamp(24px, 3vw, 48px);
+  background: var(--mg-surface);
+}
+
+.mg-work__card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--mg-gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--mg-dur-3) var(--mg-ease);
+}
+
+.mg-work__card:hover::before,
+.mg-work__card:focus-within::before {
+  transform: scaleX(1);
+}
+
+.mg-work__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.mg-work__top .mg-label {
+  text-align: right;
+  padding-top: 0.6em;
+}
+
+.mg-work__num {
+  font-size: clamp(3.5rem, 2.5rem + 3vw, 6rem);
+  transition: transform var(--mg-dur-3) var(--mg-ease);
+}
+
+.mg-work__card:hover .mg-work__num {
+  transform: translateY(-4px);
+}
+
+.mg-work__title {
+  align-self: end;
+  font-size: clamp(2.25rem, 1.5rem + 2.6vw, 4.25rem);
+  line-height: 0.95;
+}
+
+.mg-work__bullets,
+.mg-work__projects {
+  border-top: 1px solid var(--mg-line);
+}
+
+.mg-work__bullets li,
+.mg-work__projects li {
+  padding-block: 11px;
+  border-bottom: 1px solid var(--mg-line);
+  color: var(--mg-ink-muted);
+  font-size: var(--mg-text-sm);
+}
+
+.mg-work__projects li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-block: 9px;
+}
+
+.mg-work__project-title {
+  color: var(--mg-ink);
+  font-family: var(--mg-font-display);
+  font-size: 1.375rem;
+  line-height: 1.1;
+}
+
+.mg-work__link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: var(--mg-text-sm);
+}
+
+.mg-work__link:hover .mg-link,
+.mg-work__link:focus-visible .mg-link {
+  background-size:
+    100% 1px,
+    100% 1px;
+}
+
+.mg-work__arrow {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--mg-line-strong);
+  border-radius: 50%;
+  transition:
+    background-color var(--mg-dur-2) var(--mg-ease),
+    border-color var(--mg-dur-2) var(--mg-ease),
+    color var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-work__arrow svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.5;
+  transition: transform var(--mg-dur-2) var(--mg-ease);
+}
+
+.mg-work__link:hover .mg-work__arrow,
+.mg-work__link:focus-visible .mg-work__arrow {
+  background: var(--mg-ink);
+  border-color: var(--mg-ink);
+  color: var(--mg-ground);
+}
+
+.mg-work__link:hover .mg-work__arrow svg,
+.mg-work__link:focus-visible .mg-work__arrow svg {
+  transform: translate(2px, -2px);
+}
+
+.mg-work__index-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  font-size: var(--mg-text-sm);
+}
+
+@media (max-width: 520px) {
+  .mg-work__loc {
+    display: none;
+  }
+}
+
+/* ---------- Pinned horizontal mode ---------- */
+
+.mg-work[data-pinned] {
+  padding-block: 0;
+}
+
+.mg-work[data-pinned] .mg-work__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: calc(var(--mg-header-h) * 0.6);
+}
+
+.mg-work[data-pinned] .mg-work__count {
+  display: block;
+}
+
+.mg-work[data-pinned] .mg-work__track {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(16px, 1.8vw, 28px);
+  width: max-content;
+  max-width: none;
+  margin: 0;
+  will-change: transform;
+}
+
+.mg-work[data-pinned] .mg-work__intro {
+  width: min(600px, 40vw);
+  padding: 0 4vw 0 0;
+}
+
+.mg-work[data-pinned] .mg-work__hint {
+  display: block;
+}
+
+.mg-work[data-pinned] .mg-work__panel {
+  flex: none;
+  width: clamp(500px, 42vw, 700px);
+  height: min(66svh, 640px);
+}

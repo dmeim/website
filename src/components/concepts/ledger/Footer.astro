@@ -1,0 +1,85 @@
+---
+/**
+ * Hairline footer with mono small print and back-to-top.
+ */
+import { ArrowUp } from "@lucide/astro";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="ft">
+  <div class="ft__inner l-container l-mono">
+    <p class="ft__mark">dmeim</p>
+    <p class="l-muted">© {year} Dimitri</p>
+    <p class="l-muted">Set in Geist &amp; Geist Mono</p>
+    <p class="l-muted">Astro · Cloudflare edge</p>
+    <a class="ft__top" href="#top">
+      Back to top
+      <ArrowUp size={14} stroke-width={1.75} aria-hidden="true" />
+    </a>
+  </div>
+</footer>
+
+<style>
+  .ft {
+    border-top: 1px solid var(--l-line-strong);
+    /* Leaves room for the fixed concept switcher in the bottom-right corner. */
+    padding-bottom: 5rem;
+  }
+
+  .ft__inner {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--l-space-4) var(--l-col-gap);
+    padding-block: var(--l-space-5);
+  }
+
+  .ft__mark {
+    font-family: var(--l-font);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.05em;
+    text-transform: none;
+  }
+
+  .ft__top {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    justify-self: start;
+    transition: color var(--l-dur-fast) var(--l-ease);
+  }
+
+  .ft__top :global(svg) {
+    transition: transform var(--l-dur) var(--l-ease);
+  }
+
+  .ft__top:hover {
+    color: var(--l-gold-ink);
+  }
+
+  .ft__top:hover :global(svg) {
+    transform: translateY(-3px);
+  }
+
+  @media (min-width: 900px) {
+    .ft__inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .ft__inner > :nth-child(1) {
+      grid-column: 1 / span 3;
+    }
+
+    .ft__inner > :nth-child(2),
+    .ft__inner > :nth-child(3),
+    .ft__inner > :nth-child(4) {
+      grid-column: span 2;
+    }
+
+    .ft__top {
+      grid-column: 11 / span 2;
+      justify-self: end;
+    }
+  }
+</style>

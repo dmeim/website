@@ -1,0 +1,89 @@
+---
+import ThemeToggle from "./ThemeToggle.astro";
+
+const nav = [
+  { label: "Work", href: "/projects" },
+  { label: "Tools", href: "/tools" },
+  { label: "Keys", href: "/keys" },
+  { label: "Connect", href: "/connect" },
+];
+---
+
+<header class="pl-header pl-container">
+  <a class="pl-header__mark" href="#top" aria-label="dmeim, back to top">dmeim</a>
+  <nav class="pl-header__nav" aria-label="Primary">
+    <ul>
+      {nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+    </ul>
+  </nav>
+  <ThemeToggle />
+</header>
+
+<style>
+  .pl-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "mark theme"
+      "nav nav";
+    align-items: center;
+    row-gap: 8px;
+    padding-top: 20px;
+    padding-bottom: 8px;
+  }
+
+  .pl-header__mark {
+    grid-area: mark;
+    justify-self: start;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .pl-header :global(.pl-theme) {
+    grid-area: theme;
+    margin-right: -8px;
+  }
+
+  .pl-header__nav {
+    grid-area: nav;
+  }
+
+  .pl-header__nav ul {
+    display: flex;
+    gap: 4px;
+    margin-left: -12px;
+  }
+
+  .pl-header__nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: var(--pl-radius-control);
+    color: var(--pl-muted);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition:
+      color var(--pl-fast) var(--pl-ease),
+      background-color var(--pl-fast) var(--pl-ease);
+  }
+
+  .pl-header__nav a:hover {
+    color: var(--pl-ink);
+    background: var(--pl-surface);
+  }
+
+  @media (min-width: 720px) {
+    .pl-header {
+      grid-template-columns: 1fr auto auto;
+      grid-template-areas: "mark nav theme";
+      column-gap: 16px;
+      padding-top: 28px;
+    }
+
+    .pl-header__nav ul {
+      margin-left: 0;
+    }
+  }
+</style>

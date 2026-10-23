@@ -1,0 +1,54 @@
+---
+/** Three-segment theme control wired to the shared concept runtime. */
+import { Sun, Monitor, Moon } from "@lucide/astro";
+
+const options = [
+  { value: "light", label: "Light", Icon: Sun },
+  { value: "system", label: "System", Icon: Monitor },
+  { value: "dark", label: "Dark", Icon: Moon },
+] as const;
+---
+
+<div class="p-theme" role="group" aria-label="Theme">
+  {
+    options.map(({ value, label, Icon }) => (
+      <button type="button" class="p-theme__btn" data-theme-set={value} aria-pressed="false" title={label}>
+        <Icon size={14} stroke-width={1.75} aria-hidden="true" />
+        <span class="p-sr-only">{label}</span>
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  .p-theme {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border-radius: var(--p-radius);
+    background: var(--p-surface);
+  }
+
+  .p-theme__btn {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 1.75rem;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--p-muted);
+    transition:
+      background-color var(--p-fast) var(--p-ease),
+      color var(--p-fast) var(--p-ease);
+  }
+
+  .p-theme__btn:hover {
+    color: var(--p-ink);
+  }
+
+  .p-theme__btn[aria-pressed="true"] {
+    background: var(--p-ground);
+    color: var(--p-ink);
+  }
+</style>

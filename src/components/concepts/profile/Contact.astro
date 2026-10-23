@@ -1,0 +1,23 @@
+---
+/** Contact: two direct routes and one line of context. */
+import { connect } from "../../../content/site";
+import Section from "./Section.astro";
+import Row from "./Row.astro";
+---
+
+<Section id="contact" title="Contact" spy="contact">
+  <p class="p-contact__line" data-reveal>
+    {connect.intro}
+  </p>
+  <ul class="p-list">
+    <Row label="Email" title={connect.email} desc="Best for collaborations and questions" href={`mailto:${connect.email}`} />
+    <Row label="GitHub" title={connect.socialHandle} desc="Code, issues, and experiments" href={connect.socialUrl} />
+  </ul>
+</Section>
+
+<style>
+  .p-contact__line {
+    max-width: 34rem;
+    margin-bottom: 1.25rem;
+  }
+</style>

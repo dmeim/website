@@ -1,0 +1,31 @@
+---
+/**
+ * The page's one link style. `arrow` reserves room for the hover arrow, so
+ * use it on standalone links only; inline prose links keep just the underline.
+ */
+import { ArrowRight, ArrowUpRight } from "@lucide/astro";
+
+interface Props {
+  href: string;
+  arrow?: boolean;
+  quiet?: boolean;
+  class?: string;
+}
+
+const { href, arrow = false, quiet = false, class: extra } = Astro.props;
+const external = /^https?:\/\//.test(href);
+const Icon = external ? ArrowUpRight : ArrowRight;
+---
+
+<a
+  href={href}
+  class:list={["lt-link", { "lt-link--quiet": quiet }, extra]}
+  rel={external ? "noopener noreferrer" : undefined}
+  target={external ? "_blank" : undefined}
+><slot />{
+    arrow && (
+      <span class="lt-link__arrow" aria-hidden="true">
+        <Icon size={16} stroke-width={1.5} />
+      </span>
+    )
+  }{external && <span class="lt-visually-hidden"> (opens in a new tab)</span>}</a>

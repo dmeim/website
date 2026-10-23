@@ -1,0 +1,72 @@
+---
+/**
+ * Isolated shell for the /home1–/home3 redesign concepts.
+ * Skips global.css and the site header so each concept owns its whole look.
+ */
+import ConceptSwitcher from "../components/concepts/shared/ConceptSwitcher.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Google Fonts stylesheet URL for this concept. */
+  fontsHref: string;
+  /** Which concept is active, for the switcher. */
+  concept: 1 | 2 | 3 | 4 | 5 | 6;
+}
+
+const {
+  title,
+  description = "Design concept for dmeim.com.",
+  fontsHref,
+  concept,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href={fontsHref} rel="stylesheet" />
+    <title>{title} · dmeim.com</title>
+    <!-- Same storage key and fallback as BaseLayout so the choice carries across the site. -->
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem("theme");
+          var pref =
+            stored === "light" || stored === "system" || stored === "dark"
+              ? stored
+              : "system";
+          var prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+          var theme =
+            pref === "light" || pref === "dark"
+              ? pref
+              : prefersDark
+                ? "dark"
+                : "light";
+          document.documentElement.setAttribute("data-theme-pref", pref);
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (_) {
+          document.documentElement.setAttribute("data-theme-pref", "system");
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+    <ConceptSwitcher active={concept} />
+    <script>
+      import { initConceptRuntime } from "../components/concepts/shared/concept-runtime";
+      initConceptRuntime();
+    </script>
+  </body>
+</html>
