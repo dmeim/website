@@ -1,5 +1,3 @@
-import { motion } from "framer-motion";
-
 import { LAYOUTS, LAYOUT_LABELS } from "@/lib/orthodox/layout";
 import { ALL_COLLECTIONS } from "@/lib/orthodox/selection";
 import {
@@ -9,10 +7,13 @@ import {
   MIN_COUNT,
   ROTATION_OPTIONS,
   formatRotation,
+  type BoardBorder,
   type ScreensaverSettings as Settings,
 } from "@/lib/orthodox/settings";
 import type { OrthodoxCollection, WallBackground } from "@/lib/orthodox/types";
+import { Button, Progress, Select, Slider, Swatch } from "@/ui/react";
 
+import { OrthodoxSheet } from "./OrthodoxSheet";
 import { SegmentedChoice } from "./SegmentedChoice";
 
 type ScreensaverSettingsProps = {
@@ -30,6 +31,14 @@ type ScreensaverSettingsProps = {
   timer: { cycle: number; ms: number };
 };
 
+/** Chips mirror the board frame fills in OrthodoxScreensaver.css. */
+const BORDER_SWATCHES: Record<BoardBorder, string> = {
+  red: "var(--ui-danger)",
+  gold: "var(--ui-accent)",
+  wood: "color-mix(in srgb, var(--ui-accent) 45%, var(--ui-ink))",
+  none: "transparent",
+};
+
 const LAYOUT_OPTIONS = LAYOUTS.map((value) => ({
   value,
   label: LAYOUT_LABELS[value],
@@ -37,6 +46,7 @@ const LAYOUT_OPTIONS = LAYOUTS.map((value) => ({
 const BORDER_OPTIONS = BORDERS.map((value) => ({
   value,
   label: BORDER_LABELS[value],
+  swatch: BORDER_SWATCHES[value],
 }));
 const ROTATION_CHOICES = ROTATION_OPTIONS.map((seconds) => ({
   value: String(seconds),
@@ -58,150 +68,133 @@ export function ScreensaverSettings({
   timer,
 }: ScreensaverSettingsProps) {
   const custom = settings.layout === "custom";
+  const collectionOptions = [
+    { value: ALL_COLLECTIONS, label: `All (${totalImages})` },
+    ...collections.map((c) => ({
+      value: c.id,
+      label: `${c.label} (${c.count})`,
+    })),
+  ];
   return (
-    <motion.aside
+    <OrthodoxSheet
       id="ow-settings"
-      className="ow-panel"
-      aria-label="Screensaver settings"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 16 }}
-      transition={{ duration: 0.25 }}
+      title="Wall"
+      onClose={onClose}
       onPointerDown={onActivity}
       onPointerMove={onActivity}
       onKeyDown={onActivity}
       onWheel={onActivity}
       onFocus={onActivity}
     >
-      <span
+      <Progress
         key={timer.cycle}
         className="ow-panel__timer"
-        style={{ animationDuration: `${timer.ms}ms` }}
-        aria-hidden="true"
+        size="sm"
+        label="Closes automatically"
+        labelHidden
+        duration={timer.ms}
       />
 
-      <div className="ow-panel__head">
-        <h2 className="ow-panel__title">Wall</h2>
-        <button
-          type="button"
-          className="ow-panel__close"
-          aria-label="Close settings"
-          onClick={onClose}
-        >
-          ×
-        </button>
-      </div>
-
-      <label className="ow-field">
-        <span className="ow-field__label">Collection</span>
-        <select
-          className="ow-select"
+      <div className="ow-panel__fields">
+        <Select
+          label="Collection"
+          size="sm"
+          options={collectionOptions}
           value={settings.collection}
           onChange={(e) => onChange({ collection: e.target.value })}
-        >
-          <option value={ALL_COLLECTIONS}>All ({totalImages})</option>
-          {collections.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.label} ({c.count})
-            </option>
-          ))}
-        </select>
-      </label>
+        />
 
-      {custom ? null : (
-        <label className="ow-field">
-          <span className="ow-field__label">
-            Icons <output className="ow-field__value">{settings.count}</output>
-          </span>
-          <input
-            className="ow-range"
-            type="range"
-            min={MIN_COUNT}
-            max={MAX_COUNT}
-            value={settings.count}
-            onChange={(e) => onChange({ count: Number(e.target.value) })}
-          />
-          {poolSize < settings.count ? (
-            <span className="ow-field__note">
-              Only {poolSize} in this collection.
-            </span>
-          ) : null}
-        </label>
-      )}
+        {custom ? null : (
+          <div className="ow-field">
+            <Slider
+              label="Icons"
+              min={MIN_COUNT}
+              max={MAX_COUNT}
+              showValue
+              value={settings.count}
+              onChange={(count) => onChange({ count: count as number })}
+            />
+            {poolSize < settings.count ? (
+              <p className="ow-field__note">
+                Only {poolSize} in this collection.
+              </p>
+            ) : null}
+          </div>
+        )}
 
-      <SegmentedChoice
-        legend="Layout"
-        options={LAYOUT_OPTIONS}
-        value={settings.layout}
-        onChange={(layout) => onChange({ layout })}
-      />
+        <SegmentedChoice
+          legend="Layout"
+          name="ow-layout"
+          options={LAYOUT_OPTIONS}
+          value={settings.layout}
+          onChange={(layout) => onChange({ layout })}
+        />
 
-      {custom ? (
-        <div className="ow-field">
-          <button type="button" className="btn btn--ghost" onClick={onArrange}>
-            Arrange wall
-          </button>
-          <span className="ow-field__note">
-            {settings.customCards.length} cards. Unlocked cards draw from the
-            collection above.
-          </span>
-        </div>
-      ) : null}
+        {custom ? (
+          <div className="ow-field">
+            <Button size="sm" iconStart="pencil-simple" onClick={onArrange}>
+              Arrange wall
+            </Button>
+            <p className="ow-field__note">
+              {settings.customCards.length} cards. Unlocked cards draw from the
+              collection above.
+            </p>
+          </div>
+        ) : null}
 
-      <SegmentedChoice
-        legend="Border"
-        options={BORDER_OPTIONS}
-        value={settings.border}
-        onChange={(border) => onChange({ border })}
-        swatches
-      />
+        <SegmentedChoice
+          legend="Border"
+          name="ow-border"
+          options={BORDER_OPTIONS}
+          value={settings.border}
+          onChange={(border) => onChange({ border })}
+        />
 
-      <SegmentedChoice
-        legend="Rotate every"
-        options={ROTATION_CHOICES}
-        value={String(settings.rotationSeconds)}
-        onChange={(v) => onChange({ rotationSeconds: Number(v) })}
-      />
+        <SegmentedChoice
+          legend="Rotate every"
+          name="ow-rotation"
+          options={ROTATION_CHOICES}
+          value={String(settings.rotationSeconds)}
+          onChange={(v) => onChange({ rotationSeconds: Number(v) })}
+        />
 
-      <fieldset className="ow-field">
-        <legend className="ow-field__label">Background</legend>
-        <div className="ow-backgrounds">
-          {backgrounds.map((bg) => (
-            <button
-              key={bg.id}
-              type="button"
-              className="ow-background"
-              aria-pressed={bg.id === settings.background}
-              onClick={() => onChange({ background: bg.id })}
-            >
-              <span
-                className="ow-background__swatch"
-                style={{ background: bg.css }}
-                aria-hidden="true"
+        <fieldset className="ow-field">
+          <legend className="ow-field__label">Background</legend>
+          <div className="ow-backgrounds">
+            {backgrounds.map((bg) => (
+              <Swatch
+                key={bg.id}
+                as="button"
+                size="sm"
+                className="ow-background"
+                color={bg.css}
+                label={bg.label}
+                selected={bg.id === settings.background}
+                onClick={() => onChange({ background: bg.id })}
               />
-              <span className="ow-background__label">{bg.label}</span>
-            </button>
-          ))}
-        </div>
-      </fieldset>
+            ))}
+          </div>
+        </fieldset>
+      </div>
 
       <div className="ow-panel__actions">
         {fullscreen.supported ? (
-          <button
-            type="button"
-            className="btn btn--primary"
+          <Button
+            size="sm"
+            variant="primary"
+            iconStart={fullscreen.active ? "corners-in" : "corners-out"}
             onClick={fullscreen.toggle}
           >
             {fullscreen.active ? "Exit fullscreen" : "Fullscreen"}
-          </button>
+          </Button>
         ) : null}
-        <button type="button" className="btn btn--ghost" onClick={onShuffle}>
+        <Button size="sm" iconStart="shuffle" onClick={onShuffle}>
           Shuffle
-        </button>
-        <a className="btn btn--ghost" href="/orthodox">
+        </Button>
+        <Button size="sm" variant="ghost" href="/orthodox">
           Leave
-        </a>
+        </Button>
       </div>
-    </motion.aside>
+    </OrthodoxSheet>
   );
 }

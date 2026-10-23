@@ -1,11 +1,12 @@
-import { motion } from "framer-motion";
-import { Search } from "lucide";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { LucideIcon } from "@/components/chat/LucideIcon";
 import type { CardLock } from "@/lib/orthodox/custom";
 import type { OrthodoxCollection, OrthodoxImage } from "@/lib/orthodox/types";
 
+import { Icon } from "@/ui/icons";
+import { Button, Select } from "@/ui/react";
+
+import { OrthodoxSheet } from "./OrthodoxSheet";
 import { SegmentedChoice } from "./SegmentedChoice";
 
 type CardLockPanelProps = {
@@ -72,112 +73,94 @@ export function CardLockPanel({
   }, [lock.kind]);
 
   return (
-    <motion.aside
-      className="ow-panel ow-panel--lock"
-      aria-label="What this card shows"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 16 }}
-      transition={{ duration: 0.25 }}
+    <OrthodoxSheet
+      className="ow-panel--lock"
+      title="Card"
+      onClose={onClose}
       onClick={(event) => event.stopPropagation()}
     >
-      <div className="ow-panel__head">
-        <h2 className="ow-panel__title">Card</h2>
-        <button
-          type="button"
-          className="ow-panel__close"
-          aria-label="Close"
-          onClick={onClose}
-        >
-          ×
-        </button>
-      </div>
+      <div className="ow-panel__fields">
+        <SegmentedChoice
+          legend="Shows"
+          name="ow-lock-kind"
+          options={KIND_OPTIONS}
+          value={lock.kind}
+          onChange={setKind}
+        />
 
-      <SegmentedChoice
-        legend="Shows"
-        options={KIND_OPTIONS}
-        value={lock.kind}
-        onChange={setKind}
-      />
+        {lock.kind === "any" ? (
+          <p className="ow-field__note">
+            Draws from the wall's Collection setting and rotates with the rest.
+          </p>
+        ) : null}
 
-      {lock.kind === "any" ? (
-        <p className="ow-field__note">
-          Draws from the wall's Collection setting and rotates with the rest.
-        </p>
-      ) : null}
-
-      {lock.kind === "collection" ? (
-        <label className="ow-field">
-          <span className="ow-field__label">Group</span>
-          <select
-            className="ow-select"
+        {lock.kind === "collection" ? (
+          <Select
+            label="Group"
+            size="sm"
+            hint="Rotates through this group only."
+            options={collections.map((c) => ({
+              value: c.id,
+              label: `${c.label} (${c.count})`,
+            }))}
             value={lock.collection}
             onChange={(e) =>
               onChange({ kind: "collection", collection: e.target.value })
             }
-          >
-            {collections.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label} ({c.count})
-              </option>
-            ))}
-          </select>
-          <span className="ow-field__note">
-            Rotates through this group only.
-          </span>
-        </label>
-      ) : null}
+          />
+        ) : null}
 
-      {lock.kind === "icon" ? (
-        <div className="ow-picker">
-          <label className="ow-picker__search">
-            <LucideIcon icon={Search} size={15} />
-            <input
-              type="search"
-              placeholder="Search by name"
-              aria-label="Search icons by name"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
-          <div ref={listRef} className="ow-picker__list">
-            {groups.map(({ collection, items }) => (
-              <section key={collection.id} className="ow-picker__group">
-                <h3 className="ow-picker__heading">{collection.label}</h3>
-                {items.map((image) => (
-                  <button
-                    key={image.id}
-                    type="button"
-                    className="ow-pick"
-                    aria-pressed={image.id === lockedId}
-                    onClick={() =>
-                      onChange({ kind: "icon", imageId: image.id })
-                    }
-                  >
-                    <img
-                      className="ow-pick__thumb"
-                      src={image.thumb}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <span className="ow-pick__title">{image.title}</span>
-                  </button>
-                ))}
-              </section>
-            ))}
-            {groups.length === 0 ? (
-              <p className="ow-field__note">No icon matches “{query}”.</p>
-            ) : null}
+        {lock.kind === "icon" ? (
+          <div className="ow-picker">
+            <label className="ow-picker__search">
+              <Icon name="magnifying-glass" />
+              <input
+                type="search"
+                placeholder="Search by name"
+                aria-label="Search icons by name"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </label>
+            <div ref={listRef} className="ow-picker__list">
+              {groups.map(({ collection, items }) => (
+                <section key={collection.id} className="ow-picker__group">
+                  <h3 className="ow-picker__heading">{collection.label}</h3>
+                  {items.map((image) => (
+                    <button
+                      key={image.id}
+                      type="button"
+                      className="ow-pick"
+                      aria-pressed={image.id === lockedId}
+                      onClick={() =>
+                        onChange({ kind: "icon", imageId: image.id })
+                      }
+                    >
+                      <img
+                        className="ow-pick__thumb"
+                        src={image.thumb}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span className="ow-pick__title">{image.title}</span>
+                    </button>
+                  ))}
+                </section>
+              ))}
+              {groups.length === 0 ? (
+                <p className="ow-field__note">No icon matches “{query}”.</p>
+              ) : null}
+            </div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
 
       <div className="ow-panel__actions">
-        <button type="button" className="btn btn--primary" onClick={onClose}>
+        <Button size="sm" variant="primary" onClick={onClose}>
           Done
-        </button>
+        </Button>
       </div>
-    </motion.aside>
+    </OrthodoxSheet>
   );
 }

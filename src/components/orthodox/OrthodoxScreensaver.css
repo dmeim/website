@@ -123,235 +123,118 @@ body:has(.ow-stage) .mobile-nav {
   color: var(--ui-text-muted);
 }
 
-/* ——— Settings panel ——— */
+/* ——— Settings + card lock sheets (library Drawer, non-modal) ——— */
+
+/* Fills the stage so the fixed drawer stays scoped to it while sliding. */
+.ow-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.ow-sheet:has(.ow-panel--lock) {
+  z-index: 7;
+}
 
 .ow-panel {
   position: absolute;
-  z-index: 4;
-  top: var(--space-md);
-  right: var(--space-md);
-  bottom: var(--space-md);
+  cursor: auto;
+}
+
+.ow-panel .ui-drawer__body {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
-  width: min(22rem, calc(100% - 2rem));
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--space-lg) var(--space-md) var(--space-md);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--color-surface) 84%, transparent);
-  backdrop-filter: blur(18px) saturate(1.15);
-  -webkit-backdrop-filter: blur(18px) saturate(1.15);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
-  color: var(--color-ink);
-  cursor: auto;
+  gap: var(--ui-space-md);
 }
 
 /* Depleting line: time left before the panel closes itself */
 .ow-panel__timer {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--color-accent);
-  transform-origin: left;
-  animation: ow-timer linear forwards;
+  inset: 0 0 auto;
 }
 
-@keyframes ow-timer {
-  from {
-    transform: scaleX(1);
-  }
-  to {
-    transform: scaleX(0);
-  }
-}
-
-.ow-panel__head {
+.ow-panel__fields {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.ow-panel__title {
-  margin: 0;
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-}
-
-.ow-panel__close {
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--color-ink-muted);
-  font-size: 1.15rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.ow-panel__close:hover {
-  color: var(--color-ink);
-  border-color: var(--color-accent-soft);
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--ui-space-md);
+  min-height: 0;
 }
 
 .ow-field {
   display: grid;
-  gap: var(--space-xs);
+  gap: var(--ui-space-xs);
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
-  min-width: 0;
 }
 
 .ow-field__label {
-  display: flex;
-  justify-content: space-between;
   padding: 0;
-  font-size: var(--text-xs);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-ink-muted);
-}
-
-.ow-field__value {
-  color: var(--color-ink);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-medium);
+  color: var(--ui-text);
 }
 
 .ow-field__note {
-  font-size: var(--text-xs);
-  color: var(--color-accent-soft);
+  margin: 0;
+  font-size: var(--ui-fs-xs);
+  color: var(--ui-text-muted);
 }
 
-.ow-select {
-  width: 100%;
-  padding: 0.55rem 0.6rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-ground);
-  color: var(--color-ink);
-  font: inherit;
-  font-size: var(--text-sm);
-}
-
-.ow-range {
-  width: 100%;
-  accent-color: var(--color-accent);
-}
-
-.ow-segments {
+.ow-segments .ui-segmented-control__track {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
+  width: 100%;
 }
 
-.ow-segment {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.45rem 0.6rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--color-ink-muted);
-  font: inherit;
-  font-size: var(--text-xs);
-  cursor: pointer;
-  transition:
-    color var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out);
-}
-
-.ow-segment:hover {
-  color: var(--color-ink);
-}
-
-.ow-segment[aria-pressed="true"] {
-  color: var(--color-ink);
-  border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-spot) 60%, transparent);
-}
-
-.ow-segment__chip {
-  width: 0.8rem;
-  height: 0.8rem;
-  border-radius: 1px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
-}
-
-.ow-segment__chip[data-swatch="red"] {
-  background: #9a2a18;
-}
-
-.ow-segment__chip[data-swatch="gold"] {
-  background: linear-gradient(135deg, #f3db8e, #c8973c 50%, #e8c66e);
-}
-
-.ow-segment__chip[data-swatch="wood"] {
-  background: #7a4f2d;
-}
-
-.ow-segment__chip[data-swatch="none"] {
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--color-ink-muted);
+.ow-segments .ui-segmented-control__option {
+  flex: 1 1 auto;
 }
 
 .ow-backgrounds {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.4rem;
+  gap: var(--ui-space-sm);
 }
 
 .ow-background {
-  display: grid;
-  gap: 0.3rem;
-  padding: 0.3rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--color-ink-muted);
-  font: inherit;
-  cursor: pointer;
+  min-width: 0;
 }
 
-.ow-background[aria-pressed="true"] {
-  border-color: var(--color-accent);
-  color: var(--color-ink);
+.ow-background .ui-swatch__chip {
+  min-width: 0;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
-.ow-background__swatch {
-  display: block;
-  aspect-ratio: 4 / 3;
-  border-radius: 1px;
+.ow-background[aria-pressed="true"] .ui-swatch__chip {
+  outline-color: var(--ui-ink);
 }
 
-.ow-background__label {
+.ow-background .ui-swatch__label {
   overflow: hidden;
-  font-size: 0.625rem;
+  color: var(--ui-text-muted);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.ow-background[aria-pressed="true"] .ui-swatch__label {
+  color: var(--ui-text);
 }
 
 .ow-panel__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-xs);
-  margin-top: auto;
-  padding-top: var(--space-sm);
-  border-top: 1px solid var(--color-border);
+  gap: var(--ui-space-xs);
+  padding-top: var(--ui-space-sm);
+  border-top: var(--ui-border-width) solid var(--ui-line);
 }
 
-.ow-panel__actions .btn {
+.ow-panel__actions > * {
   flex: 1 1 auto;
-  padding: 0.6rem 0.8rem;
-  font-size: var(--text-xs);
 }
 
 /* Bottom sheet on phones */
@@ -360,16 +243,8 @@ body:has(.ow-stage) .mobile-nav {
     bottom: calc(var(--ui-space-md) + 3.25rem);
   }
 
-  .ow-panel {
-    top: auto;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    max-height: 72dvh;
-    border-inline: 0;
-    border-bottom: 0;
-    padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+  .ow-panel .ui-drawer__body {
+    padding-bottom: calc(var(--ui-space-md) + env(safe-area-inset-bottom));
   }
 }
 
@@ -476,45 +351,43 @@ body:has(.ow-stage) .mobile-nav {
   font-variant-numeric: tabular-nums;
 }
 
-/* ——— Card lock panel + icon picker ——— */
-
-.ow-panel--lock {
-  z-index: 7;
-}
+/* ——— Card lock icon picker ——— */
 
 .ow-picker {
   display: flex;
-  flex-direction: column;
   flex: 1 1 auto;
-  gap: var(--space-xs);
+  flex-direction: column;
+  gap: var(--ui-space-xs);
   min-height: 14rem;
 }
 
 .ow-picker__search {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0 0.6rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-ground);
-  color: var(--color-ink-muted);
+  gap: var(--ui-space-xs);
+  height: var(--ui-control-sm);
+  padding: 0 var(--ui-space-sm);
+  border: var(--ui-border-width) solid var(--ui-line-field);
+  border-radius: var(--ui-radius-control);
+  color: var(--ui-text-muted);
 }
 
 .ow-picker__search:focus-within {
-  border-color: var(--color-accent);
+  border-color: transparent;
+  outline: var(--ui-focus-width) solid var(--ui-focus-ring);
+  outline-offset: var(--ui-focus-offset);
 }
 
 .ow-picker__search input {
   flex: 1;
   min-width: 0;
-  padding: 0.55rem 0;
+  padding: 0;
   border: 0;
   outline: none;
   background: transparent;
-  color: var(--color-ink);
+  color: var(--ui-text);
   font: inherit;
-  font-size: var(--text-sm);
+  font-size: var(--ui-fs-sm);
 }
 
 .ow-picker__list {
@@ -522,12 +395,10 @@ body:has(.ow-stage) .mobile-nav {
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  margin-inline: -0.25rem;
-  padding-inline: 0.25rem;
 }
 
 .ow-picker__group + .ow-picker__group {
-  margin-top: var(--space-sm);
+  margin-top: var(--ui-space-sm);
 }
 
 .ow-picker__heading {
@@ -535,50 +406,62 @@ body:has(.ow-stage) .mobile-nav {
   top: 0;
   z-index: 1;
   margin: 0;
-  padding: 0.4rem 0;
-  background: var(--color-surface);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  padding: var(--ui-space-xs) 0;
+  background: var(--ui-bg);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-medium);
+  letter-spacing: var(--ui-tracking-wide);
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--ui-text-muted);
 }
 
 .ow-pick {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: var(--ui-space-sm);
   width: 100%;
-  padding: 0.3rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius);
+  padding: var(--ui-space-2xs);
+  border: 0;
+  border-radius: var(--ui-radius-control);
   background: transparent;
-  color: var(--color-ink-muted);
+  color: var(--ui-text-muted);
   font: inherit;
-  font-size: var(--text-sm);
-  text-align: left;
+  font-size: var(--ui-fs-sm);
+  text-align: start;
   cursor: pointer;
+  transition: background-color var(--ui-dur-fast) var(--ui-ease-out);
 }
 
 .ow-pick:hover {
-  color: var(--color-ink);
-  background: color-mix(in srgb, var(--color-spot) 45%, transparent);
+  color: var(--ui-text);
+  background: var(--ui-surface);
 }
 
 .ow-pick[aria-pressed="true"] {
-  border-color: var(--color-accent);
-  color: var(--color-ink);
-  background: color-mix(in srgb, var(--color-spot) 60%, transparent);
+  color: var(--ui-text);
+  font-weight: var(--ui-fw-medium);
+  background: var(--ui-surface-active);
+}
+
+/* Gold current marker */
+.ow-pick[aria-pressed="true"]::before {
+  content: "";
+  position: absolute;
+  inset-block: var(--ui-space-xs);
+  inset-inline-start: 0;
+  width: 2px;
+  background: var(--ui-accent);
 }
 
 .ow-pick__thumb {
   flex: none;
   width: 2.25rem;
   height: 3rem;
-  border-radius: 2px;
+  border-radius: var(--ui-radius-xs);
   object-fit: cover;
   object-position: center top;
-  background: #2a1d10;
+  background: var(--ui-canvas-bg);
 }
 
 .ow-pick__title {
