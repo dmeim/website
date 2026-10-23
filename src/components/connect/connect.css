@@ -1,0 +1,17 @@
+.connect-form {
+  display: grid;
+  gap: var(--ui-space-lg);
+  justify-items: start;
+}
+
+.connect-form > .ui-form-grid {
+  justify-self: stretch;
+}
+
+.connect-form > .ui-notice {
+  justify-self: stretch;
+}
+
+.connect-form > .ui-notice[hidden] {
+  display: none;
+}

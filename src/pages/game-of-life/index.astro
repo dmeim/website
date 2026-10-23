@@ -1,21 +1,26 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import PageIntro from "../../components/react/PageIntro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Button from "@/ui/components/Button.astro";
+import Container from "@/ui/components/Container.astro";
+import Link from "@/ui/components/Link.astro";
+import PageHeader from "@/ui/components/PageHeader.astro";
+import Prose from "@/ui/components/Prose.astro";
+import Section from "@/ui/components/Section.astro";
+import Stack from "@/ui/components/Stack.astro";
 ---
 
 <BaseLayout
   title="Game of Life"
   description="Conway's Game of Life — B3/S23 cellular automaton with toroidal wrapping."
 >
-  <section class="gol-landing">
-    <div class="gol-landing__copy">
-      <PageIntro
-        client:visible
-        title="Game of Life"
-        lede="A zero-player cellular automaton. Set the stage, then watch the rules unfold."
-      />
+  <Container>
+    <PageHeader
+      title="Game of Life"
+      lede="A zero-player cellular automaton. Set the stage, then watch the rules unfold."
+    />
 
-      <article class="gol-landing__writeup">
+    <Section title="About" spy>
+      <Prose as="article">
         <p>
           Conway's Game of Life is a cellular automaton devised by the British
           mathematician John Horton Conway. It is a zero-player game: once you set
@@ -27,7 +32,7 @@ import PageIntro from "../../components/react/PageIntro";
           the classic B3/S23 rules to every cell at once (birth on three neighbors;
           survival on two or three):
         </p>
-        <ol class="gol-landing__rules">
+        <ol>
           <li>
             <strong>Underpopulation</strong> — A live cell with fewer than two live
             neighbors dies.
@@ -45,148 +50,29 @@ import PageIntro from "../../components/react/PageIntro";
             neighbors becomes live.
           </li>
         </ol>
-        <p class="gol-landing__attribution">
+      </Prose>
+      <Prose size="sm">
+        <p>
           Overview adapted from
-          <a
-            href="https://en.wikipedia.org/wiki/Conway's_Game_of_Life"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
+          <Link href="https://en.wikipedia.org/wiki/Conway's_Game_of_Life" external>
             Conway's Game of Life on Wikipedia
-          </a>.
+          </Link>.
         </p>
-      </article>
-    </div>
+      </Prose>
+    </Section>
 
-    <aside class="gol-landing__cta" aria-label="Enter the simulation">
-      <div class="gol-landing__cta-panel">
-        <p class="gol-landing__cta-eyebrow">Simulation</p>
-        <h2 class="gol-landing__cta-title">Step onto the grid</h2>
-        <p class="gol-landing__cta-lede">
-          Paint cells, run the automaton, and watch patterns emerge under B3/S23
-          with toroidal edges.
-        </p>
-        <a class="btn btn--primary gol-landing__cta-btn" href="/game-of-life/simulation">
+    <Section title="Step onto the grid" eyebrow="Simulation" spy>
+      <Stack gap="md" align="start">
+        <Prose>
+          <p>
+            Paint cells, run the automaton, and watch patterns emerge under B3/S23
+            with toroidal edges.
+          </p>
+        </Prose>
+        <Button variant="primary" href="/game-of-life/simulation" iconEnd="arrow-right">
           Enter simulation
-        </a>
-      </div>
-    </aside>
-  </section>
+        </Button>
+      </Stack>
+    </Section>
+  </Container>
 </BaseLayout>
-
-<style>
-  .gol-landing {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(16rem, 0.65fr);
-    gap: var(--space-xl);
-    align-items: start;
-  }
-
-  .gol-landing__copy {
-    display: grid;
-    gap: var(--space-xl);
-    min-width: 0;
-  }
-
-  .gol-landing__copy :global(.page-intro) {
-    margin-bottom: 0;
-  }
-
-  .gol-landing__writeup {
-    display: grid;
-    gap: var(--space-md);
-    max-width: 42rem;
-  }
-
-  .gol-landing__writeup p {
-    margin: 0;
-    color: var(--color-stone);
-    font-size: var(--text-md);
-    line-height: 1.65;
-  }
-
-  .gol-landing__rules {
-    margin: 0;
-    padding-left: 1.25rem;
-    display: grid;
-    gap: var(--space-sm);
-    color: var(--color-stone);
-    font-size: var(--text-md);
-    line-height: 1.55;
-  }
-
-  .gol-landing__rules strong {
-    color: var(--color-ink);
-    font-weight: 500;
-  }
-
-  .gol-landing__attribution {
-    padding-top: var(--space-sm);
-    border-top: 1px solid var(--color-border);
-    font-size: var(--text-sm);
-  }
-
-  .gol-landing__attribution a {
-    color: var(--color-gold);
-  }
-
-  .gol-landing__cta {
-    position: sticky;
-    top: calc(var(--header-height) + var(--space-lg));
-  }
-
-  .gol-landing__cta-panel {
-    display: grid;
-    gap: var(--space-md);
-    padding: var(--space-xl) var(--space-lg);
-    border: 1px solid var(--color-border);
-    background:
-      linear-gradient(
-        160deg,
-        color-mix(in srgb, var(--color-spot) 55%, transparent),
-        transparent 55%
-      ),
-      var(--color-surface);
-  }
-
-  .gol-landing__cta-eyebrow {
-    margin: 0;
-    font-size: var(--text-xs);
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-gold);
-  }
-
-  .gol-landing__cta-title {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-size: var(--text-xl);
-    font-weight: 400;
-    line-height: 1.15;
-    color: var(--color-ink);
-  }
-
-  .gol-landing__cta-lede {
-    margin: 0;
-    color: var(--color-stone);
-    font-size: var(--text-sm);
-    line-height: 1.55;
-  }
-
-  .gol-landing__cta-btn {
-    justify-self: start;
-    margin-top: var(--space-xs);
-  }
-
-  @media (max-width: 900px) {
-    .gol-landing {
-      grid-template-columns: 1fr;
-    }
-
-    .gol-landing__cta {
-      position: static;
-      order: -1;
-    }
-  }
-</style>

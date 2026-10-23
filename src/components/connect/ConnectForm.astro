@@ -10,156 +10,194 @@
  * “form not connected yet” message (no fake success).
  * Turnstile / Workers email / live n8n wiring are intentionally out of scope.
  */
-import { connect } from '../../content/site';
+import Button from "@/ui/components/Button.astro";
+import FormGrid from "@/ui/components/FormGrid.astro";
+import Input from "@/ui/components/Input.astro";
+import Notice from "@/ui/components/Notice.astro";
+import Spinner from "@/ui/components/Spinner.astro";
+import Textarea from "@/ui/components/Textarea.astro";
+import { connect } from "@/content/site";
+import "./connect.css";
 
-const webhookUrl = import.meta.env.PUBLIC_N8N_WEBHOOK_URL?.trim() ?? '';
+const webhookUrl = import.meta.env.PUBLIC_N8N_WEBHOOK_URL?.trim() ?? "";
 const { fields, submitLabel } = connect.form;
+const autocomplete = (name: string) => (name === "name" ? "name" : name === "email" ? "email" : undefined);
 ---
 
-<div class="connect-form-wrapper">
-  <form
-    class="connect-form"
-    id="connect-form"
-    novalidate
-    data-webhook-url={webhookUrl}
-  >
+<form class="connect-form" id="connect-form" novalidate data-webhook-url={webhookUrl}>
+  <FormGrid columns={2}>
     {
-      fields.map((field) => (
-        <div class="form-group">
-          <label for={field.name}>{field.label}</label>
-          {field.type === 'textarea' ? (
-            <textarea
-              id={field.name}
-              name={field.name}
-              required={field.required}
-              placeholder={field.placeholder}
-              rows={6}
-            />
-          ) : (
-            <input
-              type={field.type}
-              id={field.name}
-              name={field.name}
-              required={field.required}
-              placeholder={field.placeholder}
-              autocomplete={
-                field.name === 'name'
-                  ? 'name'
-                  : field.name === 'email'
-                    ? 'email'
-                    : undefined
-              }
-            />
-          )}
-        </div>
-      ))
+      fields.map((field) =>
+        field.type === "textarea" ? (
+          <Textarea
+            id={field.name}
+            name={field.name}
+            label={field.label}
+            required={field.required}
+            placeholder={field.placeholder}
+            rows={6}
+            span="full"
+          />
+        ) : (
+          <Input
+            type={field.type}
+            id={field.name}
+            name={field.name}
+            label={field.label}
+            required={field.required}
+            placeholder={field.placeholder}
+            autocomplete={autocomplete(field.name)}
+            span={field.name === "subject" ? "full" : "auto"}
+          />
+        ),
+      )
     }
+  </FormGrid>
 
-    <p
-      class="form-status"
-      id="connect-form-status"
-      role="status"
-      aria-live="polite"
-      hidden
-    ></p>
+  <Notice id="connect-form-status" class="form-status" icon={false} hidden />
 
-    <button type="submit" class="btn-primary" id="connect-form-submit">
-      {submitLabel}
-    </button>
-  </form>
-</div>
+  <Button type="submit" variant="primary" id="connect-form-submit" class="connect-form__submit">
+    {submitLabel}
+  </Button>
+  <template id="connect-form-spinner"><Spinner size="sm" class="ui-button__spinner" label="Sending" /></template>
+</form>
 
 <script>
-  function initConnectForm() {
-    const form = document.getElementById('connect-form');
-    if (!(form instanceof HTMLFormElement) || form.dataset.bound === '1') return;
-    form.dataset.bound = '1';
+  type Kind = "idle" | "loading" | "success" | "error" | "disconnected";
+  type Control = HTMLInputElement | HTMLTextAreaElement;
 
-    const statusEl = document.getElementById('connect-form-status');
-    const submitBtn = document.getElementById('connect-form-submit');
+  const TONES: Record<Kind, string> = {
+    idle: "neutral",
+    loading: "neutral",
+    success: "success",
+    error: "danger",
+    disconnected: "warning",
+  };
+
+  function initConnectForm() {
+    const form = document.getElementById("connect-form");
+    if (!(form instanceof HTMLFormElement) || form.dataset.bound === "1") return;
+    form.dataset.bound = "1";
+
+    const statusEl = document.getElementById("connect-form-status");
+    const submitBtn = document.getElementById("connect-form-submit");
+    const spinnerTpl = document.getElementById("connect-form-spinner");
     if (!(statusEl instanceof HTMLElement) || !(submitBtn instanceof HTMLButtonElement)) {
       return;
     }
+    const statusBody = statusEl.querySelector<HTMLElement>(".ui-notice__body") ?? statusEl;
+    const labelEl = submitBtn.querySelector<HTMLElement>(".ui-button__label") ?? submitBtn;
+    const defaultLabel = labelEl.textContent?.trim() || "Send Message";
 
-    const defaultLabel = submitBtn.textContent ?? 'Send Message';
-
-    function setStatus(
-      message: string,
-      kind: 'idle' | 'loading' | 'success' | 'error' | 'disconnected',
-    ) {
+    function setStatus(message: string, kind: Kind) {
       statusEl.hidden = !message;
-      statusEl.textContent = message;
+      statusBody.textContent = message;
       statusEl.dataset.kind = kind;
-      statusEl.className = `form-status form-status--${kind}`;
+      statusEl.dataset.tone = TONES[kind];
+      statusEl.classList.remove(...Array.from(statusEl.classList).filter((c) => c.startsWith("form-status--")));
+      statusEl.classList.add(`form-status--${kind}`);
     }
 
     function setLoading(loading: boolean) {
       submitBtn.disabled = loading;
-      submitBtn.textContent = loading ? 'Sending…' : defaultLabel;
-      form.setAttribute('aria-busy', loading ? 'true' : 'false');
+      labelEl.textContent = loading ? "Sending…" : defaultLabel;
+      form.setAttribute("aria-busy", loading ? "true" : "false");
+      submitBtn.querySelector(".ui-button__spinner")?.remove();
+      if (loading) {
+        submitBtn.setAttribute("aria-busy", "true");
+        if (spinnerTpl instanceof HTMLTemplateElement) submitBtn.append(spinnerTpl.content.cloneNode(true));
+      } else {
+        submitBtn.removeAttribute("aria-busy");
+      }
+    }
+
+    function setFieldError(el: Control, message: string) {
+      el.setCustomValidity(message);
+      const field = el.closest<HTMLElement>(".ui-field");
+      const errorId = `${el.id}-error`;
+      let errorEl = document.getElementById(errorId);
+      if (!message) {
+        el.removeAttribute("aria-invalid");
+        el.removeAttribute("aria-describedby");
+        errorEl?.remove();
+        if (field) delete field.dataset.invalid;
+        return;
+      }
+      el.setAttribute("aria-invalid", "true");
+      el.setAttribute("aria-describedby", errorId);
+      if (field) field.dataset.invalid = "true";
+      if (!errorEl) {
+        errorEl = document.createElement("p");
+        errorEl.className = "ui-field__error";
+        errorEl.id = errorId;
+        field?.append(errorEl);
+      }
+      errorEl.textContent = message;
+    }
+
+    function messageFor(el: Control): string {
+      const value = el.value.trim();
+      if (el.required && !value) return "This field is required.";
+      // Lightweight client check; server/n8n can validate further.
+      if (el.type === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        return "Please enter a valid email address.";
+      }
+      return "";
     }
 
     function validate(): boolean {
-      const controls = form.querySelectorAll<
-        HTMLInputElement | HTMLTextAreaElement
-      >('input, textarea');
-
+      const controls = form.querySelectorAll<Control>("input, textarea");
+      let first: Control | null = null;
       for (const el of controls) {
-        el.setCustomValidity('');
-        const value = el.value.trim();
-        if (el.required && !value) {
-          el.setCustomValidity('This field is required.');
-          el.reportValidity();
-          el.focus();
-          return false;
-        }
-        if (el.type === 'email' && value) {
-          // Lightweight client check; server/n8n can validate further.
-          const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-          if (!ok) {
-            el.setCustomValidity('Please enter a valid email address.');
-            el.reportValidity();
-            el.focus();
-            return false;
-          }
-        }
+        const message = messageFor(el);
+        setFieldError(el, message);
+        if (message && !first) first = el;
+      }
+      if (first) {
+        first.reportValidity();
+        first.focus();
+        return false;
       }
       return form.checkValidity();
     }
 
-    form.addEventListener('submit', async (event) => {
+    form.addEventListener("input", (event) => {
+      const el = event.target;
+      if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && el.hasAttribute("aria-invalid")) {
+        setFieldError(el, messageFor(el));
+      }
+    });
+
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      setStatus('', 'idle');
+      setStatus("", "idle");
 
       if (!validate()) return;
 
-      const webhook = (form.dataset.webhookUrl ?? '').trim();
-      const data = Object.fromEntries(new FormData(form).entries()) as Record<
-        string,
-        string
-      >;
+      const webhook = (form.dataset.webhookUrl ?? "").trim();
+      const data = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
       const payload = {
-        name: (data.name ?? '').trim(),
-        email: (data.email ?? '').trim(),
-        subject: (data.subject ?? '').trim(),
-        message: (data.message ?? '').trim(),
+        name: (data.name ?? "").trim(),
+        email: (data.email ?? "").trim(),
+        subject: (data.subject ?? "").trim(),
+        message: (data.message ?? "").trim(),
       };
 
       if (!webhook) {
         setStatus(
-          'Thanks for filling this out — the form is not connected yet. Please email hello@dmeim.com directly for now.',
-          'disconnected',
+          "Thanks for filling this out — the form is not connected yet. Please email hello@dmeim.com directly for now.",
+          "disconnected",
         );
         return;
       }
 
       setLoading(true);
-      setStatus('Sending your message…', 'loading');
+      setStatus("Sending your message…", "loading");
 
       try {
         const res = await fetch(webhook, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify(payload),
         });
 
@@ -168,11 +206,11 @@ const { fields, submitLabel } = connect.form;
         }
 
         form.reset();
-        setStatus('Message sent — thank you. Dimitri will be in touch soon.', 'success');
+        setStatus("Message sent — thank you. Dimitri will be in touch soon.", "success");
       } catch {
         setStatus(
-          'Something went wrong sending your message. Please try again or email hello@dmeim.com directly.',
-          'error',
+          "Something went wrong sending your message. Please try again or email hello@dmeim.com directly.",
+          "error",
         );
       } finally {
         setLoading(false);
@@ -181,142 +219,5 @@ const { fields, submitLabel } = connect.form;
   }
 
   initConnectForm();
-  document.addEventListener('astro:page-load', initConnectForm);
+  document.addEventListener("astro:page-load", initConnectForm);
 </script>
-
-<style>
-  .connect-form-wrapper {
-    width: 100%;
-    padding: var(--space-xl);
-    border: 1px solid var(--color-border);
-    background:
-      radial-gradient(
-        ellipse 80% 60% at 0% 0%,
-        var(--color-spot),
-        transparent 55%
-      ),
-      color-mix(in srgb, var(--color-surface) 88%, transparent);
-  }
-
-  .connect-form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-  }
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-  }
-
-  .form-group label {
-    font-size: var(--text-xs);
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-gold);
-  }
-
-  .form-group input,
-  .form-group textarea {
-    width: 100%;
-    padding: 0.85rem 0;
-    border: none;
-    border-bottom: 1px solid var(--color-border);
-    border-radius: 0;
-    background: transparent;
-    color: var(--color-ink);
-    font-family: var(--font-sans);
-    font-size: var(--text-md);
-    line-height: 1.5;
-    transition:
-      border-color var(--duration) var(--ease-out),
-      background-color var(--duration) var(--ease-out);
-  }
-
-  .form-group input::placeholder,
-  .form-group textarea::placeholder {
-    color: var(--color-stone);
-    opacity: 0.65;
-  }
-
-  .form-group input:hover,
-  .form-group textarea:hover {
-    border-bottom-color: color-mix(in srgb, var(--color-gold) 40%, var(--color-border));
-  }
-
-  .form-group input:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-bottom-color: var(--color-gold);
-    background: color-mix(in srgb, var(--color-spot) 35%, transparent);
-    padding-inline: 0.5rem;
-  }
-
-  .form-group textarea {
-    resize: vertical;
-    min-height: 9rem;
-  }
-
-  .btn-primary {
-    align-self: flex-start;
-    margin-top: var(--space-sm);
-    padding: 0.9rem 1.85rem;
-    border: 1px solid var(--color-gold);
-    background: var(--color-gold);
-    color: var(--color-night);
-    font-family: var(--font-sans);
-    font-size: var(--text-sm);
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition:
-      background var(--duration) var(--ease-out),
-      color var(--duration) var(--ease-out),
-      border-color var(--duration) var(--ease-out),
-      opacity var(--duration) var(--ease-out);
-  }
-
-  .btn-primary:hover:not(:disabled) {
-    background: transparent;
-    color: var(--color-gold);
-  }
-
-  .btn-primary:disabled {
-    opacity: 0.65;
-    cursor: wait;
-  }
-
-  .form-status {
-    margin: 0;
-    padding: 0.85rem 0;
-    border: none;
-    border-top: 1px solid var(--color-border);
-    font-size: var(--text-sm);
-    line-height: 1.5;
-    max-width: none;
-  }
-
-  .form-status--loading {
-    color: var(--color-stone);
-  }
-
-  .form-status--success {
-    border-top-color: color-mix(in srgb, var(--color-gold) 55%, var(--color-border));
-    color: var(--color-ink);
-  }
-
-  .form-status--error,
-  .form-status--disconnected {
-    border-top-color: color-mix(in srgb, #c45c4a 45%, var(--color-border));
-    color: var(--color-ink);
-  }
-
-  @media (max-width: 800px) {
-    .connect-form-wrapper {
-      padding: var(--space-lg);
-    }
-  }
-</style>
