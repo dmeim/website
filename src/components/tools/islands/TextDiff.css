@@ -1,33 +1,15 @@
-/* Text diff — dual editors + side-by-side highlighted rows */
-
-@import "./toolIsland.css";
-
-.text-diff-tool__intro {
-  max-width: 48rem;
-}
-
-.text-diff-tool__inputs {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.text-diff-tool__panel {
-  min-width: 0;
-}
-
-.text-diff-tool__result {
-  max-width: none;
-}
+/* Text diff: side-by-side rows tinted with the --ui-diff-* tokens. */
 
 .text-diff-viewer {
   display: flex;
   flex-direction: column;
-  gap: 0;
   overflow-x: auto;
-  border: 1px solid var(--color-border);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  line-height: 1.55;
-  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-panel);
+  background: var(--ui-bg-inset);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-normal);
 }
 
 .text-diff-viewer__header,
@@ -38,24 +20,24 @@
 }
 
 .text-diff-viewer__header {
-  padding: 0.55rem 0.75rem;
-  border-bottom: 1px solid var(--color-border);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  padding: var(--ui-space-xs) var(--ui-space-sm);
+  border-bottom: 1px solid var(--ui-line);
+  font-family: var(--ui-font-body);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-medium);
+  letter-spacing: var(--ui-tracking-wide);
   text-transform: uppercase;
-  color: var(--color-gold);
-  background: color-mix(in srgb, var(--color-spot) 35%, transparent);
+  color: var(--ui-text-muted);
 }
 
 .text-diff-cell {
   display: flex;
-  gap: 0.65rem;
+  gap: var(--ui-space-sm);
   align-items: flex-start;
   min-width: 0;
-  padding: 0.2rem 0.75rem;
-  border-right: 1px solid var(--color-border);
-  color: var(--color-stone);
+  padding: var(--ui-space-3xs) var(--ui-space-sm);
+  border-right: 1px solid var(--ui-line);
+  color: var(--ui-text-muted);
 }
 
 .text-diff-cell:last-child {
@@ -74,39 +56,33 @@
 .text-diff-gutter {
   flex: 0 0 1.25rem;
   text-align: right;
-  opacity: 0.55;
+  color: var(--ui-text-subtle);
   user-select: none;
 }
 
 .text-diff-cell--empty {
-  background: color-mix(in srgb, var(--color-border) 18%, transparent);
+  background: var(--ui-surface);
 }
 
 .text-diff-cell--added {
-  background: color-mix(in srgb, #5a8f6a 18%, transparent);
-  color: #8fbf9c;
+  background: var(--ui-diff-add-soft);
+  color: var(--ui-diff-add);
 }
 
 .text-diff-cell--removed {
-  background: color-mix(in srgb, #c45c4a 14%, transparent);
-  color: color-mix(in srgb, #c45c4a 85%, var(--color-ink));
+  background: var(--ui-diff-remove-soft);
+  color: var(--ui-diff-remove);
 }
 
 .text-diff-mark {
   border-radius: 2px;
-  padding: 0.05em 0;
+  color: inherit;
 }
 
 .text-diff-mark--added {
-  background: color-mix(in srgb, #5a8f6a 40%, transparent);
+  background: color-mix(in srgb, var(--ui-diff-add) 28%, transparent);
 }
 
 .text-diff-mark--removed {
-  background: color-mix(in srgb, #c45c4a 35%, transparent);
-}
-
-@media (max-width: 900px) {
-  .text-diff-tool__inputs {
-    grid-template-columns: 1fr;
-  }
+  background: color-mix(in srgb, var(--ui-diff-remove) 26%, transparent);
 }

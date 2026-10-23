@@ -1,100 +1,63 @@
-/* Emoji picker — searchable grouped emoji gallery */
-
-@import "./toolIsland.css";
-
-.emoji-picker-tool {
-  gap: var(--space-lg);
-}
-
-.emoji-picker-tool__panel {
-  max-width: 40rem;
-}
+/* Emoji picker: dense grid of flat tiles; keeps the large DOM cheap (no per-tile components). */
 
 .emoji-picker-groups {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
+  display: grid;
+  gap: var(--ui-space-xl);
 }
 
 .emoji-picker-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
+  display: grid;
+  gap: var(--ui-space-sm);
 }
 
 .emoji-picker-group__title {
   margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: var(--text-lg);
-  line-height: 1.2;
-  color: var(--color-ink);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-medium);
+  letter-spacing: var(--ui-tracking-wide);
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
 }
 
 .emoji-picker-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-sm);
-}
-
-@media (min-width: 40rem) {
-  .emoji-picker-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 56rem) {
-  .emoji-picker-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 72rem) {
-  .emoji-picker-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 90rem) {
-  .emoji-picker-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+  gap: var(--ui-space-xs);
 }
 
 .emoji-picker-card {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--ui-space-sm);
   min-width: 0;
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  padding: var(--ui-space-xs) var(--ui-space-sm);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
+  transition: background-color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.emoji-picker-card:hover {
+  background: var(--ui-surface-hover);
 }
 
 .emoji-picker-card__glyph {
   flex-shrink: 0;
   margin: 0;
-  padding: 0;
+  padding: var(--ui-space-3xs);
   border: 0;
+  border-radius: var(--ui-radius-xs);
   background: transparent;
-  font-size: var(--text-xl);
+  font-size: var(--ui-fs-xl);
   line-height: 1;
   cursor: pointer;
   color: inherit;
 }
 
-.emoji-picker-card__glyph:hover,
-.emoji-picker-card__glyph:focus-visible {
-  outline: 2px solid var(--color-accent, var(--color-ink));
-  outline-offset: 2px;
-}
-
 .emoji-picker-card__meta {
+  display: grid;
+  gap: var(--ui-space-3xs);
   min-width: 0;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
 }
 
 .emoji-picker-card__title {
@@ -102,27 +65,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: var(--text-sm);
-  line-height: 1.35;
-  color: var(--color-ink);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-medium);
+  line-height: var(--ui-lh-snug);
+  color: var(--ui-text);
 }
 
 .emoji-picker-card__codes {
   display: flex;
-  gap: var(--space-sm);
+  gap: var(--ui-space-sm);
   min-width: 0;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  line-height: 1.4;
-  color: color-mix(in srgb, var(--color-stone) 90%, transparent);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-xs);
+  line-height: var(--ui-lh-snug);
+  color: var(--ui-text-muted);
 }
 
 .emoji-picker-card__code {
   margin: 0;
   padding: 0;
   border: 0;
+  border-radius: var(--ui-radius-xs);
   background: transparent;
   font: inherit;
   color: inherit;
@@ -137,9 +100,6 @@
   min-width: 0;
 }
 
-.emoji-picker-card__code:hover,
-.emoji-picker-card__code:focus-visible {
-  color: var(--color-ink);
-  outline: none;
-  text-decoration: underline;
+.emoji-picker-card__code:hover {
+  color: var(--ui-accent-text);
 }

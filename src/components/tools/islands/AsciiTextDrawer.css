@@ -1,19 +1,6 @@
-/* ASCII text drawer — monospace preview chrome */
-
-@import "./toolIsland.css";
-
-.ascii-drawer-tool__panel {
-  max-width: 42rem;
-}
-
-.ascii-drawer-settings {
-  align-items: end;
-}
-
-.ascii-drawer-output {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  line-height: 1.2;
+/* FIGlet art must not wrap: keep rows intact and scroll sideways instead. */
+.ascii-drawer-output textarea {
   white-space: pre;
   overflow-x: auto;
+  line-height: 1.2;
 }

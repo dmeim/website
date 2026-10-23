@@ -1,15 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  ToolCheck,
-  ToolHint,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-  ToolWorkspace,
-} from "@/components/tools/ui";
+import { FormGrid, Notice, Panel, Switch, Textarea, ToolFrame } from "@/ui/react";
 import { copyTextToClipboard } from "@/lib/tools/clipboard";
 import {
   areDeepEqual,
@@ -63,103 +54,68 @@ export default function JsonDiff() {
   }, []);
 
   return (
-    <ToolIsland className="jd-tool">
-      <ToolPanel labelledBy="jd-heading" className="jd-tool__intro">
-        <ToolSectionHeading
-          title="JSON diff"
-          titleId="jd-heading"
-          description={
-            <ToolHint>
-              Paste two JSON documents to compare them. JSON5 syntax (unquoted
-              keys, trailing commas) is accepted.
-            </ToolHint>
-          }
-        />
-      </ToolPanel>
-
-      <ToolWorkspace className="jd-tool__inputs" stagger>
-        <ToolPanel className="jd-tool__panel">
-          <ToolTextarea
+    <ToolFrame>
+      <Panel
+        title="JSON diff"
+        titleId="jd-heading"
+        description="Paste two JSON documents to compare them. JSON5 syntax (unquoted keys, trailing commas) is accepted."
+      >
+        <FormGrid columns={2}>
+          <Textarea
             id="jd-left"
             label="Your first JSON"
-            full
-            code
+            mono
             rows={16}
             value={rawLeft}
             placeholder="Paste your first JSON here..."
             onChange={(event) => setRawLeft(event.target.value)}
             autoFocus
-            aria-invalid={leftInvalid || undefined}
+            spellCheck={false}
+            error={leftInvalid ? "Invalid JSON format" : undefined}
           />
-          {leftInvalid ? (
-            <ToolStatus tone="error" live="polite">
-              Invalid JSON format
-            </ToolStatus>
-          ) : null}
-        </ToolPanel>
-
-        <ToolPanel className="jd-tool__panel">
-          <ToolTextarea
+          <Textarea
             id="jd-right"
             label="Your JSON to compare"
-            full
-            code
+            mono
             rows={16}
             value={rawRight}
             placeholder="Paste your JSON to compare here..."
             onChange={(event) => setRawRight(event.target.value)}
-            aria-invalid={rightInvalid || undefined}
+            spellCheck={false}
+            error={rightInvalid ? "Invalid JSON format" : undefined}
           />
-          {rightInvalid ? (
-            <ToolStatus tone="error" live="polite">
-              Invalid JSON format
-            </ToolStatus>
-          ) : null}
-        </ToolPanel>
-      </ToolWorkspace>
+        </FormGrid>
+      </Panel>
 
       {showResults && result ? (
-        <ToolPanel
-          labelledBy="jd-result-heading"
-          className="jd-tool__result"
+        <Panel
+          title="Differences"
+          titleId="jd-result-heading"
+          description="Click a highlighted value to copy it."
           aria-live="polite"
+          actions={
+            <Switch
+              id="jd-only-diff"
+              label="Only show differences"
+              checked={onlyShowDifferences}
+              onChange={(event) => setOnlyShowDifferences(event.target.checked)}
+            />
+          }
         >
-          <ToolSectionHeading
-            title="Differences"
-            titleId="jd-result-heading"
-            description={
-              <ToolHint>Click a highlighted value to copy it.</ToolHint>
-            }
-          />
-
-          <ToolCheck
-            id="jd-only-diff"
-            label="Only show differences"
-            toggle
-            checked={onlyShowDifferences}
-            onChange={(event) => setOnlyShowDifferences(event.target.checked)}
-          />
-
           {jsonAreTheSame ? (
-            <ToolStatus>The provided JSONs are the same</ToolStatus>
+            <Notice tone="neutral">The provided JSONs are the same</Notice>
           ) : (
             <div className="jd-viewer" data-testid="diff-result">
               <ul>
-                <DiffViewerNode
-                  difference={result}
-                  showKeys={false}
-                  onCopy={copyValue}
-                />
+                <DiffViewerNode difference={result} showKeys={false} onCopy={copyValue} />
               </ul>
             </div>
           )}
 
-          {copyStatus ? (
-            <ToolStatus tone="success">{copyStatus}</ToolStatus>
-          ) : null}
-        </ToolPanel>
+          {copyStatus ? <Notice tone="success">{copyStatus}</Notice> : null}
+        </Panel>
       ) : null}
-    </ToolIsland>
+    </ToolFrame>
   );
 }
 

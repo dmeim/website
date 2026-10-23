@@ -1,19 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolFormGrid,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolSelect,
-  ToolStatus,
-  ToolTextarea,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { FormGrid, Input, Notice, OutputField, Panel, Select, Textarea, ToolFrame } from "@/ui/react";
 import {
   ASCII_FONTS,
   DEFAULT_FONT,
@@ -36,7 +23,6 @@ export default function AsciiTextDrawer() {
   const [output, setOutput] = useState("");
   const [processing, setProcessing] = useState(true);
   const [errored, setErrored] = useState(false);
-  const [actionStatus, setActionStatus] = useState("");
 
   useEffect(() => {
     configureBrowserFigletFonts();
@@ -71,130 +57,73 @@ export default function AsciiTextDrawer() {
     };
   }, [input, font, width]);
 
-  const copyOutput = useCallback(async () => {
-    if (!output) {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(output);
-      setActionStatus("ASCII art copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the output and copy it manually.");
-    }
-  }, [output]);
-
   return (
-    <ToolIsland className="ascii-drawer-tool">
-      <ToolPanel
-        labelledBy="ascii-drawer-heading"
-        className="ascii-drawer-tool__panel"
+    <ToolFrame>
+      <Panel
+        title="ASCII art text"
+        titleId="ascii-drawer-heading"
+        description="Type text, pick a FIGlet font and wrap width, then copy the ASCII art output."
       >
-        <ToolSectionHeading
-          title="ASCII art text"
-          titleId="ascii-drawer-heading"
-          description={
-            <ToolHint>
-              Type text, pick a FIGlet font and wrap width, then copy the ASCII
-              art output.
-            </ToolHint>
-          }
-        />
-
-        <ToolTextarea
+        <Textarea
           id="ascii-drawer-input"
           label="Your text"
-          full
           rows={4}
           value={input}
           placeholder="Your text to draw"
           spellCheck={false}
           autoFocus
-          onChange={(event) => {
-            setInput(event.target.value);
-            setActionStatus("");
-          }}
+          onChange={(event) => setInput(event.target.value)}
         />
 
-        <ToolFormGrid className="ascii-drawer-settings">
-          <ToolSelect
+        <FormGrid columns={2}>
+          <Select
             id="ascii-drawer-font"
             label="Font"
             value={normalizeFont(font)}
-            onChange={(event) => {
-              setFont(normalizeFont(event.target.value));
-              setActionStatus("");
-            }}
-          >
-            {ASCII_FONTS.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </ToolSelect>
+            onChange={(event) => setFont(normalizeFont(event.target.value))}
+            options={ASCII_FONTS.map((name) => ({ value: name, label: name }))}
+          />
 
-          <ToolInput
+          <Input
             id="ascii-drawer-width"
             label="Width"
             type="number"
             min={WIDTH_MIN}
             max={WIDTH_MAX}
             step={1}
+            mono
             value={clampWidth(width)}
             placeholder="Width of the text"
             onChange={(event) => {
               const next = Number(event.target.value);
               setWidth(Number.isFinite(next) ? next : DEFAULT_WIDTH);
-              setActionStatus("");
             }}
           />
-        </ToolFormGrid>
+        </FormGrid>
 
         {processing ? (
-          <ToolStatus tone="default" live="polite">
+          <Notice tone="neutral" live="polite">
             Loading font…
-          </ToolStatus>
+          </Notice>
         ) : null}
 
         {errored && !processing ? (
-          <ToolStatus tone="error" live="assertive">
+          <Notice tone="danger" live="assertive">
             Current settings resulted in error.
-          </ToolStatus>
+          </Notice>
         ) : null}
 
         {!processing && !errored ? (
-          <>
-            <ToolTextarea
-              id="ascii-drawer-output"
-              label="ASCII art text"
-              full
-              code
-              rows={12}
-              readOnly
-              value={output}
-              className="ascii-drawer-output"
-              aria-live="polite"
-            />
-
-            <ToolActionRow>
-              <ToolButton
-                type="button"
-                onClick={() => void copyOutput()}
-                disabled={!output}
-              >
-                Copy
-              </ToolButton>
-            </ToolActionRow>
-          </>
+          <OutputField
+            id="ascii-drawer-output"
+            label="ASCII art text"
+            multiline
+            rows={12}
+            value={output}
+            className="ascii-drawer-output"
+          />
         ) : null}
-
-        {actionStatus ? (
-          <ToolStatus tone="success" live="polite">
-            {actionStatus}
-          </ToolStatus>
-        ) : null}
-      </ToolPanel>
-    </ToolIsland>
+      </Panel>
+    </ToolFrame>
   );
 }

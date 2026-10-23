@@ -1,17 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import {
-  ToolCheck,
-  ToolEmpty,
-  ToolFormGrid,
-  ToolHint,
-  ToolIsland,
-  ToolNested,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-} from "@/components/tools/ui";
+import { Checkbox, CodeBlock, EmptyState, FormGrid, Panel, Table, Textarea, ToolFrame } from "@/ui/react";
 import {
   DEFAULT_FLAG_OPTIONS,
   DEFAULT_REGEX,
@@ -50,24 +39,17 @@ export default function RegexTester() {
   };
 
   return (
-    <ToolIsland className="rt-tool">
-      <ToolPanel labelledBy="rt-heading" className="rt-tool__panel">
-        <ToolSectionHeading
-          title="Regex"
-          titleId="rt-heading"
-          description={
-            <ToolHint>
-              Enter a JavaScript regular expression and text to match. Toggle
-              flags below; matches update live.
-            </ToolHint>
-          }
-        />
+    <ToolFrame>
+      <Panel
+        title="Regex"
+        titleId="rt-heading"
+        description="Enter a JavaScript regular expression and text to match. Toggle flags below; matches update live."
+      >
 
-        <ToolTextarea
+        <Textarea
           id="rt-regex"
           label="Regex to test"
-          full
-          code
+          mono
           rows={3}
           value={regex}
           placeholder="Put the regex to test"
@@ -77,17 +59,11 @@ export default function RegexTester() {
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
-          aria-invalid={validationError ? true : undefined}
+          error={validationError ? `Invalid regex: ${validationError}` : undefined}
         />
 
-        {validationError ? (
-          <ToolStatus tone="error" live="polite">
-            Invalid regex: {validationError}
-          </ToolStatus>
-        ) : null}
-
-        <ToolFormGrid className="rt-flags" exportLayout>
-          <ToolCheck
+        <FormGrid columns="auto" className="rt-flags">
+          <Checkbox
             id="rt-flag-g"
             label={
               <>
@@ -98,7 +74,7 @@ export default function RegexTester() {
             checked={flags.global}
             onChange={(event) => setFlag("global", event.target.checked)}
           />
-          <ToolCheck
+          <Checkbox
             id="rt-flag-i"
             label={
               <>
@@ -109,7 +85,7 @@ export default function RegexTester() {
             checked={flags.ignoreCase}
             onChange={(event) => setFlag("ignoreCase", event.target.checked)}
           />
-          <ToolCheck
+          <Checkbox
             id="rt-flag-m"
             label={
               <>
@@ -120,7 +96,7 @@ export default function RegexTester() {
             checked={flags.multiline}
             onChange={(event) => setFlag("multiline", event.target.checked)}
           />
-          <ToolCheck
+          <Checkbox
             id="rt-flag-s"
             label={
               <>
@@ -131,7 +107,7 @@ export default function RegexTester() {
             checked={flags.dotAll}
             onChange={(event) => setFlag("dotAll", event.target.checked)}
           />
-          <ToolCheck
+          <Checkbox
             id="rt-flag-u"
             label={
               <>
@@ -142,7 +118,7 @@ export default function RegexTester() {
             checked={flags.unicode}
             onChange={(event) => setFlag("unicode", event.target.checked)}
           />
-          <ToolCheck
+          <Checkbox
             id="rt-flag-v"
             label={
               <>
@@ -153,13 +129,12 @@ export default function RegexTester() {
             checked={flags.unicodeSets}
             onChange={(event) => setFlag("unicodeSets", event.target.checked)}
           />
-        </ToolFormGrid>
+        </FormGrid>
 
-        <ToolTextarea
+        <Textarea
           id="rt-text"
           label="Text to match"
-          full
-          code
+          mono
           rows={5}
           value={text}
           placeholder="Put the text to match"
@@ -173,79 +148,67 @@ export default function RegexTester() {
         {text && results.length > 0 ? (
           <MatchHighlight text={text} matches={results} />
         ) : null}
-      </ToolPanel>
+      </Panel>
 
-      <ToolPanel labelledBy="rt-matches-heading" className="rt-tool__panel">
-        <ToolSectionHeading title="Matches" titleId="rt-matches-heading" />
-
+      <Panel title="Matches" titleId="rt-matches-heading">
         {results.length > 0 ? (
-          <div className="rt-table-wrap">
-            <table className="rt-table">
-              <thead>
-                <tr>
-                  <th scope="col">Index in text</th>
-                  <th scope="col">Value</th>
-                  <th scope="col">Captures</th>
-                  <th scope="col">Groups</th>
+          <Table caption="Regex matches" captionHidden density="compact" className="rt-table">
+            <thead>
+              <tr>
+                <th scope="col">Index in text</th>
+                <th scope="col">Value</th>
+                <th scope="col">Captures</th>
+                <th scope="col">Groups</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map((match) => (
+                <tr key={`${match.index}:${match.value}`}>
+                  <td className="rt-table__mono">{match.index}</td>
+                  <td className="rt-table__mono">{match.value}</td>
+                  <td>
+                    {match.captures.length > 0 ? (
+                      <ul className="rt-capture-list">
+                        {match.captures.map((capture) => (
+                          <li key={capture.name}>
+                            &quot;{capture.name}&quot; = {capture.value} [{capture.start} - {capture.end}]
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="rt-muted">—</span>
+                    )}
+                  </td>
+                  <td>
+                    {match.groups.length > 0 ? (
+                      <ul className="rt-capture-list">
+                        {match.groups.map((group) => (
+                          <li key={group.name}>
+                            &quot;{group.name}&quot; = {group.value} [{group.start} - {group.end}]
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="rt-muted">—</span>
+                    )}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {results.map((match) => (
-                  <tr key={`${match.index}:${match.value}`}>
-                    <td>{match.index}</td>
-                    <td className="rt-table__mono">{match.value}</td>
-                    <td>
-                      {match.captures.length > 0 ? (
-                        <ul className="rt-capture-list">
-                          {match.captures.map((capture) => (
-                            <li key={capture.name}>
-                              &quot;{capture.name}&quot; = {capture.value} [
-                              {capture.start} - {capture.end}]
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <span className="rt-muted">—</span>
-                      )}
-                    </td>
-                    <td>
-                      {match.groups.length > 0 ? (
-                        <ul className="rt-capture-list">
-                          {match.groups.map((group) => (
-                            <li key={group.name}>
-                              &quot;{group.name}&quot; = {group.value} [
-                              {group.start} - {group.end}]
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <span className="rt-muted">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </Table>
         ) : (
-          <ToolEmpty>No match</ToolEmpty>
+          <EmptyState size="sm" icon="magnifying-glass" title="No match" />
         )}
-      </ToolPanel>
+      </Panel>
 
-      <ToolPanel labelledBy="rt-sample-heading" className="rt-tool__panel">
-        <ToolNested title={<span id="rt-sample-heading">Sample matching text</span>}>
-          <pre className="rt-sample tool-code" aria-live="polite">
-            {sample || "—"}
-          </pre>
-        </ToolNested>
-      </ToolPanel>
+      <Panel title="Sample matching text" titleId="rt-sample-heading">
+        <CodeBlock code={sample || "—"} copy={Boolean(sample)} wrap aria-live="polite" />
+      </Panel>
 
-      <ToolPanel labelledBy="rt-diagram-heading" className="rt-tool__panel">
-        <ToolNested title={<span id="rt-diagram-heading">Regex diagram</span>}>
-          <RegexDiagram pattern={validationError ? "" : regex} />
-        </ToolNested>
-      </ToolPanel>
-    </ToolIsland>
+      <Panel title="Regex diagram" titleId="rt-diagram-heading">
+        <RegexDiagram pattern={validationError ? "" : regex} />
+      </Panel>
+    </ToolFrame>
   );
 }
 
@@ -283,7 +246,7 @@ function MatchHighlight({
   return (
     <div className="rt-highlight" aria-live="polite">
       <span className="rt-highlight__label">Highlighted matches</span>
-      <pre className="rt-highlight__body tool-code">
+      <pre className="rt-highlight__body">
         {segments.map((segment, index) =>
           segment.matched ? (
             <mark key={index} className="rt-highlight__mark">

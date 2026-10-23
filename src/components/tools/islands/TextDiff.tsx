@@ -1,17 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-  ToolWorkspace,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Button, ButtonGroup, CopyButton, FormGrid, Notice, Panel, Textarea, ToolFrame } from "@/ui/react";
 import {
   DEFAULT_MODIFIED,
   DEFAULT_ORIGINAL,
@@ -39,20 +28,6 @@ export default function TextDiff() {
     [original, modified],
   );
 
-  const copyUnified = useCallback(async () => {
-    if (!unified) {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(unified);
-      setActionStatus("Unified diff copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the diff and copy it manually.");
-    }
-  }, [unified]);
-
   const swap = useCallback(() => {
     setOriginal(modified);
     setModified(original);
@@ -66,27 +41,17 @@ export default function TextDiff() {
   }, []);
 
   return (
-    <ToolIsland className="text-diff-tool">
-      <ToolPanel labelledBy="text-diff-heading" className="text-diff-tool__intro">
-        <ToolSectionHeading
-          title="Text diff"
-          titleId="text-diff-heading"
-          description={
-            <ToolHint>
-              Compare two texts side by side. Edit either pane — differences
-              update live with line and character highlighting.
-            </ToolHint>
-          }
-        />
-      </ToolPanel>
-
-      <ToolWorkspace className="text-diff-tool__inputs" stagger>
-        <ToolPanel className="text-diff-tool__panel">
-          <ToolTextarea
+    <ToolFrame>
+      <Panel
+        title="Text diff"
+        titleId="text-diff-heading"
+        description="Compare two texts side by side. Edit either pane — differences update live with line and character highlighting."
+      >
+        <FormGrid columns={2}>
+          <Textarea
             id="text-diff-original"
             label="Original"
-            full
-            code
+            mono
             rows={12}
             value={original}
             placeholder="Original text"
@@ -94,64 +59,40 @@ export default function TextDiff() {
             autoFocus
             spellCheck={false}
           />
-        </ToolPanel>
-
-        <ToolPanel className="text-diff-tool__panel">
-          <ToolTextarea
+          <Textarea
             id="text-diff-modified"
             label="Modified"
-            full
-            code
+            mono
             rows={12}
             value={modified}
             placeholder="Modified text"
             onChange={(event) => setModified(event.target.value)}
             spellCheck={false}
           />
-        </ToolPanel>
-      </ToolWorkspace>
+        </FormGrid>
+      </Panel>
 
-      <ToolPanel
-        labelledBy="text-diff-result-heading"
-        className="text-diff-tool__result"
+      <Panel
+        title="Differences"
+        titleId="text-diff-result-heading"
+        description="Green marks additions, red marks removals. Modified lines show character-level changes."
         aria-live="polite"
+        actions={
+          <ButtonGroup>
+            <CopyButton value={unified} label="Copy unified diff" disabled={!unified || equal} size="sm" />
+            <Button variant="ghost" size="sm" iconStart="arrows-left-right" onClick={swap}>
+              Swap
+            </Button>
+            <Button variant="ghost" size="sm" iconStart="arrows-clockwise" onClick={reset}>
+              Reset
+            </Button>
+          </ButtonGroup>
+        }
       >
-        <ToolSectionHeading
-          title="Differences"
-          titleId="text-diff-result-heading"
-          description={
-            <ToolHint>
-              Green marks additions, red marks removals. Modified lines show
-              character-level changes.
-            </ToolHint>
-          }
-        />
-
-        <ToolActionRow>
-          <ToolButton
-            type="button"
-            onClick={() => void copyUnified()}
-            disabled={!unified || equal}
-          >
-            Copy unified diff
-          </ToolButton>
-          <ToolButton type="button" variant="ghost" onClick={swap}>
-            Swap
-          </ToolButton>
-          <ToolButton type="button" variant="ghost" onClick={reset}>
-            Reset
-          </ToolButton>
-        </ToolActionRow>
-
         {equal ? (
-          <ToolStatus>The two texts are identical.</ToolStatus>
+          <Notice tone="neutral">The two texts are identical.</Notice>
         ) : (
-          <div
-            className="text-diff-viewer"
-            data-testid="text-diff-result"
-            role="table"
-            aria-label="Side-by-side text differences"
-          >
+          <div className="text-diff-viewer" data-testid="text-diff-result" role="table" aria-label="Side-by-side text differences">
             <div className="text-diff-viewer__header" role="row">
               <span role="columnheader">Original</span>
               <span role="columnheader">Modified</span>
@@ -162,11 +103,9 @@ export default function TextDiff() {
           </div>
         )}
 
-        {actionStatus ? (
-          <ToolStatus tone="success">{actionStatus}</ToolStatus>
-        ) : null}
-      </ToolPanel>
-    </ToolIsland>
+        {actionStatus ? <Notice tone="success">{actionStatus}</Notice> : null}
+      </Panel>
+    </ToolFrame>
   );
 }
 

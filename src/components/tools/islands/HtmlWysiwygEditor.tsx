@@ -1,20 +1,9 @@
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-  ToolWorkspace,
-  cx,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import type { IconName } from "@/ui/icons";
+import { CopyButton, IconButton, OutputField, Panel, ToolFrame, Toolbar } from "@/ui/react";
 import {
   DEFAULT_HTML,
   formatEditorHtml,
@@ -27,7 +16,7 @@ import "./HtmlWysiwygEditor.css";
 type MenuItem =
   | {
       type: "button";
-      label: string;
+      icon: IconName;
       title: string;
       action: (editor: Editor) => void;
       isActive?: (editor: Editor) => boolean;
@@ -37,28 +26,28 @@ type MenuItem =
 const MENU_ITEMS: MenuItem[] = [
   {
     type: "button",
-    label: "B",
+    icon: "text-b",
     title: "Bold",
     action: (editor) => editor.chain().focus().toggleBold().run(),
     isActive: (editor) => editor.isActive("bold"),
   },
   {
     type: "button",
-    label: "I",
+    icon: "text-italic",
     title: "Italic",
     action: (editor) => editor.chain().focus().toggleItalic().run(),
     isActive: (editor) => editor.isActive("italic"),
   },
   {
     type: "button",
-    label: "S",
+    icon: "text-strikethrough",
     title: "Strike",
     action: (editor) => editor.chain().focus().toggleStrike().run(),
     isActive: (editor) => editor.isActive("strike"),
   },
   {
     type: "button",
-    label: "</>",
+    icon: "code",
     title: "Inline code",
     action: (editor) => editor.chain().focus().toggleCode().run(),
     isActive: (editor) => editor.isActive("code"),
@@ -66,7 +55,7 @@ const MENU_ITEMS: MenuItem[] = [
   { type: "divider" },
   {
     type: "button",
-    label: "H1",
+    icon: "text-h-one",
     title: "Heading 1",
     action: (editor) =>
       editor.chain().focus().toggleHeading({ level: 1 }).run(),
@@ -74,7 +63,7 @@ const MENU_ITEMS: MenuItem[] = [
   },
   {
     type: "button",
-    label: "H2",
+    icon: "text-h-two",
     title: "Heading 2",
     action: (editor) =>
       editor.chain().focus().toggleHeading({ level: 2 }).run(),
@@ -82,7 +71,7 @@ const MENU_ITEMS: MenuItem[] = [
   },
   {
     type: "button",
-    label: "H3",
+    icon: "text-h-three",
     title: "Heading 3",
     action: (editor) =>
       editor.chain().focus().toggleHeading({ level: 3 }).run(),
@@ -90,7 +79,7 @@ const MENU_ITEMS: MenuItem[] = [
   },
   {
     type: "button",
-    label: "H4",
+    icon: "text-h-four",
     title: "Heading 4",
     action: (editor) =>
       editor.chain().focus().toggleHeading({ level: 4 }).run(),
@@ -99,28 +88,28 @@ const MENU_ITEMS: MenuItem[] = [
   { type: "divider" },
   {
     type: "button",
-    label: "•",
+    icon: "list-bullets",
     title: "Bullet list",
     action: (editor) => editor.chain().focus().toggleBulletList().run(),
     isActive: (editor) => editor.isActive("bulletList"),
   },
   {
     type: "button",
-    label: "1.",
+    icon: "list-numbers",
     title: "Ordered list",
     action: (editor) => editor.chain().focus().toggleOrderedList().run(),
     isActive: (editor) => editor.isActive("orderedList"),
   },
   {
     type: "button",
-    label: "{ }",
+    icon: "code-block",
     title: "Code block",
     action: (editor) => editor.chain().focus().toggleCodeBlock().run(),
     isActive: (editor) => editor.isActive("codeBlock"),
   },
   {
     type: "button",
-    label: "“”",
+    icon: "quotes",
     title: "Blockquote",
     action: (editor) => editor.chain().focus().toggleBlockquote().run(),
     isActive: (editor) => editor.isActive("blockquote"),
@@ -128,26 +117,26 @@ const MENU_ITEMS: MenuItem[] = [
   { type: "divider" },
   {
     type: "button",
-    label: "↵",
+    icon: "arrow-elbow-down-left",
     title: "Hard break",
     action: (editor) => editor.chain().focus().setHardBreak().run(),
   },
   {
     type: "button",
-    label: "⌫",
+    icon: "eraser",
     title: "Clear format",
     action: (editor) =>
       editor.chain().focus().clearNodes().unsetAllMarks().run(),
   },
   {
     type: "button",
-    label: "↶",
+    icon: "arrow-counter-clockwise",
     title: "Undo",
     action: (editor) => editor.chain().focus().undo().run(),
   },
   {
     type: "button",
-    label: "↷",
+    icon: "arrow-clockwise",
     title: "Redo",
     action: (editor) => editor.chain().focus().redo().run(),
   },
@@ -155,43 +144,30 @@ const MENU_ITEMS: MenuItem[] = [
 
 function MenuBar({ editor }: { editor: Editor }) {
   return (
-    <div className="wysiwyg-toolbar" role="toolbar" aria-label="Formatting">
+    <Toolbar label="Formatting" className="wysiwyg-toolbar">
       {MENU_ITEMS.map((item, index) => {
         if (item.type === "divider") {
-          return (
-            <span
-              key={`divider-${index}`}
-              className="wysiwyg-toolbar__divider"
-              aria-hidden="true"
-            />
-          );
+          return <span key={`divider-${index}`} className="wysiwyg-toolbar__divider" aria-hidden="true" />;
         }
 
         const active = item.isActive?.(editor) ?? false;
         return (
-          <button
+          <IconButton
             key={item.title}
-            type="button"
-            className={cx(
-              "wysiwyg-toolbar__btn",
-              active && "wysiwyg-toolbar__btn--active",
-            )}
-            title={item.title}
-            aria-label={item.title}
-            aria-pressed={item.isActive ? active : undefined}
+            icon={item.icon}
+            label={item.title}
+            size="sm"
+            pressed={item.isActive ? active : undefined}
             onClick={() => item.action(editor)}
-          >
-            {item.label}
-          </button>
+          />
         );
       })}
-    </div>
+    </Toolbar>
   );
 }
 
 export default function HtmlWysiwygEditor() {
   const [html, setHtml] = useState(DEFAULT_HTML);
-  const [actionStatus, setActionStatus] = useState("");
 
   const editor = useEditor(
     {
@@ -220,82 +196,38 @@ export default function HtmlWysiwygEditor() {
 
   const formattedHtml = useMemo(() => formatEditorHtml(html), [html]);
 
-  const copyHtml = useCallback(async () => {
-    if (!formattedHtml) {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(formattedHtml);
-      setActionStatus("HTML copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the source and copy it manually.");
-    }
-  }, [formattedHtml]);
-
   return (
-    <ToolIsland className="wysiwyg-tool">
-      <ToolWorkspace stagger className="wysiwyg-tool__workspace">
-        <ToolPanel labelledBy="wysiwyg-heading" className="wysiwyg-tool__panel">
-          <ToolSectionHeading
-            title="Editor"
-            titleId="wysiwyg-heading"
-            description={
-              <ToolHint>
-                Format with the toolbar. Source HTML updates live as you edit.
-              </ToolHint>
-            }
-          />
-
-          <div className="wysiwyg-chrome">
-            {editor ? <MenuBar editor={editor} /> : null}
-            <div className="wysiwyg-surface">
-              <EditorContent editor={editor} />
-            </div>
+    <ToolFrame layout="split">
+      <Panel
+        title="Editor"
+        titleId="wysiwyg-heading"
+        description="Format with the toolbar. Source HTML updates live as you edit."
+      >
+        <div className="wysiwyg-chrome">
+          {editor ? <MenuBar editor={editor} /> : null}
+          <div className="wysiwyg-surface">
+            <EditorContent editor={editor} />
           </div>
-        </ToolPanel>
+        </div>
+      </Panel>
 
-        <ToolPanel
-          labelledBy="wysiwyg-source-heading"
-          className="wysiwyg-tool__panel"
-        >
-          <ToolSectionHeading
-            title="HTML source"
-            titleId="wysiwyg-source-heading"
-            description={
-              <ToolHint>Pretty-printed markup generated from the editor.</ToolHint>
-            }
-          />
-
-          <ToolTextarea
-            id="wysiwyg-source"
-            label="Source"
-            full
-            code
-            readOnly
-            rows={16}
-            value={formattedHtml}
-            placeholder="HTML source appears here"
-            className="wysiwyg-source"
-            aria-live="polite"
-          />
-
-          <ToolActionRow>
-            <ToolButton
-              type="button"
-              onClick={() => void copyHtml()}
-              disabled={!formattedHtml}
-            >
-              Copy HTML
-            </ToolButton>
-          </ToolActionRow>
-
-          {actionStatus ? (
-            <ToolStatus tone="success">{actionStatus}</ToolStatus>
-          ) : null}
-        </ToolPanel>
-      </ToolWorkspace>
-    </ToolIsland>
+      <Panel
+        title="HTML source"
+        titleId="wysiwyg-source-heading"
+        description="Pretty-printed markup generated from the editor."
+        actions={<CopyButton value={formattedHtml} label="Copy HTML" disabled={!formattedHtml} size="sm" />}
+      >
+        <OutputField
+          id="wysiwyg-source"
+          label="Source"
+          multiline
+          rows={16}
+          value={formattedHtml}
+          placeholder="HTML source appears here"
+          className="wysiwyg-source"
+          copy={false}
+        />
+      </Panel>
+    </ToolFrame>
   );
 }

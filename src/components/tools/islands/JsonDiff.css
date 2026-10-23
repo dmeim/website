@@ -1,39 +1,25 @@
-/* JSON diff — dual editors + nested structural diff viewer */
-
-@import "./toolIsland.css";
-
-.jd-tool__intro {
-  max-width: 48rem;
-}
-
-.jd-tool__inputs {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.jd-tool__panel {
-  min-width: 0;
-}
-
-.jd-tool__result {
-  max-width: none;
-}
+/* JSON diff: nested structural viewer tinted with the --ui-diff-* tokens. */
 
 .jd-viewer {
-  color: var(--color-stone);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  line-height: 1.55;
   overflow-x: auto;
-}
-
-.jd-viewer > ul {
-  padding-left: 0 !important;
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-panel);
+  background: var(--ui-bg-inset);
+  color: var(--ui-text-muted);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-normal);
 }
 
 .jd-viewer ul {
   list-style: none;
-  padding-left: 1.25rem;
   margin: 0;
+  padding-left: var(--ui-space-lg);
+}
+
+.jd-viewer > ul {
+  padding-left: 0;
 }
 
 .jd-viewer li {
@@ -41,14 +27,14 @@
 }
 
 .jd-updated-line {
-  padding: 0.2rem 0;
+  padding: var(--ui-space-3xs) 0;
 }
 
 .jd-result,
 .jd-array,
 .jd-object,
 .jd-value {
-  margin-right: 0.25rem;
+  margin-right: var(--ui-space-3xs);
 }
 
 .jd-array,
@@ -57,38 +43,38 @@
 }
 
 .jd-key {
-  font-weight: 500;
-  color: var(--color-ink);
+  font-weight: var(--ui-fw-medium);
+  color: var(--ui-text);
 }
 
 .jd-value {
   appearance: none;
   display: inline;
   margin: 0;
-  padding: 0.15rem 0.35rem;
+  padding: 0 var(--ui-space-3xs);
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: var(--ui-radius-xs);
   background: transparent;
   color: inherit;
   font: inherit;
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: border-color var(--ui-dur-fast) var(--ui-ease-out);
 }
 
 .jd-result.added,
 .jd-array.added,
 .jd-object.added,
 .jd-value.added {
-  background: color-mix(in srgb, #5a8f6a 22%, transparent);
-  color: #8fbf9c;
+  background: var(--ui-diff-add-soft);
+  color: var(--ui-diff-add);
 }
 
 .jd-result.removed,
 .jd-array.removed,
 .jd-object.removed,
 .jd-value.removed {
-  background: color-mix(in srgb, #c45c4a 18%, transparent);
-  color: color-mix(in srgb, #c45c4a 85%, var(--color-ink));
+  background: var(--ui-diff-remove-soft);
+  color: var(--ui-diff-remove);
 }
 
 .jd-result.added .jd-key,
@@ -101,11 +87,11 @@
 }
 
 .jd-value.added:hover {
-  border-color: #8fbf9c;
+  border-color: var(--ui-diff-add);
 }
 
 .jd-value.removed:hover {
-  border-color: #c45c4a;
+  border-color: var(--ui-diff-remove);
 }
 
 .jd-result.added .jd-value.added,
@@ -116,10 +102,4 @@
 .jd-object.removed .jd-value.removed {
   background: transparent;
   color: inherit;
-}
-
-@media (max-width: 900px) {
-  .jd-tool__inputs {
-    grid-template-columns: 1fr;
-  }
 }

@@ -1,14 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  ToolEmpty,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-} from "@/components/tools/ui";
+import { Notice, Panel, ReferenceList, ToolFrame } from "@/ui/react";
 import { copyTextToClipboard } from "@/lib/tools/clipboard";
 import {
   SEARCH_DEBOUNCE_MS,
@@ -59,75 +51,52 @@ export default function EmojiPicker() {
   };
 
   return (
-    <ToolIsland className="emoji-picker-tool">
-      <ToolPanel
-        labelledBy="emoji-picker-heading"
-        className="emoji-picker-tool__panel"
+    <ToolFrame>
+      <Panel
+        title="Emoji picker"
+        titleId="emoji-picker-heading"
+        description={`Browse ${total.toLocaleString()} emojis, search by name or keyword, and copy the character, code point, or unicode escape.`}
       >
-        <ToolSectionHeading
-          title="Emoji picker"
-          titleId="emoji-picker-heading"
-          description={
-            <ToolHint>
-              Browse {total.toLocaleString()} emojis, search by name or keyword,
-              and copy the character, code point, or unicode escape.
-            </ToolHint>
-          }
-        />
-
-        <ToolInput
-          id="emoji-picker-search"
-          label="Search"
-          full
-          value={search}
-          placeholder="Search emojis (e.g. 'smile')…"
-          autoComplete="off"
-          spellCheck={false}
-          autoFocus
-          onChange={(event) => {
-            setSearch(event.target.value);
+        <ReferenceList
+          searchLabel="Search emojis (e.g. 'smile')…"
+          query={search}
+          onQueryChange={(value) => {
+            setSearch(value);
             setActionStatus("");
           }}
-        />
+          count={matchCount}
+          empty={{ title: isSearching ? "No results" : "No emojis loaded." }}
+        >
+          {actionStatus ? (
+            <Notice tone="success" live="polite">
+              {actionStatus}
+            </Notice>
+          ) : null}
 
-        {actionStatus ? (
-          <ToolStatus tone="success" live="polite">
-            {actionStatus}
-          </ToolStatus>
-        ) : null}
-      </ToolPanel>
+          {matchCount === 0 ? null : (
+            <div className="emoji-picker-groups">
+              {groups.map((group) => (
+                <section
+                  key={group.group}
+                  className="emoji-picker-group"
+                  aria-labelledby={`emoji-group-${slugify(group.group)}`}
+                >
+                  <h3 id={`emoji-group-${slugify(group.group)}`} className="emoji-picker-group__title">
+                    {group.group}
+                  </h3>
 
-      {matchCount === 0 ? (
-        <ToolEmpty>{isSearching ? "No results" : "No emojis loaded."}</ToolEmpty>
-      ) : (
-        <div className="emoji-picker-groups">
-          {groups.map((group) => (
-            <section
-              key={group.group}
-              className="emoji-picker-group"
-              aria-labelledby={`emoji-group-${slugify(group.group)}`}
-            >
-              <h2
-                id={`emoji-group-${slugify(group.group)}`}
-                className="emoji-picker-group__title"
-              >
-                {group.group}
-              </h2>
-
-              <div className="emoji-picker-grid">
-                {group.emojiInfos.map((emojiInfo) => (
-                  <EmojiCard
-                    key={`${emojiInfo.group}-${emojiInfo.slug}`}
-                    emojiInfo={emojiInfo}
-                    onCopy={copyValue}
-                  />
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      )}
-    </ToolIsland>
+                  <div className="emoji-picker-grid">
+                    {group.emojiInfos.map((emojiInfo) => (
+                      <EmojiCard key={`${emojiInfo.group}-${emojiInfo.slug}`} emojiInfo={emojiInfo} onCopy={copyValue} />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
+        </ReferenceList>
+      </Panel>
+    </ToolFrame>
   );
 }
 
