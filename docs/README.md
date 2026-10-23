@@ -5,7 +5,7 @@ Start here to understand the project and navigate the docs.
 1. 01-Product-Vision.md — Why this site exists
 2. 02-Information-Architecture.md — Routes and content layout
 3. 03-Stack-and-Structure.md — Tech stack and repo layout
-4. 04-Design-System.md — Colors, typography, plain CSS + dark mode
+4. 04-Design-System.md — Profile design: tokens, typography, theming, motion
 5. 05-Keys-and-Security.md — Keys, fingerprints, security.txt, headers
 6. 06-Verification.md — In-browser + CLI verification flows
 7. 07-Deployment.md — Cloudflare Workers Assets + Wrangler
@@ -14,7 +14,8 @@ Start here to understand the project and navigate the docs.
 10. 10-Content-and-Branding.md — Branding, content seeds, assets
 11. 11-Redesign-Concepts.md — /home1–/home6 redesign concepts
 12. 12-UI-Library-Spec.md — Shared UI library contract for the site-wide redesign (tokens, components, icons, work packages)
-13. tools/AGENT_BRIEF.md — Checklist for porting it-tools onto the shared kit
+13. 13-Redesign-Profile.md — Profile redesign (this branch): design language, shell, decisions, known issues
+14. tools/AGENT_BRIEF.md — Checklist for porting it-tools onto the shared kit
 
 Related:
 

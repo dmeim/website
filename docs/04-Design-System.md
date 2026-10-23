@@ -1,75 +1,79 @@
 # Design System
 
-**Midnight Concert Hall** — dark ground, champagne (gold) and steel (teal) accents, quiet motion. Adapted from the `pre-retro-pop` branch of the georgios-zerdalis reference (`reference/`, gitignored).
+**Profile** is a refined online CV: flat and quiet, with cream or near-black ground, black and grey ink, and gold used sparingly. Colour, spacing and hairlines carry the hierarchy.
 
-Source of truth: `src/styles/global.css` (tokens) and `src/layouts/BaseLayout.astro` (fonts, theme bootstrap). If this doc and the CSS disagree, the CSS wins — update this doc.
+This branch implements concept 5 site-wide. Design details, decisions and known issues are in `docs/13-Redesign-Profile.md`. The token and component contract shared with the other redesign branches is `docs/12-UI-Library-Spec.md`.
+
+Source of truth:
+- Tokens: `src/ui/tokens.css`
+- Element defaults: `src/ui/base.css`
+- Stylesheet entry: `src/ui/index.css`, loaded once by `BaseLayout.astro`
+- Fonts: `src/ui/fonts/Fonts.astro`
+
+If this doc and the CSS disagree, the CSS wins; update this doc.
 
 ## Colors
 
-### Raw palette
+Use only `--ui-*` tokens; components never use raw colours. Main values:
 
-Each hue has a light-theme and dark-theme value; semantic tokens pick one per theme.
-
-| Token | Light theme | Dark theme | Notes |
+| Token | Light | Dark | Role |
 | --- | --- | --- | --- |
-| `--color-gold-*` | `#8a7349` | `#d4bc8a` | Champagne accent |
-| `--color-teal-*` | `#5c7385` | `#8fa3b0` | Steel accent |
-| `--color-stone-*` | `#565650` | `#a7a7a2` | Muted ink |
-| `--color-cream-*` | `#f3eee6` | `#eceae6` | Ink on dark |
-| `--color-night-*` | — | `#050607` / `#101112` | Dark ground / elevated |
-| `--color-mist-*` | `#f5f4f0` / `#ecebe6` | — | Light ground / elevated |
-| `--color-black-light` | `#0c0e12` | — | Ink on light |
-| `--color-blue-*` | `#194a7a` | `#476f95` | Legacy brand blue (AD-003); rarely used |
+| `--ui-bg` | `#f6f4ef` | `#111110` | Page ground |
+| `--ui-bg-inset` | `#efece6` | `#0c0c0b` | Code blocks, read-only output |
+| `--ui-surface` | `#eeebe4` | `#191917` | Flat tiles, row hover |
+| `--ui-popover` | `#fbfaf7` | `#1b1b19` | Menus, dialogs, toasts (with a `--ui-line-strong` border) |
+| `--ui-line` / `--ui-line-strong` | ink at 10% / 18% | cream at 10% / 18% | Hairlines |
+| `--ui-text` / `--ui-text-muted` | `#171614` / `#6d6961` | `#edeae3` / `#9a968e` | Text |
+| `--ui-ink` / `--ui-on-ink` | `#171614` / `#f6f4ef` | `#edeae3` / `#111110` | Primary buttons, checked controls |
+| `--ui-accent` | `#8a6d3b` | `#cfb27a` | Gold: links, focus, the current marker, the live dot |
+| `--ui-success` / `--ui-warning` / `--ui-danger` / `--ui-info` | muted tones + `-soft` tints | lighter tones + tints | Status |
 
-### Semantic tokens (use these in components)
-
-| Token | Role |
-| --- | --- |
-| `--color-ground` | Page background |
-| `--color-ground-elevated` / `--color-surface` | Panels, cards, raised surfaces |
-| `--color-ink` | Primary text |
-| `--color-ink-muted` | Secondary text, meta |
-| `--color-accent` | Champagne — links, highlights, focus |
-| `--color-accent-soft` | Steel — secondary accent |
-| `--color-border` | Hairlines (ink mixed at 12–15%) |
-| `--color-overlay` | Scrims behind lightboxes and modals |
-| `--color-spot` | Faint gold wash for spotlight effects |
-
-Prefer semantic tokens over raw palette values so both themes work automatically.
+The live, complete list is at `/colors`, which is generated from the tokens.
 
 ## Theming
 
-- Theme is set via `data-theme="light" | "dark"` on `<html>`. The user's preference (`light` / `dark` / `system`) is stored in `localStorage` under `theme` and mirrored to `data-theme-pref`.
-- An inline script in `BaseLayout.astro` applies the theme before first paint (no flash). `system` follows `prefers-color-scheme`; dark is the fallback.
-- The toggle lives in the header (`src/scripts/theme-toggle`).
+- **Attributes.** The resolved theme is `data-theme="light" | "dark"` on `<html>`. The preference (`light` / `system` / `dark`) is stored in `localStorage.theme` and mirrored to `data-theme-pref`.
+- **Pre-paint.** An inline script in `BaseLayout.astro` applies the theme before first paint. `system` follows `prefers-color-scheme`.
+- **Subtrees.** Tokens are also declared on `[data-theme]`, so a subtree can force a theme; `/ui` uses this.
+- **Controls.** `ThemeControl` (segmented sun / half / moon) is bound by `src/ui/lib/theme.ts`, which dispatches a `ui:theme` event.
+- **Canvases.** Canvas code watches `data-theme` and reads the `--ui-canvas-*` tokens.
 
 ## Typography
 
-- **Current:** every face token (`--font-display`, `--font-serif`, `--font-sans`, `--font-mono`) resolves to **JetBrains Mono**.
-- **Previous faces** (kept commented in `global.css`, still loaded from Google Fonts): Syne (display), Instrument Serif (serif), Manrope (sans). Restore those token values to switch back.
-- Scale: `--text-xs` (0.6875rem), `--text-sm` (0.8125rem), `--text-md` (1rem), then fluid `--text-lg` / `--text-xl` / `--text-2xl` via `clamp()` across 360–1280px viewports.
-- Reading width: `--measure: 65ch`.
+- **Inter** is the only webfont, loaded in `Fonts.astro`. Body text is 15px at line height 1.6 with features `cv11` and `ss01`. Headings are weight 600 with tight tracking. The largest size, `--ui-fs-3xl`, is about 2.25rem.
+- `--ui-font-mono` is the system monospace stack and is used only for code, values and tool output.
+- Small labels and section titles are 13px, weight 500, uppercase, wide tracking and muted.
 
 ## Layout & Spacing
 
-- Spacing scale: `--space-3xs` (0.125rem) through `--space-xl` (2.5rem) and up.
-- Page width `--site-max: 80rem`; header height `--header-height: 4.25rem`.
-- Corners are nearly square: `--radius: 2px`. Photo frames use `--he-frame-radius: 0.375rem`.
+- **Space scale:** `--ui-space-3xs` (2px) to `--ui-space-4xl` (88px).
+- **Gutter:** `--ui-gutter`, at least 16px.
+- **Widths:** `--ui-content-narrow` (40rem), `--ui-content` (46rem) and `--ui-content-wide` (64rem).
+- **Content pages:** a sticky 320px identity rail sits beside the content column at ≥960px. Below that, a top bar opens a drawer.
+- **App pages** (`/tools`, `/chat`): a 56px top bar (`--ui-header-height`) with `AppShell` filling the rest of the viewport.
+- **Corners:** 8px for controls and tiles, 12px for overlays, pills for badges. No shadows or gradients.
 
 ## Motion
 
-- Easing: `--ease-out`, `--ease-in-out`, `--ease-expo`. Durations: `--duration-fast` (150ms), `--duration` (280ms), `--duration-slow` (560ms).
-- React islands use Framer Motion. Shared primitives live in `src/components/motion/` (`Reveal`, `TextReveal`, `Magnetic`, `PhotoTilt`, `Grain`).
-- Ambient background: a soft Game of Life field (`LifeField`) site-wide, kept alive by a gardener (`src/lib/game-of-life/gardener.ts`). Switch to the dotted wave (`GlyphField`) via `SITE_FIELD_MODE` in `SiteEffects.tsx`. Hidden on `/game-of-life/simulation`.
-- Respect reduced motion: the `prefers-reduced-motion` block in `global.css` and `useReducedMotion()` in islands collapse animations to static states.
+- Durations are `--ui-dur-instant` / `fast` / `base` / `slow` (80 / 160 / 240 / 360ms), plus `--ui-dur-glide` (320ms) for the signature gold marker that glides to the current nav item.
+- Reveals fade up 6px and are gated on `html.js`. React motion code uses `src/ui/lib/motion.ts`.
+- Reduced motion: `base.css` collapses every duration, and islands use `MotionConfigProvider` / `usePrefersReducedMotion`.
+- The ambient Life field is mounted but off (`AMBIENT_ENABLED` in `SiteEffects.tsx`).
 
 ## Styling Approach
 
-- Plain CSS with custom properties; one CSS file beside each component (e.g. `HomeExperience.css`).
-- No CSS frameworks; no UI component libraries.
-- Icons via Lucide (`lucide`, `@lucide/astro`).
+- Plain CSS with custom properties, and no frameworks.
+- The UI library lives in `src/ui/`:
+  - Astro components in `components/`, React components in `react/`;
+  - one shared stylesheet per component in `styles/`;
+  - `/ui` is the showcase.
+- Pages and apps build from the library. Page-unique layout CSS sits beside its component and uses `--ui-*` tokens only.
+- Icons are Phosphor via `@/ui/icons` (`<Icon name="…" />`). Lucide remains installed only for the archived concept pages.
 
 ## Accessibility
 
-- Semantic landmarks and labelled sections; focus-visible styles; keyboard-reachable controls.
-- Sufficient contrast in both themes — the light theme swaps accents to their darker variants for this reason.
+- Every page has a skip link, semantic landmarks and one h1.
+- Focus is a single gold `:focus-visible` ring.
+- Overlays use native `<dialog>` and focus-trapped drawers.
+- Icon-only buttons have accessible names.
+- Both themes are tuned so muted text and gold links meet AA contrast on the ground.
