@@ -11,7 +11,7 @@ export const WIDTH_MIN = 0;
 export const WIDTH_MAX = 10000;
 
 /** CDN used by the browser build to fetch FIGfonts (parity with it-tools). */
-export const FIGLET_FONT_PATH = "https://unpkg.com/figlet@1.11.3/fonts/";
+export const FIGLET_FONT_PATH = "https://unpkg.com/figlet@1.11.3/fonts";
 
 export const ASCII_FONTS = [
   "1Row",
