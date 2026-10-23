@@ -1,0 +1,31 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+
+interface Props extends Omit<HTMLAttributes<"nav">, "class"> {
+  items: Array<{ label: string; href?: string }>;
+  class?: string;
+}
+
+const { items, class: className, ...rest } = Astro.props;
+---
+
+<nav {...rest} class={cx("ui-breadcrumbs", className)} aria-label="Breadcrumb">
+  <ol class="ui-breadcrumbs__list">
+    {
+      items.map((item, index) => {
+        const last = index === items.length - 1;
+        return (
+          <li class="ui-breadcrumbs__item">
+            {item.href && !last ? (
+              <a class="ui-breadcrumbs__link" href={item.href}>{item.label}</a>
+            ) : (
+              <span class="ui-breadcrumbs__current" aria-current={last ? "page" : undefined}>{item.label}</span>
+            )}
+            {!last && <span class="ui-breadcrumbs__sep" aria-hidden="true">/</span>}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>

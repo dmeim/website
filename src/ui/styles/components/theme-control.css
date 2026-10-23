@@ -1,0 +1,57 @@
+/* segmented: built on .ui-segmented-control; first sync fades the thumb in place. */
+.ui-theme-control[data-instant] .ui-segmented-control__thumb {
+  transition: opacity var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-theme-control[data-appearance="segmented"] .ui-segmented-control__option {
+  padding-inline: var(--ui-space-xs);
+}
+
+/* cycle: one button, the icon for the current preference */
+.ui-theme-control[data-appearance="cycle"] {
+  display: inline-flex;
+}
+
+.ui-theme-control__glyph {
+  display: none;
+}
+
+.ui-theme-control[data-appearance="cycle"]:not([data-value]) .ui-theme-control__glyph[data-icon="circle-half"],
+.ui-theme-control[data-value="light"] .ui-theme-control__glyph[data-icon="sun"],
+.ui-theme-control[data-value="system"] .ui-theme-control__glyph[data-icon="circle-half"],
+.ui-theme-control[data-value="dark"] .ui-theme-control__glyph[data-icon="moon"] {
+  display: block;
+}
+
+/* text */
+.ui-theme-control[data-appearance="text"] {
+  display: inline-flex;
+  gap: var(--ui-space-sm);
+}
+
+.ui-theme-control__text {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ui-text-muted);
+  font: inherit;
+  font-size: var(--ui-fs-sm);
+  cursor: pointer;
+  transition: color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-theme-control[data-size="sm"] .ui-theme-control__text {
+  font-size: var(--ui-fs-xs);
+}
+
+.ui-theme-control__text:hover,
+.ui-theme-control__text[aria-pressed="true"] {
+  color: var(--ui-text);
+}
+
+.ui-theme-control__text[aria-pressed="true"] {
+  text-decoration: underline;
+  text-decoration-color: var(--ui-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.35em;
+}

@@ -1,10 +1,116 @@
 ---
 import ThemePair from "./ThemePair.astro";
+import { Breadcrumbs, SideNav, SiteFooter, SiteHeader, SiteNav, ThemeControl } from "@/ui/components/groups/navigation";
+import { NavigationShowcase } from "@/ui/react/showcase/NavigationShowcase";
+
+const groups = ["text", "actions", "forms", "display", "feedback", "overlays", "navigation", "layout", "composites"];
+const spySections = [
+  {
+    id: "library",
+    title: "Library",
+    count: groups.length,
+    items: groups.map((group) => ({ id: group, href: `#${group}`, label: group[0].toUpperCase() + group.slice(1) })),
+  },
+];
+const toolSections = [
+  {
+    id: "encoding",
+    title: "Encoding",
+    count: 3,
+    collapsible: true,
+    items: [
+      { id: "base64", href: "#", label: "Base64", current: true },
+      { id: "url", href: "#", label: "URL encode" },
+      { id: "jwt", href: "#", label: "JWT decoder", badge: "WIP" },
+    ],
+  },
+  {
+    id: "text",
+    title: "Text",
+    count: 2,
+    items: [
+      { id: "diff", href: "#", label: "Diff" },
+      { id: "case", label: "Case converter", disabled: true },
+    ],
+  },
+];
 ---
 
 <section id="navigation" class="ui-showcase-section" aria-labelledby="navigation-title">
   <h2 id="navigation-title" class="ui-showcase-section__title">Navigation</h2>
+  <h3 class="ui-showcase-sub">Astro</h3>
+
+  <h4 class="ui-showcase-sub">SiteHeader: rail mode (currentPath "/"; sub-links come from spy Sections on this page)</h4>
+  <div class="ui-nav-demo" data-mode="rail">
+    <SiteHeader currentPath="/" menuId="demo-rail-nav" />
+  </div>
+
+  <h4 class="ui-showcase-sub">SiteHeader: app mode (currentPath "/tools/base64")</h4>
+  <div class="ui-nav-demo" data-mode="app">
+    <SiteHeader currentPath="/tools/base64" menuId="demo-app-nav" />
+  </div>
+
   <ThemePair>
-    <p class="ui-showcase-empty">No navigation components yet.</p>
+    <div style="display: grid; gap: var(--ui-space-lg)">
+      <h4 class="ui-showcase-sub">SiteNav: horizontal / vertical</h4>
+      <SiteNav currentPath="/projects" aria-label="Demo horizontal" />
+      <SiteNav currentPath="/keys" orientation="vertical" aria-label="Demo vertical" />
+      <h4 class="ui-showcase-sub">ThemeControl: segmented, cycle, text (all stay in sync)</h4>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-lg)">
+        <ThemeControl />
+        <ThemeControl size="sm" />
+        <ThemeControl appearance="cycle" />
+        <ThemeControl appearance="text" />
+      </div>
+      <h4 class="ui-showcase-sub">Breadcrumbs</h4>
+      <Breadcrumbs items={[{ label: "Tools", href: "/tools" }, { label: "Encoding", href: "/tools" }, { label: "Base64" }]} />
+      <h4 class="ui-showcase-sub">SideNav: sections, count, badge, disabled, collapsible</h4>
+      <SideNav label="Demo tools" sections={toolSections}>
+        <a slot="header" href="#" class="ui-side-nav__link">All tools</a>
+      </SideNav>
+      <h4 class="ui-showcase-sub">SiteFooter</h4>
+      <SiteFooter />
+    </div>
   </ThemePair>
+
+  <h4 class="ui-showcase-sub">SideNav spy (scroll the page: the marker follows the showcase sections)</h4>
+  <div class="ui-nav-demo" data-mode="spy">
+    <SideNav label="Showcase sections (spy)" sections={spySections} spy />
+  </div>
+
+  <h3 class="ui-showcase-sub">React</h3>
+  <NavigationShowcase client:visible />
 </section>
+
+<style is:global>
+  .ui-nav-demo {
+    margin-block: var(--ui-space-md) var(--ui-space-xl);
+    border: var(--ui-border-width) solid var(--ui-line);
+    border-radius: var(--ui-radius-panel);
+    overflow: hidden;
+  }
+
+  .ui-nav-demo[data-mode="rail"] .ui-site-header {
+    position: static;
+    height: auto;
+    max-height: 44rem;
+    padding-inline: var(--ui-space-xl);
+  }
+
+  .ui-nav-demo[data-mode="rail"] .ui-site-header__rail {
+    padding-block: var(--ui-space-xl);
+  }
+
+  .ui-nav-demo .ui-site-header__bar {
+    position: static;
+  }
+
+  .ui-nav-demo[data-mode="spy"] {
+    position: sticky;
+    top: var(--ui-space-md);
+    z-index: 1;
+    max-width: 16rem;
+    padding: var(--ui-space-md);
+    background: var(--ui-bg);
+  }
+</style>

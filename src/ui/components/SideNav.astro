@@ -1,0 +1,100 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+import type { SideNavSection } from "@/ui/lib/side-nav";
+import Badge from "./Badge.astro";
+import Disclosure from "./Disclosure.astro";
+
+/** Sectioned side nav with the gold marker. `spy` follows in-page `#anchor` items. */
+interface Props extends Omit<HTMLAttributes<"nav">, "class"> {
+  label: string;
+  sections: SideNavSection[];
+  spy?: boolean;
+  class?: string;
+}
+
+const { label, sections, spy = false, class: className, ...rest } = Astro.props;
+---
+
+<nav
+  {...rest}
+  class={cx("ui-side-nav", className)}
+  aria-label={label}
+  data-spy={spy ? "true" : undefined}
+  data-ui-side-nav
+  data-ui-nav-marker
+>
+  <span class="ui-nav-marker" data-axis="y" data-visible="false" aria-hidden="true"></span>
+  {Astro.slots.has("header") && <div class="ui-side-nav__header"><slot name="header" /></div>}
+  {
+    sections.map((section) => {
+      const list = (
+        <ul class="ui-side-nav__list" data-ui-marker-rail>
+          {section.items.map((item) => (
+            <li class="ui-side-nav__item">
+              {item.href && !item.disabled ? (
+                <a
+                  class="ui-side-nav__link"
+                  href={item.href}
+                  aria-current={item.current ? "page" : undefined}
+                  data-item-id={item.id}
+                  data-ui-marker-target
+                >
+                  <span class="ui-side-nav__label">{item.label}</span>
+                  {item.badge && <Badge size="sm">{item.badge}</Badge>}
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  class="ui-side-nav__link"
+                  disabled={item.disabled}
+                  aria-current={item.current ? "page" : undefined}
+                  data-item-id={item.id}
+                  data-ui-marker-target
+                >
+                  <span class="ui-side-nav__label">{item.label}</span>
+                  {item.badge && <Badge size="sm">{item.badge}</Badge>}
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      );
+      const meta = section.count;
+      return section.collapsible ? (
+        <Disclosure
+          class="ui-side-nav__section"
+          summary={section.title}
+          meta={meta}
+          defaultOpen={section.open ?? true}
+          level="inline"
+          data-section-id={section.id}
+        >
+          {list}
+        </Disclosure>
+      ) : (
+        <div class="ui-side-nav__section" data-section-id={section.id}>
+          <p class="ui-side-nav__title">
+            <span>{section.title}</span>
+            {meta !== undefined && <span class="ui-side-nav__count">{meta}</span>}
+            {section.badge && <Badge size="sm">{section.badge}</Badge>}
+          </p>
+          {list}
+        </div>
+      );
+    })
+  }
+</nav>
+
+<script>
+  import { bindNavMarkers } from "@/ui/lib/nav-marker";
+  import { bindSideNavSpies } from "@/ui/lib/spy";
+
+  function bind(): void {
+    bindSideNavSpies();
+    bindNavMarkers();
+  }
+
+  bind();
+  document.addEventListener("astro:page-load", bind);
+</script>

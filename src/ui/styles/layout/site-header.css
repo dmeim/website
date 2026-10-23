@@ -1,0 +1,200 @@
+.ui-site-header {
+  /* Dark tile must read lighter than the page. */
+  --ui-site-tile: light-dark(var(--ui-surface), color-mix(in srgb, var(--ui-text) 16%, var(--ui-bg)));
+  min-width: 0;
+}
+
+.ui-site-header__portrait {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 144px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--ui-radius-panel);
+  background: var(--ui-site-tile);
+}
+
+.ui-site-header__portrait[data-size="sm"] {
+  width: 32px;
+  border-radius: 6px;
+}
+
+/* Crop the full-length cut-out to head and shoulders. */
+.ui-site-header__portrait img {
+  position: absolute;
+  top: -1%;
+  left: -42%;
+  width: 200%;
+  max-width: none;
+  height: auto;
+}
+
+/* Rail (content pages, >=960px) */
+.ui-site-header__rail {
+  display: none;
+}
+
+.ui-site-header__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ui-space-md);
+}
+
+.ui-site-header__names {
+  display: grid;
+  gap: var(--ui-space-3xs);
+}
+
+.ui-site-header__name {
+  color: var(--ui-text);
+  font-size: var(--ui-fs-2xl);
+  font-weight: var(--ui-fw-semibold);
+  letter-spacing: var(--ui-tracking-tight);
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.ui-site-header__handle,
+.ui-site-header__status {
+  margin: 0;
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-sm);
+}
+
+.ui-site-header__role {
+  margin: 0;
+  max-width: 24rem;
+  font-size: var(--ui-fs-md);
+}
+
+.ui-site-header__status {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-xs);
+  margin-top: calc(-1 * var(--ui-space-md));
+}
+
+.ui-site-header__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ui-accent);
+}
+
+.ui-site-header__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ui-space-lg);
+  margin-top: auto;
+}
+
+.ui-site-header__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ui-site-header__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-xs);
+  color: var(--ui-text);
+  font-size: var(--ui-fs-sm);
+  text-decoration: none;
+  transition: color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-site-header__links a:hover {
+  color: var(--ui-accent);
+}
+
+/* Top bar (rail mode <960px, app mode always) */
+.ui-site-header__bar {
+  position: sticky;
+  top: 0;
+  z-index: var(--ui-z-header);
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-lg);
+  height: var(--ui-header-height);
+  padding-inline: var(--ui-gutter, var(--ui-space-md));
+  border-bottom: var(--ui-border-width) solid var(--ui-line);
+  background: var(--ui-bg);
+}
+
+.ui-site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-xs);
+  color: var(--ui-text);
+  font-weight: var(--ui-fw-semibold);
+  letter-spacing: var(--ui-tracking-tight);
+  text-decoration: none;
+}
+
+.ui-site-header__bar-nav {
+  display: none;
+  align-self: stretch;
+}
+
+.ui-site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-xs);
+  margin-left: auto;
+}
+
+.ui-site-header__bar-theme {
+  display: none;
+}
+
+.ui-site-header__drawer .ui-drawer__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-xl);
+}
+
+@media (min-width: 960px) {
+  .ui-site-header__toggle {
+    display: none;
+  }
+
+  .ui-site-header[data-shell="app"] .ui-site-header__bar-nav,
+  .ui-site-header[data-shell="app"] .ui-site-header__bar-theme {
+    display: block;
+  }
+
+  .ui-site-header[data-shell="rail"] {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    width: var(--ui-rail-width);
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .ui-site-header[data-shell="rail"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ui-site-header[data-shell="rail"] .ui-site-header__bar {
+    display: none;
+  }
+
+  .ui-site-header[data-shell="rail"] .ui-site-header__rail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-lg);
+    min-height: 100%;
+    box-sizing: border-box;
+    padding-block: var(--ui-space-4xl) var(--ui-space-xl);
+  }
+}

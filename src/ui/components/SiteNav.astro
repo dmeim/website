@@ -1,0 +1,80 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+import { defaultNavItems, isCurrentPath, type NavItem } from "@/ui/lib/site-nav";
+import Tooltip from "./Tooltip.astro";
+
+/**
+ * Primary site nav with the gliding gold current marker. Add `data-ui-site-spy`
+ * (rail only) to expand the current item with the page's spy sections.
+ */
+interface Props extends Omit<HTMLAttributes<"nav">, "class"> {
+  items?: NavItem[];
+  currentPath: string;
+  orientation?: "horizontal" | "vertical";
+  class?: string;
+}
+
+const {
+  items = defaultNavItems,
+  currentPath,
+  orientation = "horizontal",
+  class: className,
+  "aria-label": ariaLabel = "Primary",
+  ...rest
+} = Astro.props;
+const vertical = orientation === "vertical";
+---
+
+<nav
+  {...rest}
+  class={cx("ui-site-nav", className)}
+  data-orientation={orientation}
+  aria-label={ariaLabel}
+  data-ui-nav-marker
+>
+  <span class="ui-nav-marker" data-axis={vertical ? "y" : "x"} data-visible="false" aria-hidden="true"></span>
+  <ul class="ui-site-nav__list" data-ui-marker-rail={vertical ? "" : undefined}>
+    {
+      items.map(({ href, label, glyph, ariaLabel: itemLabel }) => {
+        const current = isCurrentPath(href, currentPath);
+        const link = (
+          <a
+            class="ui-site-nav__link"
+            href={href}
+            aria-current={current ? "page" : undefined}
+            aria-label={glyph ? (itemLabel ?? label) : itemLabel}
+            data-ui-marker-target
+          >
+            {glyph && !vertical ? (
+              <span class="ui-site-nav__glyph" aria-hidden="true">{glyph}</span>
+            ) : (
+              <>
+                {label}
+                {glyph && <span class="ui-site-nav__glyph" aria-hidden="true">{glyph}</span>}
+              </>
+            )}
+          </a>
+        );
+        return (
+          <li class="ui-site-nav__item">
+            {glyph && !vertical ? <Tooltip content={itemLabel ?? label} placement="bottom">{link}</Tooltip> : link}
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<script>
+  import { bindNavMarkers } from "@/ui/lib/nav-marker";
+  import { bindSiteNavSpies } from "@/ui/lib/spy";
+
+  function bind(): void {
+    bindSiteNavSpies();
+    bindNavMarkers();
+  }
+
+  bind();
+  document.addEventListener("astro:page-load", bind);
+</script>

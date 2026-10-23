@@ -95,7 +95,26 @@ function syncControls(preference: ThemePreference): void {
       }
     });
     group.setAttribute("data-value", preference);
+    group.querySelectorAll("[data-ui-theme-cycle]").forEach((button) => {
+      button.setAttribute("aria-label", `Theme: ${preference}. Switch to ${nextPreference(preference)}`);
+    });
+    syncSegmented(group as HTMLElement, preference);
   });
+}
+
+export function nextPreference(preference: ThemePreference): ThemePreference {
+  return themePreferences[(themePreferences.indexOf(preference) + 1) % themePreferences.length];
+}
+
+/** Keep a SegmentedControl-based control's thumb on the checked radio. */
+function syncSegmented(group: HTMLElement, preference: ThemePreference): void {
+  if (!group.matches(".ui-segmented-control")) return;
+  const index = themePreferences.indexOf(preference);
+  const wasHidden = group.dataset.selected !== "true";
+  if (wasHidden) group.dataset.instant = "true";
+  group.style.setProperty("--ui-seg-index", String(index));
+  group.dataset.selected = "true";
+  if (wasHidden) requestAnimationFrame(() => requestAnimationFrame(() => delete group.dataset.instant));
 }
 
 /**
@@ -113,6 +132,13 @@ export function bindThemeControls(root: ParentNode = document): void {
       if (isThemePreference(value)) setThemePreference(value);
     });
     group.addEventListener("click", (event) => {
+      const cycle = event.target instanceof Element
+        ? event.target.closest("button[data-ui-theme-cycle]")
+        : null;
+      if (cycle) {
+        setThemePreference(nextPreference(getThemePreference()));
+        return;
+      }
       const target = event.target instanceof Element
         ? event.target.closest("button[data-ui-theme-value]")
         : null;

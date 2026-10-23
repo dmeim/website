@@ -1,0 +1,83 @@
+/* Marker styles live in styles/layout/site-nav.css (.ui-nav-marker). */
+.ui-side-nav {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-lg);
+  min-width: 0;
+}
+
+.ui-side-nav__header {
+  display: grid;
+  gap: var(--ui-space-xs);
+}
+
+.ui-side-nav__title,
+.ui-side-nav__section > .ui-disclosure__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-xs);
+  margin: 0 0 var(--ui-space-xs);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-medium);
+  letter-spacing: var(--ui-tracking-wide);
+  text-transform: uppercase;
+}
+
+.ui-side-nav__count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+.ui-side-nav__section > .ui-disclosure__summary .ui-disclosure__meta {
+  font-size: var(--ui-fs-xs);
+}
+
+.ui-side-nav__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 0 0 var(--ui-space-md);
+  border-left: var(--ui-border-width) solid var(--ui-line);
+  list-style: none;
+}
+
+.ui-side-nav__link {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-xs);
+  width: 100%;
+  padding: 0.3125rem 0;
+  border: 0;
+  background: none;
+  color: var(--ui-text-muted);
+  font: inherit;
+  font-size: var(--ui-fs-sm);
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-side-nav__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-side-nav__link:hover,
+.ui-side-nav__link[aria-current] {
+  color: var(--ui-text);
+}
+
+.ui-side-nav__link[aria-current="page"] {
+  font-weight: var(--ui-fw-medium);
+}
+
+.ui-side-nav__link:disabled {
+  color: var(--ui-text-disabled);
+  cursor: not-allowed;
+}

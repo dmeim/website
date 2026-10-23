@@ -1,0 +1,60 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import { cx } from "@/ui/lib/cx";
+import { createId } from "@/ui/lib/ids";
+import SegmentedControl from "./SegmentedControl.astro";
+
+/** Light / system / dark preference. Bound by `bindThemeControls` (`@/ui/lib/theme`). */
+interface Props extends Omit<HTMLAttributes<"div">, "class"> {
+  appearance?: "segmented" | "cycle" | "text";
+  size?: "sm" | "md";
+  class?: string;
+}
+
+const { appearance = "segmented", size = "md", class: className, ...rest } = Astro.props;
+const options = [
+  { value: "light", label: "Light", icon: "sun" as const },
+  { value: "system", label: "System", icon: "circle-half" as const },
+  { value: "dark", label: "Dark", icon: "moon" as const },
+];
+---
+
+{
+  appearance === "segmented" ? (
+    <SegmentedControl
+      {...rest}
+      class={cx("ui-theme-control", className)}
+      name={createId("theme")}
+      label="Theme"
+      labelHidden
+      size={size}
+      options={options.map((option) => ({ ...option, iconOnly: true }))}
+      data-appearance="segmented"
+      data-ui-theme-control
+    />
+  ) : appearance === "cycle" ? (
+    <div {...rest} class={cx("ui-theme-control", className)} data-appearance="cycle" data-size={size} data-ui-theme-control>
+      <button type="button" class="ui-icon-button" data-variant="ghost" data-size={size} aria-label="Theme" data-ui-theme-cycle>
+        {options.map((option) => (
+          <Icon name={option.icon} class="ui-icon-button__icon ui-theme-control__glyph" />
+        ))}
+      </button>
+    </div>
+  ) : (
+    <div {...rest} class={cx("ui-theme-control", className)} data-appearance="text" data-size={size} role="group" aria-label="Theme" data-ui-theme-control>
+      {options.map((option) => (
+        <button type="button" class="ui-theme-control__text" data-ui-theme-value={option.value} aria-pressed="false">
+          {option.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+<script>
+  import { bindThemeControls } from "@/ui/lib/theme";
+
+  bindThemeControls();
+  document.addEventListener("astro:page-load", () => bindThemeControls());
+</script>

@@ -1,0 +1,26 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+
+interface Props extends Omit<HTMLAttributes<"footer">, "class"> {
+  immersive?: boolean;
+  class?: string;
+}
+
+const { immersive = false, class: className, ...rest } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+{
+  !immersive && (
+    <footer {...rest} class={cx("ui-site-footer", className)}>
+      <p class="ui-site-footer__line">
+        <span>&copy; {year} Dimitri</span>
+        <span class="ui-site-footer__sep" aria-hidden="true">·</span>
+        <a href="/connect">Connect</a>
+        <span class="ui-site-footer__sep" aria-hidden="true">·</span>
+        <a href="/keys">Keys</a>
+      </p>
+    </footer>
+  )
+}

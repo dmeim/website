@@ -1,0 +1,116 @@
+/* SiteNav + the shared gliding gold marker (also used by SideNav). */
+.ui-site-nav {
+  position: relative;
+  min-width: 0;
+}
+
+.ui-site-nav__list,
+.ui-site-nav__sub {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ui-site-nav__link,
+.ui-site-nav__sublink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2xs);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-sm);
+  text-decoration: none;
+  transition: color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-site-nav__link:hover,
+.ui-site-nav__link[aria-current],
+.ui-site-nav__sublink:hover,
+.ui-site-nav__sublink[aria-current] {
+  color: var(--ui-text);
+}
+
+.ui-site-nav__glyph {
+  font-size: var(--ui-fs-md);
+  line-height: 1;
+}
+
+/* vertical */
+.ui-site-nav[data-orientation="vertical"] .ui-site-nav__list {
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--ui-space-md);
+  border-left: var(--ui-border-width) solid var(--ui-line);
+}
+
+.ui-site-nav[data-orientation="vertical"] .ui-site-nav__link,
+.ui-site-nav__sublink {
+  display: flex;
+  padding-block: 0.3125rem;
+}
+
+.ui-site-nav[data-orientation="vertical"] .ui-site-nav__link[aria-current="page"] {
+  font-weight: var(--ui-fw-medium);
+}
+
+.ui-site-nav__sub {
+  padding-left: var(--ui-space-sm);
+}
+
+.ui-site-nav__sublink {
+  font-size: var(--ui-fs-xs);
+  padding-block: var(--ui-space-3xs);
+}
+
+/* horizontal */
+.ui-site-nav[data-orientation="horizontal"] .ui-site-nav__list {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-lg);
+}
+
+.ui-site-nav[data-orientation="horizontal"] .ui-site-nav__link {
+  height: var(--ui-header-height);
+}
+
+/* Shared marker. --ui-spy-* are set by src/ui/lib/nav-marker.ts. */
+.ui-nav-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  border-radius: 2px;
+  background: var(--ui-accent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ui-nav-marker[data-axis="y"] {
+  width: 2px;
+  height: var(--ui-spy-h, 1.5rem);
+  margin-left: -0.5px;
+  transform: translate(var(--ui-spy-x, 0), var(--ui-spy-y, 0));
+  transition:
+    transform var(--ui-dur-glide) var(--ui-ease-out),
+    height var(--ui-dur-glide) var(--ui-ease-out),
+    opacity var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-nav-marker[data-axis="x"] {
+  top: auto;
+  bottom: 0;
+  width: var(--ui-spy-w, 0);
+  height: 2px;
+  transform: translateX(var(--ui-spy-x, 0));
+  transition:
+    transform var(--ui-dur-glide) var(--ui-ease-out),
+    width var(--ui-dur-glide) var(--ui-ease-out),
+    opacity var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-nav-marker[data-visible="true"] {
+  opacity: 1;
+}
+
+.ui-nav-marker[data-instant] {
+  transition: opacity var(--ui-dur-fast) var(--ui-ease-out);
+}
