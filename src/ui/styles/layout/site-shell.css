@@ -1,0 +1,50 @@
+/* Page grid around SiteHeader, main and SiteFooter (BaseLayout). */
+
+/* App and immersive pages keep the body flex column (main fills the rest). */
+.ui-site-shell {
+  display: contents;
+}
+
+.ui-site-shell > .ui-site-footer {
+  padding-inline: var(--ui-gutter);
+}
+
+@media (min-width: 960px) {
+  .ui-site-shell[data-shell="rail"] {
+    display: grid;
+    flex: 1 0 auto;
+    grid-template-columns: var(--ui-rail-width) minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    column-gap: var(--ui-rail-gap);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: calc(var(--ui-rail-width) + var(--ui-rail-gap) + var(--ui-content-wide) + 2 * var(--ui-gutter));
+    margin-inline: auto;
+    padding-inline: var(--ui-gutter);
+  }
+
+  .ui-site-shell[data-shell="rail"] > .ui-site-header {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .ui-site-shell[data-shell="rail"] > .site-main {
+    grid-column: 2;
+    grid-row: 1;
+    width: auto;
+    min-width: 0;
+    margin-inline: 0;
+    padding-block: var(--ui-space-4xl) var(--ui-space-3xl);
+  }
+
+  .ui-site-shell[data-shell="rail"] > .ui-site-footer {
+    grid-column: 2;
+    grid-row: 2;
+    padding-inline: 0;
+  }
+
+  /* No top bar on rail pages at this width. */
+  html:has(body[data-shell="rail"]) {
+    scroll-padding-top: var(--ui-space-md);
+  }
+}

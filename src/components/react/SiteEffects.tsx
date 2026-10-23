@@ -13,6 +13,9 @@ import LifeField from "./LifeField";
  */
 const SITE_FIELD_MODE: "wave" | "life" = "life";
 
+/** The Profile design is flat: the ambient field stays off unless re-enabled here. */
+const AMBIENT_ENABLED = false;
+
 function normalizePath(pathname: string): string {
   const trimmed = pathname.replace(/\/+$/, "");
   return trimmed.length === 0 ? "/" : trimmed;
@@ -32,9 +35,12 @@ function shouldHideLifeAmbient(pathname: string): boolean {
 export default function SiteEffects() {
   // Mount Life/wave immediately — do not start stuck on "none".
   // Sim route clears Life after mount so it doesn't compete with the simulator.
-  const [field, setField] = useState<"wave" | "life" | "none">(SITE_FIELD_MODE);
+  const [field, setField] = useState<"wave" | "life" | "none">(
+    AMBIENT_ENABLED ? SITE_FIELD_MODE : "none",
+  );
 
   useEffect(() => {
+    if (!AMBIENT_ENABLED) return;
     if (
       SITE_FIELD_MODE === "life" &&
       shouldHideLifeAmbient(window.location.pathname)

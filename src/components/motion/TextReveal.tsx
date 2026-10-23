@@ -1,3 +1,4 @@
+import { uiDur, uiEase } from "@/ui/lib/motion";
 import { motion, useReducedMotion } from "framer-motion";
 import "./TextReveal.css";
 
@@ -12,7 +13,7 @@ type TextRevealProps = {
   id?: string;
 };
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+const EASE = uiEase;
 
 const motionTags = {
   h1: motion.h1,
@@ -65,7 +66,7 @@ export function TextReveal({
               visible: {
                 y: "0%",
                 transition: {
-                  duration: 0.7,
+                  duration: uiDur.slow,
                   ease: EASE,
                   delay: delay + i * 0.045,
                 },

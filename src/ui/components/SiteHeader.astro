@@ -115,6 +115,18 @@ const toggleId = menuId === "mobile-nav" ? "nav-toggle" : `${menuId}-toggle`;
 }
 
 <script>
+  import { closeDrawer } from "@/ui/lib/overlay";
+
+  const wideQuery = window.matchMedia("(min-width: 960px)");
+
+  /** The menu has no trigger at >=960px, so close it when the viewport widens. */
+  function closeSiteMenusWhenWide(): void {
+    if (!wideQuery.matches) return;
+    document.querySelectorAll<HTMLElement>("[data-ui-site-menu][data-state='open']").forEach((drawer) => {
+      closeDrawer(drawer, false);
+    });
+  }
+
   /** Mirror the Drawer state onto the legacy `data-open` / `.is-open` hooks. */
   function bindSiteMenus(): void {
     document.querySelectorAll<HTMLElement>("[data-ui-site-menu]").forEach((drawer) => {
@@ -133,6 +145,7 @@ const toggleId = menuId === "mobile-nav" ? "nav-toggle" : `${menuId}-toggle`;
     });
   }
 
+  wideQuery.addEventListener("change", closeSiteMenusWhenWide);
   bindSiteMenus();
   document.addEventListener("astro:page-load", bindSiteMenus);
 </script>

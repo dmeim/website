@@ -19,10 +19,9 @@ function isLightTheme(): boolean {
 
 function readInkRgb(): string {
   const styles = getComputedStyle(document.documentElement);
-  const preferred = isLightTheme() ? "--color-black" : "--color-cream";
-  const raw =
-    styles.getPropertyValue(preferred).trim() ||
-    styles.getPropertyValue("--color-ink").trim();
+  const raw = styles.getPropertyValue("--ui-ambient").trim();
+  const rgb = raw.match(/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/);
+  if (rgb) return `${rgb[1]}, ${rgb[2]}, ${rgb[3]}`;
   if (/^#[0-9a-fA-F]{6}$/.test(raw)) {
     const n = parseInt(raw.slice(1), 16);
     return `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;

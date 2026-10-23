@@ -1,3 +1,4 @@
+import { uiDur, uiEase } from "@/ui/lib/motion";
 import { motion, useReducedMotion, type HTMLMotionProps } from "framer-motion";
 import type { ReactNode } from "react";
 
@@ -9,7 +10,7 @@ type RevealProps = {
   once?: boolean;
 } & Omit<HTMLMotionProps<"div">, "children" | "className">;
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+const EASE = uiEase;
 
 export function Reveal({
   children,
@@ -31,7 +32,7 @@ export function Reveal({
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once, margin: "-10%" }}
-      transition={{ duration: 0.75, ease: EASE, delay }}
+      transition={{ duration: uiDur.slow, ease: EASE, delay }}
       {...rest}
     >
       {children}

@@ -4,11 +4,16 @@ import SiteEffects from "../components/react/SiteEffects";
 import "../styles/global.css";
 import "@/ui/index.css";
 import Fonts from "@/ui/fonts/Fonts.astro";
+import SiteFooter from "@/ui/components/SiteFooter.astro";
+import SiteHeader from "@/ui/components/SiteHeader.astro";
+import SkipLink from "@/ui/components/SkipLink.astro";
+import Toaster from "@/ui/components/Toaster.astro";
+import { shellMode } from "@/ui/lib/site-nav";
 
 interface Props {
   title?: string;
   description?: string;
-  /** Full-bleed main under the site header; hides footer. */
+  /** Full-bleed main, no footer. Outside /tools and /chat it also drops the site header. */
   immersive?: boolean;
   /** Adds robots noindex (e.g. the /ui showcase). */
   noindex?: boolean;
@@ -24,23 +29,8 @@ const {
 const pageTitle = title === "dmeim.com" ? title : `${title} · dmeim.com`;
 
 const pathname = Astro.url.pathname;
-
-// U+FE0E keeps the cross as a text glyph instead of an emoji on iOS.
-const nav: { href: string; label: string; glyph?: string }[] = [
-  { href: "/", label: "Home" },
-  { href: "/orthodox", label: "Orthodox", glyph: "☦︎" },
-  { href: "/projects", label: "Projects" },
-  { href: "/tools", label: "Tools" },
-  { href: "/keys", label: "Keys" },
-  { href: "/connect", label: "Connect" },
-];
-
-function isCurrent(href: string): boolean {
-  if (href === "/") return pathname === "/" || pathname === "";
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-const year = new Date().getFullYear();
+// Tools and chat keep the app bar even though their main is full-bleed.
+const mode = shellMode(pathname, immersive && shellMode(pathname) !== "app");
 ---
 
 <!doctype html>
@@ -51,12 +41,6 @@ const year = new Date().getFullYear();
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Previous: Instrument Serif + Manrope + Syne
-    <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    -->
     <Fonts />
     {noindex ? <meta name="robots" content="noindex" /> : null}
     <title>{pageTitle}</title>
@@ -88,211 +72,26 @@ const year = new Date().getFullYear();
     </script>
     <ClientRouter />
   </head>
-  <body class:list={[{ "is-immersive": immersive }]}>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="site-brand" href="/">dmeim</a>
+  <body class:list={[{ "is-immersive": immersive }]} data-shell={mode}>
+    <SkipLink />
+    <div class="ui-site-shell" data-shell={mode}>
+      <SiteHeader currentPath={pathname} immersive={mode === "immersive"} />
+      <main
+        class:list={["site-main", { "site-main--immersive": immersive }]}
+        id="main"
+      >
+        <slot />
+      </main>
+      <SiteFooter immersive={immersive} />
+    </div>
 
-        <nav
-          class="site-nav sliding-thumb sliding-thumb--measured"
-          aria-label="Primary"
-        >
-          <span class="sliding-thumb__thumb" aria-hidden="true"></span>
-          {
-            nav.map(({ href, label, glyph }) => (
-              <a
-                class:list={["sliding-thumb__option", { "site-nav__glyph": glyph }]}
-                href={href}
-                aria-current={isCurrent(href) ? "page" : undefined}
-                aria-label={glyph ? label : undefined}
-                title={glyph ? label : undefined}
-              >
-                {glyph ?? label}
-              </a>
-            ))
-          }
-        </nav>
-
-        <div class="site-header__actions">
-          <div id="theme-toggle-host" class="theme-toggle-host"></div>
-
-          <button
-            type="button"
-            class="nav-toggle"
-            id="nav-toggle"
-            aria-label="Open menu"
-            aria-controls="mobile-nav"
-            aria-expanded="false"
-          >
-            <span class="nav-toggle__bars" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <nav
-      class="mobile-nav"
-      id="mobile-nav"
-      aria-label="Mobile"
-      data-open="false"
-    >
-      {
-        nav.map(({ href, label, glyph }) => (
-          <a href={href} aria-current={isCurrent(href) ? "page" : undefined}>
-            {glyph ? `${glyph} ${label}` : label}
-          </a>
-        ))
-      }
-    </nav>
-
-    <main
-      class:list={["site-main", { "site-main--immersive": immersive }]}
-      id="main"
-    >
-      <slot />
-    </main>
-
-    {
-      !immersive ? (
-        <footer class="site-footer">
-          <p class="site-footer__line">
-            &copy; {year} dmeim — Dimitri · hello@dmeim.com
-          </p>
-        </footer>
-      ) : null
-    }
-
+    <Toaster />
     <SiteEffects client:load />
 
     <script>
-      import "../scripts/theme-toggle";
-      import "../scripts/site-nav-thumb";
       import { initReveals } from "@/ui/lib/reveal";
 
       initReveals();
-    </script>
-
-    <script is:inline>
-      (function () {
-        function bindMobileNav() {
-          var toggle = document.getElementById("nav-toggle");
-          var drawer = document.getElementById("mobile-nav");
-          if (!toggle || !drawer) return;
-
-          var lastFocus = null;
-
-          function focusables() {
-            return Array.prototype.slice.call(
-              drawer.querySelectorAll(
-                'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-              ),
-            );
-          }
-
-          function isOpen() {
-            return drawer.getAttribute("data-open") === "true";
-          }
-
-          function openNav() {
-            lastFocus = document.activeElement;
-            drawer.setAttribute("data-open", "true");
-            drawer.classList.add("is-open");
-            toggle.setAttribute("aria-expanded", "true");
-            toggle.setAttribute("aria-label", "Close menu");
-            document.body.style.overflow = "hidden";
-            var items = focusables();
-            if (items.length) items[0].focus();
-          }
-
-          function closeNav() {
-            drawer.setAttribute("data-open", "false");
-            drawer.classList.remove("is-open");
-            toggle.setAttribute("aria-expanded", "false");
-            toggle.setAttribute("aria-label", "Open menu");
-            document.body.style.overflow = "";
-            if (lastFocus && typeof lastFocus.focus === "function") {
-              try {
-                lastFocus.focus();
-              } catch (_) {}
-            }
-          }
-
-          closeNav();
-
-          if (toggle.dataset.bound === "1") return;
-          toggle.dataset.bound = "1";
-
-          toggle.addEventListener("click", function () {
-            if (isOpen()) closeNav();
-            else openNav();
-          });
-
-          drawer.addEventListener("click", function (e) {
-            if (e.target.tagName === "A") closeNav();
-          });
-
-          if (!window.__dmeimNavListeners) {
-            window.__dmeimNavListeners = true;
-
-            document.addEventListener("keydown", function (e) {
-              var t = document.getElementById("nav-toggle");
-              var d = document.getElementById("mobile-nav");
-              if (!t || !d || d.getAttribute("data-open") !== "true") return;
-
-              if (e.key === "Escape") {
-                e.preventDefault();
-                d.setAttribute("data-open", "false");
-                d.classList.remove("is-open");
-                t.setAttribute("aria-expanded", "false");
-                t.setAttribute("aria-label", "Open menu");
-                document.body.style.overflow = "";
-                t.focus();
-                return;
-              }
-
-              if (e.key !== "Tab") return;
-
-              var items = Array.prototype.slice.call(
-                d.querySelectorAll(
-                  'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-                ),
-              );
-              if (!items.length) return;
-
-              var first = items[0];
-              var last = items[items.length - 1];
-              var active = document.activeElement;
-
-              if (e.shiftKey && (active === first || active === t)) {
-                e.preventDefault();
-                last.focus();
-              } else if (!e.shiftKey && active === last) {
-                e.preventDefault();
-                first.focus();
-              }
-            });
-
-            window.addEventListener("resize", function () {
-              if (!window.matchMedia("(min-width: 769px)").matches) return;
-              var t = document.getElementById("nav-toggle");
-              var d = document.getElementById("mobile-nav");
-              if (!t || !d || d.getAttribute("data-open") !== "true") return;
-              d.setAttribute("data-open", "false");
-              d.classList.remove("is-open");
-              t.setAttribute("aria-expanded", "false");
-              t.setAttribute("aria-label", "Open menu");
-              document.body.style.overflow = "";
-            });
-          }
-        }
-
-        bindMobileNav();
-        document.addEventListener("astro:page-load", bindMobileNav);
-      })();
     </script>
   </body>
 </html>
