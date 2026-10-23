@@ -1,0 +1,20 @@
+---
+/** Renders its slot twice: once in a light and once in a dark theme column. */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const html = await Astro.slots.render("default");
+---
+
+<div class:list={["ui-showcase-pair", className]}>
+  <div class="ui-showcase-pair__col" data-theme="light">
+    <p class="ui-showcase-pair__label">Light</p>
+    <Fragment set:html={html} />
+  </div>
+  <div class="ui-showcase-pair__col" data-theme="dark">
+    <p class="ui-showcase-pair__label">Dark</p>
+    <Fragment set:html={html} />
+  </div>
+</div>

@@ -1,0 +1,173 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/ui/icons/Icon.astro";
+import { iconNames, uiColorTokenNames } from "@/ui";
+import ThemePair from "@/ui/showcase/ThemePair.astro";
+import Text from "@/ui/showcase/Text.astro";
+import Actions from "@/ui/showcase/Actions.astro";
+import Forms from "@/ui/showcase/Forms.astro";
+import Display from "@/ui/showcase/Display.astro";
+import Feedback from "@/ui/showcase/Feedback.astro";
+import Overlays from "@/ui/showcase/Overlays.astro";
+import Navigation from "@/ui/showcase/Navigation.astro";
+import Layout from "@/ui/showcase/Layout.astro";
+import Composites from "@/ui/showcase/Composites.astro";
+
+const typeScale = ["3xl", "2xl", "xl", "lg", "md", "sm", "xs", "2xs"];
+const spaceSteps = ["3xs", "2xs", "xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"];
+const radii = ["xs", "control", "panel", "dialog", "pill"];
+const durations = ["instant", "fast", "base", "slow", "glide"];
+const weights = ["regular", "bold", "fill"] as const;
+const groups = [
+  "tokens",
+  "icons",
+  "text",
+  "actions",
+  "forms",
+  "display",
+  "feedback",
+  "overlays",
+  "navigation",
+  "layout",
+  "composites",
+];
+---
+
+<BaseLayout title="UI library" description="Profile UI library showcase." noindex>
+  <div class="ui-showcase" id="ui-showcase">
+    <header class="ui-showcase__header">
+      <div>
+        <h1>UI library</h1>
+        <p class="ui-showcase__lede">Every token and component, in both themes.</p>
+      </div>
+      <label class="ui-showcase__toggle">
+        <input type="checkbox" id="ui-show-focus" />
+        Show focus
+      </label>
+    </header>
+
+    <nav aria-label="Showcase sections">
+      <ul class="ui-showcase__toc">
+        {groups.map((g) => <li><a href={`#${g}`}>{g}</a></li>)}
+      </ul>
+    </nav>
+
+    <section id="tokens" class="ui-showcase-section" aria-labelledby="tokens-title">
+      <h2 id="tokens-title" class="ui-showcase-section__title">Tokens</h2>
+      <ThemePair>
+        <div class="ui-sheet" tabindex="0">
+          <h3 class="ui-showcase-sub">Colour</h3>
+          <div class="ui-swatches">
+            {
+              uiColorTokenNames.map((name) => (
+                <div class="ui-swatch">
+                  <span class="ui-swatch__chip" style={`background: var(${name})`} />
+                  <code class="ui-swatch__name">{name.replace("--ui-", "")}</code>
+                </div>
+              ))
+            }
+          </div>
+
+          <h3 class="ui-showcase-sub">Type</h3>
+          <div class="ui-token-rows">
+            {
+              typeScale.map((step) => (
+                <div class="ui-token-row">
+                  <code class="ui-token-name">--ui-fs-{step}</code>
+                  <span class="ui-type-sample" style={`font-size: var(--ui-fs-${step})`}>
+                    Dimitri builds quiet tools
+                  </span>
+                </div>
+              ))
+            }
+            <div class="ui-token-row">
+              <code class="ui-token-name">--ui-font-mono</code>
+              <span class="ui-type-sample" style="font-family: var(--ui-font-mono)">
+                const x = 42;
+              </span>
+            </div>
+          </div>
+
+          <h3 class="ui-showcase-sub">Space</h3>
+          <div class="ui-token-rows">
+            {
+              spaceSteps.map((step) => (
+                <div class="ui-token-row">
+                  <code class="ui-token-name">--ui-space-{step}</code>
+                  <span class="ui-space-bar" style={`width: var(--ui-space-${step})`} />
+                </div>
+              ))
+            }
+          </div>
+
+          <h3 class="ui-showcase-sub">Radius</h3>
+          <div class="ui-token-rows">
+            {
+              radii.map((r) => (
+                <div class="ui-token-row">
+                  <code class="ui-token-name">--ui-radius-{r}</code>
+                  <span class="ui-radius-sample" style={`border-radius: var(--ui-radius-${r})`} />
+                </div>
+              ))
+            }
+          </div>
+
+          <h3 class="ui-showcase-sub">Motion (hover or focus the sheet)</h3>
+          <div class="ui-token-rows">
+            {
+              durations.map((d) => (
+                <div class="ui-token-row">
+                  <code class="ui-token-name">--ui-dur-{d}</code>
+                  <span class="ui-motion-track">
+                    <span class="ui-motion-dot" style={`transition-duration: var(--ui-dur-${d})`} />
+                  </span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </ThemePair>
+    </section>
+
+    <section id="icons" class="ui-showcase-section" aria-labelledby="icons-title">
+      <h2 id="icons-title" class="ui-showcase-section__title">Icons ({iconNames.length})</h2>
+      <ul class="ui-icon-grid">
+        {
+          iconNames.map((name) => (
+            <li class="ui-icon-grid__item">
+              <span class="ui-icon-grid__glyphs">
+                {weights.map((weight) => <Icon name={name} weight={weight} />)}
+              </span>
+              <code class="ui-token-name">{name}</code>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <Text />
+    <Actions />
+    <Forms />
+    <Display />
+    <Feedback />
+    <Overlays />
+    <Navigation />
+    <Layout />
+    <Composites />
+  </div>
+
+  <script>
+    function bindShowFocus(): void {
+      const toggle = document.getElementById("ui-show-focus") as HTMLInputElement | null;
+      const root = document.getElementById("ui-showcase");
+      if (!toggle || !root || toggle.dataset.bound === "1") return;
+      toggle.dataset.bound = "1";
+      const sync = () => root.classList.toggle("ui-show-focus", toggle.checked);
+      toggle.addEventListener("change", sync);
+      sync();
+    }
+
+    bindShowFocus();
+    document.addEventListener("astro:page-load", bindShowFocus);
+  </script>
+</BaseLayout>

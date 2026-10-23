@@ -1,0 +1,203 @@
+/*
+ * Profile base: reset and element defaults. Loads after tokens.css.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--ui-header-height) + var(--ui-space-md));
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  font-family: var(--ui-font-body);
+  font-size: var(--ui-fs-md);
+  font-weight: var(--ui-fw-regular);
+  line-height: var(--ui-lh-normal);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition:
+    background-color 200ms var(--ui-ease-out),
+    color 200ms var(--ui-ease-out);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-family: var(--ui-font-display);
+  font-weight: var(--ui-fw-semibold);
+  letter-spacing: var(--ui-tracking-tight);
+  line-height: var(--ui-lh-tight);
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--ui-fs-3xl); }
+h2 { font-size: var(--ui-fs-2xl); }
+h3 { font-size: var(--ui-fs-xl); line-height: var(--ui-lh-snug); }
+h4 { font-size: var(--ui-fs-lg); line-height: var(--ui-lh-snug); }
+h5,
+h6 { font-size: var(--ui-fs-md); line-height: var(--ui-lh-snug); }
+
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--ui-accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  transition:
+    color var(--ui-dur-fast) var(--ui-ease-out),
+    text-decoration-color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+a:hover {
+  text-decoration-color: currentColor;
+}
+
+:focus-visible {
+  outline: var(--ui-focus-width) solid var(--ui-focus-ring);
+  outline-offset: var(--ui-focus-offset);
+  border-radius: 4px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.ui-show-focus :focus {
+  outline: var(--ui-focus-width) solid var(--ui-focus-ring);
+  outline-offset: var(--ui-focus-offset);
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--ui-selection);
+  color: var(--ui-text);
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--ui-font-mono);
+}
+
+code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: var(--ui-bg-inset);
+  font-size: 0.875em;
+}
+
+pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+
+kbd {
+  display: inline-block;
+  padding: 0 0.4em;
+  border: var(--ui-border-width) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-xs);
+  background: var(--ui-bg-inset);
+  color: var(--ui-text-muted);
+  font-size: 0.8125em;
+  line-height: 1.6;
+}
+
+hr {
+  height: 0;
+  margin: var(--ui-space-lg) 0;
+  border: 0;
+  border-top: var(--ui-border-width) solid var(--ui-line);
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+svg.ui-icon {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Reveal: hidden only when JS is present to reveal it again. */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(var(--ui-reveal-distance));
+  transition:
+    opacity var(--ui-dur-slow) var(--ui-ease-out),
+    transform var(--ui-dur-slow) var(--ui-ease-out);
+  transition-delay: min(calc(var(--reveal-index, 0) * 40ms), 280ms);
+}
+
+html.js [data-reveal][data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ui-dur-instant: 0.01ms;
+    --ui-dur-fast: 0.01ms;
+    --ui-dur-base: 0.01ms;
+    --ui-dur-slow: 0.01ms;
+    --ui-dur-glide: 0.01ms;
+    --ui-reveal-distance: 0;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  html.js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

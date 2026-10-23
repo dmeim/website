@@ -1,0 +1,9 @@
+/* Profile UI library entry. Imported once by BaseLayout, after global.css. */
+@import "./tokens.css";
+@import "./base.css";
+@import "./legacy.css";
+
+/* Layout stylesheets (styles/layout/*.css) */
+@import "./styles/layout/showcase.css";
+
+/* Component stylesheets (styles/components/*.css): append one line per component. */

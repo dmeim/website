@@ -1,0 +1,281 @@
+/*
+ * Profile design tokens. Names follow docs/12-UI-Library-Spec.md §3; values
+ * are this design's. Flat: colour, spacing and hairlines carry hierarchy.
+ */
+
+:root {
+  /* Type: Inter only; code falls back to the system mono stack (no webfont). */
+  --ui-font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ui-font-display: var(--ui-font-body);
+  --ui-font-mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --ui-fs-2xs: 0.75rem;
+  --ui-fs-xs: 0.8125rem;
+  --ui-fs-sm: 0.875rem;
+  --ui-fs-md: 0.9375rem;
+  --ui-fs-lg: 1.0625rem;
+  --ui-fs-xl: 1.25rem;
+  --ui-fs-2xl: 1.5rem;
+  --ui-fs-3xl: clamp(1.75rem, 1.45rem + 1.2vw, 2.25rem);
+
+  --ui-fw-regular: 400;
+  --ui-fw-medium: 500;
+  --ui-fw-semibold: 600;
+
+  --ui-lh-tight: 1.2;
+  --ui-lh-snug: 1.4;
+  --ui-lh-normal: 1.6;
+  --ui-lh-relaxed: 1.75;
+
+  --ui-tracking-tight: -0.015em;
+  --ui-tracking-normal: 0;
+  --ui-tracking-wide: 0.04em;
+
+  --ui-measure: 65ch;
+
+  /* Space */
+  --ui-space-3xs: 0.125rem;
+  --ui-space-2xs: 0.25rem;
+  --ui-space-xs: 0.5rem;
+  --ui-space-sm: 0.75rem;
+  --ui-space-md: 1rem;
+  --ui-space-lg: 1.5rem;
+  --ui-space-xl: 2rem;
+  --ui-space-2xl: 3rem;
+  --ui-space-3xl: 4rem;
+  --ui-space-4xl: 5.5rem;
+
+  /* Layout */
+  --ui-gutter: clamp(16px, 4vw, 2.5rem);
+  --ui-content-narrow: 40rem;
+  --ui-content: 46rem;
+  --ui-content-wide: 64rem;
+  --ui-section-gap: clamp(2.25rem, 1.5rem + 2vw, 3rem);
+  --ui-header-height: 3.5rem;
+  --ui-sidebar-width: 17.5rem;
+  /* Profile-only: the sticky identity rail beside content pages. */
+  --ui-rail-width: 320px;
+  --ui-rail-gap: clamp(3rem, 6vw, 6rem);
+  /* Profile-only: leading label column in rows (ListRow, KeyValue). */
+  --ui-label-col: 7rem;
+
+  --ui-control-sm: 1.875rem;
+  --ui-control-md: 2.25rem;
+  --ui-control-lg: 2.75rem;
+
+  --ui-icon-sm: 0.875rem;
+  --ui-icon-md: 1.125rem;
+  --ui-icon-lg: 1.375rem;
+
+  /* Shape */
+  --ui-border-width: 1px;
+  --ui-radius-xs: 4px;
+  --ui-radius-control: 8px;
+  --ui-radius-panel: 8px;
+  --ui-radius-dialog: 12px;
+  --ui-radius-pill: 999px;
+  --ui-shadow-overlay: none;
+
+  /* Motion */
+  --ui-dur-instant: 80ms;
+  --ui-dur-fast: 160ms;
+  --ui-dur-base: 240ms;
+  --ui-dur-slow: 360ms;
+  --ui-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ui-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ui-ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  --ui-press-scale: 1;
+  --ui-reveal-distance: 6px;
+  /* Profile signature: the gold marker glide (nav, side nav, tabs). */
+  --ui-dur-glide: 320ms;
+
+  /* Focus */
+  --ui-focus-width: 2px;
+  --ui-focus-offset: 2px;
+
+  /* Z layers (fixed across designs) */
+  --ui-z-ambient: -1;
+  --ui-z-base: 0;
+  --ui-z-sticky: 10;
+  --ui-z-header: 50;
+  --ui-z-drawer: 60;
+  --ui-z-popover: 70;
+  --ui-z-dialog: 80;
+  --ui-z-toast: 90;
+  --ui-z-tooltip: 95;
+  --ui-z-grain: 100;
+}
+
+/* Light (also the no-JS default) */
+:root:not([data-theme]),
+:root[data-theme="light"],
+[data-theme="light"] {
+  color-scheme: light;
+
+  --ui-bg: #f6f4ef;
+  --ui-bg-inset: #efece6;
+  --ui-surface: #eeebe4;
+  --ui-surface-hover: #e9e5dd;
+  --ui-surface-active: #e3dfd6;
+  --ui-field: transparent;
+  --ui-field-hover: transparent;
+  --ui-popover: #fbfaf7;
+  --ui-overlay: rgb(23 22 20 / 32%);
+
+  --ui-line: rgb(23 22 20 / 10%);
+  --ui-line-strong: rgb(23 22 20 / 18%);
+  --ui-line-field: rgb(23 22 20 / 18%);
+
+  --ui-text: #171614;
+  --ui-text-muted: #6d6961;
+  --ui-text-subtle: #7b766e;
+  --ui-text-disabled: #b3aea5;
+
+  --ui-ink: #171614;
+  --ui-ink-hover: #34322e;
+  --ui-on-ink: #f6f4ef;
+
+  --ui-accent: #8a6d3b;
+  --ui-accent-hover: #6f5630;
+  --ui-accent-soft: rgb(138 109 59 / 12%);
+  --ui-accent-text: #8a6d3b;
+  --ui-on-accent: #ffffff;
+
+  --ui-success: #3d6b48;
+  --ui-success-soft: rgb(61 107 72 / 11%);
+  --ui-warning: #8a5a12;
+  --ui-warning-soft: rgb(138 90 18 / 11%);
+  --ui-danger: #a3442c;
+  --ui-danger-soft: rgb(163 68 44 / 10%);
+  --ui-info: #4a5a6b;
+  --ui-info-soft: rgb(74 90 107 / 10%);
+  --ui-live: var(--ui-accent);
+
+  --ui-diff-add: #2f6b3f;
+  --ui-diff-add-soft: rgb(47 107 63 / 13%);
+  --ui-diff-remove: #a3442c;
+  --ui-diff-remove-soft: rgb(163 68 44 / 12%);
+  --ui-highlight: rgb(207 178 122 / 38%);
+  --ui-selection: rgb(138 109 59 / 22%);
+  --ui-focus-ring: var(--ui-accent);
+
+  --ui-canvas-bg: #f6f4ef;
+  --ui-canvas-cell: #171614;
+  --ui-canvas-grid: rgb(23 22 20 / 6%);
+  --ui-ambient: rgb(23 22 20 / 50%);
+}
+
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ui-bg: #111110;
+  --ui-bg-inset: #0c0c0b;
+  --ui-surface: #191917;
+  --ui-surface-hover: #1f1f1c;
+  --ui-surface-active: #272723;
+  --ui-field: transparent;
+  --ui-field-hover: transparent;
+  --ui-popover: #1b1b19;
+  --ui-overlay: rgb(0 0 0 / 60%);
+
+  --ui-line: rgb(237 234 227 / 10%);
+  --ui-line-strong: rgb(237 234 227 / 18%);
+  --ui-line-field: rgb(237 234 227 / 18%);
+
+  --ui-text: #edeae3;
+  --ui-text-muted: #9a968e;
+  --ui-text-subtle: #86827a;
+  --ui-text-disabled: #55524d;
+
+  --ui-ink: #edeae3;
+  --ui-ink-hover: #d6d2c9;
+  --ui-on-ink: #111110;
+
+  --ui-accent: #cfb27a;
+  --ui-accent-hover: #dcc394;
+  --ui-accent-soft: rgb(207 178 122 / 14%);
+  --ui-accent-text: #cfb27a;
+  --ui-on-accent: #111110;
+
+  --ui-success: #86b994;
+  --ui-success-soft: rgb(134 185 148 / 13%);
+  --ui-warning: #d9a95b;
+  --ui-warning-soft: rgb(217 169 91 / 13%);
+  --ui-danger: #e0927a;
+  --ui-danger-soft: rgb(224 146 122 / 13%);
+  --ui-info: #9db0c4;
+  --ui-info-soft: rgb(157 176 196 / 12%);
+  --ui-live: var(--ui-accent);
+
+  --ui-diff-add: #8cc79b;
+  --ui-diff-add-soft: rgb(134 185 148 / 16%);
+  --ui-diff-remove: #e0927a;
+  --ui-diff-remove-soft: rgb(224 146 122 / 16%);
+  --ui-highlight: rgb(207 178 122 / 28%);
+  --ui-selection: rgb(207 178 122 / 26%);
+  --ui-focus-ring: var(--ui-accent);
+
+  --ui-canvas-bg: #111110;
+  --ui-canvas-cell: #edeae3;
+  --ui-canvas-grid: rgb(237 234 227 / 6%);
+  --ui-ambient: rgb(237 234 227 / 50%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --ui-bg: #111110;
+    --ui-bg-inset: #0c0c0b;
+    --ui-surface: #191917;
+    --ui-surface-hover: #1f1f1c;
+    --ui-surface-active: #272723;
+    --ui-field: transparent;
+    --ui-field-hover: transparent;
+    --ui-popover: #1b1b19;
+    --ui-overlay: rgb(0 0 0 / 60%);
+
+    --ui-line: rgb(237 234 227 / 10%);
+    --ui-line-strong: rgb(237 234 227 / 18%);
+    --ui-line-field: rgb(237 234 227 / 18%);
+
+    --ui-text: #edeae3;
+    --ui-text-muted: #9a968e;
+    --ui-text-subtle: #86827a;
+    --ui-text-disabled: #55524d;
+
+    --ui-ink: #edeae3;
+    --ui-ink-hover: #d6d2c9;
+    --ui-on-ink: #111110;
+
+    --ui-accent: #cfb27a;
+    --ui-accent-hover: #dcc394;
+    --ui-accent-soft: rgb(207 178 122 / 14%);
+    --ui-accent-text: #cfb27a;
+    --ui-on-accent: #111110;
+
+    --ui-success: #86b994;
+    --ui-success-soft: rgb(134 185 148 / 13%);
+    --ui-warning: #d9a95b;
+    --ui-warning-soft: rgb(217 169 91 / 13%);
+    --ui-danger: #e0927a;
+    --ui-danger-soft: rgb(224 146 122 / 13%);
+    --ui-info: #9db0c4;
+    --ui-info-soft: rgb(157 176 196 / 12%);
+    --ui-live: var(--ui-accent);
+
+    --ui-diff-add: #8cc79b;
+    --ui-diff-add-soft: rgb(134 185 148 / 16%);
+    --ui-diff-remove: #e0927a;
+    --ui-diff-remove-soft: rgb(224 146 122 / 16%);
+    --ui-highlight: rgb(207 178 122 / 28%);
+    --ui-selection: rgb(207 178 122 / 26%);
+    --ui-focus-ring: var(--ui-accent);
+
+    --ui-canvas-bg: #111110;
+    --ui-canvas-cell: #edeae3;
+    --ui-canvas-grid: rgb(237 234 227 / 6%);
+    --ui-ambient: rgb(237 234 227 / 50%);
+  }
+}
