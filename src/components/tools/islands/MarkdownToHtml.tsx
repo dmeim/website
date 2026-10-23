@@ -1,39 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Button, Notice, Panel, Prose, ToolFrame, TransformPanel } from "@/ui/react";
 import { markdownToHtml } from "@/lib/tools/markdown-to-html";
-
-import "./MarkdownToHtml.css";
 
 export default function MarkdownToHtml() {
   const [input, setInput] = useState("");
   const [actionStatus, setActionStatus] = useState("");
 
   const htmlOutput = useMemo(() => markdownToHtml(input), [input]);
-
-  const copyHtml = useCallback(async () => {
-    if (!htmlOutput) {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(htmlOutput);
-      setActionStatus("HTML copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the output and copy it manually.");
-    }
-  }, [htmlOutput]);
 
   const printHtml = useCallback(() => {
     if (!htmlOutput) {
@@ -53,64 +27,39 @@ export default function MarkdownToHtml() {
   }, [htmlOutput]);
 
   return (
-    <ToolIsland className="md2h-tool">
-      <ToolPanel labelledBy="md2h-heading" className="md2h-tool__panel">
-        <ToolSectionHeading
-          title="Markdown to HTML"
-          titleId="md2h-heading"
-          description={
-            <ToolHint>
-              Paste Markdown to convert it into HTML. Copy the result or print
-              it as a PDF from your browser&apos;s print dialog.
-            </ToolHint>
+    <ToolFrame>
+      <Panel
+        title="Markdown to HTML"
+        description="Paste Markdown to convert it into HTML. Copy the result or print it as a PDF from your browser's print dialog."
+      >
+        <TransformPanel
+          input={{
+            label: "Your Markdown to convert",
+            value: input,
+            onChange: setInput,
+            placeholder: "Your Markdown content...",
+            mono: true,
+            rows: 10,
+          }}
+          output={{ label: "Output HTML", value: htmlOutput, mono: true, rows: 12 }}
+          actions={
+            <Button
+              variant="ghost"
+              iconStart="printer"
+              onClick={printHtml}
+              disabled={!htmlOutput}
+            >
+              Print as PDF
+            </Button>
           }
         />
-
-        <ToolTextarea
-          id="md2h-input"
-          label="Your Markdown to convert"
-          full
-          code
-          rows={10}
-          value={input}
-          placeholder="Your Markdown content..."
-          onChange={(event) => setInput(event.target.value)}
-          autoFocus
-        />
-
-        <ToolTextarea
-          id="md2h-output"
-          label="Output HTML"
-          full
-          code
-          readOnly
-          rows={12}
-          value={htmlOutput}
-          placeholder="HTML output appears here"
-          className="md2h-output"
-          aria-live="polite"
-        />
-
-        <ToolActionRow>
-          <ToolButton
-            type="button"
-            onClick={() => void copyHtml()}
-            disabled={!htmlOutput}
-          >
-            Copy HTML
-          </ToolButton>
-          <ToolButton
-            type="button"
-            variant="ghost"
-            onClick={printHtml}
-            disabled={!htmlOutput}
-          >
-            Print as PDF
-          </ToolButton>
-        </ToolActionRow>
-
-        {actionStatus ? <ToolStatus tone="success">{actionStatus}</ToolStatus> : null}
-      </ToolPanel>
-    </ToolIsland>
+        {actionStatus ? <Notice variant="inline" live="polite">{actionStatus}</Notice> : null}
+      </Panel>
+      {htmlOutput ? (
+        <Panel title="Preview">
+          <Prose html={htmlOutput} />
+        </Panel>
+      ) : null}
+    </ToolFrame>
   );
 }
