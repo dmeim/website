@@ -4,6 +4,8 @@ Six homepage concepts, in two rounds, for a flatter, more professional direction
 
 Next step: pick a direction (or a blend), then extract its tokens and components into a shared UI library and roll it out site-wide.
 
+Update: Letter (4), Profile (5) and Plain (6) were chosen to be taken site-wide in parallel. The shared contract all three implement is `docs/12-UI-Library-Spec.md`.
+
 ## How they're wired
 
 - `src/layouts/ConceptLayout.astro` is an isolated page shell. It does **not** load `global.css`, the site header, or the ambient Life field, so each concept owns its whole look. It shares the `theme` localStorage key with the live site and sets `noindex`.

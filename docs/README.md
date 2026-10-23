@@ -13,7 +13,8 @@ Start here to understand the project and navigate the docs.
 9. 09-SEO-and-Performance.md — SEO and perf practices
 10. 10-Content-and-Branding.md — Branding, content seeds, assets
 11. 11-Redesign-Concepts.md — /home1–/home6 redesign concepts
-12. tools/AGENT_BRIEF.md — Checklist for porting it-tools onto the shared kit
+12. 12-UI-Library-Spec.md — Shared UI library contract for the site-wide redesign (tokens, components, icons, work packages)
+13. tools/AGENT_BRIEF.md — Checklist for porting it-tools onto the shared kit
 
 Related:
 
