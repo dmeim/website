@@ -1,0 +1,9 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"code">;
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<code class:list={["ui-code", className]} {...rest}><slot /></code>

@@ -1,10 +1,85 @@
 ---
 import ThemePair from "./ThemePair.astro";
+import { Badge, Card, Figure, Quote, StatusDot, Swatch } from "@/ui/components/groups/display";
+import { DisplayShowcase } from "@/ui/react/showcase/DisplayShowcase";
+
+const tones = ["neutral", "accent", "success", "warning", "danger", "info"] as const;
+const variants = ["soft", "outline", "solid"] as const;
+const statuses = ["live", "wip", "archived", "idle", "busy", "success", "error"] as const;
+const figureSrc = "/gpt-photoshoot/gpt-jackethold-transparent.png";
 ---
 
 <section id="display" class="ui-showcase-section" aria-labelledby="display-title">
   <h2 id="display-title" class="ui-showcase-section__title">Display</h2>
+  <h3 class="ui-showcase-sub">Astro</h3>
   <ThemePair>
-    <p class="ui-showcase-empty">No display components yet.</p>
+    <div style="display: grid; gap: var(--ui-space-sm)">
+      <h4 class="ui-showcase-sub">Badge</h4>
+      {
+        variants.map((variant) => (
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-sm)">
+            {tones.map((tone) => <Badge tone={tone} variant={variant}>{tone}</Badge>)}
+          </div>
+        ))
+      }
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-sm)">
+        <Badge size="sm">sm</Badge>
+        <Badge icon="lock">With icon</Badge>
+        <Badge tone="accent" variant="solid" icon="check">Solid icon</Badge>
+      </div>
+      <h4 class="ui-showcase-sub">StatusDot</h4>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-sm)">
+        {statuses.map((status) => <StatusDot status={status} label={status} />)}
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-sm)">
+        <StatusDot status="live" label="Hidden label" labelHidden />
+        <StatusDot status="live" pulse={false} label="No pulse" />
+        <StatusDot status="idle" pulse label="Forced pulse" />
+      </div>
+      <h4 class="ui-showcase-sub">Card</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: var(--ui-space-sm)">
+        <Card>
+          <span slot="eyebrow">Default</span>
+          <span slot="title">Static card</span>
+          Body text in a flat surface tile.
+          <span slot="footer">Footer</span>
+        </Card>
+        <Card href="#display">
+          <span slot="eyebrow">Linked</span>
+          <span slot="title">Whole card link</span>
+          Hover or focus the card.
+        </Card>
+        <Card tone="inset" padding="sm">
+          <span slot="title">Inset, padding sm</span>
+          Inset tone with hairline.
+        </Card>
+        <Card tone="inset" padding="lg" interactive>
+          <span slot="title">Inset, lg, interactive</span>
+          Hover fill without a link.
+        </Card>
+        <Card padding="none" as="article">
+          <img slot="media" src={figureSrc} alt="" width="320" height="180" style="aspect-ratio: 16/9; object-fit: cover" />
+          <span slot="title">Padding none + media</span>
+        </Card>
+      </div>
+      <h4 class="ui-showcase-sub">Quote</h4>
+      <Quote source="A mentor" cite="https://example.com">Make it quiet, then make it right.</Quote>
+      <h4 class="ui-showcase-sub">Figure</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: var(--ui-space-sm)">
+        <Figure src={figureSrc} alt="Portrait" caption="Plain figure" ratio="4 / 3" />
+        <Figure src={figureSrc} alt="Portrait" caption="Framed figure" ratio="1" frame />
+      </div>
+      <h4 class="ui-showcase-sub">Swatch</h4>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-sm)">
+        <Swatch color="#8a6d3b" label="Gold" code="--ui-accent" value="#8A6D3B" size="sm" />
+        <Swatch color="#3d6b48" label="Green" value="#3D6B48" />
+        <Swatch color="#a3442c" label="Rust" value="#A3442C" size="lg" />
+        <Swatch color="#4a5a6b" label="Selected" selected />
+        <Swatch as="button" color="#171614" label="Button" />
+        <Swatch as="button" color="#f6f4ef" label="Pressed" selected />
+      </div>
+    </div>
   </ThemePair>
+  <h3 class="ui-showcase-sub">React</h3>
+  <DisplayShowcase client:visible />
 </section>

@@ -1,0 +1,18 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import type { IconName } from "@/ui/icons";
+
+interface Props extends HTMLAttributes<"span"> {
+  tone?: "neutral" | "accent" | "success" | "warning" | "danger" | "info";
+  variant?: "soft" | "outline" | "solid";
+  size?: "sm" | "md";
+  icon?: IconName;
+}
+
+const { tone = "neutral", variant = "soft", size = "md", icon, class: className, ...rest } = Astro.props;
+---
+
+<span class:list={["ui-badge", className]} data-tone={tone} data-variant={variant} data-size={size} {...rest}>
+  {icon && <Icon name={icon} weight="bold" class="ui-badge__icon" />}<slot />
+</span>

@@ -1,0 +1,115 @@
+.ui-prose {
+  max-width: var(--ui-measure);
+  color: var(--ui-text);
+  font-family: var(--ui-font-body);
+  font-size: var(--ui-fs-md);
+  line-height: var(--ui-lh-relaxed);
+}
+
+.ui-prose[data-size="sm"] {
+  font-size: var(--ui-fs-sm);
+}
+
+.ui-prose > * + * {
+  margin-top: var(--ui-space-md);
+}
+
+.ui-prose :where(h2, h3, h4) {
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-snug);
+  letter-spacing: var(--ui-tracking-tight);
+}
+
+.ui-prose :where(h2) {
+  margin-top: var(--ui-space-xl);
+  font-size: var(--ui-fs-xl);
+}
+
+.ui-prose :where(h3) {
+  margin-top: var(--ui-space-lg);
+  font-size: var(--ui-fs-lg);
+}
+
+.ui-prose :where(h4) {
+  margin-top: var(--ui-space-lg);
+  font-size: var(--ui-fs-md);
+}
+
+.ui-prose > :first-child {
+  margin-top: 0;
+}
+
+.ui-prose :where(a) {
+  color: var(--ui-accent-text);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  transition: text-decoration-color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-prose :where(a):hover {
+  text-decoration-color: currentColor;
+}
+
+.ui-prose :where(ul, ol) {
+  padding-inline-start: var(--ui-space-lg);
+}
+
+.ui-prose :where(li) + :where(li) {
+  margin-top: var(--ui-space-2xs);
+}
+
+.ui-prose :where(li)::marker {
+  color: var(--ui-text-muted);
+}
+
+.ui-prose :where(table) {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ui-fs-sm);
+}
+
+.ui-prose :where(th, td) {
+  padding: var(--ui-space-xs) var(--ui-space-sm);
+  border-bottom: var(--ui-border-width) solid var(--ui-line);
+  text-align: start;
+  vertical-align: top;
+}
+
+.ui-prose :where(th) {
+  color: var(--ui-text-muted);
+  font-weight: var(--ui-fw-medium);
+}
+
+.ui-prose :where(thead th) {
+  border-bottom-color: var(--ui-line-strong);
+}
+
+.ui-prose :where(pre) {
+  overflow-x: auto;
+  padding: var(--ui-space-sm) var(--ui-space-md);
+  border-radius: var(--ui-radius-panel);
+  background: var(--ui-bg-inset);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-normal);
+}
+
+.ui-prose :where(blockquote) {
+  margin-inline: 0;
+  padding-inline-start: var(--ui-space-md);
+  border-inline-start: 2px solid var(--ui-line-strong);
+  color: var(--ui-text-muted);
+}
+
+.ui-prose :where(hr) {
+  margin-block: var(--ui-space-xl);
+  border: 0;
+  border-top: var(--ui-border-width) solid var(--ui-line);
+}
+
+.ui-prose :where(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--ui-radius-panel);
+}

@@ -1,0 +1,38 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+interface Props extends HTMLAttributes<"figure"> {
+  src: ImageMetadata | string;
+  alt: string;
+  caption?: string;
+  ratio?: string;
+  frame?: boolean;
+  priority?: boolean;
+}
+
+const { src, alt, caption, ratio, frame = false, priority = false, class: className, style, ...rest } = Astro.props;
+const loading = priority ? "eager" : "lazy";
+const fetchpriority = priority ? "high" : undefined;
+const ratioStyle = ratio ? `--ui-figure-ratio: ${ratio};` : "";
+---
+
+<figure
+  class:list={["ui-figure", className]}
+  data-frame={frame ? "true" : undefined}
+  data-ratio={ratio ? "true" : undefined}
+  style={[ratioStyle, style].filter(Boolean).join(" ") || undefined}
+  {...rest}
+>
+  <div class="ui-figure__media">
+    {
+      typeof src === "string" ? (
+        <img class="ui-figure__img" src={src} alt={alt} loading={loading} decoding="async" fetchpriority={fetchpriority} />
+      ) : (
+        <Image class="ui-figure__img" src={src} alt={alt} loading={loading} fetchpriority={fetchpriority} />
+      )
+    }
+  </div>
+  {caption && <figcaption class="ui-figure__caption">{caption}</figcaption>}
+</figure>

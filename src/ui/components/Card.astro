@@ -1,0 +1,39 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  as?: "div" | "article" | "section" | "li";
+  href?: string;
+  tone?: "default" | "inset";
+  padding?: "none" | "sm" | "md" | "lg";
+  interactive?: boolean;
+}
+
+const { as: Tag = "div", href, tone = "default", padding = "md", interactive, class: className, ...rest } = Astro.props;
+const isInteractive = Boolean(href) || Boolean(interactive);
+const hasTitle = Astro.slots.has("title");
+---
+
+<Tag
+  class:list={["ui-card", className]}
+  data-tone={tone}
+  data-padding={padding}
+  data-interactive={isInteractive ? "true" : undefined}
+  data-linked={href ? "true" : undefined}
+  {...rest}
+>
+  {Astro.slots.has("media") && <div class="ui-card__media"><slot name="media" /></div>}
+  <div class="ui-card__body">
+    {Astro.slots.has("eyebrow") && <p class="ui-card__eyebrow"><slot name="eyebrow" /></p>}
+    {
+      hasTitle && (
+        <p class="ui-card__title">
+          {href ? <a class="ui-card__link" href={href}><slot name="title" /></a> : <slot name="title" />}
+        </p>
+      )
+    }
+    {!hasTitle && href && <a class="ui-card__link" href={href} aria-label="Open"></a>}
+    <div class="ui-card__content"><slot /></div>
+    {Astro.slots.has("footer") && <div class="ui-card__footer"><slot name="footer" /></div>}
+  </div>
+</Tag>

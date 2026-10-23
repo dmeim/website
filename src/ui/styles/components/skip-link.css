@@ -1,0 +1,19 @@
+.ui-skip-link {
+  position: fixed;
+  top: var(--ui-space-sm);
+  left: var(--ui-space-sm);
+  z-index: var(--ui-z-toast);
+  padding: var(--ui-space-xs) var(--ui-space-md);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-ink);
+  color: var(--ui-on-ink);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-medium);
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--ui-space-lg)));
+}
+
+.ui-skip-link:focus,
+.ui-skip-link:focus-visible {
+  transform: none;
+}

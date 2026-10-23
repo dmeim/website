@@ -1,0 +1,39 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  color: string;
+  label?: string;
+  code?: string;
+  value?: string;
+  size?: "sm" | "md" | "lg";
+  selected?: boolean;
+  as?: "div" | "button";
+}
+
+const { color, label, code, value, size = "md", selected = false, as: Tag = "div", class: className, style, ...rest } = Astro.props;
+const stateAttrs =
+  Tag === "button"
+    ? { type: "button", "aria-pressed": selected ? "true" : "false" }
+    : { "data-selected": selected ? "true" : undefined };
+const hasMeta = Boolean(label || code || value);
+---
+
+<Tag
+  class:list={["ui-swatch", className]}
+  data-size={size}
+  style={[`--ui-swatch-color: ${color};`, style].filter(Boolean).join(" ")}
+  {...stateAttrs}
+  {...rest}
+>
+  <span class="ui-swatch__chip" aria-hidden={hasMeta ? "true" : undefined}></span>
+  {
+    hasMeta && (
+      <span class="ui-swatch__meta">
+        {label && <span class="ui-swatch__label">{label}</span>}
+        {code && <code class="ui-swatch__code">{code}</code>}
+        {value && <span class="ui-swatch__value">{value}</span>}
+      </span>
+    )
+  }
+</Tag>

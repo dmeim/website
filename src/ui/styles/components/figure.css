@@ -1,0 +1,38 @@
+.ui-figure {
+  margin: 0;
+}
+
+.ui-figure__media {
+  overflow: hidden;
+  border-radius: var(--ui-radius-panel);
+}
+
+.ui-figure[data-ratio] .ui-figure__media {
+  aspect-ratio: var(--ui-figure-ratio);
+}
+
+.ui-figure[data-frame] .ui-figure__media {
+  padding: var(--ui-space-sm);
+  background: var(--ui-surface);
+}
+
+.ui-figure__img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ui-figure[data-ratio] .ui-figure__img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.ui-figure[data-frame] .ui-figure__img {
+  border-radius: var(--ui-radius-xs);
+}
+
+.ui-figure__caption {
+  margin-top: var(--ui-space-xs);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+}

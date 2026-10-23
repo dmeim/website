@@ -1,0 +1,8 @@
+.ui-code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--ui-radius-xs);
+  background: var(--ui-surface);
+  font-family: var(--ui-font-mono);
+  font-size: 0.875em;
+  overflow-wrap: anywhere;
+}

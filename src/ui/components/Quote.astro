@@ -1,0 +1,15 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"figure"> {
+  cite?: string;
+  source?: string;
+}
+
+const { cite, source, class: className, ...rest } = Astro.props;
+---
+
+<figure class:list={["ui-quote", className]} {...rest}>
+  <blockquote class="ui-quote__text" cite={cite}><slot /></blockquote>
+  {source && <figcaption class="ui-quote__source">{source}</figcaption>}
+</figure>

@@ -9,12 +9,26 @@
 /* Component stylesheets (styles/components/*.css): append one line per component. */
 
 /* group: text */
+@import "./styles/components/link.css";
+@import "./styles/components/eyebrow.css";
+@import "./styles/components/prose.css";
+@import "./styles/components/code.css";
+@import "./styles/components/kbd.css";
+@import "./styles/components/visually-hidden.css";
+@import "./styles/components/skip-link.css";
+@import "./styles/components/divider.css";
 
 /* group: actions */
 
 /* group: forms */
 
 /* group: display */
+@import "./styles/components/badge.css";
+@import "./styles/components/status-dot.css";
+@import "./styles/components/card.css";
+@import "./styles/components/quote.css";
+@import "./styles/components/figure.css";
+@import "./styles/components/swatch.css";
 
 /* group: feedback */
 

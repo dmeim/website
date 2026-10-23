@@ -1,0 +1,49 @@
+.ui-link {
+  color: var(--ui-accent-text);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  transition:
+    color var(--ui-dur-fast) var(--ui-ease-out),
+    text-decoration-color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-link:hover {
+  text-decoration-color: currentColor;
+}
+
+.ui-link[data-tone="quiet"] {
+  color: var(--ui-text);
+  text-decoration-color: transparent;
+}
+
+.ui-link[data-tone="quiet"]:hover {
+  text-decoration-color: currentColor;
+}
+
+.ui-link[data-tone="accent"] {
+  color: var(--ui-accent-text);
+  text-decoration-color: transparent;
+}
+
+.ui-link[data-tone="accent"]:hover {
+  color: var(--ui-accent-hover);
+  text-decoration-color: currentColor;
+}
+
+.ui-link__arrow {
+  display: inline-block;
+  margin-inline-start: 0.2em;
+  vertical-align: -0.1em;
+  font-size: 0.9em;
+  transition: transform var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-link[data-arrow="right"]:hover .ui-link__arrow {
+  transform: translateX(2px);
+}
+
+.ui-link[data-arrow="up-right"]:hover .ui-link__arrow {
+  transform: translate(2px, -2px);
+}

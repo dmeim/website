@@ -1,0 +1,19 @@
+.ui-quote {
+  margin: 0;
+  padding-inline-start: var(--ui-space-md);
+  border-inline-start: 2px solid var(--ui-line-strong);
+}
+
+.ui-quote__text {
+  margin: 0;
+  color: var(--ui-text);
+  font-size: var(--ui-fs-lg);
+  line-height: var(--ui-lh-snug);
+  letter-spacing: var(--ui-tracking-tight);
+}
+
+.ui-quote__source {
+  margin-top: var(--ui-space-sm);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+}

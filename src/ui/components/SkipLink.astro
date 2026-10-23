@@ -1,0 +1,12 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"a"> {
+  href?: string;
+}
+
+const { href = "#main", class: className, ...rest } = Astro.props;
+const hasLabel = Astro.slots.has("default");
+---
+
+<a class:list={["ui-skip-link", className]} href={href} {...rest}>{hasLabel ? <slot /> : "Skip to content"}</a>

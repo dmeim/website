@@ -1,10 +1,51 @@
 ---
 import ThemePair from "./ThemePair.astro";
+import { Code, Divider, Eyebrow, Kbd, Link, Prose, SkipLink, VisuallyHidden } from "@/ui/components/groups/text";
+import { TextShowcase } from "@/ui/react/showcase/TextShowcase";
 ---
 
 <section id="text" class="ui-showcase-section" aria-labelledby="text-title">
   <h2 id="text-title" class="ui-showcase-section__title">Text</h2>
+  <h3 class="ui-showcase-sub">Astro</h3>
   <ThemePair>
-    <p class="ui-showcase-empty">No text components yet.</p>
+    <div style="display: grid; gap: var(--ui-space-sm)">
+      <h4 class="ui-showcase-sub">Link</h4>
+      <p style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-sm)">
+        <Link href="#text">Default</Link>
+        <Link href="#text" tone="quiet">Quiet</Link>
+        <Link href="#text" tone="accent">Accent</Link>
+        <Link href="#text" arrow="right">Arrow right</Link>
+        <Link href="#text" tone="quiet" arrow="up-right">Arrow up-right</Link>
+        <Link href="https://github.com" external>External</Link>
+      </p>
+      <h4 class="ui-showcase-sub">Eyebrow</h4>
+      <Eyebrow>Selected work</Eyebrow>
+      <Eyebrow as="span">As span</Eyebrow>
+      <h4 class="ui-showcase-sub">Code and Kbd</h4>
+      <p>Run <Code>npm run dev</Code> then press <Kbd>Esc</Kbd> or <Kbd keys={["Ctrl", "Shift", "K"]} />.</p>
+      <h4 class="ui-showcase-sub">VisuallyHidden and SkipLink</h4>
+      <p>Hidden text follows:<VisuallyHidden> screen-reader only</VisuallyHidden> (inspect to see).</p>
+      <p><SkipLink href="#text">Skip to text</SkipLink> Tab here to reveal the skip link (top-left).</p>
+      <h4 class="ui-showcase-sub">Divider</h4>
+      <Divider />
+      <Divider label="or" />
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-space-sm); height: 2rem">Left<Divider orientation="vertical" />Right</div>
+      <h4 class="ui-showcase-sub">Prose (md, sm)</h4>
+      <Prose>
+        <h2>Heading two</h2>
+        <p>Body text with a <a href="#text">link</a> and <code>inline code</code>.</p>
+        <h3>Heading three</h3>
+        <ul><li>First item</li><li>Second item</li></ul>
+        <ol><li>Ordered</li><li>List</li></ol>
+        <blockquote>A quiet blockquote.</blockquote>
+        <pre><code>const x = 42;</code></pre>
+        <table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td>a</td><td>1</td></tr><tr><td>b</td><td>2</td></tr></tbody></table>
+        <hr />
+        <p>After the rule.</p>
+      </Prose>
+      <Prose size="sm"><p>Small prose paragraph for dense contexts.</p></Prose>
+    </div>
   </ThemePair>
+  <h3 class="ui-showcase-sub">React</h3>
+  <TextShowcase client:visible />
 </section>

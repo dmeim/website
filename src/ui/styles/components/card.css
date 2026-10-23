@@ -1,0 +1,96 @@
+.ui-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--ui-radius-panel);
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  transition: background-color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-card[data-tone="inset"] {
+  border: var(--ui-border-width) solid var(--ui-line);
+  background: var(--ui-bg-inset);
+}
+
+.ui-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--ui-space-2xs);
+  padding: var(--ui-space-md);
+}
+
+.ui-card[data-padding="none"] .ui-card__body { padding: 0; }
+.ui-card[data-padding="sm"] .ui-card__body { padding: var(--ui-space-sm); }
+.ui-card[data-padding="lg"] .ui-card__body { padding: var(--ui-space-lg); }
+
+.ui-card__media > :where(img, picture, video, svg) {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ui-card__eyebrow {
+  margin: 0;
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-medium);
+  letter-spacing: var(--ui-tracking-wide);
+  text-transform: uppercase;
+}
+
+.ui-card__title {
+  margin: 0;
+  font-size: var(--ui-fs-md);
+  font-weight: var(--ui-fw-semibold);
+  line-height: var(--ui-lh-snug);
+  letter-spacing: var(--ui-tracking-tight);
+}
+
+.ui-card__content {
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-sm);
+}
+
+.ui-card__content:empty {
+  display: none;
+}
+
+.ui-card__footer {
+  margin-top: auto;
+  padding-top: var(--ui-space-sm);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+}
+
+.ui-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Stretched link: the whole card is the hit target, the title stays the accessible name. */
+.ui-card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.ui-card__link:focus-visible {
+  outline: none;
+}
+
+.ui-card[data-linked]:has(.ui-card__link:focus-visible) {
+  outline: var(--ui-focus-width) solid var(--ui-focus-ring);
+  outline-offset: var(--ui-focus-offset);
+}
+
+.ui-card[data-interactive]:hover {
+  background: var(--ui-surface-hover);
+}
+
+.ui-card[data-interactive][data-tone="inset"]:hover {
+  background: var(--ui-surface);
+}

@@ -1,0 +1,11 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"span"> {
+  as?: "span" | "div" | "p" | "h1" | "h2" | "h3" | "label";
+}
+
+const { as: Tag = "span", class: className, ...rest } = Astro.props;
+---
+
+<Tag class:list={["ui-visually-hidden", className]} {...rest}><slot /></Tag>
