@@ -1,18 +1,16 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
-  ToolActionRow,
-  ToolButton,
-  ToolEmpty,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolWorkspace,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+  CopyButton,
+  Eyebrow,
+  Link,
+  List,
+  ListRow,
+  Panel,
+  ReferenceList,
+  SectionHeading,
+  ToolFrame,
+} from "@/ui/react";
 import {
   countRegexMemoEntries,
   filterRegexMemoSections,
@@ -25,10 +23,6 @@ import "./RegexMemo.css";
 
 export default function RegexMemo() {
   const [search, setSearch] = useState("");
-  const [copyStatus, setCopyStatus] = useState<{
-    tone: "success" | "error";
-    message: string;
-  } | null>(null);
   const total = countRegexMemoEntries();
 
   const sections = useMemo(() => filterRegexMemoSections(search), [search]);
@@ -39,117 +33,59 @@ export default function RegexMemo() {
     [sections],
   );
 
-  const copyExpression = useCallback(async (expression: string) => {
-    try {
-      await copyTextToClipboard(primaryRegexExpression(expression));
-      setCopyStatus({
-        tone: "success",
-        message: "Expression copied to the clipboard.",
-      });
-    } catch {
-      setCopyStatus({
-        tone: "error",
-        message: "Copy failed. Select the expression and copy it manually.",
-      });
-    }
-  }, []);
-
   return (
-    <ToolIsland className="rm-tool">
-      <ToolPanel labelledBy="rm-heading" className="rm-tool__panel">
-        <ToolSectionHeading
-          title="Regex cheatsheet"
-          titleId="rm-heading"
-          description={
-            <ToolHint>
-              Quick reference for JavaScript regular expressions ({total}{" "}
-              patterns). Try them in the{" "}
-              <a className="rm-inline-link" href="/tools/regex-tester">
-                Regex tester
-              </a>
-              .
-            </ToolHint>
-          }
-        />
-
-        <ToolInput
-          id="rm-search"
-          label="Search"
-          full
-          value={search}
-          placeholder="Search regex expressions…"
-          autoComplete="off"
-          spellCheck={false}
-          autoFocus
-          onChange={(event) => setSearch(event.target.value)}
-        />
-
-        {copyStatus ? (
-          <ToolStatus tone={copyStatus.tone}>{copyStatus.message}</ToolStatus>
-        ) : null}
-      </ToolPanel>
-
-      {matchCount === 0 ? (
-        <ToolEmpty>No regex patterns match this search.</ToolEmpty>
-      ) : (
-        <div className="rm-sections">
+    <ToolFrame layout="stack">
+      <Panel
+        title="Regex cheatsheet"
+        titleId="rm-heading"
+        description={
+          <>
+            Quick reference for JavaScript regular expressions ({total} patterns). Try them in the{" "}
+            <Link href="/tools/regex-tester">Regex tester</Link>.
+          </>
+        }
+      >
+        <ReferenceList
+          searchLabel="Search regex expressions…"
+          query={search}
+          onQueryChange={setSearch}
+          count={matchCount}
+          empty={{ icon: "magnifying-glass", title: "No regex patterns match this search.", size: "sm" }}
+        >
           {sections.map((section, sectionIndex) => {
             const sectionSlug = slugifyRegexMemoTitle(
-              section.group
-                ? `${section.group}-${section.title}`
-                : section.title,
+              section.group ? `${section.group}-${section.title}` : section.title,
             );
+            const headingId = `rm-sec-${sectionSlug}`;
             const showGroup =
-              Boolean(section.group) &&
-              sections[sectionIndex - 1]?.group !== section.group;
+              Boolean(section.group) && sections[sectionIndex - 1]?.group !== section.group;
             return (
-              <section
-                key={`${section.group ?? ""}-${section.title}`}
-                className="rm-section"
-                aria-labelledby={`rm-sec-${sectionSlug}`}
-              >
-                {showGroup ? (
-                  <p className="rm-section__group">{section.group}</p>
-                ) : null}
-                <h2 id={`rm-sec-${sectionSlug}`} className="rm-section__title">
-                  {section.title}
-                </h2>
-
-                <ToolWorkspace className="rm-list">
+              <section key={`${section.group ?? ""}-${section.title}`} aria-labelledby={headingId}>
+                {showGroup ? <Eyebrow>{section.group}</Eyebrow> : null}
+                <SectionHeading title={section.title} titleId={headingId} level={3} />
+                <List label={section.title}>
                   {section.entries.map((entry, index) => {
                     const entryId = `rm-entry-${sectionSlug}-${index}`;
                     return (
-                      <ToolPanel
+                      <ListRow
                         key={entryId}
-                        className="rm-card"
-                        labelledBy={entryId}
-                        animate={false}
-                      >
-                        <div className="rm-card__row">
-                          <pre
-                            id={entryId}
-                            className="rm-card__expression"
-                            title={entry.expression}
-                          >
-                            <code>{entry.expression}</code>
-                          </pre>
-                          <p className="rm-card__description">
-                            {entry.description}
-                          </p>
-                        </div>
-                        <ToolActionRow>
-                          <ToolButton
-                            type="button"
-                            onClick={() => void copyExpression(entry.expression)}
-                          >
-                            Copy
-                          </ToolButton>
-                        </ToolActionRow>
-                      </ToolPanel>
+                        label={
+                          <code id={entryId} className="rm-expression" title={entry.expression}>
+                            {entry.expression}
+                          </code>
+                        }
+                        title={entry.description}
+                        actions={
+                          <CopyButton
+                            appearance="icon"
+                            label={`Copy ${entry.expression}`}
+                            value={primaryRegexExpression(entry.expression)}
+                          />
+                        }
+                      />
                     );
                   })}
-                </ToolWorkspace>
-
+                </List>
                 {section.notes && section.notes.length > 0 ? (
                   <ul className="rm-notes">
                     {section.notes.map((note) => (
@@ -160,35 +96,19 @@ export default function RegexMemo() {
               </section>
             );
           })}
-        </div>
-      )}
+        </ReferenceList>
+      </Panel>
 
       {!isSearching ? (
-        <ToolPanel className="rm-refs" labelledBy="rm-refs-heading" animate={false}>
-          <h2 id="rm-refs-heading" className="rm-refs__title">
-            References and tools
-          </h2>
-          <ul className="rm-refs__list">
+        <Panel title="References and tools" titleId="rm-refs-heading" animate={false}>
+          <List label="References and tools">
             {regexMemoReferences.map((ref) => (
-              <li key={ref.href}>
-                <a
-                  className="rm-inline-link"
-                  href={ref.href}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {ref.label}
-                </a>
-              </li>
+              <ListRow key={ref.href} href={ref.href} title={ref.label} />
             ))}
-            <li>
-              <a className="rm-inline-link" href="/tools/regex-tester">
-                Regex tester
-              </a>
-            </li>
-          </ul>
-        </ToolPanel>
+            <ListRow href="/tools/regex-tester" title="Regex tester" />
+          </List>
+        </Panel>
       ) : null}
-    </ToolIsland>
+    </ToolFrame>
   );
 }

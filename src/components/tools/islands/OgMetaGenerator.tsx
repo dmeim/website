@@ -1,21 +1,17 @@
 import { useCallback, useMemo, useState } from "react";
 
 import {
-  ToolActionRow,
-  ToolButton,
-  ToolFormGrid,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolNested,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolSelect,
-  ToolStatus,
-  ToolTextarea,
-  ToolWorkspace,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+  Button,
+  CopyButton,
+  Fieldset,
+  FormGrid,
+  IconButton,
+  Input,
+  OutputField,
+  Panel,
+  Select,
+  ToolFrame,
+} from "@/ui/react";
 import {
   DEFAULT_OG_METADATA,
   buildOgMetaTags,
@@ -49,7 +45,6 @@ function asList(value: MetaFieldValue | undefined): string[] {
 
 export default function OgMetaGenerator() {
   const [metadata, setMetadata] = useState<OgFormMetadata>(DEFAULT_OG_METADATA);
-  const [actionStatus, setActionStatus] = useState("");
 
   const pageType = asString(metadata.type) || "website";
   const sections = useMemo(() => getActiveSections(pageType), [pageType]);
@@ -101,19 +96,6 @@ export default function OgMetaGenerator() {
     });
   }, []);
 
-  const copyTags = useCallback(async () => {
-    if (!metaTags) {
-      setActionStatus("Nothing to copy yet — fill in at least one field.");
-      return;
-    }
-    try {
-      await copyTextToClipboard(metaTags);
-      setActionStatus("Meta tags copied to the clipboard.");
-    } catch {
-      setActionStatus("Copy failed. Select the output and copy it manually.");
-    }
-  }, [metaTags]);
-
   const renderSelectOptions = (element: OGSchemaTypeElement & { type: "select" }) =>
     element.options.map((option) => {
       if (isSelectGroup(option)) {
@@ -139,70 +121,56 @@ export default function OgMetaGenerator() {
 
     if (element.type === "select") {
       return (
-        <ToolSelect
+        <Select
           key={element.key}
           id={fieldId}
           label={element.label}
-          full
+          span="full"
           value={asString(metadata[element.key])}
           onChange={(event) => setField(element.key, event.target.value)}
         >
           {renderSelectOptions(element)}
-        </ToolSelect>
+        </Select>
       );
     }
 
     if (element.type === "input-multiple") {
       const values = asList(metadata[element.key]);
       return (
-        <div key={element.key} className="og-multi tool-field--full">
-          <span className="og-multi__label">{element.label}</span>
-          <div className="og-multi__rows">
-            {values.map((value, index) => (
-              <div key={`${element.key}-${index}`} className="og-multi__row">
-                <ToolInput
-                  id={`${fieldId}-${index}`}
-                  label={`${element.label} ${index + 1}`}
-                  full
-                  value={value}
-                  placeholder={element.placeholder}
-                  onChange={(event) =>
-                    updateMultiItem(element.key, index, event.target.value)
-                  }
-                  fieldClassName="og-multi__input"
-                />
-                <ToolButton
-                  type="button"
-                  variant="ghost"
-                  className="og-multi__remove"
-                  aria-label={`Remove ${element.label} ${index + 1}`}
-                  disabled={values.length <= 1}
-                  onClick={() => removeMultiItem(element.key, index)}
-                >
-                  Remove
-                </ToolButton>
-              </div>
-            ))}
-          </div>
-          <ToolActionRow>
-            <ToolButton
-              type="button"
-              variant="ghost"
-              onClick={() => addMultiItem(element.key)}
-            >
+        <Fieldset key={element.key} legend={element.label} className="og-multi">
+          {values.map((value, index) => (
+            <div key={`${element.key}-${index}`} className="og-multi__row">
+              <Input
+                id={`${fieldId}-${index}`}
+                label={`${element.label} ${index + 1}`}
+                labelHidden
+                value={value}
+                placeholder={element.placeholder}
+                onChange={(event) => updateMultiItem(element.key, index, event.target.value)}
+              />
+              <IconButton
+                icon="x"
+                label={`Remove ${element.label} ${index + 1}`}
+                disabled={values.length <= 1}
+                onClick={() => removeMultiItem(element.key, index)}
+              />
+            </div>
+          ))}
+          <div>
+            <Button variant="ghost" size="sm" iconStart="plus" onClick={() => addMultiItem(element.key)}>
               Add {element.label.toLowerCase()}
-            </ToolButton>
-          </ToolActionRow>
-        </div>
+            </Button>
+          </div>
+        </Fieldset>
       );
     }
 
     return (
-      <ToolInput
+      <Input
         key={element.key}
         id={fieldId}
         label={element.label}
-        full
+        span="full"
         value={asString(metadata[element.key])}
         placeholder={element.placeholder}
         onChange={(event) => setField(element.key, event.target.value)}
@@ -211,65 +179,41 @@ export default function OgMetaGenerator() {
   };
 
   return (
-    <ToolIsland className="og-tool">
-      <ToolWorkspace className="og-tool__workspace" stagger>
-        <ToolPanel labelledBy="og-fields-heading" className="og-tool__panel">
-          <ToolSectionHeading
-            title="Meta fields"
-            titleId="og-fields-heading"
-            description={
-              <ToolHint>
-                Fill the fields below to generate Open Graph and Twitter meta tags
-                for your page.
-              </ToolHint>
-            }
-          />
+    <ToolFrame layout="split" stagger>
+      <Panel
+        title="Meta fields"
+        titleId="og-fields-heading"
+        description="Fill the fields below to generate Open Graph and Twitter meta tags for your page."
+      >
+        {sections.map((section) => (
+          <Fieldset key={section.name} legend={section.name}>
+            <FormGrid columns={1}>
+              {section.elements.map((element) => renderElement(element, section.name))}
+            </FormGrid>
+          </Fieldset>
+        ))}
+      </Panel>
 
-          {sections.map((section) => (
-            <ToolNested key={section.name} title={section.name} className="og-section">
-              <ToolFormGrid>
-                {section.elements.map((element) =>
-                  renderElement(element, section.name),
-                )}
-              </ToolFormGrid>
-            </ToolNested>
-          ))}
-        </ToolPanel>
-
-        <ToolPanel labelledBy="og-output-heading" className="og-tool__output">
-          <ToolSectionHeading
-            title="Your meta tags"
-            titleId="og-output-heading"
-            description={
-              <ToolHint>
-                Paste these into your document <code>&lt;head&gt;</code>. Empty
-                fields are omitted.
-              </ToolHint>
-            }
-          />
-
-          <ToolTextarea
-            id="og-meta-output"
-            label="Generated HTML"
-            full
-            code
-            readOnly
-            rows={16}
-            value={metaTags}
-            className="og-output"
-            aria-live="polite"
-            placeholder="Fill in fields to generate meta tags…"
-          />
-
-          <ToolActionRow>
-            <ToolButton type="button" variant="primary" onClick={() => void copyTags()}>
-              Copy meta tags
-            </ToolButton>
-          </ToolActionRow>
-
-          {actionStatus ? <ToolStatus tone="success">{actionStatus}</ToolStatus> : null}
-        </ToolPanel>
-      </ToolWorkspace>
-    </ToolIsland>
+      <Panel
+        title="Your meta tags"
+        titleId="og-output-heading"
+        description={
+          <>
+            Paste these into your document <code>&lt;head&gt;</code>. Empty fields are omitted.
+          </>
+        }
+        actions={<CopyButton variant="primary" value={metaTags} label="Copy meta tags" disabled={!metaTags} />}
+      >
+        <OutputField
+          id="og-meta-output"
+          label="Generated HTML"
+          multiline
+          rows={16}
+          value={metaTags}
+          copy={false}
+          placeholder="Fill in fields to generate meta tags…"
+        />
+      </Panel>
+    </ToolFrame>
   );
 }

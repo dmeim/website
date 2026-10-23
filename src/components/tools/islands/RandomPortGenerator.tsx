@@ -1,22 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Button, ButtonGroup, CopyButton, Panel, Stat, ToolFrame } from "@/ui/react";
 import { generatePort } from "@/lib/tools/random-port-generator";
-
-import "./RandomPortGenerator.css";
 
 export default function RandomPortGenerator() {
   const [refreshKey, setRefreshKey] = useState(0);
-  const [actionStatus, setActionStatus] = useState("");
 
   const port = useMemo(() => {
     void refreshKey;
@@ -27,46 +15,24 @@ export default function RandomPortGenerator() {
 
   const refreshPort = useCallback(() => {
     setRefreshKey((value) => value + 1);
-    setActionStatus("Port refreshed.");
   }, []);
 
-  const copyPort = useCallback(async () => {
-    try {
-      await copyTextToClipboard(portText);
-      setActionStatus("Port copied to the clipboard.");
-    } catch {
-      setActionStatus("Copy failed. Select the port and copy it manually.");
-    }
-  }, [portText]);
-
   return (
-    <ToolIsland className="rpg-tool">
-      <ToolPanel labelledBy="rpg-heading" className="rpg-tool__panel">
-        <ToolSectionHeading
-          title="Random port"
-          titleId="rpg-heading"
-          description={
-            <ToolHint>
-              A random port outside the well-known range (0–1023). Copy it or refresh for another.
-            </ToolHint>
-          }
-        />
+    <ToolFrame>
+      <Panel
+        title="Random port"
+        titleId="rpg-heading"
+        description="A random port outside the well-known range (0–1023). Copy it or refresh for another."
+      >
+        <Stat label="Port" value={portText} size="xl" mono live data-testid="port" />
 
-        <p className="rpg-port" aria-live="polite" data-testid="port">
-          {portText}
-        </p>
-
-        <ToolActionRow>
-          <ToolButton type="button" onClick={() => void copyPort()}>
-            Copy
-          </ToolButton>
-          <ToolButton type="button" variant="ghost" onClick={refreshPort} data-testid="refresh">
+        <ButtonGroup>
+          <CopyButton value={portText} />
+          <Button variant="ghost" iconStart="arrows-clockwise" onClick={refreshPort} data-testid="refresh">
             Refresh
-          </ToolButton>
-        </ToolActionRow>
-
-        {actionStatus ? <ToolStatus tone="success">{actionStatus}</ToolStatus> : null}
-      </ToolPanel>
-    </ToolIsland>
+          </Button>
+        </ButtonGroup>
+      </Panel>
+    </ToolFrame>
   );
 }

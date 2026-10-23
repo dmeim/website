@@ -1,58 +1,9 @@
-/* HTTP status codes — searchable categorized reference */
-
-@import "./toolIsland.css";
-
-.hsc-tool {
-  gap: var(--space-lg);
-}
-
-.hsc-tool__panel {
-  max-width: 48rem;
-}
-
 .hsc-categories {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
+  display: grid;
+  gap: var(--ui-space-xl);
 }
 
-.hsc-category {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-}
-
-.hsc-category__title {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: var(--text-lg);
-  line-height: 1.2;
-  color: var(--color-ink);
-}
-
-.hsc-list {
-  grid-template-columns: 1fr;
-  gap: var(--space-sm);
-}
-
-.hsc-card {
-  gap: var(--space-xs);
-  padding: var(--space-md) var(--space-lg);
-}
-
-.hsc-card__title {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: var(--text-md);
-  line-height: 1.35;
-  color: var(--color-ink);
-}
-
-.hsc-card__meaning {
-  margin: 0;
-  font-size: var(--text-sm);
-  line-height: 1.55;
-  color: var(--color-stone);
+.hsc-code {
+  font-family: var(--ui-font-mono);
+  color: var(--ui-text);
 }

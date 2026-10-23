@@ -1,14 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
-import {
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolSelect,
-  ToolWorkspace,
-} from "@/components/tools/ui";
+import { Badge, Panel, ReferenceList, Select, Table, ToolFrame } from "@/ui/react";
 import {
   getExtensionsForMime,
   getMimeForExtension,
@@ -16,8 +8,6 @@ import {
   listMimeInfos,
   listMimeTypes,
 } from "@/lib/tools/mime-types";
-
-import "./MimeTypes.css";
 
 const MIME_OPTIONS = listMimeTypes();
 const EXTENSION_OPTIONS = listExtensions();
@@ -49,23 +39,16 @@ export default function MimeTypes() {
   }, [tableFilter]);
 
   return (
-    <ToolIsland className="mime-tool">
-      <ToolWorkspace className="mime-tool__workspace" stagger>
-        <ToolPanel labelledBy="mime-to-ext-heading" className="mime-tool__panel">
-          <ToolSectionHeading
-            title="Mime type to extension"
-            titleId="mime-to-ext-heading"
-            description={
-              <ToolHint>
-                Know which file extensions are associated with a MIME type.
-              </ToolHint>
-            }
-          />
-
-          <ToolSelect
+    <ToolFrame layout="stack">
+      <ToolFrame layout="split" stagger>
+        <Panel
+          title="Mime type to extension"
+          titleId="mime-to-ext-heading"
+          description="Know which file extensions are associated with a MIME type."
+        >
+          <Select
             id="mime-select-type"
             label="MIME type"
-            full
             value={selectedMimeType}
             onChange={(event) => setSelectedMimeType(event.target.value)}
           >
@@ -75,40 +58,24 @@ export default function MimeTypes() {
                 {mimeType}
               </option>
             ))}
-          </ToolSelect>
+          </Select>
 
           {extensionsFound.length > 0 ? (
-            <div className="mime-result" aria-live="polite">
-              <p className="mime-result__copy">
-                Extensions of files with the{" "}
-                <span className="mime-tag">{selectedMimeType}</span> MIME type:
-              </p>
-              <div className="mime-tags" role="list">
-                {extensionsFound.map((extension) => (
-                  <span key={extension} className="mime-tag mime-tag--accent" role="listitem">
-                    .{extension}
-                  </span>
-                ))}
-              </div>
-            </div>
+            <ResultTags
+              intro={<>Extensions of files with the <code>{selectedMimeType}</code> MIME type:</>}
+              tags={extensionsFound.map((extension) => `.${extension}`)}
+            />
           ) : null}
-        </ToolPanel>
+        </Panel>
 
-        <ToolPanel labelledBy="ext-to-mime-heading" className="mime-tool__panel">
-          <ToolSectionHeading
-            title="File extension to mime type"
-            titleId="ext-to-mime-heading"
-            description={
-              <ToolHint>
-                Know which MIME type is associated with a file extension.
-              </ToolHint>
-            }
-          />
-
-          <ToolSelect
+        <Panel
+          title="File extension to mime type"
+          titleId="ext-to-mime-heading"
+          description="Know which MIME type is associated with a file extension."
+        >
+          <Select
             id="mime-select-extension"
             label="File extension"
-            full
             value={selectedExtension}
             onChange={(event) => setSelectedExtension(event.target.value)}
           >
@@ -118,48 +85,30 @@ export default function MimeTypes() {
                 .{extension}
               </option>
             ))}
-          </ToolSelect>
+          </Select>
 
           {selectedExtension && mimeTypeFound ? (
-            <div className="mime-result" aria-live="polite">
-              <p className="mime-result__copy">
-                MIME type associated with the{" "}
-                <span className="mime-tag">.{selectedExtension}</span> file extension:
-              </p>
-              <div className="mime-tags" role="list">
-                <span className="mime-tag mime-tag--accent" role="listitem">
-                  {mimeTypeFound}
-                </span>
-              </div>
-            </div>
+            <ResultTags
+              intro={<>MIME type associated with the <code>.{selectedExtension}</code> file extension:</>}
+              tags={[mimeTypeFound]}
+            />
           ) : null}
-        </ToolPanel>
-      </ToolWorkspace>
+        </Panel>
+      </ToolFrame>
 
-      <ToolPanel labelledBy="mime-table-heading" className="mime-tool__panel mime-tool__table-panel">
-        <ToolSectionHeading
-          title="MIME types reference"
-          titleId="mime-table-heading"
-          description={
-            <ToolHint>
-              Full MIME type ↔ extension map from mime-db ({MIME_INFOS.length} types).
-            </ToolHint>
-          }
-        />
-
-        <ToolInput
-          id="mime-table-filter"
-          label="Filter table"
-          full
-          value={tableFilter}
-          placeholder="Filter by MIME type or extension…"
-          onChange={(event) => setTableFilter(event.target.value)}
-          autoComplete="off"
-          spellCheck={false}
-        />
-
-        <div className="mime-table-wrap">
-          <table className="mime-table">
+      <Panel
+        title="MIME types reference"
+        titleId="mime-table-heading"
+        description={`Full MIME type ↔ extension map from mime-db (${MIME_INFOS.length} types).`}
+      >
+        <ReferenceList
+          searchLabel="Filter by MIME type or extension…"
+          query={tableFilter}
+          onQueryChange={setTableFilter}
+          count={filteredInfos.length}
+          empty={{ icon: "magnifying-glass", title: "No MIME types match this filter.", size: "sm" }}
+        >
+          <Table caption="MIME types and their extensions" captionHidden density="compact" stickyHeader>
             <thead>
               <tr>
                 <th scope="col">MIME types</th>
@@ -173,27 +122,35 @@ export default function MimeTypes() {
                     <code>{mimeType}</code>
                   </td>
                   <td>
-                    <div className="mime-tags">
-                      {extensions.map((extension) => (
-                        <span key={extension} className="mime-tag">
-                          .{extension}
-                        </span>
-                      ))}
-                    </div>
+                    <TagRow tags={extensions.map((extension) => `.${extension}`)} />
                   </td>
                 </tr>
               ))}
-              {filteredInfos.length === 0 ? (
-                <tr>
-                  <td colSpan={2} className="mime-table__empty">
-                    No MIME types match this filter.
-                  </td>
-                </tr>
-              ) : null}
             </tbody>
-          </table>
-        </div>
-      </ToolPanel>
-    </ToolIsland>
+          </Table>
+        </ReferenceList>
+      </Panel>
+    </ToolFrame>
+  );
+}
+
+function ResultTags({ intro, tags }: { intro: ReactNode; tags: string[] }) {
+  return (
+    <div className="mime-result" aria-live="polite">
+      <p className="mime-result__copy">{intro}</p>
+      <TagRow tags={tags} tone="accent" />
+    </div>
+  );
+}
+
+function TagRow({ tags, tone = "neutral" }: { tags: string[]; tone?: "neutral" | "accent" }) {
+  return (
+    <div className="mime-tags" role="list">
+      {tags.map((tag) => (
+        <Badge key={tag} tone={tone} size="sm" role="listitem" className="mime-tag">
+          {tag}
+        </Badge>
+      ))}
+    </div>
   );
 }

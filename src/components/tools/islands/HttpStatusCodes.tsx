@@ -1,19 +1,10 @@
 import { useMemo, useState } from "react";
 
-import {
-  ToolEmpty,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolWorkspace,
-} from "@/components/tools/ui";
+import { List, ListRow, Panel, ReferenceList, SectionHeading, ToolFrame } from "@/ui/react";
 import {
   countHttpStatusCodes,
   filterHttpStatusCategories,
   formatHttpStatusMeaning,
-  formatHttpStatusTitle,
 } from "@/lib/tools/http-status-codes";
 
 import "./HttpStatusCodes.css";
@@ -22,10 +13,7 @@ export default function HttpStatusCodes() {
   const [search, setSearch] = useState("");
   const total = countHttpStatusCodes();
 
-  const categories = useMemo(
-    () => filterHttpStatusCategories(search),
-    [search],
-  );
+  const categories = useMemo(() => filterHttpStatusCategories(search), [search]);
 
   const matchCount = useMemo(
     () => categories.reduce((sum, group) => sum + group.codes.length, 0),
@@ -33,71 +21,42 @@ export default function HttpStatusCodes() {
   );
 
   return (
-    <ToolIsland className="hsc-tool">
-      <ToolPanel labelledBy="hsc-heading" className="hsc-tool__panel">
-        <ToolSectionHeading
-          title="HTTP status codes"
-          titleId="hsc-heading"
-          description={
-            <ToolHint>
-              The list of all HTTP status codes, their name, and their meaning
-              ({total} codes).
-            </ToolHint>
-          }
-        />
-
-        <ToolInput
-          id="hsc-search"
-          label="Search"
-          full
-          value={search}
-          placeholder="Search http status…"
-          autoComplete="off"
-          spellCheck={false}
-          autoFocus
-          onChange={(event) => setSearch(event.target.value)}
-        />
-      </ToolPanel>
-
-      {matchCount === 0 ? (
-        <ToolEmpty>No status codes match this search.</ToolEmpty>
-      ) : (
-        <div className="hsc-categories">
-          {categories.map((group) => (
-            <section
-              key={group.category}
-              className="hsc-category"
-              aria-labelledby={`hsc-cat-${slugify(group.category)}`}
-            >
-              <h2
-                id={`hsc-cat-${slugify(group.category)}`}
-                className="hsc-category__title"
-              >
-                {group.category}
-              </h2>
-
-              <ToolWorkspace className="hsc-list">
-                {group.codes.map((entry) => (
-                  <ToolPanel
-                    key={entry.code}
-                    className="hsc-card"
-                    labelledBy={`hsc-code-${entry.code}`}
-                    animate={false}
-                  >
-                    <h3 id={`hsc-code-${entry.code}`} className="hsc-card__title">
-                      {formatHttpStatusTitle(entry)}
-                    </h3>
-                    <p className="hsc-card__meaning">
-                      {formatHttpStatusMeaning(entry)}
-                    </p>
-                  </ToolPanel>
-                ))}
-              </ToolWorkspace>
-            </section>
-          ))}
-        </div>
-      )}
-    </ToolIsland>
+    <ToolFrame>
+      <Panel
+        title="HTTP status codes"
+        titleId="hsc-heading"
+        description={`The list of all HTTP status codes, their name, and their meaning (${total} codes).`}
+      >
+        <ReferenceList
+          searchLabel="Search http status…"
+          query={search}
+          onQueryChange={setSearch}
+          count={matchCount}
+          empty={{ icon: "magnifying-glass", title: "No status codes match this search.", size: "sm" }}
+        >
+          <div className="hsc-categories">
+            {categories.map((group) => {
+              const headingId = `hsc-cat-${slugify(group.category)}`;
+              return (
+                <section key={group.category} aria-labelledby={headingId}>
+                  <SectionHeading title={group.category} titleId={headingId} level={3} />
+                  <List label={group.category}>
+                    {group.codes.map((entry) => (
+                      <ListRow
+                        key={entry.code}
+                        label={<span className="hsc-code">{entry.code}</span>}
+                        title={entry.name}
+                        description={formatHttpStatusMeaning(entry)}
+                      />
+                    ))}
+                  </List>
+                </section>
+              );
+            })}
+          </div>
+        </ReferenceList>
+      </Panel>
+    </ToolFrame>
   );
 }
 

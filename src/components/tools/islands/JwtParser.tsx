@@ -1,22 +1,12 @@
 import { useMemo, useState } from "react";
 
-import {
-  ToolHint,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-  ToolWorkspace,
-} from "@/components/tools/ui";
+import { KeyValue, Notice, Panel, SectionHeading, Textarea, ToolFrame, type KeyValueItem } from "@/ui/react";
 import {
   DEFAULT_JWT,
   decodeJwt,
   isValidJwt,
   type JwtClaimRow,
 } from "@/lib/tools/jwt-parser";
-
-import "./JwtParser.css";
 
 const SECTIONS = [
   { key: "header" as const, title: "Header" },
@@ -33,102 +23,65 @@ export default function JwtParser() {
   );
 
   return (
-    <ToolIsland className="jwt-tool">
-      <ToolWorkspace className="jwt-tool__workspace" stagger>
-        <ToolPanel labelledBy="jwt-heading" className="jwt-tool__panel">
-          <ToolSectionHeading
-            title="JWT parser"
-            titleId="jwt-heading"
-            description={
-              <ToolHint>
-                Paste a JWT to decode its header and payload claims. The
-                signature segment is shown as-is and is not verified.
-              </ToolHint>
-            }
-          />
+    <ToolFrame>
+      <Panel
+        title="JWT parser"
+        titleId="jwt-heading"
+        description="Paste a JWT to decode its header and payload claims. The signature segment is shown as-is and is not verified."
+      >
+        <Textarea
+          id="jwt-input"
+          label="JWT to decode"
+          mono
+          rows={5}
+          value={rawJwt}
+          placeholder="Put your token here…"
+          spellCheck={false}
+          autoFocus
+          onChange={(event) => setRawJwt(event.target.value)}
+          aria-invalid={!valid || undefined}
+        />
 
-          <ToolTextarea
-            id="jwt-input"
-            label="JWT to decode"
-            full
-            code
-            rows={5}
-            value={rawJwt}
-            placeholder="Put your token here…"
-            spellCheck={false}
-            autoFocus
-            onChange={(event) => setRawJwt(event.target.value)}
-            aria-invalid={!valid || undefined}
-          />
+        {!valid ? (
+          <Notice tone="danger" live="polite">
+            Invalid JWT
+          </Notice>
+        ) : null}
 
-          {!valid ? (
-            <ToolStatus tone="error" live="polite">
-              Invalid JWT
-            </ToolStatus>
-          ) : null}
+        {decoded ? (
+          <>
+            {SECTIONS.map((section) => (
+              <section key={section.key} aria-labelledby={`jwt-${section.key}-heading`}>
+                <SectionHeading title={section.title} titleId={`jwt-${section.key}-heading`} level={3} />
+                <KeyValue items={decoded[section.key].map(claimItem)} />
+              </section>
+            ))}
 
-          {decoded ? (
-            <>
-              <div className="jwt-table-wrap">
-                <table className="jwt-table">
-                  <tbody>
-                    {SECTIONS.map((section) => (
-                      <ClaimSection
-                        key={section.key}
-                        title={section.title}
-                        rows={decoded[section.key]}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="jwt-signature">
-                <span className="jwt-signature__label">Signature</span>
-                <code className="jwt-signature__value tool-code" aria-live="polite">
-                  {decoded.signature || "(empty)"}
-                </code>
-              </div>
-            </>
-          ) : null}
-        </ToolPanel>
-      </ToolWorkspace>
-    </ToolIsland>
+            <KeyValue
+              aria-live="polite"
+              items={[
+                {
+                  label: "Signature",
+                  value: decoded.signature || "(empty)",
+                  mono: true,
+                  copy: decoded.signature ? decoded.signature : false,
+                },
+              ]}
+            />
+          </>
+        ) : null}
+      </Panel>
+    </ToolFrame>
   );
 }
 
-function ClaimSection({
-  title,
-  rows,
-}: {
-  title: string;
-  rows: JwtClaimRow[];
-}) {
-  return (
-    <>
-      <tr>
-        <th colSpan={2} className="jwt-table__section" scope="colgroup">
-          {title}
-        </th>
-      </tr>
-      {rows.map((row) => (
-        <tr key={`${row.claim}:${row.value}`}>
-          <td className="jwt-table__claim">
-            <span className="jwt-table__claim-name">{row.claim}</span>
-            {row.claimDescription ? (
-              <span className="jwt-table__claim-desc">
-                ({row.claimDescription})
-              </span>
-            ) : null}
-          </td>
-          <td className="jwt-table__value">
-            <span>{row.value}</span>
-            {row.friendlyValue ? (
-              <span className="jwt-table__friendly">({row.friendlyValue})</span>
-            ) : null}
-          </td>
-        </tr>
-      ))}
-    </>
-  );
+function claimItem(row: JwtClaimRow): KeyValueItem {
+  const hint = [row.claimDescription, row.friendlyValue].filter(Boolean).join(" · ");
+  return {
+    label: row.claim,
+    value: String(row.value),
+    mono: true,
+    copy: true,
+    hint: hint || undefined,
+  };
 }
