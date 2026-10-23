@@ -1,0 +1,17 @@
+.ui-tool-frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ui-space-xl);
+  align-items: start;
+}
+
+.ui-tool-frame[data-layout="single"] { max-width: var(--ui-content); }
+
+.ui-tool-frame__item { min-width: 0; }
+
+@media (min-width: 900px) {
+  .ui-tool-frame[data-layout="split"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--ui-space-2xl);
+  }
+}

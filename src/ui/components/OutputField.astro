@@ -1,0 +1,36 @@
+---
+import CopyButton from "./CopyButton.astro";
+import Input from "./Input.astro";
+import Textarea from "./Textarea.astro";
+
+interface Props {
+  label: string;
+  value: string;
+  multiline?: boolean;
+  rows?: number;
+  mono?: boolean;
+  copy?: boolean;
+  placeholder?: string;
+  hint?: string;
+  error?: string;
+  id?: string;
+  class?: string;
+}
+
+const { label, value, multiline, rows, mono = true, copy = true, placeholder, hint, error, id, class: className } = Astro.props;
+const shared = { label, mono, placeholder, hint, error, id, readonly: true, spellcheck: false };
+---
+
+<div class:list={["ui-output-field", className]}>
+  {
+    multiline ? (
+      <Textarea {...shared} rows={rows ?? 4} value={value}>
+        {copy && <CopyButton slot="trailing" value={value} appearance="icon" size="sm" disabled={!value} />}
+      </Textarea>
+    ) : (
+      <Input {...shared} value={value}>
+        {copy && <CopyButton slot="trailing" value={value} appearance="icon" size="sm" disabled={!value} />}
+      </Input>
+    )
+  }
+</div>

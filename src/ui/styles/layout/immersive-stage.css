@@ -1,0 +1,24 @@
+.ui-immersive-stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--ui-canvas-bg);
+  color: var(--ui-text);
+}
+
+.ui-immersive-stage__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.ui-immersive-stage__controls {
+  opacity: 1;
+  transition: opacity var(--ui-dur-slow) var(--ui-ease-out);
+}
+
+.ui-immersive-stage[data-idle="true"] { cursor: none; }
+
+.ui-immersive-stage[data-idle="true"] .ui-immersive-stage__controls:not(:focus-within) {
+  opacity: 0;
+  pointer-events: none;
+}

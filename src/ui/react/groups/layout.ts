@@ -3,3 +3,5 @@ export { Stack, Cluster, Grid, type StackProps, type ClusterProps, type GridProp
 export { SectionHeading, type SectionHeadingProps } from "../SectionHeading";
 export { PageHeader, type PageHeaderProps } from "../PageHeader";
 export { Reveal, type RevealProps } from "../Reveal";
+export { AppShell, type AppShellProps } from "../AppShell";
+export { ImmersiveStage, type ImmersiveStageProps } from "../ImmersiveStage";

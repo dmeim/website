@@ -6,3 +6,4 @@ export { default as Section } from "../Section.astro";
 export { default as SectionHeading } from "../SectionHeading.astro";
 export { default as PageHeader } from "../PageHeader.astro";
 export { default as Reveal } from "../Reveal.astro";
+export { default as AppShell } from "../AppShell.astro";

@@ -1,0 +1,75 @@
+.ui-app-shell {
+  display: grid;
+  grid-template-columns: var(--ui-sidebar-width) minmax(0, 1fr);
+  height: calc(100dvh - var(--ui-header-height));
+  min-height: 0;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+}
+
+.ui-app-shell__sidebar {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--ui-bg);
+  border-inline-end: 1px solid var(--ui-line);
+}
+
+.ui-app-shell__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.ui-app-shell__header {
+  flex: none;
+  border-block-end: 1px solid var(--ui-line);
+}
+
+.ui-app-shell__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ui-app-shell[data-main-scroll="false"] .ui-app-shell__content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ui-app-shell__scrim { display: none; }
+
+.ui-app-shell[data-layout="narrow"] { grid-template-columns: minmax(0, 1fr); }
+
+/* Before hydration (no data-layout) and for the static Astro shell. */
+@media (max-width: 899.98px) {
+  .ui-app-shell:not([data-layout]) { grid-template-columns: minmax(0, 1fr); }
+
+  .ui-app-shell:not([data-layout]) > .ui-app-shell__sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: var(--ui-z-drawer);
+    width: min(var(--ui-sidebar-width), 85vw);
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition: transform var(--ui-dur-base) var(--ui-ease-out), visibility 0s linear var(--ui-dur-base);
+  }
+
+  .ui-app-shell:not([data-layout])[data-sidebar-open="true"] > .ui-app-shell__sidebar {
+    visibility: visible;
+    transform: none;
+    transition: transform var(--ui-dur-base) var(--ui-ease-out);
+  }
+
+  .ui-app-shell:not([data-layout])[data-sidebar-open="true"] > .ui-app-shell__scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--ui-z-drawer) - 1);
+    background: var(--ui-overlay);
+  }
+}

@@ -1,6 +1,6 @@
 ---
 import ThemePair from "./ThemePair.astro";
-import { Cluster, Container, Grid, PageHeader, Reveal, Section, SectionHeading, Stack } from "@/ui/components/groups/layout";
+import { AppShell, Cluster, Container, Grid, PageHeader, Reveal, Section, SectionHeading, Stack } from "@/ui/components/groups/layout";
 import { Link } from "@/ui/components/groups/text";
 import { LayoutShowcase } from "@/ui/react/showcase/LayoutShowcase";
 
@@ -44,6 +44,17 @@ const tile = "background: var(--ui-surface); border-radius: var(--ui-radius-cont
         <li data-reveal style={tile}>Revealed first</li>
         <li data-reveal style={tile}>Then second</li>
       </Reveal>
+
+      <h4 class="ui-showcase-sub">AppShell (static, bounded frame)</h4>
+      <div style="position: relative; height: 14rem; overflow: hidden; transform: translateZ(0); border: 1px solid var(--ui-line); border-radius: var(--ui-radius-control)">
+        <AppShell sidebarLabel="Demo navigation" style="height: 100%">
+          <div slot="sidebar" style="padding: var(--ui-space-sm)"><div style={tile}>Sidebar item</div></div>
+          <div slot="header" style="padding: var(--ui-space-xs) var(--ui-space-sm)">
+            <button type="button" class="ui-button" data-variant="ghost" data-size="sm" data-ui-app-shell-toggle aria-expanded="false">Menu</button>
+          </div>
+          <div style="padding: var(--ui-space-md)">{[1, 2, 3, 4, 5, 6].map((n) => <p style={tile}>Main content {n}</p>)}</div>
+        </AppShell>
+      </div>
     </Stack>
   </ThemePair>
   <h3 class="ui-showcase-sub">React</h3>

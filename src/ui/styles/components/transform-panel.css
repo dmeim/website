@@ -1,0 +1,20 @@
+.ui-transform-panel {
+  display: grid;
+  gap: var(--ui-space-md);
+  min-width: 0;
+}
+
+.ui-transform-panel__options { min-width: 0; }
+
+.ui-transform-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-space-xs);
+}
+
+.ui-transform-panel__hint {
+  margin: 0;
+  font-size: var(--ui-fs-xs);
+  color: var(--ui-text-muted);
+}

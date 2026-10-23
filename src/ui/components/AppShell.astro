@@ -1,0 +1,44 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  sidebarLabel: string;
+  sidebarOpen?: boolean;
+}
+
+const { sidebarLabel, sidebarOpen = false, class: className, ...rest } = Astro.props;
+---
+
+<div {...rest} class:list={["ui-app-shell", className]} data-sidebar-open={sidebarOpen ? "true" : "false"} data-ui-app-shell>
+  <aside class="ui-app-shell__sidebar" aria-label={sidebarLabel}><slot name="sidebar" /></aside>
+  <div class="ui-app-shell__scrim" aria-hidden="true" data-ui-app-shell-close></div>
+  <div class="ui-app-shell__main">
+    {Astro.slots.has("header") && <div class="ui-app-shell__header"><slot name="header" /></div>}
+    <div class="ui-app-shell__content"><slot /></div>
+  </div>
+</div>
+
+<script>
+  // Static fallback: buttons with data-ui-app-shell-toggle open/close the narrow-width sidebar.
+  function bindShells(): void {
+    document.querySelectorAll<HTMLElement>("[data-ui-app-shell]").forEach((root) => {
+      if (root.dataset.uiBound === "1") return;
+      root.dataset.uiBound = "1";
+      const set = (open: boolean) => {
+        root.dataset.sidebarOpen = String(open);
+        root.querySelectorAll("[data-ui-app-shell-toggle]").forEach((b) => b.setAttribute("aria-expanded", String(open)));
+      };
+      root.addEventListener("click", (event) => {
+        const target = event.target as HTMLElement;
+        if (target.closest("[data-ui-app-shell-toggle]")) set(root.dataset.sidebarOpen !== "true");
+        else if (target.closest("[data-ui-app-shell-close]")) set(false);
+      });
+      root.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && root.dataset.sidebarOpen === "true") set(false);
+      });
+    });
+  }
+
+  bindShells();
+  document.addEventListener("astro:page-load", bindShells);
+</script>

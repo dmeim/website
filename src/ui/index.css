@@ -79,5 +79,11 @@
 @import "./styles/layout/section.css";
 @import "./styles/components/section-heading.css";
 @import "./styles/layout/page-header.css";
+@import "./styles/layout/app-shell.css";
+@import "./styles/layout/immersive-stage.css";
 
 /* group: composites */
+@import "./styles/components/tool-frame.css";
+@import "./styles/components/transform-panel.css";
+@import "./styles/components/output-field.css";
+@import "./styles/components/reference-list.css";

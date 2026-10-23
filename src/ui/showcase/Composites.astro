@@ -1,10 +1,20 @@
 ---
 import ThemePair from "./ThemePair.astro";
+import { OutputField } from "@/ui/components/groups/composites";
+import { Stack } from "@/ui/components/groups/layout";
+import { CompositesShowcase } from "@/ui/react/showcase/CompositesShowcase";
 ---
 
 <section id="composites" class="ui-showcase-section" aria-labelledby="composites-title">
   <h2 id="composites-title" class="ui-showcase-section__title">Composites</h2>
   <ThemePair>
-    <p class="ui-showcase-empty">No composites components yet.</p>
+    <Stack gap="md">
+      <h4 class="ui-showcase-sub">OutputField (Astro)</h4>
+      <OutputField label="Token" value="tk_9f2c4e7a1b3d5f80" hint="32 hex characters" />
+      <OutputField label="Hash" multiline rows={2} value="e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" />
+      <OutputField label="No copy" value="read only" copy={false} mono={false} />
+    </Stack>
   </ThemePair>
+  <h3 class="ui-showcase-sub">React</h3>
+  <CompositesShowcase client:visible />
 </section>

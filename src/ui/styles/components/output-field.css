@@ -1,0 +1,3 @@
+.ui-output-field { min-width: 0; }
+
+.ui-output-field .ui-field__trailing .ui-copy-button { margin-block: calc(var(--ui-space-3xs) * -1); }

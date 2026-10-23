@@ -1,0 +1,19 @@
+.ui-reference-list {
+  display: grid;
+  gap: var(--ui-space-md);
+  min-width: 0;
+}
+
+.ui-reference-list__search {
+  display: grid;
+  gap: var(--ui-space-2xs);
+}
+
+.ui-reference-list__count {
+  margin: 0;
+  font-size: var(--ui-fs-xs);
+  color: var(--ui-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-reference-list__body { min-width: 0; }
