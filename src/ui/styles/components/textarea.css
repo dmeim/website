@@ -1,0 +1,19 @@
+.ui-textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(var(--ui-control-md) * 2);
+  margin: 0;
+  padding: var(--ui-space-xs) var(--ui-space-sm);
+  box-sizing: border-box;
+  line-height: var(--ui-lh-normal);
+  resize: vertical;
+}
+
+.ui-textarea[data-resize="none"] {
+  resize: none;
+}
+
+.ui-textarea[rows] {
+  min-height: 0;
+}

@@ -21,6 +21,17 @@
 /* group: actions */
 
 /* group: forms */
+@import "./styles/components/field.css";
+@import "./styles/components/input.css";
+@import "./styles/components/textarea.css";
+@import "./styles/components/select.css";
+@import "./styles/components/checkbox.css";
+@import "./styles/components/switch.css";
+@import "./styles/components/radio-group.css";
+@import "./styles/components/segmented-control.css";
+@import "./styles/components/slider.css";
+@import "./styles/components/form-grid.css";
+@import "./styles/components/fieldset.css";
 
 /* group: display */
 @import "./styles/components/badge.css";

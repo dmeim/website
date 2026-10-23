@@ -1,0 +1,33 @@
+.ui-form-grid {
+  --ui-form-grid-gap: var(--ui-space-md);
+  display: grid;
+  grid-template-columns: repeat(var(--ui-form-grid-cols, 2), minmax(0, 1fr));
+  gap: var(--ui-form-grid-gap);
+  align-items: start;
+}
+
+.ui-form-grid[data-gap="sm"] {
+  --ui-form-grid-gap: var(--ui-space-sm);
+}
+
+.ui-form-grid[data-gap="lg"] {
+  --ui-form-grid-gap: var(--ui-space-lg);
+}
+
+.ui-form-grid[data-columns="1"] {
+  --ui-form-grid-cols: 1;
+}
+
+.ui-form-grid[data-columns="3"] {
+  --ui-form-grid-cols: 3;
+}
+
+.ui-form-grid[data-columns="auto"] {
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+}
+
+@media (max-width: 40rem) {
+  .ui-form-grid:not([data-columns="auto"]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

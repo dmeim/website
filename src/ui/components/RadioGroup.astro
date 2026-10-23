@@ -1,0 +1,70 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { createId } from "@/ui/lib/ids";
+
+interface RadioOption {
+  value: string;
+  label: string;
+  description?: string;
+  disabled?: boolean;
+}
+
+interface Props extends HTMLAttributes<"fieldset"> {
+  name: string;
+  legend: string;
+  legendHidden?: boolean;
+  options: RadioOption[];
+  value?: string;
+  defaultValue?: string;
+  orientation?: "vertical" | "horizontal";
+}
+
+const {
+  name,
+  legend,
+  legendHidden,
+  options,
+  value,
+  defaultValue,
+  orientation = "vertical",
+  id,
+  class: className,
+  ...rest
+} = Astro.props;
+const baseId = id ?? createId("radio");
+const selected = value ?? defaultValue;
+---
+
+<fieldset {...rest} id={id} class:list={["ui-radio-group", className]} data-orientation={orientation}>
+  <legend class:list={["ui-radio-group__legend", legendHidden && "ui-visually-hidden"]}>{legend}</legend>
+  <div class="ui-radio-group__options">
+    {
+      options.map((option, index) => {
+        const optionId = `${baseId}-${index}`;
+        const descId = option.description ? `${optionId}-description` : undefined;
+        return (
+          <label class="ui-radio-group__option" for={optionId}>
+            <input
+              id={optionId}
+              type="radio"
+              class="ui-radio-group__input"
+              name={name}
+              value={option.value}
+              disabled={option.disabled}
+              checked={selected === option.value}
+              aria-describedby={descId}
+            />
+            <span class="ui-radio-group__text">
+              <span class="ui-radio-group__label">{option.label}</span>
+              {option.description && (
+                <span class="ui-radio-group__description" id={descId}>
+                  {option.description}
+                </span>
+              )}
+            </span>
+          </label>
+        );
+      })
+    }
+  </div>
+</fieldset>

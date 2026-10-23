@@ -1,0 +1,100 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import { describedBy, needsField, type ControlSize, type FieldLayout, type FieldSpan } from "@/ui/lib/field";
+import { createId } from "@/ui/lib/ids";
+import Field from "./Field.astro";
+
+interface SelectOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
+  group?: string;
+}
+
+interface Props extends Omit<HTMLAttributes<"select">, "size"> {
+  label?: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  optional?: boolean;
+  labelHidden?: boolean;
+  layout?: FieldLayout;
+  span?: FieldSpan;
+  trailing?: string;
+  size?: ControlSize;
+  options?: SelectOption[];
+  /** Selected option value (sets `selected` on the matching option). */
+  value?: string;
+}
+
+const {
+  label,
+  hint,
+  error,
+  required,
+  optional,
+  labelHidden,
+  layout,
+  span,
+  trailing,
+  size = "md",
+  options,
+  value,
+  id,
+  class: className,
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
+  ...rest
+} = Astro.props;
+
+const controlId = id ?? createId("select");
+const wrap = needsField(label, hint, error);
+const fieldProps = { label, hint, error, required, optional, labelHidden, layout, span, trailing, htmlFor: controlId };
+const hasTrailing = Astro.slots.has("trailing");
+const Wrapper = wrap ? Field : Fragment;
+
+const chunks: Array<{ group?: string; items: SelectOption[] }> = [];
+for (const option of options ?? []) {
+  const last = chunks[chunks.length - 1];
+  if (last && last.group === option.group) last.items.push(option);
+  else chunks.push({ group: option.group, items: [option] });
+}
+---
+
+<Wrapper {...(wrap ? fieldProps : {})}>
+  {wrap && hasTrailing && <slot name="trailing" slot="trailing" />}
+  <span class:list={["ui-select", className]} data-size={size}>
+    <select
+      {...rest}
+      id={controlId}
+      required={required}
+      class="ui-select__control"
+      aria-invalid={error ? "true" : ariaInvalid}
+      aria-describedby={describedBy(controlId, hint, error, ariaDescribedBy as string | undefined)}
+    >
+      {
+        options
+          ? chunks.map((chunk) =>
+              chunk.group ? (
+                <optgroup label={chunk.group}>
+                  {chunk.items.map((o) => (
+                    <option value={o.value} disabled={o.disabled} selected={o.value === value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ) : (
+                chunk.items.map((o) => (
+                  <option value={o.value} disabled={o.disabled} selected={o.value === value}>
+                    {o.label}
+                  </option>
+                ))
+              ),
+            )
+          : <slot />
+      }
+    </select>
+    <Icon name="caret-down" class="ui-select__caret" />
+  </span>
+</Wrapper>

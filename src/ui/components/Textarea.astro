@@ -1,0 +1,67 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { describedBy, needsField, type FieldLayout, type FieldSpan } from "@/ui/lib/field";
+import { createId } from "@/ui/lib/ids";
+import Field from "./Field.astro";
+
+interface Props extends HTMLAttributes<"textarea"> {
+  label?: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  optional?: boolean;
+  labelHidden?: boolean;
+  layout?: FieldLayout;
+  span?: FieldSpan;
+  trailing?: string;
+  mono?: boolean;
+  rows?: number;
+  resize?: "vertical" | "none";
+  /** Initial text content. */
+  value?: string;
+}
+
+const {
+  label,
+  hint,
+  error,
+  required,
+  optional,
+  labelHidden,
+  layout,
+  span,
+  trailing,
+  mono,
+  rows,
+  resize = "vertical",
+  value,
+  id,
+  class: className,
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
+  ...rest
+} = Astro.props;
+
+const controlId = id ?? createId("textarea");
+const wrap = needsField(label, hint, error);
+const fieldProps = { label, hint, error, required, optional, labelHidden, layout, span, trailing, htmlFor: controlId };
+const hasTrailing = Astro.slots.has("trailing");
+const Wrapper = wrap ? Field : Fragment;
+const content = value ?? (Astro.slots.has("default") ? await Astro.slots.render("default") : "");
+---
+
+<Wrapper {...(wrap ? fieldProps : {})}>
+  {wrap && hasTrailing && <slot name="trailing" slot="trailing" />}
+  <textarea
+    {...rest}
+    id={controlId}
+    rows={rows}
+    required={required}
+    class:list={["ui-textarea", className]}
+    data-mono={mono ? "true" : undefined}
+    data-resize={resize}
+    aria-invalid={error ? "true" : ariaInvalid}
+    aria-describedby={describedBy(controlId, hint, error, ariaDescribedBy as string | undefined)}
+    set:text={content}
+  />
+</Wrapper>

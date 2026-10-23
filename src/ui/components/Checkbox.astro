@@ -1,0 +1,40 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { createId } from "@/ui/lib/ids";
+
+interface Props extends Omit<HTMLAttributes<"input">, "type"> {
+  label?: string;
+  description?: string;
+  invalid?: boolean;
+  labelHidden?: boolean;
+}
+
+const {
+  label,
+  description,
+  invalid,
+  labelHidden,
+  id,
+  class: className,
+  "aria-describedby": ariaDescribedBy,
+  ...rest
+} = Astro.props;
+const controlId = id ?? createId("checkbox");
+const descId = description ? `${controlId}-description` : undefined;
+---
+
+<label class:list={["ui-checkbox", className]} for={controlId} data-invalid={invalid ? "true" : undefined}>
+  <input
+    {...rest}
+    id={controlId}
+    type="checkbox"
+    class="ui-checkbox__input"
+    aria-invalid={invalid ? "true" : undefined}
+    aria-describedby={[ariaDescribedBy, descId].filter(Boolean).join(" ") || undefined}
+  />
+  <span class:list={["ui-checkbox__text", labelHidden && "ui-visually-hidden"]}>
+    <span class="ui-checkbox__label"><slot name="label">{label}</slot></span>
+    {description && <span class="ui-checkbox__description" id={descId}>{description}</span>}
+  </span>
+</label>
+

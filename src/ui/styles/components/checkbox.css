@@ -1,0 +1,108 @@
+/* Checkbox, plus the shared choice-row layout used by Switch and RadioGroup options. */
+.ui-checkbox,
+.ui-switch,
+.ui-radio-group__option {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--ui-space-xs);
+  max-width: 100%;
+  font-size: var(--ui-fs-sm);
+  line-height: var(--ui-lh-snug);
+  color: var(--ui-text);
+  cursor: pointer;
+}
+
+.ui-checkbox:has(input:disabled),
+.ui-switch:has(input:disabled),
+.ui-radio-group__option:has(input:disabled) {
+  color: var(--ui-text-disabled);
+  cursor: not-allowed;
+}
+
+.ui-checkbox__text,
+.ui-switch__text,
+.ui-radio-group__text {
+  display: grid;
+  gap: var(--ui-space-3xs);
+  min-width: 0;
+  /* Optically centre the first line on the 18px control. */
+  padding-top: 1px;
+  overflow-wrap: anywhere;
+}
+
+.ui-checkbox__description,
+.ui-switch__description,
+.ui-radio-group__description {
+  font-size: var(--ui-fs-xs);
+  color: var(--ui-text-muted);
+}
+
+.ui-checkbox__input {
+  appearance: none;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: var(--ui-border-width) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-xs);
+  background: transparent;
+  cursor: inherit;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-out),
+    border-color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-checkbox__input::after {
+  content: "";
+  width: 5px;
+  height: 9px;
+  margin-top: -2px;
+  border: solid var(--ui-on-ink);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg) scale(0.6);
+  opacity: 0;
+  transition:
+    opacity var(--ui-dur-fast) var(--ui-ease-out),
+    transform var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-checkbox__input:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--ui-text) 45%, transparent);
+}
+
+.ui-checkbox__input:checked,
+.ui-checkbox__input:indeterminate {
+  border-color: var(--ui-ink);
+  background: var(--ui-ink);
+}
+
+.ui-checkbox__input:checked::after {
+  opacity: 1;
+  transform: rotate(45deg) scale(1);
+}
+
+.ui-checkbox__input:indeterminate::after {
+  width: 8px;
+  height: 0;
+  margin-top: 0;
+  border-width: 0 0 1.5px;
+  transform: none;
+  opacity: 1;
+}
+
+.ui-checkbox__input[aria-invalid="true"] {
+  border-color: var(--ui-danger);
+}
+
+.ui-checkbox__input:disabled {
+  border-color: var(--ui-line);
+  background: transparent;
+}
+
+.ui-checkbox__input:disabled:checked,
+.ui-checkbox__input:disabled:indeterminate {
+  background: var(--ui-text-disabled);
+  border-color: transparent;
+}

@@ -1,0 +1,170 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { rangePct } from "@/ui/lib/field";
+import { createId } from "@/ui/lib/ids";
+
+interface Props extends HTMLAttributes<"div"> {
+  label: string;
+  min: number;
+  max: number;
+  step?: number;
+  value?: number | [number, number];
+  defaultValue?: number | [number, number];
+  showValue?: boolean;
+  /** Formats the server-rendered value and marks; live updates show the raw number. */
+  formatValue?: (value: number) => string;
+  marks?: number[];
+  disabled?: boolean;
+  name?: string;
+}
+
+const {
+  label,
+  min,
+  max,
+  step = 1,
+  value,
+  defaultValue,
+  showValue,
+  formatValue = String,
+  marks,
+  disabled,
+  name,
+  id,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+const baseId = id ?? createId("slider");
+const current = value ?? defaultValue ?? min;
+const range = Array.isArray(current);
+const [low, high] = range ? current : [min, current];
+const labelId = `${baseId}-label`;
+const inputId = `${baseId}-input`;
+const text = range ? `${formatValue(low)} – ${formatValue(high)}` : formatValue(high);
+const vars = `--ui-slider-start: ${range ? rangePct(low, min, max) : 0}%; --ui-slider-pct: ${rangePct(high, min, max)}%;${typeof style === "string" ? ` ${style}` : ""}`;
+---
+
+<div
+  {...rest}
+  id={id}
+  class:list={["ui-slider", className]}
+  data-range={range ? "true" : undefined}
+  role={range ? "group" : undefined}
+  aria-labelledby={range ? labelId : undefined}
+  data-ui-slider
+  style={vars}
+>
+  <div class="ui-slider__head">
+    {
+      range ? (
+        <span class="ui-slider__label" id={labelId}>
+          {label}
+        </span>
+      ) : (
+        <label class="ui-slider__label" id={labelId} for={inputId}>
+          {label}
+        </label>
+      )
+    }
+    {showValue && <output class="ui-slider__value" for={range ? `${inputId}-min ${inputId}-max` : inputId}>{text}</output>}
+  </div>
+  <div class="ui-slider__track">
+    {
+      range ? (
+        <>
+          <input
+            type="range"
+            class="ui-slider__input"
+            id={`${inputId}-min`}
+            name={name ? `${name}-min` : undefined}
+            min={min}
+            max={max}
+            step={step}
+            value={low}
+            disabled={disabled}
+            aria-label={`Minimum ${label}`}
+            data-ui-slider-min
+          />
+          <input
+            type="range"
+            class="ui-slider__input"
+            id={`${inputId}-max`}
+            name={name ? `${name}-max` : undefined}
+            min={min}
+            max={max}
+            step={step}
+            value={high}
+            disabled={disabled}
+            aria-label={`Maximum ${label}`}
+            data-ui-slider-max
+          />
+        </>
+      ) : (
+        <input
+          type="range"
+          class="ui-slider__input"
+          id={inputId}
+          name={name}
+          min={min}
+          max={max}
+          step={step}
+          value={high}
+          disabled={disabled}
+          data-ui-slider-max
+        />
+      )
+    }
+  </div>
+  {
+    marks && marks.length > 0 && (
+      <div class="ui-slider__marks" aria-hidden="true">
+        {marks.map((mark) => (
+          <span class="ui-slider__mark" style={`--ui-slider-mark: ${rangePct(mark, min, max)}%`}>
+            {formatValue(mark)}
+          </span>
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<script>
+  function pct(input: HTMLInputElement, value: number): string {
+    const min = Number(input.min);
+    const max = Number(input.max);
+    return `${max > min ? Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100)) : 0}%`;
+  }
+
+  function bindSliders(): void {
+    document.querySelectorAll<HTMLElement>("[data-ui-slider]").forEach((root) => {
+      if (root.dataset.uiBound === "1") return;
+      root.dataset.uiBound = "1";
+      const lowInput = root.querySelector<HTMLInputElement>("[data-ui-slider-min]");
+      const highInput = root.querySelector<HTMLInputElement>("[data-ui-slider-max]");
+      const output = root.querySelector<HTMLOutputElement>(".ui-slider__value");
+      if (!highInput) return;
+      const sync = (event?: Event) => {
+        let high = Number(highInput.value);
+        if (lowInput) {
+          let low = Number(lowInput.value);
+          if (low > high) {
+            if (event?.target === lowInput) low = high;
+            else high = low;
+            lowInput.value = String(low);
+            highInput.value = String(high);
+          }
+          root.style.setProperty("--ui-slider-start", pct(lowInput, low));
+          if (output) output.value = `${low} – ${high}`;
+        } else if (output) {
+          output.value = String(high);
+        }
+        root.style.setProperty("--ui-slider-pct", pct(highInput, high));
+      };
+      root.addEventListener("input", sync);
+    });
+  }
+
+  bindSliders();
+  document.addEventListener("astro:page-load", bindSliders);
+</script>

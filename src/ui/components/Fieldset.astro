@@ -1,0 +1,19 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { createId } from "@/ui/lib/ids";
+
+interface Props extends HTMLAttributes<"fieldset"> {
+  legend: string;
+  description?: string;
+  legendHidden?: boolean;
+}
+
+const { legend, description, legendHidden, id, class: className, ...rest } = Astro.props;
+const descId = description ? `${id ?? createId("fieldset")}-description` : undefined;
+---
+
+<fieldset {...rest} id={id} class:list={["ui-fieldset", className]} aria-describedby={descId}>
+  <legend class:list={["ui-fieldset__legend", legendHidden && "ui-visually-hidden"]}>{legend}</legend>
+  {description && <p class="ui-fieldset__description" id={descId}>{description}</p>}
+  <div class="ui-fieldset__body"><slot /></div>
+</fieldset>

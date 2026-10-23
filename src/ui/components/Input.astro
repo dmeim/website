@@ -1,0 +1,137 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import type { IconName } from "@/ui/icons";
+import { describedBy, needsField, type ControlSize, type FieldLayout, type FieldSpan } from "@/ui/lib/field";
+import { createId } from "@/ui/lib/ids";
+import Field from "./Field.astro";
+
+interface Props extends Omit<HTMLAttributes<"input">, "size"> {
+  label?: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  optional?: boolean;
+  labelHidden?: boolean;
+  layout?: FieldLayout;
+  span?: FieldSpan;
+  trailing?: string;
+  size?: ControlSize;
+  mono?: boolean;
+  iconStart?: IconName;
+  suffix?: string;
+  clearable?: boolean;
+  revealable?: boolean;
+}
+
+const {
+  label,
+  hint,
+  error,
+  required,
+  optional,
+  labelHidden,
+  layout,
+  span,
+  trailing,
+  size = "md",
+  mono,
+  iconStart,
+  suffix,
+  clearable,
+  revealable,
+  id,
+  type = "text",
+  class: className,
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
+  ...rest
+} = Astro.props;
+
+const controlId = id ?? createId("input");
+const showClear = (clearable ?? type === "search") && !rest.disabled && !rest.readonly;
+const isPassword = type === "password";
+const filled = rest.value !== undefined && rest.value !== null && String(rest.value) !== "";
+const wrap = needsField(label, hint, error);
+const fieldProps = { label, hint, error, required, optional, labelHidden, layout, span, trailing, htmlFor: controlId };
+const hasTrailing = Astro.slots.has("trailing");
+const Wrapper = wrap ? Field : Fragment;
+---
+
+<Wrapper {...(wrap ? fieldProps : {})}>
+  {wrap && hasTrailing && <slot name="trailing" slot="trailing" />}
+  <span
+    class:list={["ui-input", className]}
+    data-size={size}
+    data-mono={mono ? "true" : undefined}
+    data-filled={filled ? "true" : undefined}
+    data-ui-input
+  >
+    {iconStart && <Icon name={iconStart} class="ui-input__icon" />}
+    <input
+      {...rest}
+      id={controlId}
+      type={type}
+      required={required}
+      class="ui-input__control"
+      aria-invalid={error ? "true" : ariaInvalid}
+      aria-describedby={describedBy(controlId, hint, error, ariaDescribedBy as string | undefined)}
+    />
+    {suffix && <span class="ui-input__suffix">{suffix}</span>}
+    {
+      showClear && (
+        <button type="button" class="ui-input__action ui-input__clear" aria-label="Clear" data-ui-input-clear>
+          <Icon name="x" weight="bold" />
+        </button>
+      )
+    }
+    {
+      revealable && isPassword && (
+        <button
+          type="button"
+          class="ui-input__action"
+          aria-label="Show password"
+          aria-pressed="false"
+          data-ui-input-reveal
+          disabled={rest.disabled}
+        >
+          <Icon name="eye" class="ui-input__reveal-show" />
+          <Icon name="eye-slash" class="ui-input__reveal-hide" />
+        </button>
+      )
+    }
+  </span>
+</Wrapper>
+
+<script>
+  function bindInputs(): void {
+    document.querySelectorAll<HTMLElement>("[data-ui-input]").forEach((root) => {
+      if (root.dataset.uiBound === "1") return;
+      root.dataset.uiBound = "1";
+      const input = root.querySelector<HTMLInputElement>(".ui-input__control");
+      if (!input) return;
+      const sync = () => {
+        if (input.value) root.dataset.filled = "true";
+        else delete root.dataset.filled;
+      };
+      input.addEventListener("input", sync);
+      sync();
+      root.querySelector("[data-ui-input-clear]")?.addEventListener("click", () => {
+        input.value = "";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        input.focus();
+      });
+      const reveal = root.querySelector<HTMLButtonElement>("[data-ui-input-reveal]");
+      reveal?.addEventListener("click", () => {
+        const show = input.type === "password";
+        input.type = show ? "text" : "password";
+        reveal.setAttribute("aria-pressed", String(show));
+        reveal.setAttribute("aria-label", show ? "Hide password" : "Show password");
+      });
+    });
+  }
+
+  bindInputs();
+  document.addEventListener("astro:page-load", bindInputs);
+</script>

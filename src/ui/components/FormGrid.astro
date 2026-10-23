@@ -1,0 +1,12 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
+  columns?: 1 | 2 | 3 | "auto";
+  gap?: "sm" | "md" | "lg";
+}
+
+const { columns = 2, gap = "md", class: className, ...rest } = Astro.props;
+---
+
+<div {...rest} class:list={["ui-form-grid", className]} data-columns={columns} data-gap={gap}><slot /></div>

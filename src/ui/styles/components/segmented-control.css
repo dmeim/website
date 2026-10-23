@@ -1,0 +1,150 @@
+.ui-segmented-control {
+  --ui-seg-height: var(--ui-control-md);
+  --ui-seg-pad: 2px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ui-segmented-control[data-size="sm"] {
+  --ui-seg-height: var(--ui-control-sm);
+}
+
+.ui-segmented-control[data-size="lg"] {
+  --ui-seg-height: var(--ui-control-lg);
+}
+
+.ui-segmented-control__legend {
+  float: left;
+  width: 100%;
+  margin-bottom: var(--ui-space-2xs);
+  padding: 0;
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-medium);
+  color: var(--ui-text);
+}
+
+.ui-segmented-control__track {
+  clear: both;
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  max-width: 100%;
+  height: var(--ui-seg-height);
+  padding: var(--ui-seg-pad);
+  box-sizing: border-box;
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
+}
+
+.ui-segmented-control[data-equal="true"] .ui-segmented-control__track {
+  grid-auto-columns: minmax(0, 1fr);
+}
+
+.ui-segmented-control__thumb {
+  position: absolute;
+  top: var(--ui-seg-pad);
+  bottom: var(--ui-seg-pad);
+  left: var(--ui-seg-pad);
+  width: calc((100% - 2 * var(--ui-seg-pad)) / var(--ui-seg-count, 1));
+  border-radius: 6px;
+  background: var(--ui-bg);
+  transform: translateX(calc(100% * var(--ui-seg-index, 0)));
+  transition:
+    transform var(--ui-dur-base) var(--ui-ease-out),
+    width var(--ui-dur-base) var(--ui-ease-out),
+    opacity var(--ui-dur-fast) var(--ui-ease-out);
+  pointer-events: none;
+}
+
+.ui-segmented-control[data-equal="false"] .ui-segmented-control__thumb {
+  left: 0;
+  width: var(--ui-seg-w, 0);
+  transform: translateX(var(--ui-seg-x, 0));
+}
+
+/* Measured thumbs appear in place once measured instead of growing from zero. */
+.ui-segmented-control[data-equal="false"]:not([data-measured]) .ui-segmented-control__thumb {
+  opacity: 0;
+  transition: none;
+}
+
+.ui-segmented-control[data-selected="false"] .ui-segmented-control__thumb,
+.ui-segmented-control[data-indicator="fill"] .ui-segmented-control__thumb {
+  opacity: 0;
+}
+
+.ui-segmented-control__option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-2xs);
+  min-width: 0;
+  padding-inline: var(--ui-space-sm);
+  border-radius: 6px;
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-medium);
+  color: var(--ui-text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--ui-dur-fast) var(--ui-ease-out),
+    background-color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-segmented-control[data-size="sm"] .ui-segmented-control__option {
+  padding-inline: var(--ui-space-xs);
+  font-size: var(--ui-fs-xs);
+}
+
+.ui-segmented-control__option:hover {
+  color: var(--ui-text);
+}
+
+.ui-segmented-control__option:has(:checked) {
+  color: var(--ui-text);
+}
+
+.ui-segmented-control[data-indicator="fill"] .ui-segmented-control__option:has(:checked) {
+  background: var(--ui-bg);
+}
+
+.ui-segmented-control__option:has(:focus-visible) {
+  outline: var(--ui-focus-width) solid var(--ui-focus-ring);
+  outline-offset: 0;
+}
+
+.ui-segmented-control__option:has(:disabled) {
+  color: var(--ui-text-disabled);
+  cursor: not-allowed;
+}
+
+.ui-segmented-control__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.ui-segmented-control__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ui-segmented-control__icon {
+  flex: none;
+}
+
+.ui-segmented-control__swatch {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: var(--ui-border-width) solid var(--ui-line-strong);
+  box-sizing: border-box;
+}

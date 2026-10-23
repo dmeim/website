@@ -1,10 +1,156 @@
 ---
-import ThemePair from "./ThemePair.astro";
+import Field from "@/ui/components/Field.astro";
+import Input from "@/ui/components/Input.astro";
+import Textarea from "@/ui/components/Textarea.astro";
+import Select from "@/ui/components/Select.astro";
+import Checkbox from "@/ui/components/Checkbox.astro";
+import Switch from "@/ui/components/Switch.astro";
+import RadioGroup from "@/ui/components/RadioGroup.astro";
+import SegmentedControl from "@/ui/components/SegmentedControl.astro";
+import Slider from "@/ui/components/Slider.astro";
+import FormGrid from "@/ui/components/FormGrid.astro";
+import Fieldset from "@/ui/components/Fieldset.astro";
+import { FormsShowcase } from "@/ui/react/showcase/FormsShowcase";
+
+// Rendered once per theme column (not via ThemePair) so ids and radio names stay unique.
+const themes = ["light", "dark"] as const;
+const longLabel =
+  "A deliberately long label that keeps going to show how wrapping behaves inside narrow columns";
+const languages = [
+  { value: "ts", label: "TypeScript", group: "Typed" },
+  { value: "rs", label: "Rust", group: "Typed" },
+  { value: "js", label: "JavaScript", group: "Dynamic" },
+  { value: "py", label: "Python", group: "Dynamic", disabled: true },
+];
+const density = [
+  { value: "compact", label: "Compact" },
+  { value: "default", label: "Default" },
+  { value: "relaxed", label: "Relaxed" },
+];
+const theme3 = [
+  { value: "light", label: "Light", icon: "sun" as const, iconOnly: true },
+  { value: "system", label: "System", icon: "circle-half" as const, iconOnly: true },
+  { value: "dark", label: "Dark", icon: "moon" as const, iconOnly: true },
+];
+const swatches = [
+  { value: "gold", label: "Gold", swatch: "#b8862f" },
+  { value: "red", label: "Red", swatch: "#a8322d" },
+  { value: "blue", label: "Blue", swatch: "#2d5aa8" },
+];
+const uneven = [
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium thinking" },
+  { value: "high", label: "High" },
+];
+const pct = (n: number) => `${n}%`;
 ---
 
 <section id="forms" class="ui-showcase-section" aria-labelledby="forms-title">
   <h2 id="forms-title" class="ui-showcase-section__title">Forms</h2>
-  <ThemePair>
-    <p class="ui-showcase-empty">No forms components yet.</p>
-  </ThemePair>
+  <h3 class="ui-showcase-sub">Astro</h3>
+  <div class="ui-showcase-pair">
+    {
+      themes.map((theme) => (
+        <div class="ui-showcase-pair__col" data-theme={theme}>
+          <p class="ui-showcase-pair__label">{theme === "light" ? "Light" : "Dark"}</p>
+          <div style="display: grid; gap: var(--ui-space-lg)">
+            <h4 class="ui-showcase-sub">Input</h4>
+            <FormGrid columns={1} gap="sm">
+              <Input label="Name" placeholder="Ada Lovelace" hint="As it appears on your profile." />
+              <Input label="Email" type="email" placeholder="you@example.com" required />
+              <Input label="Website" type="url" optional iconStart="globe" placeholder="https://" />
+              <Input label="Search" type="search" iconStart="magnifying-glass" value="phosphor" />
+              <Input label="Amount" type="number" suffix="ms" value="250" mono />
+              <Input label="Password" type="password" revealable value="hunter2" />
+              <Input label="Clearable" clearable value="Clear me" />
+              <Input label="Invalid" value="not-an-email" error="Enter a valid email address." />
+              <Input label="Output (readonly)" readonly mono value="sha256:9f86d081884c7d65" />
+              <Input label="Disabled" disabled value="Can't touch this" />
+              <Input label={longLabel} placeholder="Long label overflow" />
+              <Input label="With trailing" value="abc">
+                <span slot="trailing" style="font-size: var(--ui-fs-xs); color: var(--ui-text-muted)">3 chars</span>
+              </Input>
+              <Input label="Inline layout" layout="inline" placeholder="Label column" />
+              <Input label="Hidden label" labelHidden placeholder="Label is visually hidden" />
+              <div style="display: grid; gap: var(--ui-space-xs)">
+                <Input size="sm" placeholder="Small" aria-label="Small" />
+                <Input size="md" placeholder="Medium" aria-label="Medium" />
+                <Input size="lg" placeholder="Large" aria-label="Large" />
+              </div>
+            </FormGrid>
+
+            <h4 class="ui-showcase-sub">Textarea</h4>
+            <Textarea label="Message" placeholder="Say hello" rows={3} hint="Markdown is supported." />
+            <Textarea label="Invalid" rows={2} error="Message is required." />
+            <Textarea label="Output" readonly mono rows={2} value={'{\n  "ok": true\n}'} />
+            <Textarea label="No resize, disabled" resize="none" rows={2} disabled value="Disabled" />
+
+            <h4 class="ui-showcase-sub">Select</h4>
+            <Select label="Language" options={languages} value="ts" />
+            <Select label="Invalid" options={languages} error="Pick a language." />
+            <Select label="Disabled" disabled options={languages} />
+            <Select size="sm" aria-label="Children select">
+              <option>Children option</option>
+              <option>Another</option>
+            </Select>
+
+            <h4 class="ui-showcase-sub">Checkbox and Switch</h4>
+            <Checkbox label="Send me a copy" checked />
+            <Checkbox label="Unchecked" description="Optional description line in muted text." />
+            <Checkbox label="Invalid" invalid />
+            <Checkbox label="Disabled checked" disabled checked />
+            <Checkbox label={longLabel} />
+            <Switch label="Email notifications" checked />
+            <Switch label="Label at start" labelPosition="start" description="Thumb slides on toggle." />
+            <Switch label="Disabled" disabled />
+
+            <h4 class="ui-showcase-sub">RadioGroup</h4>
+            <RadioGroup
+              name={`a-plan-${theme}`}
+              legend="Plan"
+              defaultValue="pro"
+              options={[
+                { value: "free", label: "Free" },
+                { value: "pro", label: "Pro", description: "Everything in Free, plus more." },
+                { value: "team", label: "Team", disabled: true },
+              ]}
+            />
+            <RadioGroup name={`a-dir-${theme}`} legend="Direction" orientation="horizontal" defaultValue="ltr" options={[{ value: "ltr", label: "Left to right" }, { value: "rtl", label: "Right to left" }]} />
+
+            <h4 class="ui-showcase-sub">SegmentedControl</h4>
+            <SegmentedControl name={`a-density-${theme}`} label="Density" options={density} defaultValue="default" />
+            <SegmentedControl name={`a-theme-${theme}`} label="Theme" labelHidden options={theme3} defaultValue="system" size="sm" />
+            <SegmentedControl name={`a-colour-${theme}`} label="Border colour" options={swatches} defaultValue="gold" />
+            <SegmentedControl name={`a-uneven-${theme}`} label="Measured (equal=false)" equal={false} options={uneven} defaultValue="medium" />
+            <SegmentedControl name={`a-fill-${theme}`} label="Fill indicator" indicator="fill" options={density} defaultValue="compact" size="lg" />
+            <SegmentedControl name={`a-none-${theme}`} label="No selection, one disabled" options={[...density.slice(0, 2), { value: "x", label: "Off", disabled: true }]} />
+
+            <h4 class="ui-showcase-sub">Slider</h4>
+            <Slider label="Length" min={4} max={64} defaultValue={24} showValue />
+            <Slider label="Opacity" min={0} max={100} step={10} defaultValue={40} showValue formatValue={pct} marks={[0, 50, 100]} />
+            <Slider label="Words" min={1} max={50} defaultValue={[5, 20]} showValue />
+            <Slider label="Disabled" min={0} max={10} defaultValue={3} disabled showValue />
+
+            <h4 class="ui-showcase-sub">Field, FormGrid and Fieldset</h4>
+            <Fieldset legend="Export" description="Settings applied to the downloaded file.">
+              <FormGrid columns="auto" gap="sm">
+                <Input label="Width" suffix="px" value="1200" />
+                <Input label="Height" suffix="px" value="630" />
+                <Select label="Format" options={[{ value: "png", label: "PNG" }, { value: "svg", label: "SVG" }]} />
+              </FormGrid>
+            </Fieldset>
+            <FormGrid columns={2}>
+              <Input label="First" />
+              <Input label="Last" />
+              <Field label="Custom child (span full)" span="full" htmlFor={`a-raw-${theme}`} hint="Field wraps any control.">
+                <input id={`a-raw-${theme}`} class="ui-input__control" style="border-bottom: 1px solid var(--ui-line)" />
+              </Field>
+            </FormGrid>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+  <h3 class="ui-showcase-sub">React</h3>
+  <FormsShowcase client:visible />
 </section>

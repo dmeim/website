@@ -1,0 +1,47 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { createId } from "@/ui/lib/ids";
+
+interface Props extends Omit<HTMLAttributes<"input">, "type" | "role"> {
+  label?: string;
+  description?: string;
+  invalid?: boolean;
+  labelHidden?: boolean;
+  labelPosition?: "start" | "end";
+}
+
+const {
+  label,
+  description,
+  invalid,
+  labelHidden,
+  labelPosition = "end",
+  id,
+  class: className,
+  "aria-describedby": ariaDescribedBy,
+  ...rest
+} = Astro.props;
+const controlId = id ?? createId("switch");
+const descId = description ? `${controlId}-description` : undefined;
+---
+
+<label
+  class:list={["ui-switch", className]}
+  for={controlId}
+  data-label-position={labelPosition}
+  data-invalid={invalid ? "true" : undefined}
+>
+  <input
+    {...rest}
+    id={controlId}
+    type="checkbox"
+    role="switch"
+    class="ui-switch__input"
+    aria-invalid={invalid ? "true" : undefined}
+    aria-describedby={[ariaDescribedBy, descId].filter(Boolean).join(" ") || undefined}
+  />
+  <span class:list={["ui-switch__text", labelHidden && "ui-visually-hidden"]}>
+    <span class="ui-switch__label"><slot name="label">{label}</slot></span>
+    {description && <span class="ui-switch__description" id={descId}>{description}</span>}
+  </span>
+</label>

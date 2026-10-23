@@ -1,0 +1,122 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import type { IconName } from "@/ui/icons";
+import type { ControlSize } from "@/ui/lib/field";
+import { createId } from "@/ui/lib/ids";
+
+interface SegmentedOption {
+  value: string;
+  label: string;
+  icon?: IconName;
+  iconOnly?: boolean;
+  disabled?: boolean;
+  swatch?: string;
+}
+
+interface Props extends HTMLAttributes<"fieldset"> {
+  name: string;
+  label: string;
+  labelHidden?: boolean;
+  options: SegmentedOption[];
+  value?: string;
+  defaultValue?: string;
+  size?: ControlSize;
+  equal?: boolean;
+  indicator?: "slide" | "fill";
+}
+
+const {
+  name,
+  label,
+  labelHidden,
+  options,
+  value,
+  defaultValue,
+  size = "md",
+  equal = true,
+  indicator = "slide",
+  id,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+const baseId = id ?? createId("seg");
+const selected = value ?? defaultValue;
+const index = options.findIndex((option) => option.value === selected);
+const vars = `--ui-seg-count: ${options.length}; --ui-seg-index: ${Math.max(index, 0)};${typeof style === "string" ? ` ${style}` : ""}`;
+---
+
+<fieldset
+  {...rest}
+  id={id}
+  class:list={["ui-segmented-control", className]}
+  data-size={size}
+  data-equal={equal ? "true" : "false"}
+  data-indicator={indicator}
+  data-selected={index >= 0 ? "true" : "false"}
+  data-ui-segmented
+  style={vars}
+>
+  <legend class:list={["ui-segmented-control__legend", labelHidden && "ui-visually-hidden"]}>{label}</legend>
+  <div class="ui-segmented-control__track">
+    <span class="ui-segmented-control__thumb" aria-hidden="true"></span>
+    {
+      options.map((option, optionIndex) => {
+        const optionId = `${baseId}-${optionIndex}`;
+        return (
+          <label class="ui-segmented-control__option" for={optionId}>
+            <input
+              id={optionId}
+              type="radio"
+              class="ui-segmented-control__input"
+              name={name}
+              value={option.value}
+              disabled={option.disabled}
+              checked={selected === option.value}
+            />
+            {option.swatch && (
+              <span class="ui-segmented-control__swatch" style={`background: ${option.swatch}`} aria-hidden="true" />
+            )}
+            {option.icon && <Icon name={option.icon} class="ui-segmented-control__icon" />}
+            <span class:list={["ui-segmented-control__label", option.iconOnly && "ui-visually-hidden"]}>
+              {option.label}
+            </span>
+          </label>
+        );
+      })
+    }
+  </div>
+</fieldset>
+
+<script>
+  function syncSegmented(root: HTMLElement): void {
+    const track = root.querySelector<HTMLElement>(".ui-segmented-control__track");
+    const inputs = Array.from(root.querySelectorAll<HTMLInputElement>(".ui-segmented-control__input"));
+    const index = inputs.findIndex((input) => input.checked);
+    root.style.setProperty("--ui-seg-count", String(inputs.length));
+    root.style.setProperty("--ui-seg-index", String(Math.max(index, 0)));
+    root.dataset.selected = index >= 0 ? "true" : "false";
+    const option = inputs[index]?.closest<HTMLElement>(".ui-segmented-control__option");
+    if (root.dataset.equal === "false" && track && option) {
+      root.style.setProperty("--ui-seg-x", `${option.offsetLeft}px`);
+      root.style.setProperty("--ui-seg-w", `${option.offsetWidth}px`);
+      requestAnimationFrame(() => root.setAttribute("data-measured", ""));
+    }
+  }
+
+  function bindSegmented(): void {
+    document.querySelectorAll<HTMLElement>("[data-ui-segmented]").forEach((root) => {
+      if (root.dataset.uiBound === "1") return;
+      root.dataset.uiBound = "1";
+      root.addEventListener("change", () => syncSegmented(root));
+      if (root.dataset.equal === "false") {
+        new ResizeObserver(() => syncSegmented(root)).observe(root);
+      }
+      syncSegmented(root);
+    });
+  }
+
+  bindSegmented();
+  document.addEventListener("astro:page-load", bindSegmented);
+</script>

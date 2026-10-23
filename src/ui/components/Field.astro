@@ -1,0 +1,72 @@
+---
+import { fieldErrorId, fieldHintId, type FieldLayout, type FieldSpan } from "@/ui/lib/field";
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends Omit<HTMLAttributes<"div">, "id"> {
+  label?: string;
+  /** Id of the control the label points at. */
+  htmlFor?: string;
+  id?: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  optional?: boolean;
+  labelHidden?: boolean;
+  layout?: FieldLayout;
+  span?: FieldSpan;
+  /** Text beside the label; use the `trailing` slot for markup. */
+  trailing?: string;
+}
+
+const {
+  label,
+  htmlFor,
+  id,
+  hint,
+  error,
+  required,
+  optional,
+  labelHidden,
+  layout = "stack",
+  span = "auto",
+  trailing,
+  class: className,
+  ...rest
+} = Astro.props;
+const controlId = htmlFor ?? id;
+const hasTrailing = Boolean(trailing) || Astro.slots.has("trailing");
+---
+
+<div
+  {...rest}
+  class:list={["ui-field", className]}
+  data-layout={layout}
+  data-span={span}
+  data-invalid={error ? "true" : undefined}
+>
+  {
+    (label || hasTrailing) && (
+      <div class="ui-field__head">
+        {label && (
+          <label class:list={["ui-field__label", labelHidden && "ui-visually-hidden"]} for={controlId}>
+            {label}
+            {required && (
+              <span class="ui-field__required" aria-hidden="true">
+                *
+              </span>
+            )}
+            {optional && !required && <span class="ui-field__optional">optional</span>}
+          </label>
+        )}
+        {hasTrailing && (
+          <div class="ui-field__trailing">
+            <slot name="trailing">{trailing}</slot>
+          </div>
+        )}
+      </div>
+    )
+  }
+  <div class="ui-field__control"><slot /></div>
+  {hint && <p class="ui-field__hint" id={controlId ? fieldHintId(controlId) : undefined}>{hint}</p>}
+  {error && <p class="ui-field__error" id={controlId ? fieldErrorId(controlId) : undefined}>{error}</p>}
+</div>
