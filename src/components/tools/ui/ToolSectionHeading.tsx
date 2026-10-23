@@ -14,24 +14,21 @@ type ToolSectionHeadingProps = {
   as?: "h2" | "h3";
 };
 
-export function ToolSectionHeading({
-  title,
-  titleId,
-  description,
-  trailing,
-  row = false,
-  className,
-  as = "h2",
-}: ToolSectionHeadingProps) {
+/**
+ * Renders the library Panel header markup inside a ToolPanel body, so kit tools
+ * get the Panel heading without restructuring their JSX.
+ */
+export function ToolSectionHeading({ title, titleId, description, trailing, className, as = "h2" }: ToolSectionHeadingProps) {
   const Heading = as;
-
   return (
-    <div className={cx("tool-section-heading", row && "tool-section-heading--row", className)}>
-      <div className="tool-section-heading__copy">
-        <Heading id={titleId}>{title}</Heading>
-        {description}
+    <header className={cx("ui-panel__header tool-section-heading", className)}>
+      <div className="ui-panel__heading">
+        <Heading id={titleId} className="ui-panel__title">
+          {title}
+        </Heading>
+        {description ? <div className="ui-panel__description">{description}</div> : null}
       </div>
-      {trailing}
-    </div>
+      {trailing ? <div className="ui-panel__actions">{trailing}</div> : null}
+    </header>
   );
 }

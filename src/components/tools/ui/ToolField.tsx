@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { Field, Input, Select, Textarea } from "@/ui/react";
 
 import { cx } from "./cx";
 
@@ -10,64 +11,51 @@ type ToolFieldShellProps = {
   children: ReactNode;
 };
 
-export function ToolField({
-  label,
-  htmlFor,
-  full = false,
-  className,
-  children,
-}: ToolFieldShellProps) {
+/** The kit accepts node labels; the library renders them inside its <label> unchanged. */
+const asLabel = (label: ReactNode) => label as string | undefined;
+
+export function ToolField({ label, htmlFor, full = false, className, children }: ToolFieldShellProps) {
   return (
-    <div className={cx("tool-field", full && "tool-field--full", className)}>
-      {label ? <label htmlFor={htmlFor}>{label}</label> : null}
+    <Field
+      label={asLabel(label)}
+      htmlFor={htmlFor}
+      span={full ? "full" : "auto"}
+      className={cx("tool-field", className)}
+    >
       {children}
-    </div>
+    </Field>
   );
 }
 
-type ToolInputProps = InputHTMLAttributes<HTMLInputElement> & {
+type ToolInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
   label: ReactNode;
   full?: boolean;
   fieldClassName?: string;
+  size?: number;
+  code?: boolean;
 };
 
-export function ToolInput({
-  label,
-  id,
-  full,
-  fieldClassName,
-  className,
-  ...rest
-}: ToolInputProps) {
+export function ToolInput({ label, full, fieldClassName, size: _size, code = false, ...rest }: ToolInputProps) {
   return (
-    <ToolField label={label} htmlFor={id} full={full} className={fieldClassName}>
-      <input id={id} className={className} {...rest} />
-    </ToolField>
+    <Field label={asLabel(label)} htmlFor={rest.id} span={full ? "full" : "auto"} className={cx("tool-field", fieldClassName)}>
+      <Input {...rest} mono={code} />
+    </Field>
   );
 }
 
-type ToolSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
+type ToolSelectProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> & {
   label: ReactNode;
   full?: boolean;
   fieldClassName?: string;
   children: ReactNode;
+  size?: number;
 };
 
-export function ToolSelect({
-  label,
-  id,
-  full,
-  fieldClassName,
-  className,
-  children,
-  ...rest
-}: ToolSelectProps) {
+export function ToolSelect({ label, full, fieldClassName, children, size: _size, ...rest }: ToolSelectProps) {
   return (
-    <ToolField label={label} htmlFor={id} full={full} className={fieldClassName}>
-      <select id={id} className={className} {...rest}>
-        {children}
-      </select>
-    </ToolField>
+    <Field label={asLabel(label)} htmlFor={rest.id} span={full ? "full" : "auto"} className={cx("tool-field", fieldClassName)}>
+      <Select {...rest}>{children}</Select>
+    </Field>
   );
 }
 
@@ -78,18 +66,10 @@ type ToolTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   fieldClassName?: string;
 };
 
-export function ToolTextarea({
-  label,
-  id,
-  full,
-  code = false,
-  fieldClassName,
-  className,
-  ...rest
-}: ToolTextareaProps) {
+export function ToolTextarea({ label, full, code = false, fieldClassName, ...rest }: ToolTextareaProps) {
   return (
-    <ToolField label={label} htmlFor={id} full={full} className={fieldClassName}>
-      <textarea id={id} className={cx(code && "tool-code", className)} {...rest} />
-    </ToolField>
+    <Field label={asLabel(label)} htmlFor={rest.id} span={full ? "full" : "auto"} className={cx("tool-field", fieldClassName)}>
+      <Textarea {...rest} mono={code} />
+    </Field>
   );
 }

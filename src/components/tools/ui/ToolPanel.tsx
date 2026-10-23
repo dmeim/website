@@ -1,8 +1,7 @@
-import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
+import { Panel } from "@/ui/react";
 
 import { cx } from "./cx";
-import { toolPanelReveal, toolPanelTransition } from "./motion";
 
 type ToolPanelProps = {
   children: ReactNode;
@@ -12,35 +11,10 @@ type ToolPanelProps = {
   "aria-live"?: "off" | "polite" | "assertive";
 };
 
-export function ToolPanel({
-  children,
-  className,
-  labelledBy,
-  animate = true,
-  "aria-live": ariaLive,
-}: ToolPanelProps) {
-  const reduced = useReducedMotion();
-  const classes = cx("tool-panel", className);
-
-  if (!animate || reduced) {
-    return (
-      <section className={classes} aria-labelledby={labelledBy} aria-live={ariaLive}>
-        {children}
-      </section>
-    );
-  }
-
+export function ToolPanel({ children, className, labelledBy, animate = true, "aria-live": ariaLive }: ToolPanelProps) {
   return (
-    <motion.section
-      className={classes}
-      aria-labelledby={labelledBy}
-      aria-live={ariaLive}
-      initial="hidden"
-      animate="visible"
-      variants={toolPanelReveal}
-      transition={toolPanelTransition}
-    >
+    <Panel className={cx("tool-panel", className)} titleId={labelledBy} animate={animate} aria-live={ariaLive}>
       {children}
-    </motion.section>
+    </Panel>
   );
 }

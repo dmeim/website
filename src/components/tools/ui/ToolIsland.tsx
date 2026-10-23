@@ -1,33 +1,19 @@
-import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
+import { ToolFrame } from "@/ui/react";
 
 import { cx } from "./cx";
-import { toolFadeUp, toolTransition } from "./motion";
 
 type ToolIslandProps = {
   children: ReactNode;
   className?: string;
-  /** When true, fade the island in once on mount. */
+  /** Kept for API compatibility; panels carry their own reveal. */
   animate?: boolean;
 };
 
-export function ToolIsland({ children, className, animate = true }: ToolIslandProps) {
-  const reduced = useReducedMotion();
-  const classes = cx("tool-island", className);
-
-  if (!animate || reduced) {
-    return <div className={classes}>{children}</div>;
-  }
-
+export function ToolIsland({ children, className }: ToolIslandProps) {
   return (
-    <motion.div
-      className={classes}
-      initial="hidden"
-      animate="visible"
-      variants={toolFadeUp}
-      transition={toolTransition}
-    >
+    <ToolFrame layout="stack" className={cx("tool-island", className)}>
       {children}
-    </motion.div>
+    </ToolFrame>
   );
 }

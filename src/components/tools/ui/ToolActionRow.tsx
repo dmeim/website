@@ -1,44 +1,21 @@
-import { motion, useReducedMotion } from "framer-motion";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { Button, ButtonGroup, type ButtonProps, type ButtonVariant } from "@/ui/react";
 
 import { cx } from "./cx";
-import { toolFadeUp, toolTransition } from "./motion";
 
 type ToolActionRowProps = {
   children: ReactNode;
   className?: string;
+  /** Kept for API compatibility; the row no longer animates on its own. */
   animate?: boolean;
   "aria-label"?: string;
 };
 
-export function ToolActionRow({
-  children,
-  className,
-  animate = false,
-  "aria-label": ariaLabel,
-}: ToolActionRowProps) {
-  const reduced = useReducedMotion();
-  const classes = cx("tool-actions", className);
-
-  if (!animate || reduced) {
-    return (
-      <div className={classes} aria-label={ariaLabel}>
-        {children}
-      </div>
-    );
-  }
-
+export function ToolActionRow({ children, className, "aria-label": ariaLabel }: ToolActionRowProps) {
   return (
-    <motion.div
-      className={classes}
-      aria-label={ariaLabel}
-      initial="hidden"
-      animate="visible"
-      variants={toolFadeUp}
-      transition={toolTransition}
-    >
+    <ButtonGroup className={cx("tool-actions", className)} label={ariaLabel}>
       {children}
-    </motion.div>
+    </ButtonGroup>
   );
 }
 
@@ -48,26 +25,13 @@ type ToolButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ToolButtonVariant;
 };
 
-export function ToolButton({
-  variant = "default",
-  className,
-  type = "button",
-  children,
-  ...rest
-}: ToolButtonProps) {
-  return (
-    <button
-      type={type}
-      className={cx(
-        "btn",
-        variant === "primary" && "btn--primary",
-        variant === "ghost" && "btn--ghost",
-        variant === "danger" && "tool-btn--danger",
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </button>
-  );
+const VARIANTS: Record<ToolButtonVariant, ButtonVariant> = {
+  default: "secondary",
+  primary: "primary",
+  ghost: "ghost",
+  danger: "danger",
+};
+
+export function ToolButton({ variant = "default", type = "button", ...rest }: ToolButtonProps) {
+  return <Button {...(rest as ButtonProps)} type={type as ButtonProps["type"]} variant={VARIANTS[variant]} />;
 }

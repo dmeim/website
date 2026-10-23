@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import type { AriaRole, ReactNode } from "react";
+import { EmptyState, Notice, type NoticeTone } from "@/ui/react";
 
 import { cx } from "./cx";
 
@@ -12,29 +13,28 @@ type ToolStatusProps = {
   role?: string;
 };
 
-export function ToolStatus({
-  children,
-  tone = "default",
-  className,
-  live = "polite",
-  role = "status",
-}: ToolStatusProps) {
-  const resolvedTone = tone === "default" || tone === "" ? undefined : tone;
+const TONES: Record<ToolStatusTone, NoticeTone> = {
+  "": "neutral",
+  default: "neutral",
+  success: "success",
+  error: "danger",
+  accent: "accent",
+};
 
+const isEmpty = (node: ReactNode) => node == null || node === false || node === "";
+
+export function ToolStatus({ children, tone = "default", className, live = "polite", role = "status" }: ToolStatusProps) {
+  const noticeTone = TONES[tone];
   return (
-    <p
-      className={cx(
-        "tool-status",
-        resolvedTone === "success" && "tool-status--success",
-        resolvedTone === "error" && "tool-status--error",
-        resolvedTone === "accent" && "tool-status--accent",
-        className,
-      )}
-      role={role}
-      aria-live={live === "off" ? undefined : live}
+    <Notice
+      className={cx("tool-status", className)}
+      tone={noticeTone}
+      live={live}
+      role={role as AriaRole}
+      icon={noticeTone === "neutral" || isEmpty(children) ? false : undefined}
     >
       {children}
-    </p>
+    </Notice>
   );
 }
 
@@ -44,7 +44,11 @@ type ToolHintProps = {
 };
 
 export function ToolHint({ children, className }: ToolHintProps) {
-  return <p className={cx("tool-hint", className)}>{children}</p>;
+  return (
+    <Notice className={cx("tool-hint", className)} tone="neutral" live="off" icon={false}>
+      {children}
+    </Notice>
+  );
 }
 
 type ToolEmptyProps = {
@@ -53,5 +57,5 @@ type ToolEmptyProps = {
 };
 
 export function ToolEmpty({ children, className }: ToolEmptyProps) {
-  return <p className={cx("tool-empty", className)}>{children}</p>;
+  return <EmptyState className={cx("tool-empty", className)} size="sm" title={children as string} />;
 }

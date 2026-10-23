@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
-import { Search, Toolbox, X } from "lucide";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import {
   getCategoryForTool,
   toolCategories,
@@ -7,7 +6,7 @@ import {
   type Tool,
   type ToolCategory,
 } from "@/content/tools";
-import { LucideIcon } from "@/components/chat/LucideIcon";
+import { EmptyState, Input, List, ListRow, SideNav, type SideNavSection } from "@/ui/react";
 
 type Props = {
   activeSlug: string | null;
@@ -25,15 +24,21 @@ function categoryHasWip(category: ToolCategory): boolean {
   return category.tools.some((tool) => !toolRoute(tool));
 }
 
-export function ToolsSidebar({
-  activeSlug,
-  onSelectCatalog,
-  onSelectTool,
-}: Props) {
+/** Plain left clicks are handled in-app; modified clicks keep native link behaviour. */
+export function isPlainClick(event: MouseEvent<HTMLElement>): boolean {
+  return !(
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  );
+}
+
+export function ToolsSidebar({ activeSlug, onSelectCatalog, onSelectTool }: Props) {
   const [query, setQuery] = useState("");
-  const activeCategoryId = activeSlug
-    ? getCategoryForTool(activeSlug)?.id
-    : undefined;
+  const activeCategoryId = activeSlug ? getCategoryForTool(activeSlug)?.id : undefined;
 
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     () => new Set(activeCategoryId ? [activeCategoryId] : []),
@@ -47,176 +52,88 @@ export function ToolsSidebar({
 
   const normalizedQuery = query.trim().toLowerCase();
 
-  const filteredCategories = useMemo(() => {
+  const sections = useMemo<SideNavSection[]>(() => {
     return toolCategories
       .map((category) => ({
-        ...category,
-        tools: category.tools.filter((tool) =>
-          toolMatches(tool, normalizedQuery),
-        ),
+        category,
+        tools: category.tools.filter((tool) => toolMatches(tool, normalizedQuery)),
       }))
-      .filter((category) => category.tools.length > 0);
-  }, [normalizedQuery]);
+      .filter(({ tools }) => tools.length > 0)
+      .map(({ category, tools }) => ({
+        id: category.id,
+        title: category.name,
+        badge: categoryHasWip(category) ? "WIP" : undefined,
+        count: tools.length,
+        collapsible: true,
+        open: Boolean(normalizedQuery) || expandedCategories.has(category.id),
+        items: tools.map((tool) => {
+          const href = toolRoute(tool);
+          return {
+            id: tool.id,
+            href: href ?? undefined,
+            label: tool.title,
+            badge: href ? undefined : "WIP",
+            disabled: !href,
+            current: activeSlug === tool.id,
+          };
+        }),
+      }));
+  }, [normalizedQuery, expandedCategories, activeSlug]);
 
-  return (
-    <aside className="tools-sidebar" aria-label="Tool categories">
-      <div className="tools-sidebar__top">
-        <a
+  const header = (
+    <>
+      <List density="compact" divided={false} className="tools-sidebar__home">
+        <ListRow
+          title="All tools"
+          icon="toolbox"
           href="/tools"
-          className={
-            !activeSlug
-              ? "tools-sidebar__home is-active"
-              : "tools-sidebar__home"
-          }
+          current={!activeSlug}
+          arrow={false}
           onClick={(event) => {
-            if (
-              event.defaultPrevented ||
-              event.button !== 0 ||
-              event.metaKey ||
-              event.ctrlKey ||
-              event.shiftKey ||
-              event.altKey
-            ) {
-              return;
-            }
+            if (!isPlainClick(event)) return;
             event.preventDefault();
             onSelectCatalog();
           }}
-        >
-          <LucideIcon icon={Toolbox} size={16} />
-          All tools
-        </a>
-      </div>
+        />
+      </List>
+      <Input
+        id="tools-sidebar-search"
+        type="search"
+        label="Search tools"
+        labelHidden
+        iconStart="magnifying-glass"
+        size="sm"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        onClear={() => setQuery("")}
+        placeholder="Search tools…"
+        autoComplete="off"
+      />
+      {sections.length === 0 ? <EmptyState size="sm" title="No matching tools" /> : null}
+    </>
+  );
 
-      <div className="tools-sidebar__section">
-        <div className="tools-sidebar__search-field">
-          <LucideIcon icon={Search} size={16} />
-          <label className="visually-hidden" htmlFor="tools-sidebar-search">
-            Search tools
-          </label>
-          <input
-            id="tools-sidebar-search"
-            type="search"
-            className="tools-sidebar__search-input"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search tools…"
-            autoComplete="off"
-          />
-          {query ? (
-            <button
-              type="button"
-              className="tools-sidebar__search-close"
-              onClick={() => setQuery("")}
-              aria-label="Clear search"
-            >
-              <LucideIcon icon={X} size={14} />
-            </button>
-          ) : null}
-        </div>
-        <div className="tools-sidebar__section-head">
-          <h2 className="tools-sidebar__heading">Categories</h2>
-        </div>
-
-        <nav className="tools-sidebar__nav" aria-label="Categories">
-          {filteredCategories.length === 0 ? (
-            <p className="tools-sidebar__empty">No matching tools</p>
-          ) : (
-            filteredCategories.map((category) => {
-              const hasWip = categoryHasWip(category);
-              const forceOpen =
-                Boolean(normalizedQuery) || expandedCategories.has(category.id);
-              return (
-                <details
-                  key={category.id}
-                  className="tools-sidebar__category"
-                  open={forceOpen}
-                  onToggle={(event) => {
-                    if (normalizedQuery) return;
-                    const open = event.currentTarget.open;
-                    setExpandedCategories((current) => {
-                      if (current.has(category.id) === open) return current;
-                      const next = new Set(current);
-                      if (open) next.add(category.id);
-                      else next.delete(category.id);
-                      return next;
-                    });
-                  }}
-                >
-                  <summary>
-                    <span className="tools-sidebar__category-name">
-                      {category.name}
-                      {hasWip ? (
-                        <span
-                          className="tools-wip-badge"
-                          title="Contains WIP tools"
-                        >
-                          WIP
-                        </span>
-                      ) : null}
-                    </span>
-                    <span className="tools-sidebar__category-count">
-                      {category.tools.length}
-                    </span>
-                  </summary>
-                  <ul className="tools-sidebar__list" role="list">
-                    {category.tools.map((tool) => {
-                      const href = toolRoute(tool);
-                      const isActive = activeSlug === tool.id;
-                      if (href) {
-                        return (
-                          <li key={tool.id}>
-                            <a
-                              href={href}
-                              className={
-                                isActive
-                                  ? "tools-sidebar__item is-available is-active"
-                                  : "tools-sidebar__item is-available"
-                              }
-                              onClick={(event) => {
-                                if (
-                                  event.defaultPrevented ||
-                                  event.button !== 0 ||
-                                  event.metaKey ||
-                                  event.ctrlKey ||
-                                  event.shiftKey ||
-                                  event.altKey
-                                ) {
-                                  return;
-                                }
-                                event.preventDefault();
-                                onSelectTool(tool.id);
-                              }}
-                              aria-current={isActive ? "page" : undefined}
-                            >
-                              <span className="tools-sidebar__item-label">
-                                {tool.title}
-                              </span>
-                            </a>
-                          </li>
-                        );
-                      }
-                      return (
-                        <li key={tool.id}>
-                          <span
-                            className="tools-sidebar__item is-wip"
-                            title="Work in progress"
-                          >
-                            <span className="tools-sidebar__item-label">
-                              {tool.title}
-                            </span>
-                            <span className="tools-wip-badge">WIP</span>
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </details>
-              );
-            })
-          )}
-        </nav>
-      </div>
-    </aside>
+  return (
+    <SideNav
+      className="tools-sidebar"
+      label="Tool categories"
+      header={header}
+      sections={sections}
+      onNavigate={(item, event) => {
+        if (item.disabled || !isPlainClick(event)) return;
+        event.preventDefault();
+        onSelectTool(item.id);
+      }}
+      onToggleSection={(id, open) => {
+        if (normalizedQuery) return;
+        setExpandedCategories((current) => {
+          if (current.has(id) === open) return current;
+          const next = new Set(current);
+          if (open) next.add(id);
+          else next.delete(id);
+          return next;
+        });
+      }}
+    />
   );
 }

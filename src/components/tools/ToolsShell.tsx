@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { getToolById } from "@/content/tools";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+import { getCategoryForTool, getToolById } from "@/content/tools";
+import { AppShell, Breadcrumbs, IconButton, PageHeader } from "@/ui/react";
 import { ToolCatalog } from "./ToolCatalog";
 import { ToolMount } from "./ToolMount";
-import { ToolsSidebar } from "./ToolsSidebar";
+import { isPlainClick, ToolsSidebar } from "./ToolsSidebar";
 import "./ToolsShell.css";
 
 type Props = {
@@ -50,8 +51,10 @@ function pageTitle(slug: string | null): string {
 export default function ToolsShell({ initialSlug = null }: Props) {
   const [activeSlug, setActiveSlug] = useState<string | null>(initialSlug);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigatedRef = useRef(false);
 
   const applySlug = useCallback((slug: string | null) => {
+    navigatedRef.current = true;
     setActiveSlug(slug);
     setSidebarOpen(false);
     document.title = pageTitle(slug);
@@ -78,6 +81,11 @@ export default function ToolsShell({ initialSlug = null }: Props) {
 
   useEffect(() => {
     document.title = pageTitle(activeSlug);
+    if (!navigatedRef.current) return;
+    const heading = document.getElementById(activeSlug ? "tools-stage-title" : "tools-catalog-heading");
+    if (!heading) return;
+    heading.setAttribute("tabindex", "-1");
+    heading.focus();
   }, [activeSlug]);
 
   useEffect(() => {
@@ -120,54 +128,58 @@ export default function ToolsShell({ initialSlug = null }: Props) {
   }, [sidebarOpen]);
 
   const activeTool = activeSlug ? getToolById(activeSlug) : null;
+  const activeCategory = activeSlug ? getCategoryForTool(activeSlug) : undefined;
+
+  const onBreadcrumbClick = (event: MouseEvent<HTMLElement>) => {
+    const link = (event.target as HTMLElement).closest("a");
+    if (!link || link.getAttribute("href") !== "/tools" || !isPlainClick(event)) return;
+    event.preventDefault();
+    selectSlug(null);
+  };
 
   return (
-    <div
+    <AppShell
       className="tools-shell"
-      data-sidebar-open={sidebarOpen ? "true" : "false"}
+      sidebarLabel="Tool categories"
+      sidebarOpen={sidebarOpen}
+      onSidebarOpenChange={setSidebarOpen}
+      header={
+        <div className="tools-shell__bar">
+          <IconButton icon="list" label="Open tools menu" tooltip={false} onClick={() => setSidebarOpen(true)} />
+          <span className="tools-shell__bar-title">Tools</span>
+        </div>
+      }
+      sidebar={
+        <ToolsSidebar
+          activeSlug={activeSlug}
+          onSelectCatalog={() => selectSlug(null)}
+          onSelectTool={(slug) => selectSlug(slug)}
+        />
+      }
     >
-      <button
-        type="button"
-        className="tools-shell__backdrop"
-        aria-label="Close sidebar"
-        onClick={() => setSidebarOpen(false)}
-      />
-
-      <ToolsSidebar
-        activeSlug={activeSlug}
-        onSelectCatalog={() => selectSlug(null)}
-        onSelectTool={(slug) => selectSlug(slug)}
-      />
-
       <section className="tools-main" aria-label="Tool workspace">
         {activeSlug && activeTool ? (
-          <div className="tools-stage">
-            <header className="tools-main__header">
-              <button
-                type="button"
-                className="tools-main__menu"
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Open tools menu"
-              >
-                Menu
-              </button>
-              <div className="tools-main__title-block">
-                <p className="tools-main__eyebrow">Tool</p>
-                <h1 className="tools-main__title">{activeTool.title}</h1>
-              </div>
-            </header>
-            <div className="tools-stage__body">
-              <p className="tools-stage__lede">{activeTool.description}</p>
-              <ToolMount slug={activeSlug} />
+          <div className="tools-stage" key={activeSlug}>
+            <div className="tools-stage__crumbs" onClick={onBreadcrumbClick}>
+              <Breadcrumbs
+                items={[
+                  { label: "Tools", href: "/tools" },
+                  { label: activeCategory?.name ?? "Tool" },
+                ]}
+              />
             </div>
+            <PageHeader
+              className="tools-stage__header"
+              titleId="tools-stage-title"
+              title={activeTool.title}
+              lede={activeTool.description}
+            />
+            <ToolMount slug={activeSlug} />
           </div>
         ) : (
-          <ToolCatalog
-            onOpenTool={(slug) => selectSlug(slug)}
-            onOpenSidebar={() => setSidebarOpen(true)}
-          />
+          <ToolCatalog onOpenTool={(slug) => selectSlug(slug)} />
         )}
       </section>
-    </div>
+    </AppShell>
   );
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Fieldset, FormGrid } from "@/ui/react";
 
 import { cx } from "./cx";
 
@@ -9,21 +10,11 @@ type ToolFormGridProps = {
   exportLayout?: boolean;
 };
 
-export function ToolFormGrid({
-  children,
-  className,
-  exportLayout = false,
-}: ToolFormGridProps) {
+export function ToolFormGrid({ children, className, exportLayout = false }: ToolFormGridProps) {
   return (
-    <div
-      className={cx(
-        "tool-form-grid",
-        exportLayout && "tool-form-grid--export",
-        className,
-      )}
-    >
+    <FormGrid className={cx("tool-form-grid", className)} columns={exportLayout ? 3 : 2}>
       {children}
-    </div>
+    </FormGrid>
   );
 }
 
@@ -35,9 +26,12 @@ type ToolNestedProps = {
 
 export function ToolNested({ children, title, className }: ToolNestedProps) {
   return (
-    <div className={cx("tool-nested", className)}>
-      {title ? <h3>{title}</h3> : null}
+    <Fieldset
+      className={cx("tool-nested", className)}
+      legend={(title ?? "") as string}
+      legendHidden={!title}
+    >
       {children}
-    </div>
+    </Fieldset>
   );
 }

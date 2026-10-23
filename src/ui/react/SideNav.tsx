@@ -70,7 +70,15 @@ export function SideNav({ label, sections, header, onNavigate, onToggleSection, 
             <Disclosure
               key={section.id}
               className="ui-side-nav__section"
-              summary={section.title}
+              summary={
+                section.badge ? (
+                  <>
+                    {section.title} <Badge size="sm">{section.badge}</Badge>
+                  </>
+                ) : (
+                  section.title
+                )
+              }
               meta={section.count}
               level="inline"
               data-section-id={section.id}

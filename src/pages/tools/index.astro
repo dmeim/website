@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ToolsShell from "../../components/tools/ToolsShell";
+import "../../components/tools/ToolsShell.css";
 ---
 
 <BaseLayout
@@ -8,5 +9,11 @@ import ToolsShell from "../../components/tools/ToolsShell";
   description="Private, local-first utilities — a growing catalogue of browser tools."
   immersive
 >
-  <ToolsShell client:only="react" />
+  <ToolsShell client:only="react">
+    <div slot="fallback" class="tools-shell-fallback" aria-busy="true">
+      <span class="ui-skeleton" style="--ui-skeleton-w: 40%; --ui-skeleton-h: 2.25rem" aria-hidden="true"></span>
+      <span class="ui-skeleton" style="--ui-skeleton-h: 1rem" aria-hidden="true"></span>
+      <span class="ui-skeleton" style="--ui-skeleton-h: 12rem" data-radius="panel" aria-hidden="true"></span>
+    </div>
+  </ToolsShell>
 </BaseLayout>
