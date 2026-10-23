@@ -1,18 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolNested,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolWorkspace,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+  Button,
+  ButtonGroup,
+  CopyButton,
+  IconButton,
+  Input,
+  Notice,
+  Panel,
+  Table,
+  ToolFrame,
+} from "@/ui/react";
 import {
   EMPTY_RESET_SUITES,
   RESULT_HEADER,
@@ -89,7 +87,7 @@ function SuiteMeasures({
     <div className="bb-measures" role="group" aria-label="Suite values">
       {values.map((value, index) => (
         <div key={`${suiteIndex}-m-${index}`} className="bb-measure-row">
-          <ToolInput
+          <Input
             id={measureInputId(suiteIndex, index)}
             label={`Measure ${index + 1}`}
             type="number"
@@ -105,26 +103,27 @@ function SuiteMeasures({
               }
             }}
             data-testid={measureInputId(suiteIndex, index)}
-            fieldClassName="bb-measure-row__field"
+            labelHidden
+            mono
           />
-          <ToolButton
-            type="button"
-            variant="ghost"
-            className="bb-measure-row__delete"
-            aria-label={`Delete measure ${index + 1}`}
+          <IconButton
+            icon="x"
+            label={`Delete measure ${index + 1}`}
             onClick={() => removeAt(index)}
-          >
-            Delete
-          </ToolButton>
+          />
         </div>
       ))}
-      <ToolButton
-        type="button"
-        onClick={addValue}
-        data-testid={`bb-add-measure-${suiteIndex}`}
-      >
-        Add a measure
-      </ToolButton>
+      <ButtonGroup>
+        <Button
+          variant="ghost"
+          size="sm"
+          iconStart="plus"
+          onClick={addValue}
+          data-testid={`bb-add-measure-${suiteIndex}`}
+        >
+          Add a measure
+        </Button>
+      </ButtonGroup>
     </div>
   );
 }
@@ -177,172 +176,127 @@ export default function BenchmarkBuilder() {
     setActionStatus("Suites reset.");
   };
 
-  const copyExport = async (label: string, text: string) => {
-    if (!text) {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-    try {
-      await copyTextToClipboard(text);
-      setActionStatus(`${label} copied.`);
-    } catch {
-      setActionStatus("Copy failed. Select the result and copy it manually.");
-    }
-  };
-
   return (
-    <ToolIsland className="bb-tool">
-      <ToolSectionHeading
+    <ToolFrame>
+      <Panel
         title="Benchmark builder"
         titleId="bb-heading"
-        description={
-          <ToolHint>
-            Compare execution time (or any numeric samples) across suites —
-            ranked by mean with variance and deltas vs the best.
-          </ToolHint>
-        }
-      />
-
-      <div className="bb-suites" aria-label="Benchmark suites">
-        {suites.map((suite, index) => (
-          <ToolPanel
-            key={`suite-${index}`}
-            labelledBy={`bb-suite-${index}-heading`}
-            className="bb-suite"
-          >
-            <h3 id={`bb-suite-${index}-heading`} className="bb-suite__title">
-              Suite {index + 1}
-            </h3>
-            <ToolInput
-              id={`bb-suite-${index}-name`}
-              label="Suite name"
-              value={suite.title}
-              placeholder="Suite name..."
-              onChange={(event) =>
-                updateSuite(index, { title: event.target.value })
-              }
-              data-testid={`bb-suite-${index}-name`}
-            />
-            <SuiteMeasures
-              suiteIndex={index}
-              values={suite.data}
-              onChange={(data) => updateSuite(index, { data })}
-            />
-            <ToolActionRow
-              className="bb-suite__actions"
-              aria-label="Suite actions"
+        description="Compare execution time (or any numeric samples) across suites — ranked by mean with variance and deltas vs the best."
+      >
+        <div className="bb-suites" aria-label="Benchmark suites">
+          {suites.map((suite, index) => (
+            <section
+              key={`suite-${index}`}
+              aria-labelledby={`bb-suite-${index}-heading`}
+              className="bb-suite"
             >
-              {suites.length > 1 ? (
-                <ToolButton
-                  type="button"
-                  variant="ghost"
-                  onClick={() => deleteSuite(index)}
-                  data-testid={`bb-delete-suite-${index}`}
+              <h3 id={`bb-suite-${index}-heading`} className="bb-suite__title">
+                Suite {index + 1}
+              </h3>
+              <Input
+                id={`bb-suite-${index}-name`}
+                label="Suite name"
+                value={suite.title}
+                placeholder="Suite name..."
+                onChange={(event) =>
+                  updateSuite(index, { title: event.target.value })
+                }
+                data-testid={`bb-suite-${index}-name`}
+              />
+              <SuiteMeasures
+                suiteIndex={index}
+                values={suite.data}
+                onChange={(data) => updateSuite(index, { data })}
+              />
+              <ButtonGroup label="Suite actions">
+                {suites.length > 1 ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    iconStart="trash"
+                    onClick={() => deleteSuite(index)}
+                    data-testid={`bb-delete-suite-${index}`}
+                  >
+                    Delete suite
+                  </Button>
+                ) : null}
+                <Button
+                  size="sm"
+                  iconStart="plus"
+                  onClick={() => addSuiteAfter(index)}
+                  data-testid={`bb-add-suite-${index}`}
                 >
-                  Delete suite
-                </ToolButton>
-              ) : null}
-              <ToolButton
-                type="button"
-                onClick={() => addSuiteAfter(index)}
-                data-testid={`bb-add-suite-${index}`}
-              >
-                Add suite
-              </ToolButton>
-            </ToolActionRow>
-          </ToolPanel>
-        ))}
-      </div>
+                  Add suite
+                </Button>
+              </ButtonGroup>
+            </section>
+          ))}
+        </div>
+      </Panel>
 
-      <ToolWorkspace className="bb-results-workspace">
-        <ToolPanel labelledBy="bb-results-heading" className="bb-results">
-          <ToolSectionHeading
-            title="Results"
-            titleId="bb-results-heading"
-            description={
-              <ToolHint>
-                Suites ranked by ascending mean. Slower suites show delta and
-                ratio versus the best.
-              </ToolHint>
-            }
+      <Panel
+        title="Results"
+        titleId="bb-results-heading"
+        description="Suites ranked by ascending mean. Slower suites show delta and ratio versus the best."
+        actions={
+          <Button iconStart="arrows-clockwise" onClick={resetSuites} data-testid="bb-reset">
+            Reset suites
+          </Button>
+        }
+      >
+        <div className="bb-controls">
+          <Input
+            id="bb-unit"
+            label="Unit"
+            value={unit}
+            placeholder="Unit (eg: ms)"
+            onChange={(event) => {
+              setUnit(event.target.value);
+              setActionStatus("");
+            }}
+            data-testid="bb-unit"
           />
+        </div>
 
-          <div className="bb-controls">
-            <ToolInput
-              id="bb-unit"
-              label="Unit"
-              value={unit}
-              placeholder="Unit (eg: ms)"
-              onChange={(event) => {
-                setUnit(event.target.value);
-                setActionStatus("");
-              }}
-              data-testid="bb-unit"
-              fieldClassName="bb-unit-field"
-            />
-            <ToolButton
-              type="button"
-              onClick={resetSuites}
-              data-testid="bb-reset"
-            >
-              Reset suites
-            </ToolButton>
-          </div>
+        <Table caption="Benchmark results" captionHidden data-testid="bb-results-table">
+          <thead>
+            <tr>
+              <th scope="col">{RESULT_HEADER.position}</th>
+              <th scope="col">{RESULT_HEADER.title}</th>
+              <th scope="col">{RESULT_HEADER.size}</th>
+              <th scope="col">{RESULT_HEADER.mean}</th>
+              <th scope="col">{RESULT_HEADER.variance}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {results.map((row) => (
+              <tr key={`${row.position}-${row.title}`}>
+                <td>{row.position}</td>
+                <td>{row.title}</td>
+                <td>{row.size}</td>
+                <td>{row.mean}</td>
+                <td>{row.variance}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
 
-          <div className="bb-table-wrap">
-            <table className="bb-table" data-testid="bb-results-table">
-              <thead>
-                <tr>
-                  <th scope="col">{RESULT_HEADER.position}</th>
-                  <th scope="col">{RESULT_HEADER.title}</th>
-                  <th scope="col">{RESULT_HEADER.size}</th>
-                  <th scope="col">{RESULT_HEADER.mean}</th>
-                  <th scope="col">{RESULT_HEADER.variance}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((row) => (
-                  <tr key={`${row.position}-${row.title}`}>
-                    <td>{row.position}</td>
-                    <td>{row.title}</td>
-                    <td>{row.size}</td>
-                    <td>{row.mean}</td>
-                    <td>{row.variance}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <ButtonGroup label="Export actions">
+          <CopyButton
+            variant="primary"
+            label="Copy as markdown table"
+            getValue={() => formatMarkdownTable(results)}
+            data-testid="bb-copy-markdown"
+          />
+          <CopyButton
+            label="Copy as bullet list"
+            getValue={() => formatBulletList(results)}
+            data-testid="bb-copy-bullets"
+          />
+        </ButtonGroup>
 
-          <ToolNested title="Export">
-            <ToolActionRow animate aria-label="Export actions">
-              <ToolButton
-                type="button"
-                variant="primary"
-                onClick={() =>
-                  copyExport("Markdown table", formatMarkdownTable(results))
-                }
-                data-testid="bb-copy-markdown"
-              >
-                Copy as markdown table
-              </ToolButton>
-              <ToolButton
-                type="button"
-                onClick={() =>
-                  copyExport("Bullet list", formatBulletList(results))
-                }
-                data-testid="bb-copy-bullets"
-              >
-                Copy as bullet list
-              </ToolButton>
-            </ToolActionRow>
-          </ToolNested>
-
-          {actionStatus ? (
-            <ToolStatus live="polite">{actionStatus}</ToolStatus>
-          ) : null}
-        </ToolPanel>
-      </ToolWorkspace>
-    </ToolIsland>
+        {actionStatus ? <Notice live="polite">{actionStatus}</Notice> : null}
+      </Panel>
+    </ToolFrame>
   );
 }

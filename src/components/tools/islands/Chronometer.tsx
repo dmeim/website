@@ -1,16 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-} from "@/components/tools/ui";
+import { Button, ButtonGroup, Panel, Stat, ToolFrame } from "@/ui/react";
 import { formatMs } from "@/lib/tools/chronometer";
-
-import "./Chronometer.css";
 
 export default function Chronometer() {
   const [isRunning, setIsRunning] = useState(false);
@@ -52,62 +43,49 @@ export default function Chronometer() {
   useEffect(() => () => stopRaf(), [stopRaf]);
 
   return (
-    <ToolIsland className="chrono-tool">
-      <ToolPanel labelledBy="chrono-heading" className="chrono-tool__panel">
-        <ToolSectionHeading
-          title="Chronometer"
-          titleId="chrono-heading"
-          description={
-            <ToolHint>
-              Monitor the duration of a thing — start, stop, and reset a simple
-              stopwatch.
-            </ToolHint>
-          }
-        />
-
-        <div
-          className="chrono-duration"
+    <ToolFrame>
+      <Panel
+        title="Chronometer"
+        titleId="chrono-heading"
+        description="Monitor the duration of a thing — start, stop, and reset a simple stopwatch."
+      >
+        <Stat
+          label="Elapsed"
+          value={formatMs(elapsedMs)}
+          size="xl"
+          mono
           role="timer"
           aria-live="off"
           aria-atomic="true"
           data-testid="chrono-duration"
-        >
-          {formatMs(elapsedMs)}
-        </div>
+        />
 
-        <ToolActionRow
-          className="chrono-actions"
-          aria-label="Chronometer controls"
-          animate
-        >
+        <ButtonGroup label="Chronometer controls">
           {isRunning ? (
-            <ToolButton
-              type="button"
+            <Button
               variant="danger"
+              iconStart="pause"
+              pressed
               onClick={pause}
               data-testid="chrono-stop"
             >
               Stop
-            </ToolButton>
+            </Button>
           ) : (
-            <ToolButton
-              type="button"
+            <Button
               variant="primary"
+              iconStart="play"
               onClick={resume}
               data-testid="chrono-start"
             >
               Start
-            </ToolButton>
+            </Button>
           )}
-          <ToolButton
-            type="button"
-            onClick={reset}
-            data-testid="chrono-reset"
-          >
+          <Button iconStart="arrows-clockwise" onClick={reset} data-testid="chrono-reset">
             Reset
-          </ToolButton>
-        </ToolActionRow>
-      </ToolPanel>
-    </ToolIsland>
+          </Button>
+        </ButtonGroup>
+      </Panel>
+    </ToolFrame>
   );
 }

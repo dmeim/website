@@ -1,78 +1,32 @@
-/* User-agent parser — section result cards */
-
-@import "./toolIsland.css";
-
-.uap-tool {
-  gap: var(--space-lg);
-}
-
-.uap-tool__panel {
-  max-width: 48rem;
-}
-
-.uap-loading {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--color-stone);
-}
+/* User-agent parser — section tiles with badge tags */
 
 .uap-results {
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 720px) {
-  .uap-results {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.uap-card {
-  min-height: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--ui-space-sm);
 }
 
 .uap-card__title {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: var(--text-lg);
-  line-height: 1.2;
-  color: var(--color-ink);
+  margin: 0 0 var(--ui-space-xs);
+  font-size: var(--ui-fs-xs);
+  font-weight: 500;
+  letter-spacing: var(--ui-tracking-wide);
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
 }
 
-.uap-tags {
+.uap-tags,
+.uap-fallbacks {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--ui-space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.uap-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.4rem 0.75rem;
-  border: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  line-height: 1.3;
-  color: var(--color-ink);
-  word-break: break-word;
 }
 
 .uap-fallbacks {
-  display: grid;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.uap-fallback {
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  line-height: 1.4;
-  color: var(--color-stone);
-  opacity: 0.85;
+  flex-direction: column;
+  font-size: var(--ui-fs-sm);
+  color: var(--ui-text-muted);
 }

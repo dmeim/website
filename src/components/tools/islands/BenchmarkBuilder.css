@@ -1,119 +1,41 @@
-/* Benchmark builder — suite cards + ranked results table */
-
-@import "./toolIsland.css";
-
-.bb-tool {
-  gap: var(--space-lg);
-}
+/* Benchmark builder — suite columns and measure rows */
 
 .bb-suites {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: var(--space-md);
-  overflow-x: auto;
-  padding-bottom: var(--space-xs);
-  scroll-snap-type: x proximity;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--ui-space-lg);
 }
 
 .bb-suite {
-  flex: 0 0 min(18.5rem, 85vw);
-  scroll-snap-align: start;
-  max-width: 20rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-sm);
+  padding-top: var(--ui-space-sm);
+  border-top: 1px solid var(--ui-line);
 }
 
 .bb-suite__title {
   margin: 0;
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: var(--text-lg);
-  line-height: 1.2;
-  color: var(--color-ink);
+  font-size: var(--ui-fs-xs);
+  font-weight: 500;
+  letter-spacing: var(--ui-tracking-wide);
+  text-transform: uppercase;
+  color: var(--ui-text-muted);
 }
 
 .bb-measures {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--ui-space-xs);
 }
 
 .bb-measure-row {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--space-sm);
-}
-
-.bb-measure-row__field {
-  flex: 1;
-  min-width: 0;
-}
-
-.bb-measure-row__delete {
-  flex-shrink: 0;
-  margin-bottom: 0.1rem;
-}
-
-.bb-suite__actions {
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.bb-results-workspace {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.bb-results {
-  max-width: 40rem;
-  width: 100%;
-  justify-self: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--ui-space-xs);
+  align-items: end;
 }
 
 .bb-controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: var(--space-md);
-}
-
-.bb-unit-field {
-  flex: 1 1 12rem;
-  min-width: 0;
-}
-
-.bb-table-wrap {
-  overflow-x: auto;
-  margin-top: var(--space-sm);
-}
-
-.bb-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-}
-
-.bb-table th,
-.bb-table td {
-  padding: 0.65rem 0.75rem;
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--color-stone) 28%, transparent);
-  text-align: left;
-  vertical-align: top;
-}
-
-.bb-table th {
-  font-weight: 600;
-  color: var(--color-ink);
-  white-space: nowrap;
-}
-
-.bb-table td {
-  color: var(--color-ink);
-  font-variant-numeric: tabular-nums;
-}
-
-@media (max-width: 640px) {
-  .bb-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
+  max-width: 16rem;
 }

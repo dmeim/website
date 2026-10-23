@@ -1,111 +1,91 @@
-@import "./toolIsland.css";
+/* Camera recorder — preview stage and capture gallery */
 
-/* Camera recorder island — extends shared tool surface patterns */
+.camera-workspace {
+  display: grid;
+  gap: var(--ui-space-xl);
+}
 
-.camera-island .tool-workspace {
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+@media (min-width: 1100px) {
+  .camera-workspace {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.camera-span-full {
+  grid-column: 1 / -1;
+}
+
+.camera-hint {
+  margin: 0;
+  font-size: var(--ui-fs-sm);
+  color: var(--ui-text-muted);
 }
 
 .camera-preview-frame {
-  position: relative;
   display: grid;
   place-items: center;
-  min-height: 20rem;
+  min-height: 14rem;
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  background: var(--color-ground);
+  background: var(--ui-bg-inset);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius-panel);
 }
 
 .camera-preview-frame video {
-  width: 100%;
-  height: auto;
-  max-height: 32rem;
   display: block;
-  background: var(--color-black-dark);
+  width: 100%;
+  max-height: 32rem;
   object-fit: contain;
+}
+
+.camera-preview-frame video[hidden] {
+  display: none;
 }
 
 .camera-control-bar {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   justify-content: space-between;
-  gap: var(--space-md);
-}
-
-.camera-capture-controls,
-.camera-orientation-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  align-items: center;
+  gap: var(--ui-space-sm);
 }
 
 .capture-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--ui-space-lg);
 }
 
 .capture-card {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  border: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-ground) 70%, transparent);
-  overflow: hidden;
+  gap: var(--ui-space-sm);
+  min-width: 0;
 }
 
 .capture-card img,
 .capture-card video {
+  display: block;
   width: 100%;
   aspect-ratio: 16 / 10;
   object-fit: cover;
-  background: var(--color-black-dark);
-  display: block;
+  background: var(--ui-bg-inset);
+  border-radius: var(--ui-radius-control);
 }
 
 .capture-meta {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  padding: 0 var(--space-md) var(--space-md);
-}
-
-.capture-meta > div:first-child {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  font-size: var(--ui-fs-sm);
+  color: var(--ui-text-muted);
 }
 
 .capture-meta strong {
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
   font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-gold);
+  color: var(--ui-text);
 }
 
-.capture-meta span {
-  font-size: var(--text-sm);
-  color: var(--color-stone);
-  word-break: break-all;
-}
-
-.capture-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-@media (max-width: 900px) {
-  .camera-island .tool-workspace {
-    grid-template-columns: 1fr;
-  }
-
-  .camera-control-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
+.capture-meta__file {
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-xs);
+  overflow-wrap: anywhere;
 }
