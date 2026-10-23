@@ -1,0 +1,37 @@
+.ui-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-space-xs);
+}
+
+.ui-button-group[data-wrap="false"] {
+  flex-wrap: nowrap;
+}
+
+.ui-button-group[data-align="end"] {
+  justify-content: flex-end;
+}
+
+.ui-button-group[data-align="between"] {
+  justify-content: space-between;
+}
+
+.ui-button-group[data-align="stretch"] > * {
+  flex: 1 1 0;
+}
+
+.ui-button-group[data-attached] {
+  flex-wrap: nowrap;
+  gap: 1px;
+}
+
+.ui-button-group[data-attached] > :not(:first-child) {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+
+.ui-button-group[data-attached] > :not(:last-child) {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}

@@ -1,0 +1,60 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import type { IconName } from "@/ui/icons";
+import { cx } from "@/ui/lib/cx";
+import Spinner from "./Spinner.astro";
+
+interface Props extends Omit<HTMLAttributes<"button">, "class" | "type"> {
+  variant?: "primary" | "secondary" | "ghost" | "danger";
+  size?: "sm" | "md" | "lg";
+  href?: string;
+  iconStart?: IconName;
+  iconEnd?: IconName;
+  loading?: boolean;
+  pressed?: boolean;
+  fullWidth?: boolean;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  variant = "secondary",
+  size = "md",
+  href,
+  iconStart,
+  iconEnd,
+  loading = false,
+  pressed,
+  fullWidth = false,
+  type = "button",
+  disabled = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const isLink = href !== undefined;
+const Tag = isLink ? "a" : "button";
+const attrs = {
+  ...rest,
+  class: cx("ui-button", className),
+  "data-variant": variant,
+  "data-size": size,
+  "data-full-width": fullWidth ? "" : undefined,
+  "aria-busy": loading ? "true" : undefined,
+  "aria-pressed": pressed === undefined ? undefined : String(pressed),
+  ...(isLink
+    ? { href: disabled ? undefined : href, "aria-disabled": disabled ? "true" : undefined }
+    : { type, disabled }),
+};
+const hasLabel = Astro.slots.has("default");
+---
+
+<Tag {...attrs}>
+  {iconStart && <Icon name={iconStart} weight={pressed ? "fill" : undefined} class="ui-button__icon" />}
+  {hasLabel && <span class="ui-button__label"><slot /></span>}
+  {iconEnd && <Icon name={iconEnd} class="ui-button__icon" />}
+  {loading && <Spinner size="sm" class="ui-button__spinner" />}
+</Tag>

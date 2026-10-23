@@ -1,0 +1,36 @@
+.ui-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: currentColor;
+}
+
+.ui-spinner__icon {
+  width: var(--ui-icon-md);
+  height: var(--ui-icon-md);
+  /* 800ms: 2.5 × the 320ms glide token. */
+  animation: ui-spin calc(var(--ui-dur-glide) * 2.5) linear infinite;
+}
+
+.ui-spinner[data-size="sm"] .ui-spinner__icon {
+  width: var(--ui-icon-sm);
+  height: var(--ui-icon-sm);
+}
+
+.ui-spinner[data-size="lg"] .ui-spinner__icon {
+  width: var(--ui-icon-lg);
+  height: var(--ui-icon-lg);
+}
+
+@keyframes ui-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-spinner__icon {
+    animation: none;
+  }
+}

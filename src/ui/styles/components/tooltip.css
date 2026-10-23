@@ -1,0 +1,57 @@
+.ui-tooltip {
+  --_gap: var(--ui-space-2xs);
+  position: relative;
+  display: inline-flex;
+}
+
+.ui-tooltip__bubble {
+  position: absolute;
+  z-index: var(--ui-z-tooltip);
+  width: max-content;
+  max-width: 16rem;
+  padding: var(--ui-space-3xs) var(--ui-space-xs);
+  border-radius: 6px;
+  background: var(--ui-ink);
+  color: var(--ui-on-ink);
+  font-size: var(--ui-fs-2xs);
+  font-weight: var(--ui-fw-medium);
+  line-height: var(--ui-lh-snug);
+  text-align: center;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--ui-dur-fast) var(--ui-ease-out),
+    visibility 0s linear var(--ui-dur-fast);
+}
+
+.ui-tooltip:is(:hover, :has(:focus-visible)):not([data-dismissed]) > .ui-tooltip__bubble {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: var(--ui-tooltip-delay, var(--ui-dur-slow));
+}
+
+.ui-tooltip[data-placement="top"] > .ui-tooltip__bubble {
+  bottom: calc(100% + var(--_gap));
+  left: 50%;
+  translate: -50% 0;
+}
+
+.ui-tooltip[data-placement="bottom"] > .ui-tooltip__bubble {
+  top: calc(100% + var(--_gap));
+  left: 50%;
+  translate: -50% 0;
+}
+
+.ui-tooltip[data-placement="start"] > .ui-tooltip__bubble {
+  inset-inline-end: calc(100% + var(--_gap));
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.ui-tooltip[data-placement="end"] > .ui-tooltip__bubble {
+  inset-inline-start: calc(100% + var(--_gap));
+  top: 50%;
+  translate: 0 -50%;
+}

@@ -1,0 +1,32 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+
+interface Props extends Omit<HTMLAttributes<"div">, "class"> {
+  label: string;
+  orientation?: "horizontal" | "vertical";
+  placement?: "inline" | "floating-top" | "floating-bottom";
+  class?: string;
+}
+
+const { label, orientation = "horizontal", placement = "inline", class: className, ...rest } = Astro.props;
+---
+
+<div
+  role="toolbar"
+  aria-label={label}
+  aria-orientation={orientation}
+  {...rest}
+  class={cx("ui-toolbar", className)}
+  data-placement={placement}
+  data-ui-toolbar
+>
+  <slot />
+</div>
+
+<script>
+  import { bindToolbars } from "@/ui/lib/roving-focus";
+
+  bindToolbars();
+  document.addEventListener("astro:page-load", bindToolbars);
+</script>

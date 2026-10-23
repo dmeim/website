@@ -1,0 +1,29 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+import { createId } from "@/ui/lib/ids";
+
+interface Props extends Omit<HTMLAttributes<"span">, "class"> {
+  content: string;
+  placement?: "top" | "bottom" | "start" | "end";
+  /** Show delay in ms. */
+  delay?: number;
+  class?: string;
+}
+
+const { content, placement = "top", delay, class: className, id, style, ...rest } = Astro.props;
+const tipId = id ?? createId("ui-tooltip");
+const vars = delay === undefined ? style : `--ui-tooltip-delay: ${delay}ms;${typeof style === "string" ? style : ""}`;
+---
+
+<span class={cx("ui-tooltip", className)} data-placement={placement} data-ui-tooltip style={vars} {...rest}>
+  <slot />
+  <span role="tooltip" id={tipId} class="ui-tooltip__bubble">{content}</span>
+</span>
+
+<script>
+  import { bindTooltips } from "@/ui/lib/tooltip";
+
+  bindTooltips();
+  document.addEventListener("astro:page-load", bindTooltips);
+</script>

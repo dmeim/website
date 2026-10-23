@@ -1,0 +1,33 @@
+.ui-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ui-space-3xs);
+}
+
+.ui-toolbar[aria-orientation="vertical"] {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.ui-toolbar:is([data-placement="floating-top"], [data-placement="floating-bottom"]) {
+  position: absolute;
+  inset-inline-start: 50%;
+  z-index: var(--ui-z-sticky);
+  flex-wrap: nowrap;
+  max-width: calc(100% - 2 * var(--ui-space-md));
+  padding: var(--ui-space-3xs);
+  border: var(--ui-border-width) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-dialog);
+  background: var(--ui-popover);
+  translate: -50% 0;
+}
+
+.ui-toolbar[data-placement="floating-top"] {
+  top: var(--ui-space-md);
+}
+
+.ui-toolbar[data-placement="floating-bottom"] {
+  bottom: var(--ui-space-md);
+}

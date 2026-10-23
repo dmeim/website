@@ -1,0 +1,111 @@
+/* Button, plus the variant fills shared by IconButton and CopyButton. */
+:is(.ui-button, .ui-icon-button) {
+  --_h: var(--ui-control-md);
+  --_fill: var(--ui-surface);
+  --_fill-hover: var(--ui-surface-hover);
+  --_fg: var(--ui-text);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-space-xs);
+  min-height: var(--_h);
+  padding: 0 var(--ui-space-md);
+  border: 0;
+  border-radius: var(--ui-radius-control);
+  background: var(--_fill);
+  color: var(--_fg);
+  font: inherit;
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-medium);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--ui-dur-fast) var(--ui-ease-out),
+    color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+:is(.ui-button, .ui-icon-button)[data-size="sm"] {
+  --_h: var(--ui-control-sm);
+  padding-inline: var(--ui-space-sm);
+  font-size: var(--ui-fs-xs);
+}
+
+:is(.ui-button, .ui-icon-button)[data-size="lg"] {
+  --_h: var(--ui-control-lg);
+  padding-inline: var(--ui-space-lg);
+  font-size: var(--ui-fs-md);
+}
+
+:is(.ui-button, .ui-icon-button)[data-variant="primary"] {
+  --_fill: var(--ui-ink);
+  --_fill-hover: var(--ui-ink-hover);
+  --_fg: var(--ui-on-ink);
+}
+
+:is(.ui-button, .ui-icon-button)[data-variant="ghost"] {
+  --_fill: transparent;
+  --_fill-hover: var(--ui-surface);
+}
+
+:is(.ui-button, .ui-icon-button)[data-variant="danger"] {
+  --_fill: var(--ui-danger-soft);
+  --_fill-hover: color-mix(in srgb, var(--ui-danger) 18%, transparent);
+  --_fg: var(--ui-danger);
+}
+
+:is(.ui-button, .ui-icon-button):is(:hover, [aria-expanded="true"]):not(:disabled, [aria-disabled="true"], [aria-busy="true"]) {
+  background: var(--_fill-hover);
+}
+
+:is(.ui-button, .ui-icon-button):active:not(:disabled, [aria-disabled="true"]) {
+  transform: scale(var(--ui-press-scale));
+}
+
+:is(.ui-button, .ui-icon-button)[aria-pressed="true"]:not([data-variant="primary"], [data-variant="danger"]) {
+  background: var(--ui-surface-active);
+  color: var(--ui-text);
+}
+
+:is(.ui-button, .ui-icon-button):is(:disabled, [aria-disabled="true"]) {
+  color: var(--ui-text-disabled);
+  cursor: not-allowed;
+}
+
+:is(.ui-button, .ui-icon-button)[data-variant="primary"]:is(:disabled, [aria-disabled="true"]) {
+  background: var(--ui-surface-active);
+}
+
+.ui-button[data-full-width] {
+  display: flex;
+  width: 100%;
+}
+
+.ui-button__icon {
+  flex: none;
+  width: var(--ui-icon-md);
+  height: var(--ui-icon-md);
+}
+
+.ui-button[data-size="sm"] .ui-button__icon {
+  width: var(--ui-icon-sm);
+  height: var(--ui-icon-sm);
+}
+
+/* Loading keeps the width: content stays in flow but hidden, spinner overlays it. */
+.ui-button[aria-busy="true"] {
+  cursor: progress;
+}
+
+.ui-button[aria-busy="true"] > :not(.ui-button__spinner) {
+  visibility: hidden;
+}
+
+.ui-button__spinner {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+}

@@ -1,10 +1,37 @@
 ---
 import ThemePair from "./ThemePair.astro";
+import { Button, ButtonGroup, IconButton } from "@/ui/components/groups/actions";
+import { Spinner, Tooltip } from "@/ui/components/groups/feedback";
+import { FeedbackShowcase } from "@/ui/react/showcase/FeedbackShowcase";
+
+const placements = ["top", "bottom", "start", "end"] as const;
 ---
 
 <section id="feedback" class="ui-showcase-section" aria-labelledby="feedback-title">
   <h2 id="feedback-title" class="ui-showcase-section__title">Feedback</h2>
+  <h3 class="ui-showcase-sub">Astro</h3>
   <ThemePair>
-    <p class="ui-showcase-empty">No feedback components yet.</p>
+    <div style="display: grid; gap: var(--ui-space-sm)">
+      <h4 class="ui-showcase-sub">Spinner: sm, md, lg</h4>
+      <ButtonGroup>
+        <Spinner size="sm" />
+        <Spinner />
+        <Spinner size="lg" label="Loading fonts" />
+      </ButtonGroup>
+      <h4 class="ui-showcase-sub">Tooltip: placements, delay (hover or focus; Escape hides)</h4>
+      <ButtonGroup>
+        {
+          placements.map((placement) => (
+            <Tooltip content={`Tooltip ${placement}`} placement={placement}>
+              <Button size="sm">{placement}</Button>
+            </Tooltip>
+          ))
+        }
+        <Tooltip content="No delay" delay={0}><Button size="sm">delay 0</Button></Tooltip>
+        <IconButton icon="info" label="IconButton tooltip" />
+      </ButtonGroup>
+    </div>
   </ThemePair>
+  <h3 class="ui-showcase-sub">React</h3>
+  <FeedbackShowcase client:visible />
 </section>

@@ -1,0 +1,43 @@
+.ui-copy-button__icon {
+  display: inline-flex;
+  flex: none;
+}
+
+.ui-copy-button__icon .ui-icon {
+  width: var(--ui-icon-md);
+  height: var(--ui-icon-md);
+}
+
+.ui-copy-button:is([data-size="sm"], [data-appearance="inline"]) .ui-copy-button__icon .ui-icon {
+  width: var(--ui-icon-sm);
+  height: var(--ui-icon-sm);
+}
+
+.ui-copy-button[data-state="idle"] .ui-copy-button__icon[data-when="copied"],
+.ui-copy-button[data-state="copied"] .ui-copy-button__icon[data-when="idle"] {
+  display: none;
+}
+
+.ui-copy-button[data-appearance="inline"] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-3xs);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ui-text-muted);
+  font: inherit;
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-medium);
+  cursor: pointer;
+  transition: color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-copy-button[data-appearance="inline"]:is(:hover, [data-state="copied"]):not(:disabled) {
+  color: var(--ui-text);
+}
+
+.ui-copy-button[data-appearance="inline"]:disabled {
+  color: var(--ui-text-disabled);
+  cursor: not-allowed;
+}

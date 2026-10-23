@@ -19,6 +19,11 @@
 @import "./styles/components/divider.css";
 
 /* group: actions */
+@import "./styles/components/button.css";
+@import "./styles/components/icon-button.css";
+@import "./styles/components/copy-button.css";
+@import "./styles/components/button-group.css";
+@import "./styles/components/toolbar.css";
 
 /* group: forms */
 @import "./styles/components/field.css";
@@ -42,6 +47,8 @@
 @import "./styles/components/swatch.css";
 
 /* group: feedback */
+@import "./styles/components/spinner.css";
+@import "./styles/components/tooltip.css";
 
 /* group: overlays */
 

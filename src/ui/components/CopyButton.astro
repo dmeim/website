@@ -1,0 +1,58 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import { cx } from "@/ui/lib/cx";
+
+interface Props extends Omit<HTMLAttributes<"button">, "class" | "type" | "value"> {
+  value: string;
+  label?: string;
+  copiedLabel?: string;
+  appearance?: "button" | "icon" | "inline";
+  size?: "sm" | "md" | "lg";
+  variant?: "primary" | "secondary" | "ghost" | "danger";
+  resetAfter?: number;
+  class?: string;
+}
+
+const {
+  value,
+  label = "Copy",
+  copiedLabel = "Copied",
+  appearance = "button",
+  size = "md",
+  variant,
+  resetAfter = 1600,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const appearanceClass = { button: "ui-button", icon: "ui-icon-button", inline: undefined }[appearance];
+---
+
+<button
+  type="button"
+  {...rest}
+  class={cx("ui-copy-button", appearanceClass, className)}
+  data-ui-copy
+  data-value={value}
+  data-label={label}
+  data-copied-label={copiedLabel}
+  data-reset-after={resetAfter}
+  data-appearance={appearance}
+  data-variant={variant ?? (appearance === "icon" ? "ghost" : "secondary")}
+  data-size={size}
+  data-state="idle"
+  aria-label={appearance === "icon" ? label : undefined}
+>
+  <span class="ui-copy-button__icon" data-when="idle"><Icon name="copy" /></span>
+  <span class="ui-copy-button__icon" data-when="copied"><Icon name="check" /></span>
+  {appearance !== "icon" && <span class="ui-copy-button__label">{label}</span>}
+  <span class="ui-copy-button__live ui-visually-hidden" aria-live="polite"></span>
+</button>
+
+<script>
+  import { bindCopyDelegate } from "@/ui/lib/copy-delegate";
+
+  bindCopyDelegate();
+  document.addEventListener("astro:page-load", bindCopyDelegate);
+</script>

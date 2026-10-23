@@ -1,0 +1,26 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+
+interface Props extends Omit<HTMLAttributes<"div">, "class"> {
+  align?: "start" | "end" | "between" | "stretch";
+  wrap?: boolean;
+  attached?: boolean;
+  label?: string;
+  class?: string;
+}
+
+const { align = "start", wrap = true, attached = false, label, class: className, ...rest } = Astro.props;
+---
+
+<div
+  role={label ? "group" : undefined}
+  aria-label={label}
+  {...rest}
+  class={cx("ui-button-group", className)}
+  data-align={align}
+  data-wrap={wrap ? undefined : "false"}
+  data-attached={attached ? "" : undefined}
+>
+  <slot />
+</div>

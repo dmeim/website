@@ -1,0 +1,18 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import { cx } from "@/ui/lib/cx";
+
+interface Props extends Omit<HTMLAttributes<"span">, "class"> {
+  size?: "sm" | "md" | "lg";
+  label?: string;
+  class?: string;
+}
+
+const { size = "md", label = "Loading", class: className, ...rest } = Astro.props;
+---
+
+<span class={cx("ui-spinner", className)} data-size={size} {...rest}>
+  <Icon name="circle-notch" weight="bold" class="ui-spinner__icon" />
+  <span class="ui-visually-hidden">{label}</span>
+</span>

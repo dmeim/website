@@ -1,0 +1,33 @@
+.ui-icon-button {
+  width: var(--_h);
+  height: var(--_h);
+  min-height: 0;
+  padding: 0;
+}
+
+.ui-icon-button[data-variant="ghost"]:not([aria-pressed="true"]) {
+  color: var(--ui-text-muted);
+}
+
+.ui-icon-button[data-variant="ghost"]:hover:not(:disabled, [aria-disabled="true"]) {
+  color: var(--ui-text);
+}
+
+.ui-icon-button[data-variant="ghost"]:is(:disabled, [aria-disabled="true"]) {
+  color: var(--ui-text-disabled);
+}
+
+.ui-icon-button__icon {
+  width: var(--ui-icon-md);
+  height: var(--ui-icon-md);
+}
+
+.ui-icon-button[data-size="sm"] .ui-icon-button__icon {
+  width: var(--ui-icon-sm);
+  height: var(--ui-icon-sm);
+}
+
+.ui-icon-button[data-size="lg"] .ui-icon-button__icon {
+  width: var(--ui-icon-lg);
+  height: var(--ui-icon-lg);
+}
