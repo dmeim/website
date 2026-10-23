@@ -1,0 +1,34 @@
+---
+/** Tools (six common picks + index link) and the stack it all runs on. */
+import Section from "@/ui/components/Section.astro";
+import List from "@/ui/components/List.astro";
+import ListRow from "@/ui/components/ListRow.astro";
+import Link from "@/ui/components/Link.astro";
+import { venues } from "@/content/site";
+import { availableTools, toolCategories, toolRoute } from "@/content/tools";
+
+const POPULAR = ["qrcode-generator", "token-generator", "hash-text", "uuid-generator", "jwt-parser", "json-prettify"];
+const available = availableTools();
+const picked = POPULAR.map((id) => available.find((t) => t.id === id)).filter((t) => t !== undefined);
+const tools = (picked.length === POPULAR.length ? picked : available).slice(0, 6);
+
+// Framer Motion is no longer part of the stack.
+const stack = venues.filter((v) => v.name !== "Framer Motion");
+const stackRole: Record<string, string> = { "Astro 7": "Framework", Cloudflare: "Hosting", "Open keys": "Identity" };
+---
+
+<Section id="tools" title="Tools" spy class="home-section" data-reveal-group>
+  <p class="home-muted" data-reveal>
+    {available.length} private, local-first utilities across {toolCategories.length} categories, all running in your
+    browser.
+  </p>
+  <List class="home-tools" data-reveal>
+    {tools.map((tool) => <ListRow title={tool.title} href={toolRoute(tool)} arrow={false} />)}
+  </List>
+  <p class="home-after" data-reveal><Link href="/tools" arrow="right">All tools</Link></p>
+
+  <h3 class="home-sub" data-reveal>Stack</h3>
+  <List>
+    {stack.map((v) => <ListRow label={stackRole[v.name]} title={v.name} description={v.place} data-reveal />)}
+  </List>
+</Section>

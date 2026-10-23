@@ -1,0 +1,17 @@
+---
+/** Principles as numbered rows (titles only), then the working quote. */
+import Section from "@/ui/components/Section.astro";
+import List from "@/ui/components/List.astro";
+import ListRow from "@/ui/components/ListRow.astro";
+import Quote from "@/ui/components/Quote.astro";
+import { mentorQuote, pedagogy } from "@/content/site";
+---
+
+<Section id="principles" title="Principles" spy class="home-section" data-reveal-group>
+  <List as="ol">
+    {pedagogy.map((item, i) => <ListRow label={String(i + 1).padStart(2, "0")} title={item.title} data-reveal />)}
+  </List>
+  <Quote class="home-quote" source={mentorQuote.attribution} data-reveal>
+    <p>{mentorQuote.text}</p>
+  </Quote>
+</Section>

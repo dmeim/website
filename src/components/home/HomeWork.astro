@@ -1,0 +1,50 @@
+---
+/** Work: ongoing roles, then selected projects with status. */
+import Section from "@/ui/components/Section.astro";
+import List from "@/ui/components/List.astro";
+import ListRow from "@/ui/components/ListRow.astro";
+import { appointments, projects } from "@/content/site";
+
+// Source summaries carry lorem and an old design name; keep one plain line.
+const blurbs: Record<string, string> = {
+  "dmeim-com": "Personal platform for projects, keys, and tools on Cloudflare.",
+  "verification-lab": "In-browser PGP and SSH/Ed25519 verification.",
+  "edge-experiments": "Workers, bindings, and small edge utilities.",
+};
+const blurb = (slug: string, summary: string): string => blurbs[slug] ?? summary.split(" — ")[0];
+const statusLabel = { live: "Live", wip: "In progress", archived: "Archived" } as const;
+---
+
+<Section id="work" title="Work" spy class="home-section" data-reveal-group>
+  <h3 class="home-sub" data-reveal>Roles</h3>
+  <List>
+    {
+      appointments.map((a) => (
+        <ListRow
+          label={a.dates}
+          title={a.title}
+          description={a.bullets?.[0] ?? a.organization}
+          href={a.url}
+          data-reveal
+        />
+      ))
+    }
+  </List>
+
+  <h3 class="home-sub" data-reveal>Projects</h3>
+  <List>
+    {
+      projects.map((p) => (
+        <ListRow
+          label={p.tags[0]}
+          title={p.title}
+          description={blurb(p.slug, p.summary)}
+          status={{ status: p.status, label: statusLabel[p.status] }}
+          href={p.href}
+          arrow
+          data-reveal
+        />
+      ))
+    }
+  </List>
+</Section>

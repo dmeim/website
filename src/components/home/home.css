@@ -1,0 +1,87 @@
+/* Home (Profile): page-specific layout on top of the UI library. */
+.home-section:first-child {
+  padding-top: 0;
+}
+
+.home-intro {
+  display: grid;
+  gap: var(--ui-space-md);
+  max-width: 36rem;
+  margin-bottom: var(--ui-space-lg);
+}
+
+.home-intro__lead {
+  margin: 0;
+  color: var(--ui-text);
+  font-size: var(--ui-fs-lg);
+  font-weight: var(--ui-fw-regular);
+  line-height: var(--ui-lh-normal);
+  letter-spacing: var(--ui-tracking-tight);
+}
+
+.home-intro__more,
+.home-muted {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--ui-text-muted);
+}
+
+.home-lede {
+  max-width: 34rem;
+  margin: 0 0 var(--ui-space-lg);
+}
+
+.home-section .home-muted:has(+ .ui-list) {
+  margin-bottom: var(--ui-space-lg);
+}
+
+.home-sub {
+  margin: 0 0 var(--ui-space-xs);
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-medium);
+}
+
+.ui-list + .home-sub,
+.home-after + .home-sub {
+  margin-top: var(--ui-space-xl);
+}
+
+.home-after {
+  margin: var(--ui-space-md) 0 0;
+  font-size: var(--ui-fs-sm);
+}
+
+.home-quote {
+  max-width: 34rem;
+  margin-top: var(--ui-space-xl);
+}
+
+.home-quote .ui-quote__text {
+  font-style: italic;
+  line-height: var(--ui-lh-normal);
+}
+
+.home-quote .ui-quote__text p {
+  margin: 0;
+}
+
+/* Fingerprint copy controls stay visible, as in the approved concept. */
+#keys .ui-list-row__actions {
+  opacity: 1;
+}
+
+@media (min-width: 560px) {
+  .home-tools.ui-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--ui-space-xl);
+  }
+
+  .home-tools > .ui-list-row:nth-child(2) {
+    border-top: var(--ui-border-width) solid var(--ui-line);
+  }
+
+  .home-tools > .ui-list-row:nth-last-child(2):nth-child(odd) {
+    border-bottom: var(--ui-border-width) solid var(--ui-line);
+  }
+}
