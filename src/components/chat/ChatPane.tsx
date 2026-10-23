@@ -10,18 +10,12 @@ import {
 } from "react";
 import type { UIMessage } from "ai";
 import {
-  ArrowDown,
   Brain,
-  Check,
-  Download,
   File,
-  GitFork,
   Images,
   Library,
   Plus,
-  RefreshCw,
   Send,
-  SquarePen,
   Wrench,
   X,
 } from "lucide";
@@ -34,7 +28,17 @@ import type {
   ThinkingLevel,
 } from "@/lib/chat/types";
 import { ComposerStatusBar } from "./ComposerStatusBar";
-import { IconButton } from "@/ui/react";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  IconButton,
+  Input,
+  Notice,
+  Spinner,
+  Textarea,
+  Toolbar,
+} from "@/ui/react";
 import { LibraryPickerModal } from "./LibraryPickerModal";
 import { LucideIcon } from "./LucideIcon";
 import MarkdownBody from "./MarkdownBody";
@@ -378,37 +382,33 @@ export function ChatPane({
         <div className="chat-main__title-block">
           {renaming ? (
             <div className="chat-main__title-edit">
-              <input
+              <Input
                 ref={titleInputRef}
                 className="chat-main__title-input"
+                size="sm"
+                label="Chat title"
+                labelHidden
                 value={titleDraft}
                 onChange={(event) => setTitleDraft(event.target.value)}
                 onKeyDown={onTitleKeyDown}
                 onBlur={onTitleBlur}
-                aria-label="Chat title"
                 maxLength={120}
               />
               <div className="chat-main__title-actions">
-                <button
-                  type="button"
-                  className="chat-main__title-btn"
+                <IconButton
+                  icon="check"
+                  label="Save title"
+                  size="sm"
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => void commitRename()}
-                  aria-label="Save title"
-                  title="Save"
-                >
-                  <LucideIcon icon={Check} size={16} />
-                </button>
-                <button
-                  type="button"
-                  className="chat-main__title-btn"
+                />
+                <IconButton
+                  icon="x"
+                  label="Cancel rename"
+                  size="sm"
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={cancelRename}
-                  aria-label="Cancel rename"
-                  title="Cancel"
-                >
-                  <LucideIcon icon={X} size={16} />
-                </button>
+                />
               </div>
             </div>
           ) : (
@@ -419,87 +419,95 @@ export function ChatPane({
             </div>
           )}
         </div>
-        <div className="chat-main__header-actions">
+        <Toolbar label="Chat actions" className="chat-main__header-actions">
           {canRename && onRenameTitle && !renaming ? (
-            <button
-              type="button"
-              className="chat-main__title-btn"
+            <IconButton
+              icon="pencil-simple"
+              label="Rename chat"
+              size="sm"
               onClick={startRename}
-              aria-label="Rename chat"
-              title="Rename"
-            >
-              <LucideIcon icon={SquarePen} size={16} />
-            </button>
+            />
           ) : null}
           {canFork && onFork ? (
-            <button
-              type="button"
-              className="chat-main__title-btn"
+            <IconButton
+              icon="git-fork"
+              label="Fork chat"
+              size="sm"
               onClick={() => onFork()}
               disabled={!actionsEnabled}
-              aria-label="Fork chat"
-              title="Fork chat"
-            >
-              <LucideIcon icon={GitFork} size={16} />
-            </button>
+            />
           ) : null}
           {canExport ? (
-            <button
-              type="button"
-              className="chat-main__title-btn"
+            <IconButton
+              icon="download-simple"
+              label="Export"
+              size="sm"
               onClick={onExport}
               disabled={busy || composerBusy}
-              aria-label="Export"
-              title="Export"
-            >
-              <LucideIcon icon={Download} size={16} />
-            </button>
+            />
           ) : null}
-        </div>
+        </Toolbar>
       </header>
 
       {errorMessage ? (
-        <div className="chat-main__error" role="alert">
-          <p>{errorMessage}</p>
-          <div className="chat-main__error-actions">
-            {canRetry && onRetry ? (
-              <button type="button" className="chat-btn" onClick={onRetry}>
-                Retry
-              </button>
-            ) : null}
-            {onDismissError ? (
-              <button
-                type="button"
-                className="chat-btn chat-btn--ghost"
-                onClick={onDismissError}
-              >
-                Dismiss
-              </button>
-            ) : null}
-          </div>
-        </div>
+        <Notice
+          className="chat-main__error"
+          tone="danger"
+          variant="callout"
+          role="alert"
+          live="assertive"
+          actions={
+            canRetry || onDismissError ? (
+              <>
+                {canRetry && onRetry ? (
+                  <Button size="sm" iconStart="arrows-clockwise" onClick={onRetry}>
+                    Retry
+                  </Button>
+                ) : null}
+                {onDismissError ? (
+                  <Button size="sm" variant="ghost" onClick={onDismissError}>
+                    Dismiss
+                  </Button>
+                ) : null}
+              </>
+            ) : undefined
+          }
+        >
+          {errorMessage}
+        </Notice>
       ) : null}
 
-      <p className="visually-hidden" role="status" aria-live="polite">
+      <p className="ui-visually-hidden" role="status" aria-live="polite">
         {announcement}
       </p>
 
       <div className="chat-thread" ref={threadRef}>
         {loadingThread ? (
-          <p className="chat-empty">Loading…</p>
+          <p className="chat-thread__status">
+            <Spinner size="sm" />
+            Loading…
+          </p>
         ) : messages.length === 0 ? (
-          <div className="chat-empty chat-empty--hero">
-            <p className="chat-empty__brand">dmeim chat</p>
-            <p>
-              Private OpenCode Go session. Default model is DeepSeek V4 Flash —
-              pick another from the thinking control below when you need it.
-            </p>
-            <p className="chat-empty__hints">
-              Shortcuts: ⌘/Ctrl+Shift+O new chat · Esc stop / close menu · ⌘/Ctrl+Enter
-              send. Attach: images ≤4MiB inlined; text/PDF extracted when possible;
-              video/other sent as filename notes.
-            </p>
-          </div>
+          <EmptyState
+            className="chat-thread__empty"
+            size="lg"
+            icon="chat-circle"
+            title="dmeim chat"
+            description={
+              <>
+                <p>
+                  Private OpenCode Go session. Default model is DeepSeek V4
+                  Flash — pick another from the thinking control below when you
+                  need it.
+                </p>
+                <p className="chat-thread__hints">
+                  Shortcuts: ⌘/Ctrl+Shift+O new chat · Esc stop / close menu ·
+                  ⌘/Ctrl+Enter send. Attach: images ≤4MiB inlined; text/PDF
+                  extracted when possible; video/other sent as filename notes.
+                </p>
+              </>
+            }
+          />
         ) : (
           messages.map((message, index) => {
             const isUser = message.role === "user";
@@ -525,83 +533,64 @@ export function ChatPane({
               showEdit || showRegenerate || showForkHere ? (
                 <>
                   {showEdit ? (
-                    <button
-                      type="button"
-                      className="chat-bubble__icon-btn"
+                    <IconButton
+                      icon="pencil-simple"
+                      label="Edit message"
+                      size="sm"
                       onClick={() => startEdit(message.id, text)}
-                      aria-label="Edit message"
-                      title="Edit"
-                    >
-                      <LucideIcon icon={SquarePen} size={14} />
-                    </button>
+                    />
                   ) : null}
                   {showRegenerate ? (
-                    <button
-                      type="button"
-                      className="chat-bubble__icon-btn"
+                    <IconButton
+                      icon="arrows-clockwise"
+                      label="Regenerate"
+                      size="sm"
                       onClick={onRegenerate}
-                      aria-label="Regenerate"
-                      title="Regenerate"
-                    >
-                      <LucideIcon icon={RefreshCw} size={14} />
-                    </button>
+                    />
                   ) : null}
                   {showForkHere ? (
-                    <button
-                      type="button"
-                      className="chat-bubble__icon-btn"
+                    <IconButton
+                      icon="git-fork"
+                      label="Fork here"
+                      size="sm"
                       onClick={() => onFork?.(message.id)}
-                      aria-label="Fork here"
-                      title="Fork here"
-                    >
-                      <LucideIcon icon={GitFork} size={14} />
-                    </button>
+                    />
                   ) : null}
                 </>
               ) : null;
             return (
               <article
                 key={message.id}
-                className={
-                  isUser
-                    ? "chat-bubble chat-bubble--user"
-                    : "chat-bubble chat-bubble--assistant"
-                }
+                className="chat-message"
+                data-role={isUser ? "user" : "assistant"}
               >
                 {isEditing ? (
-                  <div className="chat-bubble__edit">
-                    <textarea
-                      className="chat-bubble__edit-input"
+                  <div className="chat-message__edit">
+                    <Textarea
+                      label="Edit message"
+                      labelHidden
                       rows={4}
                       value={editDraft}
                       onChange={(event) => setEditDraft(event.target.value)}
-                      aria-label="Edit message"
+                      hint="Creates a new chat from this point with your edit. The original chat stays unchanged."
                     />
-                    <div className="chat-bubble__edit-actions">
-                      <button
-                        type="button"
-                        className="chat-btn"
+                    <div className="chat-message__edit-actions">
+                      <Button
+                        size="sm"
+                        variant="primary"
                         onClick={saveEdit}
                         disabled={!editDraft.trim()}
                       >
                         Save &amp; branch
-                      </button>
-                      <button
-                        type="button"
-                        className="chat-btn chat-btn--ghost"
-                        onClick={cancelEdit}
-                      >
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={cancelEdit}>
                         Cancel
-                      </button>
+                      </Button>
                     </div>
-                    <p className="chat-bubble__edit-hint">
-                      Creates a new chat from this point with your edit. The
-                      original chat stays unchanged.
-                    </p>
                   </div>
                 ) : isUser ? (
                   <>
-                    <p className="chat-bubble__text">{text}</p>
+                    <p className="chat-message__text">{text}</p>
                     <MessageMetrics actions={statusActions} />
                   </>
                 ) : (
@@ -615,18 +604,28 @@ export function ChatPane({
                     {toolCalls.length > 0 ? (
                       <ul className="chat-tool-chips" aria-label="Tools used">
                         {toolCalls.map((chip) => (
-                          <li
-                            key={chip.key}
-                            className={`chat-tool-chip chat-tool-chip--${chip.state}`}
-                          >
-                            {chip.label}
-                            {chip.state === "pending" ? "…" : null}
+                          <li key={chip.key}>
+                            <Badge
+                              className={`chat-tool-chip chat-tool-chip--${chip.state}`}
+                              size="sm"
+                              icon={chip.state === "error" ? "warning" : "wrench"}
+                              tone={
+                                chip.state === "error"
+                                  ? "danger"
+                                  : chip.state === "pending"
+                                    ? "accent"
+                                    : "neutral"
+                              }
+                            >
+                              {chip.label}
+                              {chip.state === "pending" ? "…" : null}
+                            </Badge>
                           </li>
                         ))}
                       </ul>
                     ) : null}
                     {text.trim() ? (
-                      <MarkdownBody className="chat-bubble__md" text={text} />
+                      <MarkdownBody text={text} />
                     ) : null}
                     <MessageMetrics
                       generation={generationOf(message)}
@@ -635,11 +634,11 @@ export function ChatPane({
                   </>
                 )}
                 {attachments.length > 0 && !isEditing ? (
-                  <ul className="chat-bubble__attachments">
+                  <ul className="chat-message__attachments">
                     {attachments.map((a) => (
                       <li key={a.id}>
                         {a.filename}
-                        <span className="chat-bubble__attach-kind">
+                        <span className="chat-message__attach-kind">
                           {a.kind === "image"
                             ? " · image (inlined ≤4MiB)"
                             : a.kind === "pdf"
@@ -660,9 +659,9 @@ export function ChatPane({
           })
         )}
         {showGeneratingStatus ? (
-          <p className="chat-generating" role="status" aria-live="polite">
-            <span className="chat-status-spinner" aria-hidden="true" />
-            Generating…
+          <p className="chat-thread__status" role="status" aria-live="polite">
+            <Spinner size="sm" label="Generating" />
+            <span aria-hidden="true">Generating…</span>
           </p>
         ) : null}
         <div ref={threadEndRef} />
@@ -670,15 +669,14 @@ export function ChatPane({
 
       <form className="chat-composer" onSubmit={handleComposerSubmit}>
         {showJumpToLatest && onJumpToLatest ? (
-          <button
-            type="button"
+          <IconButton
+            icon="arrow-down"
+            label="Jump to latest"
+            variant="secondary"
+            tooltip={false}
             className="chat-jump"
             onClick={onJumpToLatest}
-            title="Jump to latest"
-          >
-            <LucideIcon icon={ArrowDown} size={14} />
-            <span>Latest</span>
-          </button>
+          />
         ) : null}
         {pendingAttachments.length > 0 ? (
           <ul className="chat-composer__attachments">

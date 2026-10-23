@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { ArrowDown, ArrowUp, Brain, Clock, Gauge } from "lucide";
 import type { ChatGenerationMetadata } from "@/lib/chat";
 import {
   formatDurationMs,
@@ -7,7 +6,8 @@ import {
   formatTokensPerSecond,
   metricsForDisplay,
 } from "@/lib/chat/message-metrics";
-import { LucideIcon } from "./LucideIcon";
+import { Icon, type IconName } from "@/ui/icons";
+import { KeyValue } from "@/ui/react";
 
 type MessageMetricsProps = {
   generation?: ChatGenerationMetadata | null;
@@ -20,14 +20,14 @@ export function MessageMetrics({ generation, actions }: MessageMetricsProps) {
 
   const tokenItems: Array<{
     key: string;
-    icon: typeof ArrowUp;
+    icon: IconName;
     label: string;
     value: string;
   }> = [];
 
   const perfItems: Array<{
     key: string;
-    icon: typeof Gauge;
+    icon: IconName;
     label: string;
     value: string;
   }> = [];
@@ -36,7 +36,7 @@ export function MessageMetrics({ generation, actions }: MessageMetricsProps) {
     if (typeof metrics.inputTokens === "number") {
       tokenItems.push({
         key: "input",
-        icon: ArrowUp,
+        icon: "arrow-up",
         label: "Input tokens",
         value: formatTokenCount(metrics.inputTokens),
       });
@@ -44,7 +44,7 @@ export function MessageMetrics({ generation, actions }: MessageMetricsProps) {
     if (typeof metrics.outputTokens === "number") {
       tokenItems.push({
         key: "output",
-        icon: ArrowDown,
+        icon: "arrow-down",
         label: "Output tokens",
         value: formatTokenCount(metrics.outputTokens),
       });
@@ -52,7 +52,7 @@ export function MessageMetrics({ generation, actions }: MessageMetricsProps) {
     if (typeof metrics.reasoningTokens === "number") {
       tokenItems.push({
         key: "reasoning",
-        icon: Brain,
+        icon: "brain",
         label: "Reasoning tokens",
         value: formatTokenCount(metrics.reasoningTokens),
       });
@@ -60,7 +60,7 @@ export function MessageMetrics({ generation, actions }: MessageMetricsProps) {
     if (typeof metrics.outputTokensPerSecond === "number") {
       perfItems.push({
         key: "tps",
-        icon: Gauge,
+        icon: "gauge",
         label: "Output tokens per second",
         value: formatTokensPerSecond(metrics.outputTokensPerSecond),
       });
@@ -68,7 +68,7 @@ export function MessageMetrics({ generation, actions }: MessageMetricsProps) {
     if (typeof metrics.responseTimeMs === "number") {
       perfItems.push({
         key: "duration",
-        icon: Clock,
+        icon: "clock",
         label: "Response duration",
         value: formatDurationMs(metrics.responseTimeMs),
       });
@@ -78,41 +78,31 @@ export function MessageMetrics({ generation, actions }: MessageMetricsProps) {
   const hasMetrics = tokenItems.length > 0 || perfItems.length > 0;
   if (!hasMetrics && !actions) return null;
 
+  const items = [...tokenItems, ...perfItems].map((item) => ({
+    label: item.label,
+    value: (
+      <span className="chat-metrics__value" title={item.label}>
+        <Icon name={item.icon} size={12} />
+        {item.value}
+      </span>
+    ),
+  }));
+
   return (
-    <div className="chat-bubble__status">
+    <div className="chat-message__status">
       {hasMetrics ? (
-        <p className="chat-bubble__metrics" aria-label="Generation metrics">
-          {tokenItems.map((item) => (
-            <span
-              key={item.key}
-              className="chat-bubble__metric"
-              title={item.label}
-            >
-              <LucideIcon icon={item.icon} size={12} />
-              <span>{item.value}</span>
-            </span>
-          ))}
-          {tokenItems.length > 0 && perfItems.length > 0 ? (
-            <span className="chat-bubble__metric-sep" aria-hidden="true">
-              ·
-            </span>
-          ) : null}
-          {perfItems.map((item) => (
-            <span
-              key={item.key}
-              className="chat-bubble__metric"
-              title={item.label}
-            >
-              <LucideIcon icon={item.icon} size={12} />
-              <span>{item.value}</span>
-            </span>
-          ))}
-        </p>
+        <KeyValue
+          className="chat-metrics"
+          layout="inline"
+          density="compact"
+          items={items}
+          aria-label="Generation metrics"
+        />
       ) : (
-        <span className="chat-bubble__metrics chat-bubble__metrics--empty" />
+        <span className="chat-message__status-spacer" />
       )}
       {actions ? (
-        <div className="chat-bubble__status-actions">{actions}</div>
+        <div className="chat-message__actions">{actions}</div>
       ) : null}
     </div>
   );

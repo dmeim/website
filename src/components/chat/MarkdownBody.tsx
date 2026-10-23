@@ -1,6 +1,8 @@
 import { useDeferredValue, useEffect, useMemo, useRef } from "react";
 
 import { renderMarkdownBlocks } from "@/lib/chat/markdown";
+import { copyTextToClipboard } from "@/ui/lib/clipboard";
+import { cx } from "@/ui/lib/cx";
 
 type Props = {
   text: string;
@@ -23,26 +25,31 @@ export default function MarkdownBody({ text, className }: Props) {
 
     const onClick = async (event: MouseEvent) => {
       const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
+      if (!(target instanceof Element)) return;
       const button = target.closest("[data-chat-copy]");
       if (!(button instanceof HTMLButtonElement) || !root.contains(button)) {
         return;
       }
-      const block = button.closest(".chat-code");
-      const code = block?.querySelector("code");
-      const value = code?.textContent ?? "";
+      // The button also carries the library's `data-copy` contract; stop here so
+      // the document-level copy delegate does not write the clipboard a second time.
+      event.stopPropagation();
+      const value =
+        button.closest(".chat-code")?.querySelector("pre")?.textContent ?? "";
+      const reset = (label: string, state: string) => {
+        button.textContent = label;
+        button.dataset.state = state;
+      };
       try {
-        await navigator.clipboard.writeText(value);
-        button.textContent = "Copied";
-        window.setTimeout(() => {
-          button.textContent = "Copy";
-        }, 1200);
-      } catch {
-        button.textContent = "Failed";
-        window.setTimeout(() => {
-          button.textContent = "Copy";
-        }, 1200);
+        await copyTextToClipboard(value);
+        reset("Copied", "copied");
+      } catch (error) {
+        console.error("[chat] code copy failed", error);
+        reset("Failed", "idle");
       }
+      window.clearTimeout(Number(button.dataset.timer));
+      button.dataset.timer = String(
+        window.setTimeout(() => reset("Copy", "idle"), 1600),
+      );
     };
 
     root.addEventListener("click", onClick);
@@ -51,7 +58,7 @@ export default function MarkdownBody({ text, className }: Props) {
   }, []);
 
   return (
-    <div ref={rootRef} className={className}>
+    <div ref={rootRef} className={cx("ui-prose chat-prose", className)} data-size="md">
       {blocks.map((html, index) => (
         <div
           // Blocks are append-only while streaming, so the index is stable.

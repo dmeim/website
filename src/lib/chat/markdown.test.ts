@@ -81,8 +81,8 @@ describe("renderMarkdown", () => {
 
   it("wraps fenced code with a language label and copy button", () => {
     const html = renderMarkdown("```ts\nconst x = 1;\n```");
-    expect(html).toContain('class="chat-code" data-lang="ts"');
-    expect(html).toContain("data-chat-copy");
+    expect(html).toContain('class="chat-code ui-code-block" data-lang="ts"');
+    expect(html).toContain("data-chat-copy data-copy");
   });
 
   it("labels unlabelled fences as code", () => {

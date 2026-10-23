@@ -97,7 +97,8 @@ md.renderer.rules.fence = (tokens, idx, options, env, self) => {
   const lang = info.split(/\s+/g)[0] || "";
   const raw = defaultFence(tokens, idx, options, env, self);
   const label = lang || "code";
-  return `<div class="chat-code" data-lang="${md.utils.escapeHtml(label)}"><div class="chat-code__bar"><span class="chat-code__lang">${md.utils.escapeHtml(label)}</span><button type="button" class="chat-code__copy" data-chat-copy>Copy</button></div>${raw}</div>`;
+  const safe = md.utils.escapeHtml(label);
+  return `<figure class="chat-code ui-code-block" data-lang="${safe}" data-labelled="true"><figcaption class="ui-code-block__head"><span class="chat-code__lang ui-code-block__label">${safe}</span><button type="button" class="chat-code__copy ui-code-block__copy ui-copy-button" data-appearance="inline" data-state="idle" data-chat-copy data-copy>Copy</button></figcaption>${raw}</figure>`;
 };
 
 // A bare <table> won't shrink below its min-content width, so a wide one

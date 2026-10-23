@@ -1,12 +1,12 @@
 import {
   useEffect,
-  useId,
   useLayoutEffect,
   useRef,
   useState,
   type TouchEvent,
   type WheelEvent,
 } from "react";
+import { Disclosure, Spinner } from "@/ui/react";
 
 /** Must be essentially at the bottom to re-engage stickiness. */
 const LOCK_BOTTOM_PX = 8;
@@ -23,7 +23,6 @@ function distanceFromBottom(el: HTMLElement): number {
 }
 
 export function ThinkingBlock({ text, streaming = false }: ThinkingBlockProps) {
-  const panelId = useId();
   const [open, setOpen] = useState(false);
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const stickToBottomRef = useRef(true);
@@ -83,39 +82,23 @@ export function ThinkingBlock({ text, streaming = false }: ThinkingBlockProps) {
   if (!text.trim()) return null;
 
   return (
-    <div
-      className={
-        streaming
-          ? "chat-thinking-block chat-thinking-block--streaming"
-          : "chat-thinking-block"
-      }
-    >
-      <button
-        type="button"
-        className="chat-thinking-block__toggle"
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => setOpen((value) => !value)}
-      >
-        {streaming ? (
-          <span
-            className="chat-status-spinner chat-thinking-block__spinner"
-            aria-hidden="true"
-          />
-        ) : (
-          <span className="chat-thinking-block__chevron" aria-hidden="true">
-            {open ? "▾" : "▸"}
-          </span>
-        )}
-        <span className="chat-thinking-block__title">
+    <Disclosure
+      level="inline"
+      className="chat-thinking"
+      data-streaming={streaming ? "true" : undefined}
+      open={open}
+      onToggle={setOpen}
+      summary={
+        <span className="chat-thinking__summary">
+          {streaming ? <Spinner size="sm" label="Thinking" /> : null}
           {streaming ? "Thinking…" : "Thinking"}
         </span>
-      </button>
+      }
+    >
       {open ? (
         <div
-          id={panelId}
           ref={bodyRef}
-          className="chat-thinking-block__body"
+          className="chat-thinking__body"
           onScroll={syncStickFromScroll}
           onWheel={onWheel}
           onTouchStart={onTouchStart}
@@ -123,9 +106,9 @@ export function ThinkingBlock({ text, streaming = false }: ThinkingBlockProps) {
           onTouchEnd={onTouchEnd}
           onTouchCancel={onTouchEnd}
         >
-          <pre className="chat-thinking-block__text">{text}</pre>
+          <pre className="chat-thinking__text">{text}</pre>
         </div>
       ) : null}
-    </div>
+    </Disclosure>
   );
 }
