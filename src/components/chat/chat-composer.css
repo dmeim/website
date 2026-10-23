@@ -224,3 +224,10 @@
       calc(var(--ui-space-sm) + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* Phones: five equal segments are too narrow for "Medium" with the default padding. */
+@media (max-width: 480px) {
+  .chat-thinking-toggle[data-size] .ui-segmented-control__option {
+    padding-inline: var(--ui-space-3xs);
+  }
+}
