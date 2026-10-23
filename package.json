@@ -23,6 +23,7 @@
     "@ai-sdk/react": "^4.0.38",
     "@astrojs/cloudflare": "^14.1.4",
     "@lucide/astro": "^1.25.0",
+    "@phosphor-icons/react": "^2.1.10",
     "@regexper/render": "^1.0.0",
     "@scure/bip39": "^2.2.0",
     "@sindresorhus/slugify": "^2.2.1",

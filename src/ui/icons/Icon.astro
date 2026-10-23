@@ -1,0 +1,29 @@
+---
+/**
+ * Static Phosphor icon for .astro files. Renders the shared React icon on the
+ * server with no client directive, so it ships inline SVG and zero JS.
+ */
+import { Icon as IconSvg } from "./Icon";
+import type { IconName, IconWeight } from "./registry";
+
+interface Props {
+  name: IconName;
+  size?: number | string;
+  weight?: IconWeight;
+  mirrored?: boolean;
+  /** Accessible name; omit for decorative icons (aria-hidden). */
+  label?: string;
+  class?: string;
+}
+
+const { name, size, weight, mirrored, label, class: className } = Astro.props;
+---
+
+<IconSvg
+  name={name}
+  size={size}
+  weight={weight}
+  mirrored={mirrored}
+  label={label}
+  className={className}
+/>

@@ -27,6 +27,7 @@ const CLOUDFLARE_SSR_OPTIMIZE_DEPS = [
   "framer-motion",
   "lucide",
   "@lucide/astro",
+  "@phosphor-icons/react/dist/ssr",
   "ai",
   "@ai-sdk/react",
   "@ai-sdk/openai-compatible",
