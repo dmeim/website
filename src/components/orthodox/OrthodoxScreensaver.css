@@ -194,6 +194,26 @@ body:has(.ow-stage) .mobile-nav {
   flex: 1 1 auto;
 }
 
+/* Phones: let long options wrap onto extra rows; the sliding thumb can't follow rows, so fill the checked option. */
+@media (max-width: 480px) {
+  .ow-segments .ui-segmented-control__track {
+    flex-wrap: wrap;
+    height: auto;
+  }
+
+  .ow-segments .ui-segmented-control__option {
+    min-height: calc(var(--ui-seg-height) - 2 * var(--ui-seg-pad));
+  }
+
+  .ow-segments .ui-segmented-control__thumb {
+    display: none;
+  }
+
+  .ow-segments .ui-segmented-control__option:has(:checked) {
+    background: var(--ui-bg);
+  }
+}
+
 .ow-backgrounds {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
