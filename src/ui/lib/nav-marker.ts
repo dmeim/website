@@ -75,7 +75,8 @@ let swapBound = false;
 /** Bind every Astro-rendered marker; observers are released on ClientRouter swaps. */
 export function bindNavMarkers(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>("[data-ui-nav-marker]").forEach((el) => {
-    if (el.dataset.bound === "1") return;
+    // React islands bind their own markers; touching their DOM pre-hydration causes a mismatch.
+    if (el.dataset.bound === "1" || el.closest("astro-island")) return;
     el.dataset.bound = "1";
     pageCleanups.push(bindNavMarker(el));
   });
