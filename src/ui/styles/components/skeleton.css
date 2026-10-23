@@ -1,0 +1,38 @@
+.ui-skeleton {
+  display: block;
+  width: var(--ui-skeleton-w, 100%);
+  height: var(--ui-skeleton-h, 1em);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-surface);
+  animation: ui-skeleton-pulse calc(var(--ui-dur-slow) * 5) var(--ui-ease-in-out) infinite;
+}
+
+.ui-skeleton[data-radius="panel"] { border-radius: var(--ui-radius-panel); }
+.ui-skeleton[data-radius="pill"] { border-radius: var(--ui-radius-pill); }
+
+.ui-skeleton[data-lines] {
+  display: grid;
+  gap: var(--ui-space-xs);
+  height: auto;
+  background: none;
+  animation: none;
+}
+
+.ui-skeleton__line {
+  display: block;
+  height: var(--ui-skeleton-h, 0.75em);
+  border-radius: inherit;
+  background: var(--ui-surface);
+  animation: ui-skeleton-pulse calc(var(--ui-dur-slow) * 5) var(--ui-ease-in-out) infinite;
+}
+
+.ui-skeleton__line:last-child:not(:only-child) { width: 60%; }
+
+@keyframes ui-skeleton-pulse {
+  50% { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-skeleton,
+  .ui-skeleton__line { animation: none; }
+}

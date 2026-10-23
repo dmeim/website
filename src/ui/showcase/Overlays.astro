@@ -1,10 +1,45 @@
 ---
 import ThemePair from "./ThemePair.astro";
+import { Button, ButtonGroup } from "@/ui/components/groups/actions";
+import { Dialog, Drawer, Tabs } from "@/ui/components/groups/overlays";
+import { OverlaysShowcase } from "@/ui/react/showcase/OverlaysShowcase";
+
+const tabItems = [
+  { id: "string", label: "String" },
+  { id: "file", label: "File", icon: "file" as const },
+  { id: "off", label: "Disabled", disabled: true },
+];
 ---
 
 <section id="overlays" class="ui-showcase-section" aria-labelledby="overlays-title">
   <h2 id="overlays-title" class="ui-showcase-section__title">Overlays</h2>
+  <h3 class="ui-showcase-sub">Astro</h3>
   <ThemePair>
-    <p class="ui-showcase-empty">No overlays components yet.</p>
+    <div style="display: grid; gap: var(--ui-space-sm)">
+      <h4 class="ui-showcase-sub">Dialog and Drawer (data-attribute openers)</h4>
+      <ButtonGroup>
+        <Button data-ui-dialog-open="ui-demo-dialog">Open dialog</Button>
+        <Button data-ui-drawer-toggle="ui-demo-drawer">Toggle drawer</Button>
+      </ButtonGroup>
+      <h4 class="ui-showcase-sub">Tabs (panel-&lt;id&gt; slots)</h4>
+      <Tabs label="Input type" items={tabItems}>
+        <p slot="panel-string" style="margin: 0">Encode a string.</p>
+        <p slot="panel-file" style="margin: 0">Encode a file.</p>
+      </Tabs>
+    </div>
   </ThemePair>
+  <Dialog id="ui-demo-dialog" title="Astro dialog" description="Native dialog with showModal.">
+    <p style="margin: 0">Escape, backdrop click or the close button dismiss it.</p>
+    <Fragment slot="footer">
+      <Button variant="ghost" data-ui-dialog-close>Cancel</Button>
+      <Button variant="primary" data-ui-dialog-close>OK</Button>
+    </Fragment>
+  </Dialog>
+  <Drawer id="ui-demo-drawer" title="Menu" side="start">
+    <ButtonGroup>
+      <a href="#overlays">Back to overlays</a>
+    </ButtonGroup>
+  </Drawer>
+  <h3 class="ui-showcase-sub">React</h3>
+  <OverlaysShowcase client:visible />
 </section>

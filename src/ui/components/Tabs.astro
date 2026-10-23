@@ -1,0 +1,75 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import type { IconName } from "@/ui/icons";
+import { cx } from "@/ui/lib/cx";
+import { createId } from "@/ui/lib/ids";
+
+/** Panels come from `panel-<id>` slots. Emits `ui:tabs-change` ({ detail: { id } }) on the root. */
+interface Props extends Omit<HTMLAttributes<"div">, "class"> {
+  label: string;
+  items: Array<{ id: string; label: string; icon?: IconName; badge?: string; disabled?: boolean }>;
+  value?: string;
+  defaultValue?: string;
+  activation?: "auto" | "manual";
+  class?: string;
+}
+
+const { label, items, value, defaultValue, activation = "auto", class: className, id, ...rest } = Astro.props;
+const baseId = id ?? createId("ui-tabs");
+const selected = value ?? defaultValue ?? items.find((item) => !item.disabled)?.id;
+const panels = await Promise.all(
+  items.map(async (item) => ({
+    id: item.id,
+    html: Astro.slots.has(`panel-${item.id}`) ? await Astro.slots.render(`panel-${item.id}`) : "",
+  })),
+);
+---
+
+<div id={id} {...rest} class={cx("ui-tabs", className)} data-ui-tabs data-activation={activation}>
+  <div class="ui-tabs__list" role="tablist" aria-label={label}>
+    {
+      items.map((item) => {
+        const on = item.id === selected;
+        return (
+          <button
+            type="button"
+            role="tab"
+            id={`${baseId}-tab-${item.id}`}
+            class="ui-tabs__tab"
+            aria-selected={on ? "true" : "false"}
+            aria-controls={`${baseId}-panel-${item.id}`}
+            tabindex={on ? 0 : -1}
+            disabled={item.disabled}
+            data-value={item.id}
+          >
+            {item.icon && <Icon name={item.icon} class="ui-tabs__icon" />}
+            <span>{item.label}</span>
+            {item.badge && <span class="ui-tabs__badge">{item.badge}</span>}
+          </button>
+        );
+      })
+    }
+    <span class="ui-tabs__indicator" aria-hidden="true"></span>
+  </div>
+  {
+    panels.map((panel) => (
+      <div
+        id={`${baseId}-panel-${panel.id}`}
+        class="ui-tabs__panel"
+        role="tabpanel"
+        aria-labelledby={`${baseId}-tab-${panel.id}`}
+        tabindex="0"
+        hidden={panel.id !== selected}
+        set:html={panel.html}
+      />
+    ))
+  }
+</div>
+
+<script>
+  import { bindTabs } from "@/ui/lib/tabs";
+
+  bindTabs();
+  document.addEventListener("astro:page-load", bindTabs);
+</script>

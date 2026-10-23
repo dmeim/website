@@ -1,0 +1,33 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+
+interface Props extends Omit<HTMLAttributes<"span">, "class"> {
+  width?: string | number;
+  height?: string | number;
+  lines?: number;
+  radius?: "control" | "panel" | "pill";
+  class?: string;
+}
+
+const { width, height, lines, radius = "control", class: className, style, ...rest } = Astro.props;
+const size = (v: string | number | undefined) => (typeof v === "number" ? `${v}px` : v);
+const vars = [
+  width !== undefined && `--ui-skeleton-w: ${size(width)}`,
+  height !== undefined && `--ui-skeleton-h: ${size(height)}`,
+  typeof style === "string" && style,
+]
+  .filter(Boolean)
+  .join(";");
+---
+
+<span
+  aria-hidden="true"
+  {...rest}
+  class={cx("ui-skeleton", className)}
+  data-radius={radius}
+  data-lines={lines ? "" : undefined}
+  style={vars || undefined}
+>
+  {lines ? Array.from({ length: lines }, () => <span class="ui-skeleton__line" />) : null}
+</span>

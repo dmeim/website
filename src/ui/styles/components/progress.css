@@ -1,0 +1,69 @@
+.ui-progress {
+  --_h: 4px;
+  --_fill: var(--ui-ink);
+  display: grid;
+  gap: var(--ui-space-2xs);
+  min-width: 0;
+}
+
+.ui-progress[data-size="sm"] { --_h: 2px; }
+.ui-progress[data-tone="accent"] { --_fill: var(--ui-accent); }
+.ui-progress[data-tone="success"] { --_fill: var(--ui-success); }
+.ui-progress[data-tone="warning"] { --_fill: var(--ui-warning); }
+.ui-progress[data-tone="danger"] { --_fill: var(--ui-danger); }
+.ui-progress[data-tone="info"] { --_fill: var(--ui-info); }
+
+.ui-progress__label {
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+}
+
+.ui-progress__track {
+  position: relative;
+  height: var(--_h);
+  overflow: hidden;
+  border-radius: var(--ui-radius-pill);
+  background: var(--ui-surface-active);
+}
+
+.ui-progress__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--_fill);
+  transform-origin: left center;
+  transform: scaleX(var(--ui-progress, 0));
+  transition: transform var(--ui-dur-base) var(--ui-ease-out);
+}
+
+[dir="rtl"] .ui-progress__fill { transform-origin: right center; }
+
+.ui-progress[data-mode="indeterminate"] .ui-progress__fill {
+  width: 35%;
+  transform: none;
+  transition: none;
+  animation: ui-progress-slide calc(var(--ui-dur-slow) * 4) var(--ui-ease-in-out) infinite;
+}
+
+/* A functional timer, so it runs under reduced motion too. */
+.ui-progress[data-mode="countdown"] .ui-progress__fill {
+  transition: none;
+  animation: ui-progress-countdown var(--ui-progress-duration) linear forwards;
+}
+
+@keyframes ui-progress-slide {
+  from { translate: -100% 0; }
+  to { translate: 300% 0; }
+}
+
+@keyframes ui-progress-countdown {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-progress[data-mode="indeterminate"] .ui-progress__fill {
+    animation: none;
+    translate: 100% 0;
+  }
+}

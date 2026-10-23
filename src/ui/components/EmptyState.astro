@@ -1,0 +1,39 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import type { IconName } from "@/ui/icons";
+import { cx } from "@/ui/lib/cx";
+import Button from "./Button.astro";
+
+interface Props extends Omit<HTMLAttributes<"div">, "class" | "title"> {
+  icon?: IconName;
+  title: string;
+  description?: string;
+  /** Link action; use the `action` slot for anything else. */
+  action?: { label: string; href: string };
+  size?: "sm" | "md" | "lg";
+  class?: string;
+}
+
+const { icon, title, description, action, size = "md", class: className, ...rest } = Astro.props;
+const hasActionSlot = Astro.slots.has("action");
+const hasDescriptionSlot = Astro.slots.has("description");
+---
+
+<div {...rest} class={cx("ui-empty-state", className)} data-size={size}>
+  {icon && <Icon name={icon} class="ui-empty-state__icon" />}
+  <p class="ui-empty-state__title">{title}</p>
+  {
+    (description || hasDescriptionSlot) && (
+      <div class="ui-empty-state__description">{description}<slot name="description" /></div>
+    )
+  }
+  {
+    (action || hasActionSlot) && (
+      <div class="ui-empty-state__action">
+        {action && <Button href={action.href} size={size === "sm" ? "sm" : "md"}>{action.label}</Button>}
+        <slot name="action" />
+      </div>
+    )
+  }
+</div>

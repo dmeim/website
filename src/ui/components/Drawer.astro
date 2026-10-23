@@ -1,0 +1,68 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+import { createId } from "@/ui/lib/ids";
+import IconButton from "./IconButton.astro";
+
+/**
+ * Toggle with any `[data-ui-drawer-toggle="<id>"]` element (gets aria-expanded/aria-controls);
+ * close with the scrim, Escape, `[data-ui-drawer-close]` or a link inside. Programmatic control:
+ * `openDrawer` / `closeDrawer` from `@/ui/lib/overlay`.
+ */
+interface Props extends Omit<HTMLAttributes<"div">, "class" | "title"> {
+  side?: "start" | "end" | "bottom";
+  title: string;
+  titleHidden?: boolean;
+  modal?: boolean;
+  width?: string;
+  class?: string;
+}
+
+const {
+  side = "start",
+  title,
+  titleHidden = false,
+  modal = true,
+  width,
+  class: className,
+  id,
+  style,
+  ...rest
+} = Astro.props;
+const baseId = id ?? createId("ui-drawer");
+const vars = [width && `--ui-drawer-width: ${width}`, typeof style === "string" && style].filter(Boolean).join(";");
+---
+
+<div
+  {...rest}
+  id={baseId}
+  class={cx("ui-drawer", className)}
+  data-ui-drawer
+  data-side={side}
+  data-modal={modal ? undefined : "false"}
+  data-state="closed"
+  inert
+  style={vars || undefined}
+>
+  {modal && <div class="ui-drawer__scrim" aria-hidden="true"></div>}
+  <div
+    class="ui-drawer__panel"
+    role="dialog"
+    aria-modal={modal ? "true" : undefined}
+    aria-labelledby={`${baseId}-title`}
+    tabindex="-1"
+  >
+    <header class="ui-drawer__header">
+      <h2 id={`${baseId}-title`} class={titleHidden ? "ui-visually-hidden" : "ui-drawer__title"}>{title}</h2>
+      <IconButton icon="x" label="Close" size="sm" tooltip={false} class="ui-drawer__close" data-ui-drawer-close />
+    </header>
+    <div class="ui-drawer__body"><slot /></div>
+  </div>
+</div>
+
+<script>
+  import { bindDrawers } from "@/ui/lib/overlay";
+
+  bindDrawers();
+  document.addEventListener("astro:page-load", bindDrawers);
+</script>

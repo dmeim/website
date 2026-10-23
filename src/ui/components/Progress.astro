@@ -1,0 +1,58 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+import { createId } from "@/ui/lib/ids";
+import type { Tone } from "@/ui/lib/tone-icons";
+
+interface Props extends Omit<HTMLAttributes<"div">, "class"> {
+  value?: number;
+  max?: number;
+  indeterminate?: boolean;
+  label: string;
+  labelHidden?: boolean;
+  size?: "sm" | "md";
+  /** Countdown mode in ms: the fill empties over this time. */
+  duration?: number;
+  tone?: Tone;
+  class?: string;
+}
+
+const {
+  value,
+  max = 100,
+  indeterminate = false,
+  label,
+  labelHidden = false,
+  size = "md",
+  duration,
+  tone,
+  class: className,
+  id,
+  style,
+  ...rest
+} = Astro.props;
+const labelId = `${id ?? createId("ui-progress")}-label`;
+const mode = duration !== undefined ? "countdown" : indeterminate || value === undefined ? "indeterminate" : "value";
+const ratio = mode === "value" ? Math.min(1, Math.max(0, (value ?? 0) / max)) : 1;
+const vars = [
+  `--ui-progress: ${ratio}`,
+  duration !== undefined && `--ui-progress-duration: ${duration}ms`,
+  typeof style === "string" && style,
+]
+  .filter(Boolean)
+  .join(";");
+---
+
+<div id={id} {...rest} class={cx("ui-progress", className)} data-size={size} data-tone={tone} data-mode={mode} style={vars}>
+  <span id={labelId} class={labelHidden ? "ui-visually-hidden" : "ui-progress__label"}>{label}</span>
+  <div
+    class="ui-progress__track"
+    role="progressbar"
+    aria-labelledby={labelId}
+    aria-valuemin={mode === "value" ? 0 : undefined}
+    aria-valuemax={mode === "value" ? max : undefined}
+    aria-valuenow={mode === "value" ? value : undefined}
+  >
+    <span class="ui-progress__fill"></span>
+  </div>
+</div>

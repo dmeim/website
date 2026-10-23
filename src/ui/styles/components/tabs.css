@@ -1,0 +1,82 @@
+.ui-tabs__list {
+  position: relative;
+  display: flex;
+  gap: var(--ui-space-lg);
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: var(--ui-border-width) solid var(--ui-line);
+}
+
+.ui-tabs__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-xs);
+  min-height: var(--ui-control-md);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ui-text-muted);
+  font: inherit;
+  font-size: var(--ui-fs-sm);
+  font-weight: var(--ui-fw-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-tabs__tab:hover:not(:disabled),
+.ui-tabs__tab[aria-selected="true"] {
+  color: var(--ui-text);
+}
+
+.ui-tabs__tab:disabled {
+  color: var(--ui-text-disabled);
+  cursor: not-allowed;
+}
+
+.ui-tabs__icon {
+  width: var(--ui-icon-sm);
+  height: var(--ui-icon-sm);
+}
+
+.ui-tabs__badge {
+  padding: 0 var(--ui-space-2xs);
+  border-radius: var(--ui-radius-pill);
+  background: var(--ui-surface);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The Profile signature: a gold bar that glides to the selected tab. */
+.ui-tabs__indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--ui-tab-w, 0);
+  height: 2px;
+  background: var(--ui-accent);
+  transform: translateX(var(--ui-tab-x, 0));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ui-tabs__list[data-indicator] .ui-tabs__indicator {
+  opacity: 1;
+  transition: opacity var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-tabs__list[data-indicator="ready"] .ui-tabs__indicator {
+  transition:
+    transform var(--ui-dur-glide) var(--ui-ease-out),
+    width var(--ui-dur-glide) var(--ui-ease-out),
+    opacity var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-tabs__panel {
+  padding-top: var(--ui-space-md);
+}
+
+.ui-tabs__panel:focus-visible {
+  outline-offset: var(--ui-focus-offset);
+}

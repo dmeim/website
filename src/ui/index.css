@@ -58,8 +58,18 @@
 /* group: feedback */
 @import "./styles/components/spinner.css";
 @import "./styles/components/tooltip.css";
+@import "./styles/components/notice.css";
+@import "./styles/components/toaster.css";
+@import "./styles/components/skeleton.css";
+@import "./styles/components/progress.css";
+@import "./styles/components/empty-state.css";
 
 /* group: overlays */
+@import "./styles/components/dialog.css";
+@import "./styles/components/drawer.css";
+@import "./styles/components/popover.css";
+@import "./styles/components/menu.css";
+@import "./styles/components/tabs.css";
 
 /* group: navigation */
 

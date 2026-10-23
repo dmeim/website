@@ -1,0 +1,50 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import type { IconName } from "@/ui/icons";
+import { cx } from "@/ui/lib/cx";
+import { TONE_ICONS, type Tone } from "@/ui/lib/tone-icons";
+
+interface Props extends Omit<HTMLAttributes<"div">, "class" | "title"> {
+  tone?: Tone;
+  variant?: "inline" | "callout";
+  title?: string;
+  icon?: IconName | false;
+  live?: "polite" | "assertive" | "off";
+  role?: string;
+  class?: string;
+}
+
+const { tone = "neutral", variant = "inline", title, icon, live, role, class: className, ...rest } = Astro.props;
+const liveMode = live ?? (tone === "danger" && variant === "callout" ? "assertive" : "polite");
+const resolvedRole = role ?? (liveMode === "off" ? undefined : liveMode === "assertive" ? "alert" : "status");
+const glyph = icon === false ? null : (icon ?? TONE_ICONS[tone]);
+const hasActions = Astro.slots.has("actions");
+---
+
+<div
+  role={resolvedRole}
+  aria-live={liveMode === "off" ? undefined : liveMode}
+  {...rest}
+  class={cx("ui-notice", className)}
+  data-tone={tone}
+  data-variant={variant}
+>
+  {glyph && <Icon name={glyph} weight="fill" class="ui-notice__icon" />}
+  <div class="ui-notice__body">
+    {
+      variant === "callout" ? (
+        <>
+          {title && <p class="ui-notice__title">{title}</p>}
+          <div class="ui-notice__message"><slot /></div>
+        </>
+      ) : (
+        <>
+          {title && <strong class="ui-notice__title">{title} </strong>}
+          <slot />
+        </>
+      )
+    }
+    {hasActions && <div class="ui-notice__actions"><slot name="actions" /></div>}
+  </div>
+</div>

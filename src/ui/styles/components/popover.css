@@ -1,0 +1,51 @@
+/* Popover and Menu share the anchored overlay surface. */
+:is(.ui-popover, .ui-menu) {
+  --_gap: var(--ui-space-2xs);
+  position: relative;
+  display: inline-flex;
+}
+
+:is(.ui-popover__content, .ui-menu__list) {
+  position: absolute;
+  z-index: var(--ui-z-popover);
+  min-width: 12rem;
+  max-width: min(22rem, 100vw - 2 * var(--ui-space-md));
+  border: var(--ui-border-width) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-dialog);
+  background: var(--ui-popover);
+  box-shadow: var(--ui-shadow-overlay);
+  color: var(--ui-text);
+  animation: ui-popover-in var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+:is(.ui-popover__content, .ui-menu__list)[hidden] { display: none; }
+
+.ui-popover__content {
+  width: max-content;
+  padding: var(--ui-space-sm);
+}
+
+:is(.ui-popover, .ui-menu):is([data-placement^="bottom"]) > :is(.ui-popover__content, .ui-menu__list) {
+  top: calc(100% + var(--_gap));
+}
+
+:is(.ui-popover, .ui-menu):is([data-placement^="top"]) > :is(.ui-popover__content, .ui-menu__list) {
+  bottom: calc(100% + var(--_gap));
+}
+
+:is(.ui-popover, .ui-menu):is([data-placement="top"], [data-placement="bottom"]) > :is(.ui-popover__content, .ui-menu__list) {
+  left: 50%;
+  translate: -50% 0;
+}
+
+:is(.ui-popover, .ui-menu)[data-placement$="-start"] > :is(.ui-popover__content, .ui-menu__list) {
+  inset-inline-start: 0;
+}
+
+:is(.ui-popover, .ui-menu)[data-placement$="-end"] > :is(.ui-popover__content, .ui-menu__list) {
+  inset-inline-end: 0;
+}
+
+@keyframes ui-popover-in {
+  from { opacity: 0; }
+}

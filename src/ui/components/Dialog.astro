@@ -1,0 +1,66 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cx } from "@/ui/lib/cx";
+import { createId } from "@/ui/lib/ids";
+import ButtonGroup from "./ButtonGroup.astro";
+import IconButton from "./IconButton.astro";
+
+/** Open with any `[data-ui-dialog-open="<id>"]` element; close with `[data-ui-dialog-close]`. */
+interface Props extends Omit<HTMLAttributes<"dialog">, "class" | "title"> {
+  title: string;
+  titleHidden?: boolean;
+  description?: string;
+  size?: "sm" | "md" | "lg" | "full";
+  closeLabel?: string;
+  dismissible?: boolean;
+  class?: string;
+}
+
+const {
+  title,
+  titleHidden = false,
+  description,
+  size = "md",
+  closeLabel = "Close",
+  dismissible = true,
+  class: className,
+  id,
+  ...rest
+} = Astro.props;
+const baseId = id ?? createId("ui-dialog");
+const hasFooter = Astro.slots.has("footer");
+---
+
+<dialog
+  {...rest}
+  id={baseId}
+  class={cx("ui-dialog", className)}
+  data-ui-dialog
+  data-size={size}
+  data-dismissible={dismissible ? undefined : "false"}
+  aria-labelledby={`${baseId}-title`}
+  aria-describedby={description ? `${baseId}-desc` : undefined}
+>
+  <div class="ui-dialog__panel">
+    <header class="ui-dialog__header">
+      <h2 id={`${baseId}-title`} class={titleHidden ? "ui-visually-hidden" : "ui-dialog__title"}>{title}</h2>
+      {dismissible && <IconButton icon="x" label={closeLabel} size="sm" tooltip={false} class="ui-dialog__close" data-ui-dialog-close />}
+    </header>
+    {description && <div id={`${baseId}-desc`} class="ui-dialog__description">{description}</div>}
+    <div class="ui-dialog__body"><slot /></div>
+    {
+      hasFooter && (
+        <footer class="ui-dialog__footer">
+          <ButtonGroup align="end"><slot name="footer" /></ButtonGroup>
+        </footer>
+      )
+    }
+  </div>
+</dialog>
+
+<script>
+  import { bindDialogs } from "@/ui/lib/overlay";
+
+  bindDialogs();
+  document.addEventListener("astro:page-load", bindDialogs);
+</script>

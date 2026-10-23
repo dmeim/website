@@ -1,0 +1,42 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "@/ui/icons/Icon.astro";
+import { cx } from "@/ui/lib/cx";
+import { TONE_ICONS, type Tone } from "@/ui/lib/tone-icons";
+import IconButton from "./IconButton.astro";
+
+interface Props extends Omit<HTMLAttributes<"section">, "class"> {
+  label?: string;
+  class?: string;
+}
+
+const { label = "Notifications", class: className, ...rest } = Astro.props;
+const tones = Object.keys(TONE_ICONS) as Tone[];
+---
+
+<section aria-label={label} {...rest} class={cx("ui-toaster", className)} data-ui-toaster>
+  <ol class="ui-toaster__list" aria-live="polite"></ol>
+  <template data-ui-toast-template>
+    <li class="ui-toast" role="status">
+      <p class="ui-toast__message"></p>
+      <button type="button" class="ui-button ui-toast__action" data-variant="ghost" data-size="sm">
+        <span class="ui-button__label"></span>
+      </button>
+      <IconButton icon="x" label="Dismiss" size="sm" tooltip={false} class="ui-toast__close" />
+    </li>
+  </template>
+  {
+    tones.map((tone) => (
+      <template data-ui-toast-icon={tone}>
+        <Icon name={TONE_ICONS[tone]} weight="fill" class="ui-toast__icon" />
+      </template>
+    ))
+  }
+</section>
+
+<script>
+  import { bindToasters } from "@/ui/lib/toaster-dom";
+
+  bindToasters();
+  document.addEventListener("astro:page-load", bindToasters);
+</script>

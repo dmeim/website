@@ -1,10 +1,11 @@
 ---
 import ThemePair from "./ThemePair.astro";
 import { Button, ButtonGroup, IconButton } from "@/ui/components/groups/actions";
-import { Spinner, Tooltip } from "@/ui/components/groups/feedback";
+import { EmptyState, Notice, Progress, Skeleton, Spinner, Tooltip } from "@/ui/components/groups/feedback";
 import { FeedbackShowcase } from "@/ui/react/showcase/FeedbackShowcase";
 
 const placements = ["top", "bottom", "start", "end"] as const;
+const tones = ["neutral", "info", "success", "warning", "danger", "accent"] as const;
 ---
 
 <section id="feedback" class="ui-showcase-section" aria-labelledby="feedback-title">
@@ -30,6 +31,31 @@ const placements = ["top", "bottom", "start", "end"] as const;
         <Tooltip content="No delay" delay={0}><Button size="sm">delay 0</Button></Tooltip>
         <IconButton icon="info" label="IconButton tooltip" />
       </ButtonGroup>
+      <h4 class="ui-showcase-sub">Notice: inline, all tones</h4>
+      {tones.map((tone) => <Notice tone={tone}>Inline {tone} status line.</Notice>)}
+      <Notice tone="neutral" live="off" icon={false}>Hint without icon (live off).</Notice>
+      <h4 class="ui-showcase-sub">Notice: callout</h4>
+      <Notice variant="callout" tone="info" title="Heads up">Keys are generated locally and never leave the browser.</Notice>
+      <Notice variant="callout" tone="danger" title="Request failed">
+        The server returned 502.
+        <Button slot="actions" size="sm">Retry</Button>
+      </Notice>
+      <h4 class="ui-showcase-sub">Skeleton</h4>
+      <div aria-busy="true" style="display: grid; gap: var(--ui-space-xs)">
+        <Skeleton width="40%" height="1.25rem" />
+        <Skeleton lines={3} />
+        <Skeleton width={48} height={48} radius="pill" />
+      </div>
+      <h4 class="ui-showcase-sub">Progress: value, sm, accent, indeterminate, countdown</h4>
+      <Progress label="Upload" value={40} />
+      <Progress label="Small" value={70} size="sm" labelHidden />
+      <Progress label="Accent" value={55} tone="accent" />
+      <Progress label="Hashing" indeterminate />
+      <Progress label="Auto-close in 10s" duration={10000} tone="accent" size="sm" />
+      <h4 class="ui-showcase-sub">EmptyState: sm, md, lg</h4>
+      <EmptyState size="sm" icon="magnifying-glass" title="No results" description="Try another search." />
+      <EmptyState icon="archive" title="Archive is empty" description="Archived chats show up here." action={{ label: "Open chat", href: "#" }} />
+      <EmptyState size="lg" icon="chat-circle" title="What can I help with?" description="Ask anything." />
     </div>
   </ThemePair>
   <h3 class="ui-showcase-sub">React</h3>
