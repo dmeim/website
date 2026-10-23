@@ -36,6 +36,7 @@ import {
   stopChat,
   uploadLibraryFile,
 } from "./api";
+import { AppShell } from "@/ui/react";
 import { ArchivePane } from "./ArchivePane";
 import { ChatPane } from "./ChatPane";
 import { ChatSidebar } from "./ChatSidebar";
@@ -1130,46 +1131,43 @@ export default function ChatShell({ initialChatId = null }: Props) {
   }, [streaming, showGeneratingIndicator, sidebarOpen]);
 
   return (
-    <div
+    <AppShell
       className="chat-shell"
-      data-sidebar-open={sidebarOpen ? "true" : "false"}
+      sidebarLabel="Chat navigation"
+      sidebarOpen={sidebarOpen}
+      onSidebarOpenChange={setSidebarOpen}
+      data-main-scroll="false"
+      sidebar={
+        <ChatSidebar
+          chats={chats}
+          activeChatId={activeChatId}
+          view={view}
+          busy={busy}
+          streaming={streaming}
+          generatingChatIds={generatingChatIds}
+          onNewChat={() => void handleNewChat()}
+          onSelectChat={(id) => {
+            if (id === activeChatId && view !== "chat") {
+              returnToActiveChat();
+              return;
+            }
+            void selectChat(id);
+          }}
+          onOpenLibrary={() => {
+            // Keep client stream alive when possible; server also continues.
+            setView("library");
+            setSidebarOpen(false);
+          }}
+          onOpenArchive={() => {
+            setView("archive");
+            setSidebarOpen(false);
+            setArchiveBanner(null);
+          }}
+          onArchiveChat={(id) => void handleArchive(id)}
+          onDeleteChat={(id) => void handleDeleteChat(id)}
+        />
+      }
     >
-      <button
-        type="button"
-        className="chat-shell__backdrop"
-        aria-label="Close sidebar"
-        onClick={() => setSidebarOpen(false)}
-      />
-
-      <ChatSidebar
-        chats={chats}
-        activeChatId={activeChatId}
-        view={view}
-        busy={busy}
-        streaming={streaming}
-        generatingChatIds={generatingChatIds}
-        onNewChat={() => void handleNewChat()}
-        onSelectChat={(id) => {
-          if (id === activeChatId && view !== "chat") {
-            returnToActiveChat();
-            return;
-          }
-          void selectChat(id);
-        }}
-        onOpenLibrary={() => {
-          // Keep client stream alive when possible; server also continues.
-          setView("library");
-          setSidebarOpen(false);
-        }}
-        onOpenArchive={() => {
-          setView("archive");
-          setSidebarOpen(false);
-          setArchiveBanner(null);
-        }}
-        onArchiveChat={(id) => void handleArchive(id)}
-        onDeleteChat={(id) => void handleDeleteChat(id)}
-      />
-
       <section className="chat-main" aria-label="Chat workspace">
         {view === "library" ? (
           <LibraryPane
@@ -1268,6 +1266,6 @@ export default function ChatShell({ initialChatId = null }: Props) {
           onChange={(event) => void handleUpload(event.target.files)}
         />
       </section>
-    </div>
+    </AppShell>
   );
 }

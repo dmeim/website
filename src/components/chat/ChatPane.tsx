@@ -34,6 +34,7 @@ import type {
   ThinkingLevel,
 } from "@/lib/chat/types";
 import { ComposerStatusBar } from "./ComposerStatusBar";
+import { IconButton } from "@/ui/react";
 import { LibraryPickerModal } from "./LibraryPickerModal";
 import { LucideIcon } from "./LucideIcon";
 import MarkdownBody from "./MarkdownBody";
@@ -367,14 +368,13 @@ export function ChatPane({
   return (
     <>
       <header className="chat-main__header">
-        <button
-          type="button"
+        <IconButton
+          icon="list"
+          label="Open sidebar"
+          tooltip={false}
           className="chat-main__menu"
           onClick={onOpenSidebar}
-          aria-label="Open sidebar"
-        >
-          Menu
-        </button>
+        />
         <div className="chat-main__title-block">
           {renaming ? (
             <div className="chat-main__title-edit">

@@ -1,4 +1,5 @@
-.ui-icon-button {
+.ui-icon-button,
+.ui-icon-button[data-size] {
   width: var(--_h);
   height: var(--_h);
   min-height: 0;

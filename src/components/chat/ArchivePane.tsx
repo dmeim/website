@@ -1,6 +1,6 @@
-import { ArchiveRestore, Trash2 } from "lucide";
 import type { ChatSummary } from "@/lib/chat/types";
-import { LucideIcon } from "./LucideIcon";
+import { Button, EmptyState, List, ListRow, Notice, Spinner } from "@/ui/react";
+import { PaneHeader } from "./PaneHeader";
 
 type ArchivePaneProps = {
   chats: ChatSummary[];
@@ -25,77 +25,57 @@ export function ArchivePane({
 }: ArchivePaneProps) {
   return (
     <>
-      <header className="chat-main__header">
-        <button
-          type="button"
-          className="chat-main__menu"
-          onClick={onOpenSidebar}
-          aria-label="Open sidebar"
-        >
-          Menu
-        </button>
-        <div className="chat-main__title-block">
-          <h1 className="chat-main__title">Archive</h1>
-        </div>
-      </header>
+      <PaneHeader title="Archive" onOpenSidebar={onOpenSidebar} />
 
-      <div className="chat-archive">
-        <p className="chat-archive__hint">
-          Restored chats return to the sidebar. Delete removes the thread and
-          its messages permanently.
+      <div className="chat-pane-body">
+        <p className="chat-pane-body__hint">
+          Restored chats return to the sidebar. Delete removes the thread and its messages permanently.
         </p>
 
         {banner ? (
-          <p className="chat-archive__banner" role="status">
+          <Notice
+            tone="accent"
+            actions={
+              onDismissBanner ? (
+                <Button variant="ghost" size="sm" onClick={onDismissBanner}>
+                  Dismiss
+                </Button>
+              ) : null
+            }
+          >
             {banner}
-            {onDismissBanner ? (
-              <button type="button" onClick={onDismissBanner}>
-                Dismiss
-              </button>
-            ) : null}
-          </p>
+          </Notice>
         ) : null}
 
         {loading ? (
-          <p className="chat-empty">Loading…</p>
+          <Spinner label="Loading archived chats" />
         ) : chats.length === 0 ? (
-          <p className="chat-empty">No archived chats.</p>
+          <EmptyState icon="archive" title="No archived chats." />
         ) : (
-          <ul className="chat-archive__list">
+          <List className="chat-pane-list" label="Archived chats">
             {chats.map((chat) => (
-              <li key={chat.id} className="chat-archive__item">
-                <div className="chat-archive__meta">
-                  <h2 className="chat-archive__item-title">{chat.title}</h2>
-                  <p className="chat-archive__item-sub">
+              <ListRow
+                key={chat.id}
+                title={chat.title}
+                description={
+                  <>
                     {chat.modelId}
-                    {chat.archivedAt
-                      ? ` · archived ${new Date(chat.archivedAt).toLocaleString()}`
-                      : null}
-                  </p>
-                </div>
-                <div className="chat-archive__actions">
-                  <button
-                    type="button"
-                    className="chat-btn chat-btn--ghost"
-                    disabled={busy}
-                    onClick={() => onRestore(chat.id)}
-                  >
-                    <LucideIcon icon={ArchiveRestore} size={14} />
-                    Restore
-                  </button>
-                  <button
-                    type="button"
-                    className="chat-btn chat-btn--danger"
-                    disabled={busy}
-                    onClick={() => onDelete(chat.id, chat.title)}
-                  >
-                    <LucideIcon icon={Trash2} size={14} />
-                    Delete
-                  </button>
-                </div>
-              </li>
+                    {chat.archivedAt ? ` · archived ${new Date(chat.archivedAt).toLocaleString()}` : null}
+                  </>
+                }
+                actions={
+                  <>
+                    <Button variant="ghost" size="sm" iconStart="box-arrow-up" disabled={busy} onClick={() => onRestore(chat.id)}>
+                      Restore
+                    </Button>
+                    <Button variant="danger" size="sm" iconStart="trash" disabled={busy} onClick={() => onDelete(chat.id, chat.title)}>
+                      Delete
+                    </Button>
+                  </>
+                }
+              />
             ))}
-          </ul>
+          </List>
         )}
       </div>
     </>

@@ -1,6 +1,8 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { LibraryAssetSummary } from "@/lib/chat/types";
+import { Button, Dialog, EmptyState, IconButton, List, ListRow, Spinner } from "@/ui/react";
 import { libraryContentUrl } from "./api";
+import { formatBytes } from "./format-bytes";
 
 type LibraryPickerModalProps = {
   assets: LibraryAssetSummary[];
@@ -10,32 +12,21 @@ type LibraryPickerModalProps = {
   onConfirm: (assets: LibraryAssetSummary[]) => void;
 };
 
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-export function LibraryPickerModal({
-  assets,
-  pendingIds,
-  loading = false,
-  onClose,
-  onConfirm,
-}: LibraryPickerModalProps) {
-  const titleId = useId();
+export function LibraryPickerModal({ assets, pendingIds, loading = false, onClose, onConfirm }: LibraryPickerModalProps) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const opener = useRef<HTMLElement | null>(typeof document === "undefined" ? null : (document.activeElement as HTMLElement | null));
 
+  // The parent unmounts this on close, so the Dialog's own close-event focus return never runs.
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        onClose();
-      }
+    const el = opener.current;
+    return () => {
+      // The opener is usually an attach-menu item that closed with the menu.
+      const target = el?.isConnected
+        ? el
+        : document.querySelector<HTMLElement>('.chat-composer button[aria-label="Attach"], .chat-composer textarea');
+      target?.focus();
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
+  }, []);
 
   const toggle = (id: string) => {
     setSelected((prev) => {
@@ -46,106 +37,73 @@ export function LibraryPickerModal({
     });
   };
 
-  const handleConfirm = () => {
-    onConfirm(assets.filter((asset) => selected.has(asset.id)));
+  // Mark Escape handled so the shell's global Escape doesn't also stop a generation.
+  const onKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    onClose();
   };
 
   return (
-    <div
-      className="chat-library-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={titleId}
-    >
-      <button
-        type="button"
-        className="chat-library-modal__backdrop"
-        aria-label="Close library picker"
-        onClick={onClose}
-      />
-      <div className="chat-library-modal__panel">
-        <header className="chat-library-modal__header">
-          <h2 id={titleId} className="chat-library-modal__title">
-            Attach from library
-          </h2>
-          <button
-            type="button"
-            className="chat-btn chat-btn--ghost"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-        </header>
-
-        <div className="chat-library-modal__body">
-          {loading ? (
-            <p className="chat-empty">Loading library…</p>
-          ) : assets.length === 0 ? (
-            <p className="chat-empty">
-              No assets yet. Upload images or files from the + menu.
-            </p>
-          ) : (
-            <ul className="chat-library-modal__list">
-              {assets.map((asset) => {
-                const alreadyPending = pendingIds.has(asset.id);
-                const checked = selected.has(asset.id);
-                return (
-                  <li key={asset.id}>
-                    <label
-                      className={
-                        alreadyPending
-                          ? "chat-library-modal__item chat-library-modal__item--pending"
-                          : "chat-library-modal__item"
-                      }
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        disabled={alreadyPending}
-                        onChange={() => toggle(asset.id)}
-                      />
-                      <span className="chat-library-modal__meta">
-                        <span className="chat-library-modal__kind">
-                          {asset.kind}
-                        </span>
-                        <a
-                          href={libraryContentUrl(asset.id)}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="chat-library-modal__name"
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          {asset.filename}
-                        </a>
-                        <span className="chat-library-modal__size">
-                          {formatBytes(asset.byteSize)}
-                          {alreadyPending ? " · already attached" : ""}
-                        </span>
-                      </span>
-                    </label>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
-
-        <footer className="chat-library-modal__footer">
-          <span className="chat-library-modal__count">
-            {selected.size === 0
-              ? "Select items to attach"
-              : `${selected.size} selected`}
+    <Dialog
+      open
+      onClose={onClose}
+      onKeyDown={onKeyDown}
+      title="Attach from library"
+      closeLabel="Close library picker"
+      className="chat-picker"
+      footer={
+        <>
+          <span className="chat-picker__count">
+            {selected.size === 0 ? "Select items to attach" : `${selected.size} selected`}
           </span>
-          <button
-            type="button"
-            className="chat-btn"
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
             disabled={selected.size === 0}
-            onClick={handleConfirm}
+            onClick={() => onConfirm(assets.filter((asset) => selected.has(asset.id)))}
           >
             Attach
-          </button>
-        </footer>
-      </div>
-    </div>
+          </Button>
+        </>
+      }
+    >
+      {loading ? (
+        <Spinner label="Loading library" />
+      ) : assets.length === 0 ? (
+        <EmptyState size="sm" icon="books" title="No assets yet." description="Upload images or files from the + menu." />
+      ) : (
+        <List density="compact" label="Library assets">
+          {assets.map((asset) => {
+            const alreadyPending = pendingIds.has(asset.id);
+            return (
+              <ListRow
+                key={asset.id}
+                label={asset.kind}
+                title={asset.filename}
+                meta={`${formatBytes(asset.byteSize)}${alreadyPending ? " · already attached" : ""}`}
+                selected={selected.has(asset.id)}
+                disabled={alreadyPending}
+                arrow={false}
+                onSelect={() => toggle(asset.id)}
+                actions={
+                  <IconButton
+                    icon="arrow-square-out"
+                    label={`Open ${asset.filename}`}
+                    size="sm"
+                    tooltip={false}
+                    href={libraryContentUrl(asset.id)}
+                    target="_blank"
+                    rel="noreferrer"
+                  />
+                }
+              />
+            );
+          })}
+        </List>
+      )}
+    </Dialog>
   );
 }

@@ -1,5 +1,8 @@
 import type { LibraryAssetSummary } from "@/lib/chat/types";
+import { Button, EmptyState, List, ListRow } from "@/ui/react";
 import { libraryContentUrl } from "./api";
+import { formatBytes } from "./format-bytes";
+import { PaneHeader } from "./PaneHeader";
 
 type LibraryPaneProps = {
   assets: LibraryAssetSummary[];
@@ -10,89 +13,45 @@ type LibraryPaneProps = {
   onDelete: (asset: LibraryAssetSummary) => void;
 };
 
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-export function LibraryPane({
-  assets,
-  busy = false,
-  onOpenSidebar,
-  onUploadClick,
-  onAttach,
-  onDelete,
-}: LibraryPaneProps) {
+export function LibraryPane({ assets, busy = false, onOpenSidebar, onUploadClick, onAttach, onDelete }: LibraryPaneProps) {
   return (
     <>
-      <header className="chat-main__header">
-        <button
-          type="button"
-          className="chat-main__menu"
-          onClick={onOpenSidebar}
-          aria-label="Open sidebar"
-        >
-          Menu
-        </button>
-        <div className="chat-main__title-block">
-          <h1 className="chat-main__title">Library</h1>
-        </div>
-      </header>
+      <PaneHeader title="Library" onOpenSidebar={onOpenSidebar} />
 
-      <div className="chat-library">
-        <div className="chat-library__toolbar">
-          <button
-            type="button"
-            className="chat-btn"
-            onClick={onUploadClick}
-            disabled={busy}
-          >
+      <div className="chat-pane-body">
+        <div className="chat-pane-body__toolbar">
+          <Button variant="primary" iconStart="upload-simple" onClick={onUploadClick} disabled={busy}>
             Upload
-          </button>
-          <p className="chat-library__hint">
-            Uploads stay in the Library and can be attached to any chat.
-          </p>
+          </Button>
+          <p className="chat-pane-body__hint">Uploads stay in the Library and can be attached to any chat.</p>
         </div>
         {assets.length === 0 ? (
-          <p className="chat-empty">No assets yet. Upload a file to begin.</p>
+          <EmptyState icon="books" title="No assets yet." description="Upload a file to begin." />
         ) : (
-          <ul className="chat-library__grid">
+          <List className="chat-pane-list" label="Library assets">
             {assets.map((asset) => (
-              <li key={asset.id} className="chat-library__card">
-                <div className="chat-library__meta">
-                  <span className="chat-library__kind">{asset.kind}</span>
-                  <a
-                    href={libraryContentUrl(asset.id)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="chat-library__name"
-                  >
+              <ListRow
+                key={asset.id}
+                label={asset.kind}
+                title={
+                  <a href={libraryContentUrl(asset.id)} target="_blank" rel="noreferrer" className="chat-pane-list__link">
                     {asset.filename}
                   </a>
-                  <span className="chat-library__size">
-                    {formatBytes(asset.byteSize)}
-                  </span>
-                </div>
-                <div className="chat-library__card-actions">
-                  <button
-                    type="button"
-                    className="chat-btn chat-btn--ghost"
-                    onClick={() => onAttach(asset)}
-                  >
-                    Attach
-                  </button>
-                  <button
-                    type="button"
-                    className="chat-btn chat-btn--danger"
-                    onClick={() => onDelete(asset)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
+                }
+                meta={formatBytes(asset.byteSize)}
+                actions={
+                  <>
+                    <Button variant="ghost" size="sm" onClick={() => onAttach(asset)}>
+                      Attach
+                    </Button>
+                    <Button variant="danger" size="sm" iconStart="trash" onClick={() => onDelete(asset)}>
+                      Delete
+                    </Button>
+                  </>
+                }
+              />
             ))}
-          </ul>
+          </List>
         )}
       </div>
     </>
