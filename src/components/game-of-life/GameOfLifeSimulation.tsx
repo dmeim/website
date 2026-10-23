@@ -16,6 +16,14 @@ import {
   type Grid,
 } from "@/lib/game-of-life/engine";
 
+import { Button } from "@/ui/react/Button";
+import { ImmersiveStage } from "@/ui/react/ImmersiveStage";
+import { Link } from "@/ui/react/Link";
+import { Slider } from "@/ui/react/Slider";
+import { Stat, StatGrid } from "@/ui/react/Stat";
+import { Toolbar } from "@/ui/react/Toolbar";
+import { Icon } from "@/ui/icons";
+
 import "./GameOfLifeSimulation.css";
 
 const CELL_SIZE = 12;
@@ -94,9 +102,9 @@ export default function GameOfLifeSimulation() {
     canvas.style.height = `${cssH}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const elevated = readCssColor("--color-surface", "#0e1014");
-    const accent = readCssColor("--color-gold", "#d4bc8a");
-    const border = readCssColor("--color-border", "#0e1014");
+    const elevated = readCssColor("--ui-canvas-bg", "#0e1014");
+    const accent = readCssColor("--ui-canvas-cell", "#d4bc8a");
+    const border = readCssColor("--ui-canvas-grid", "#0e1014");
 
     ctx.fillStyle = elevated;
     ctx.fillRect(0, 0, cssW, cssH);
@@ -309,64 +317,55 @@ export default function GameOfLifeSimulation() {
     draw();
   };
 
-  return (
-    <div className="gol-sim" data-running={running ? "true" : "false"}>
-      <div className="gol-sim__bar" role="toolbar" aria-label="Simulation controls">
-        <div className="gol-sim__bar-left">
-          <a className="gol-sim__exit" href="/game-of-life">
-            Exit
-          </a>
-          <div className="gol-sim__actions">
-            <button
-              type="button"
-              className={running ? "btn" : "btn btn--primary"}
-              onClick={handleToggleRun}
-              aria-pressed={running}
-            >
-              {running ? "Pause" : "Start"}
-            </button>
-            <button type="button" className="btn" onClick={handleStep}>
-              Step
-            </button>
-            <button
-              type="button"
-              className="btn gol-sim__clear"
-              onClick={handleClear}
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-
-        <dl className="gol-sim__stats">
-          <div>
-            <dt>Generation</dt>
-            <dd>{generation}</dd>
-          </div>
-          <div>
-            <dt>Population</dt>
-            <dd>{population}</dd>
-          </div>
-        </dl>
-
-        <div className="gol-sim__speed">
-          <label htmlFor="gol-sim-fps">
-            Speed
-            <span className="gol-sim__fps-value">{fps} FPS</span>
-          </label>
-          <input
-            id="gol-sim-fps"
-            type="range"
-            min={MIN_FPS}
-            max={MAX_FPS}
-            step={1}
-            value={fps}
-            onChange={(event) => setFps(Number(event.target.value))}
-            aria-valuetext={`${fps} frames per second`}
-          />
-        </div>
+  const toolbar = (
+    <Toolbar label="Simulation controls" placement="floating-top" className="gol-sim__bar">
+      <Link href="/game-of-life" tone="quiet" className="gol-sim__exit">
+        <Icon name="arrow-left" />
+        Exit
+      </Link>
+      <div className="gol-sim__actions">
+        <Button
+          size="sm"
+          variant={running ? "secondary" : "primary"}
+          iconStart={running ? "pause" : "play"}
+          pressed={running}
+          onClick={handleToggleRun}
+        >
+          {running ? "Pause" : "Start"}
+        </Button>
+        <Button size="sm" variant="ghost" iconStart="skip-forward" onClick={handleStep}>
+          Step
+        </Button>
+        <Button size="sm" variant="ghost" iconStart="eraser" onClick={handleClear}>
+          Clear
+        </Button>
       </div>
+      <StatGrid columns={2} className="gol-sim__stats">
+        <Stat label="Generation" value={generation} mono />
+        <Stat label="Population" value={population} mono />
+      </StatGrid>
+      <Slider
+        id="gol-sim-fps"
+        className="gol-sim__speed"
+        label="Speed"
+        min={MIN_FPS}
+        max={MAX_FPS}
+        step={1}
+        value={fps}
+        onChange={(value) => setFps(Array.isArray(value) ? value[1] : value)}
+        showValue
+        formatValue={(value) => `${value} FPS`}
+      />
+    </Toolbar>
+  );
 
+  return (
+    <ImmersiveStage
+      label="Game of Life simulation"
+      className="gol-sim"
+      data-running={running ? "true" : "false"}
+      toolbar={toolbar}
+    >
       <div
         ref={shellRef}
         className="gol-sim__stage"
@@ -384,6 +383,6 @@ export default function GameOfLifeSimulation() {
           onContextMenu={(event) => event.preventDefault()}
         />
       </div>
-    </div>
+    </ImmersiveStage>
   );
 }
