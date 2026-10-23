@@ -93,25 +93,25 @@
 }
 
 /* Token sheet */
-.ui-swatches {
+.ui-sheet-swatches {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
   gap: var(--ui-space-xs);
 }
 
-.ui-swatch {
+.ui-sheet-swatch {
   display: grid;
   gap: var(--ui-space-2xs);
   min-width: 0;
 }
 
-.ui-swatch__chip {
+.ui-sheet-swatch__chip {
   height: var(--ui-control-lg);
   border: var(--ui-border-width) solid var(--ui-line);
   border-radius: var(--ui-radius-xs);
 }
 
-.ui-swatch__name,
+.ui-sheet-swatch__name,
 .ui-token-name {
   overflow-wrap: anywhere;
   color: var(--ui-text-muted);

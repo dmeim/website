@@ -57,12 +57,12 @@ const groups = [
       <ThemePair>
         <div class="ui-sheet" tabindex="0">
           <h3 class="ui-showcase-sub">Colour</h3>
-          <div class="ui-swatches">
+          <div class="ui-sheet-swatches">
             {
               uiColorTokenNames.map((name) => (
-                <div class="ui-swatch">
-                  <span class="ui-swatch__chip" style={`background: var(${name})`} />
-                  <code class="ui-swatch__name">{name.replace("--ui-", "")}</code>
+                <div class="ui-sheet-swatch">
+                  <span class="ui-sheet-swatch__chip" style={`background: var(${name})`} />
+                  <code class="ui-sheet-swatch__name">{name.replace("--ui-", "")}</code>
                 </div>
               ))
             }
