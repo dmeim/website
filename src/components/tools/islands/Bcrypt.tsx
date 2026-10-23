@@ -1,19 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolField,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-  ToolWorkspace,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { CopyButton, Input, KeyValue, Notice, OutputField, Panel, Progress, Slider, Textarea, ToolFrame } from "@/ui/react";
 import {
   BCRYPT_ROUNDS_DEFAULT,
   BCRYPT_ROUNDS_MAX,
@@ -24,8 +11,6 @@ import {
   isBcryptHash,
   passwordTruncates,
 } from "@/lib/tools/bcrypt";
-
-import "./Bcrypt.css";
 
 const HASH_DEBOUNCE_MS = 280;
 const COMPARE_DEBOUNCE_MS = 280;
@@ -44,8 +29,6 @@ export default function Bcrypt() {
   const [compareState, setCompareState] = useState<CompareState>("idle");
 
   const safeRounds = clampSaltRounds(rounds);
-  const roundsFillPercent =
-    ((safeRounds - BCRYPT_ROUNDS_MIN) / (BCRYPT_ROUNDS_MAX - BCRYPT_ROUNDS_MIN)) * 100;
   const truncates = passwordTruncates(clearText);
 
   useEffect(() => {
@@ -114,20 +97,6 @@ export default function Bcrypt() {
     };
   }, [compareString, compareHash]);
 
-  const copyHash = useCallback(async () => {
-    if (!hashed) {
-      setActionStatus("Wait for a hash to finish before copying.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(hashed);
-      setActionStatus("Hash copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the hash and copy it manually.");
-    }
-  }, [hashed]);
-
   const compareLabel =
     compareState === "yes"
       ? "Yes"
@@ -140,129 +109,94 @@ export default function Bcrypt() {
             : "—";
 
   const compareTone =
-    compareState === "yes" ? "success" : compareState === "no" || compareState === "invalid" ? "error" : "default";
+    compareState === "yes" ? "success" : compareState === "no" || compareState === "invalid" ? "danger" : "default";
 
   return (
-    <ToolIsland className="bc-tool">
-      <ToolWorkspace className="bc-tool__workspace" stagger>
-        <ToolPanel labelledBy="bc-hash-heading" className="bc-tool__panel">
-          <ToolSectionHeading
-            title="Hash"
-            titleId="bc-hash-heading"
-            description={
-              <ToolHint>
-                Enter text and salt rounds. The bcrypt hash updates as you type (async, debounced).
-              </ToolHint>
-            }
-          />
+    <ToolFrame layout="split" stagger>
+      <Panel
+        title="Hash"
+        titleId="bc-hash-heading"
+        description="Enter text and salt rounds. The bcrypt hash updates as you type (async, debounced)."
+      >
+        <Input
+          id="bc-clear-text"
+          label="Your string"
+          value={clearText}
+          placeholder="Your string to bcrypt…"
+          onChange={(event) => setClearText(event.target.value)}
+          autoFocus
+          autoComplete="off"
+          spellCheck={false}
+        />
 
-          <ToolInput
-            id="bc-clear-text"
-            label="Your string"
-            full
-            value={clearText}
-            placeholder="Your string to bcrypt…"
-            onChange={(event) => setClearText(event.target.value)}
-            autoFocus
-            autoComplete="off"
-            spellCheck={false}
-          />
+        {truncates ? (
+          <Notice tone="accent">This string is longer than 72 bytes; bcrypt will truncate it before hashing.</Notice>
+        ) : null}
 
-          {truncates ? (
-            <ToolStatus tone="accent">
-              This string is longer than 72 bytes; bcrypt will truncate it before hashing.
-            </ToolStatus>
-          ) : null}
+        <Slider
+          id="bc-rounds"
+          label="Salt rounds"
+          min={BCRYPT_ROUNDS_MIN}
+          max={BCRYPT_ROUNDS_MAX}
+          step={1}
+          value={safeRounds}
+          onChange={(value) => setRounds(Number(value))}
+          showValue
+        />
 
-          <ToolField label={`Salt rounds (${safeRounds})`} htmlFor="bc-rounds" full>
-            <div className="bc-range-slider">
-              <div className="bc-range-track" />
-              <div className="bc-range-fill" style={{ width: `${roundsFillPercent}%` }} />
-              <input
-                id="bc-rounds"
-                type="range"
-                min={BCRYPT_ROUNDS_MIN}
-                max={BCRYPT_ROUNDS_MAX}
-                step={1}
-                value={safeRounds}
-                onChange={(event) => setRounds(Number(event.target.value))}
-                aria-valuemin={BCRYPT_ROUNDS_MIN}
-                aria-valuemax={BCRYPT_ROUNDS_MAX}
-                aria-valuenow={safeRounds}
-              />
-            </div>
-            <div className="bc-range-labels" aria-hidden="true">
-              <span>{BCRYPT_ROUNDS_MIN}</span>
-              <span>{BCRYPT_ROUNDS_MAX}</span>
-            </div>
-          </ToolField>
+        {safeRounds >= 14 ? (
+          <Notice tone="warning">High salt rounds can take a long time in the browser. Prefer 8–12 for interactive use.</Notice>
+        ) : null}
 
-          {safeRounds >= 14 ? (
-            <ToolHint>
-              High salt rounds can take a long time in the browser. Prefer 8–12 for interactive use.
-            </ToolHint>
-          ) : null}
+        <OutputField
+          id="bc-hash-output"
+          label="Hash"
+          multiline
+          rows={3}
+          copy={false}
+          value={hashed}
+          placeholder={hashPending ? "Hashing…" : "Hash appears here"}
+        />
 
-          <ToolTextarea
-            id="bc-hash-output"
-            label="Hash"
-            full
-            code
-            readOnly
-            rows={3}
-            value={hashed}
-            placeholder={hashPending ? "Hashing…" : "Hash appears here"}
-            className="bc-hash-display"
-            aria-live="polite"
-          />
+        {hashPending ? <Progress indeterminate label="Hashing" labelHidden size="sm" /> : null}
 
-          <ToolActionRow>
-            <ToolButton type="button" onClick={() => void copyHash()} disabled={!hashed || hashPending}>
-              Copy hash
-            </ToolButton>
-          </ToolActionRow>
+        <div>
+          <CopyButton value={hashed} label="Copy hash" variant="primary" disabled={!hashed || hashPending} />
+        </div>
 
-          {actionStatus ? <ToolStatus tone="success">{actionStatus}</ToolStatus> : null}
-        </ToolPanel>
+        {actionStatus ? <Notice tone="danger">{actionStatus}</Notice> : null}
+      </Panel>
 
-        <ToolPanel labelledBy="bc-compare-heading" className="bc-tool__panel">
-          <ToolSectionHeading
-            title="Compare string with hash"
-            titleId="bc-compare-heading"
-            description={<ToolHint>Check whether a cleartext string matches a bcrypt hash.</ToolHint>}
-          />
+      <Panel
+        title="Compare string with hash"
+        titleId="bc-compare-heading"
+        description="Check whether a cleartext string matches a bcrypt hash."
+      >
+        <Input
+          id="bc-compare-string"
+          label="Your string"
+          value={compareString}
+          placeholder="Your string to compare…"
+          onChange={(event) => setCompareString(event.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+        />
 
-          <ToolInput
-            id="bc-compare-string"
-            label="Your string"
-            full
-            value={compareString}
-            placeholder="Your string to compare…"
-            onChange={(event) => setCompareString(event.target.value)}
-            autoComplete="off"
-            spellCheck={false}
-          />
+        <Textarea
+          id="bc-compare-hash"
+          label="Your hash"
+          mono
+          rows={3}
+          value={compareHash}
+          placeholder="Your hash to compare…"
+          onChange={(event) => setCompareHash(event.target.value)}
+          spellCheck={false}
+        />
 
-          <ToolTextarea
-            id="bc-compare-hash"
-            label="Your hash"
-            full
-            code
-            rows={3}
-            value={compareHash}
-            placeholder="Your hash to compare…"
-            onChange={(event) => setCompareHash(event.target.value)}
-            spellCheck={false}
-          />
-
-          <div className="bc-compare-row">
-            <span className="bc-compare-label">Do they match?</span>
-            <ToolStatus tone={compareTone} className="bc-compare-result" live="polite">
-              {compareLabel}
-            </ToolStatus>
-          </div>
-        </ToolPanel>
-      </ToolWorkspace>
-    </ToolIsland>
+        <div aria-live="polite">
+          <KeyValue items={[{ label: "Do they match?", value: compareLabel, tone: compareTone }]} />
+        </div>
+      </Panel>
+    </ToolFrame>
   );
 }

@@ -1,18 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolField,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Button, ButtonGroup, CopyButton, Input, OutputField, Panel, SegmentedControl, ToolFrame } from "@/ui/react";
 import {
   ULID_FORMAT_DEFAULT,
   ULID_FORMATS,
@@ -25,8 +13,6 @@ import {
   normalizeUlidFormat,
 } from "@/lib/tools/ulid-generator";
 
-import "./UlidGenerator.css";
-
 const FORMAT_LABELS: Record<UlidFormat, string> = {
   raw: "Raw",
   json: "JSON",
@@ -36,7 +22,6 @@ export default function UlidGenerator() {
   const [quantity, setQuantity] = useState(ULID_QUANTITY_DEFAULT);
   const [format, setFormat] = useState<UlidFormat>(ULID_FORMAT_DEFAULT);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [actionStatus, setActionStatus] = useState("");
 
   const safeQuantity = clampUlidQuantity(quantity);
   const safeFormat = normalizeUlidFormat(format);
@@ -51,22 +36,7 @@ export default function UlidGenerator() {
 
   const refreshUlids = useCallback(() => {
     setRefreshKey((value) => value + 1);
-    setActionStatus("ULIDs refreshed.");
   }, []);
-
-  const copyUlids = useCallback(async () => {
-    if (!ulids) {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(ulids);
-      setActionStatus(safeQuantity === 1 ? "ULID copied." : "ULIDs copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the output and copy it manually.");
-    }
-  }, [ulids, safeQuantity]);
 
   const outputRows =
     safeFormat === "json"
@@ -74,22 +44,15 @@ export default function UlidGenerator() {
       : Math.min(8, Math.max(2, safeQuantity));
 
   return (
-    <ToolIsland className="ulid-tool">
-      <ToolPanel labelledBy="ulid-settings-heading" className="ulid-tool__panel">
-        <ToolSectionHeading
-          title="ULID settings"
-          titleId="ulid-settings-heading"
-          description={
-            <ToolHint>
-              Choose quantity and output format, then copy or refresh the generated identifiers.
-            </ToolHint>
-          }
-        />
-
-        <ToolInput
+    <ToolFrame>
+      <Panel
+        title="ULID settings"
+        titleId="ulid-settings-heading"
+        description="Choose quantity and output format, then copy or refresh the generated identifiers."
+      >
+        <Input
           id="ulid-quantity"
           label="Quantity"
-          full
           type="number"
           min={ULID_QUANTITY_MIN}
           max={ULID_QUANTITY_MAX}
@@ -98,52 +61,23 @@ export default function UlidGenerator() {
           onChange={(event) => setQuantity(clampUlidQuantity(event.target.value))}
         />
 
-        <ToolField label="Format" full>
-          <div className="ulid-segment" role="radiogroup" aria-label="Output format">
-            {ULID_FORMATS.map((option) => {
-              const selected = safeFormat === option;
-
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  className={`ulid-segment__btn${selected ? " is-selected" : ""}`}
-                  onClick={() => setFormat(option)}
-                >
-                  {FORMAT_LABELS[option]}
-                </button>
-              );
-            })}
-          </div>
-        </ToolField>
-
-        <ToolTextarea
-          id="ulid-output"
-          label="ULIDs"
-          full
-          code
-          readOnly
-          rows={outputRows}
-          value={ulids}
-          placeholder="Your ULIDs"
-          className="ulid-output"
-          aria-live="polite"
-          data-testid="ulids"
+        <SegmentedControl
+          name="ulid-format"
+          label="Format"
+          options={ULID_FORMATS.map((option) => ({ value: option, label: FORMAT_LABELS[option] }))}
+          value={safeFormat}
+          onChange={(value) => setFormat(value as UlidFormat)}
         />
 
-        <ToolActionRow>
-          <ToolButton type="button" onClick={() => void copyUlids()} disabled={!ulids}>
-            Copy
-          </ToolButton>
-          <ToolButton type="button" variant="ghost" onClick={refreshUlids} data-testid="refresh">
-            Refresh
-          </ToolButton>
-        </ToolActionRow>
+        <OutputField id="ulid-output" label="ULIDs" multiline copy={false} rows={outputRows} value={ulids} placeholder="Your ULIDs" />
 
-        {actionStatus ? <ToolStatus tone="success">{actionStatus}</ToolStatus> : null}
-      </ToolPanel>
-    </ToolIsland>
+        <ButtonGroup>
+          <CopyButton value={ulids} disabled={!ulids} variant="primary" />
+          <Button variant="ghost" iconStart="arrows-clockwise" onClick={refreshUlids} data-testid="refresh">
+            Refresh
+          </Button>
+        </ButtonGroup>
+      </Panel>
+    </ToolFrame>
   );
 }

@@ -1,19 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolSelect,
-  ToolStatus,
-  ToolTextarea,
-  ToolWorkspace,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Input, Notice, OutputField, Panel, Select, Textarea, ToolFrame } from "@/ui/react";
 import {
   ENCRYPTION_ALGORITHMS,
   ENCRYPTION_ALGORITHM_DEFAULT,
@@ -26,18 +13,14 @@ import {
   tryDecrypt,
 } from "@/lib/tools/encryption";
 
-import "./Encryption.css";
-
 export default function Encryption() {
   const [plainText, setPlainText] = useState(ENCRYPTION_SAMPLE_PLAINTEXT);
   const [encryptSecret, setEncryptSecret] = useState(ENCRYPTION_SAMPLE_SECRET);
   const [encryptAlgo, setEncryptAlgo] = useState<EncryptionAlgorithm>(ENCRYPTION_ALGORITHM_DEFAULT);
-  const [encryptStatus, setEncryptStatus] = useState("");
 
   const [cipherText, setCipherText] = useState(ENCRYPTION_SAMPLE_CIPHERTEXT);
   const [decryptSecret, setDecryptSecret] = useState(ENCRYPTION_SAMPLE_SECRET);
   const [decryptAlgo, setDecryptAlgo] = useState<EncryptionAlgorithm>(ENCRYPTION_ALGORITHM_DEFAULT);
-  const [decryptStatus, setDecryptStatus] = useState("");
 
   const safeEncryptAlgo = normalizeEncryptionAlgorithm(encryptAlgo);
   const safeDecryptAlgo = normalizeEncryptionAlgorithm(decryptAlgo);
@@ -52,183 +35,96 @@ export default function Encryption() {
     [safeDecryptAlgo, cipherText, decryptSecret],
   );
 
-  const copyCiphertext = useCallback(async () => {
-    try {
-      await copyTextToClipboard(encrypted);
-      setEncryptStatus("Ciphertext copied.");
-    } catch {
-      setEncryptStatus("Copy failed. Select the ciphertext and copy it manually.");
-    }
-  }, [encrypted]);
-
-  const copyPlaintext = useCallback(async () => {
-    if (!decrypted.ok) {
-      setDecryptStatus("Decrypt successfully before copying.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(decrypted.text);
-      setDecryptStatus("Plaintext copied.");
-    } catch {
-      setDecryptStatus("Copy failed. Select the plaintext and copy it manually.");
-    }
-  }, [decrypted]);
+  const algoOptions = ENCRYPTION_ALGORITHMS.map((algo) => ({ value: algo, label: algo }));
 
   return (
-    <ToolIsland className="enc-tool">
-      <ToolWorkspace className="enc-tool__workspace" stagger>
-        <ToolPanel labelledBy="enc-encrypt-heading" className="enc-tool__panel">
-          <ToolSectionHeading
-            title="Encrypt"
-            titleId="enc-encrypt-heading"
-            description={
-              <ToolHint>
-                Enter plaintext and a secret, pick an algorithm, then copy the ciphertext.
-              </ToolHint>
-            }
-          />
+    <ToolFrame layout="split" stagger>
+      <Panel
+        title="Encrypt"
+        titleId="enc-encrypt-heading"
+        description="Enter plaintext and a secret, pick an algorithm, then copy the ciphertext."
+      >
+        <Textarea
+          id="enc-plaintext"
+          label="Your text"
+          rows={4}
+          value={plainText}
+          placeholder="The string to encrypt…"
+          onChange={(event) => setPlainText(event.target.value)}
+          autoFocus
+        />
+        <Input
+          id="enc-secret"
+          label="Your secret key"
+          value={encryptSecret}
+          placeholder="Secret key…"
+          onChange={(event) => setEncryptSecret(event.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+        />
+        <Select
+          id="enc-encrypt-algo"
+          label="Encryption algorithm"
+          value={safeEncryptAlgo}
+          onChange={(event) => setEncryptAlgo(normalizeEncryptionAlgorithm(event.target.value))}
+          options={algoOptions}
+        />
+        <OutputField
+          id="enc-ciphertext-out"
+          label="Your text encrypted"
+          multiline
+          rows={3}
+          value={encrypted}
+          placeholder="Encrypted ciphertext…"
+        />
+      </Panel>
 
-          <ToolTextarea
-            id="enc-plaintext"
-            label="Your text"
-            full
-            rows={4}
-            value={plainText}
-            placeholder="The string to encrypt…"
-            onChange={(event) => setPlainText(event.target.value)}
-            autoFocus
-          />
-
-          <ToolInput
-            id="enc-secret"
-            label="Your secret key"
-            full
-            value={encryptSecret}
-            placeholder="Secret key…"
-            onChange={(event) => setEncryptSecret(event.target.value)}
-            autoComplete="off"
-            spellCheck={false}
-          />
-
-          <ToolSelect
-            id="enc-encrypt-algo"
-            label="Encryption algorithm"
-            full
-            value={safeEncryptAlgo}
-            onChange={(event) => setEncryptAlgo(normalizeEncryptionAlgorithm(event.target.value))}
-          >
-            {ENCRYPTION_ALGORITHMS.map((algo) => (
-              <option key={algo} value={algo}>
-                {algo}
-              </option>
-            ))}
-          </ToolSelect>
-
-          <ToolTextarea
-            id="enc-ciphertext-out"
-            label="Your text encrypted"
-            full
-            code
-            readOnly
+      <Panel
+        title="Decrypt"
+        titleId="enc-decrypt-heading"
+        description="Paste ciphertext and the matching secret and algorithm to recover the plaintext."
+      >
+        <Textarea
+          id="enc-ciphertext-in"
+          label="Your encrypted text"
+          mono
+          rows={4}
+          value={cipherText}
+          placeholder="The string to decrypt…"
+          onChange={(event) => setCipherText(event.target.value)}
+          spellCheck={false}
+        />
+        <Input
+          id="enc-decrypt-secret"
+          label="Your secret key"
+          value={decryptSecret}
+          placeholder="Secret key…"
+          onChange={(event) => setDecryptSecret(event.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+        />
+        <Select
+          id="enc-decrypt-algo"
+          label="Encryption algorithm"
+          value={safeDecryptAlgo}
+          onChange={(event) => setDecryptAlgo(normalizeEncryptionAlgorithm(event.target.value))}
+          options={algoOptions}
+        />
+        {decrypted.ok ? (
+          <OutputField
+            id="enc-plaintext-out"
+            label="Your decrypted text"
+            multiline
             rows={3}
-            value={encrypted}
-            placeholder="Encrypted ciphertext…"
-            className="enc-tool__output"
-            aria-live="polite"
+            value={decrypted.text}
+            placeholder="Decrypted plaintext…"
           />
-
-          <ToolActionRow>
-            <ToolButton type="button" onClick={() => void copyCiphertext()} disabled={!encrypted}>
-              Copy ciphertext
-            </ToolButton>
-          </ToolActionRow>
-
-          {encryptStatus ? <ToolStatus tone="success">{encryptStatus}</ToolStatus> : null}
-        </ToolPanel>
-
-        <ToolPanel labelledBy="enc-decrypt-heading" className="enc-tool__panel">
-          <ToolSectionHeading
-            title="Decrypt"
-            titleId="enc-decrypt-heading"
-            description={
-              <ToolHint>
-                Paste ciphertext and the matching secret and algorithm to recover the plaintext.
-              </ToolHint>
-            }
-          />
-
-          <ToolTextarea
-            id="enc-ciphertext-in"
-            label="Your encrypted text"
-            full
-            code
-            rows={4}
-            value={cipherText}
-            placeholder="The string to decrypt…"
-            onChange={(event) => setCipherText(event.target.value)}
-            spellCheck={false}
-          />
-
-          <ToolInput
-            id="enc-decrypt-secret"
-            label="Your secret key"
-            full
-            value={decryptSecret}
-            placeholder="Secret key…"
-            onChange={(event) => setDecryptSecret(event.target.value)}
-            autoComplete="off"
-            spellCheck={false}
-          />
-
-          <ToolSelect
-            id="enc-decrypt-algo"
-            label="Encryption algorithm"
-            full
-            value={safeDecryptAlgo}
-            onChange={(event) => setDecryptAlgo(normalizeEncryptionAlgorithm(event.target.value))}
-          >
-            {ENCRYPTION_ALGORITHMS.map((algo) => (
-              <option key={algo} value={algo}>
-                {algo}
-              </option>
-            ))}
-          </ToolSelect>
-
-          {decrypted.ok ? (
-            <>
-              <ToolTextarea
-                id="enc-plaintext-out"
-                label="Your decrypted text"
-                full
-                code
-                readOnly
-                rows={3}
-                value={decrypted.text}
-                placeholder="Decrypted plaintext…"
-                className="enc-tool__output"
-                aria-live="polite"
-              />
-
-              <ToolActionRow>
-                <ToolButton
-                  type="button"
-                  onClick={() => void copyPlaintext()}
-                  disabled={!decrypted.text}
-                >
-                  Copy plaintext
-                </ToolButton>
-              </ToolActionRow>
-            </>
-          ) : (
-            <ToolStatus tone="error" live="polite">
-              {decrypted.error}
-            </ToolStatus>
-          )}
-
-          {decryptStatus ? <ToolStatus tone="success">{decryptStatus}</ToolStatus> : null}
-        </ToolPanel>
-      </ToolWorkspace>
-    </ToolIsland>
+        ) : (
+          <Notice tone="danger" live="polite">
+            {decrypted.error}
+          </Notice>
+        )}
+      </Panel>
+    </ToolFrame>
   );
 }

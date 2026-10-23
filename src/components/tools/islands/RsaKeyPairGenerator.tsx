@@ -1,17 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Button, CopyButton, Input, Notice, OutputField, Panel, Progress, ToolFrame } from "@/ui/react";
 import {
   RSA_BITS_AUTO_REGEN_MAX,
   RSA_BITS_DEFAULT,
@@ -21,8 +10,6 @@ import {
   isValidRsaBits,
   normalizeRsaBits,
 } from "@/lib/tools/rsa-key-pair-generator";
-
-import "./RsaKeyPairGenerator.css";
 
 const BITS_DEBOUNCE_MS = 300;
 const EMPTY_PAIR = { publicKeyPem: "", privateKeyPem: "" };
@@ -164,157 +151,101 @@ export default function RsaKeyPairGenerator() {
     }));
   }, [bitsInput]);
 
-  const copyPublic = useCallback(async () => {
-    if (!publicKeyPem) {
-      setActionStatus("Generate a key pair before copying.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(publicKeyPem);
-      setActionStatus("Public key copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the public key and copy it manually.");
-    }
-  }, [publicKeyPem]);
-
-  const copyPrivate = useCallback(async () => {
-    if (!privateKeyPem) {
-      setActionStatus("Generate a key pair before copying.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(privateKeyPem);
-      setActionStatus("Private key copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the private key and copy it manually.");
-    }
-  }, [privateKeyPem]);
-
   const bitsFieldValue = Number.isFinite(bitsInput) ? bitsInput : "";
 
   return (
-    <ToolIsland className="rsa-tool">
-      <ToolPanel labelledBy="rsa-heading" className="rsa-tool__panel">
-        <ToolSectionHeading
-          title="RSA key pair"
-          titleId="rsa-heading"
-          description={
-            <ToolHint>
-              Choose a modulus length and generate a fresh RSA-OAEP key pair as PEM. Keys ≥4096
-              bits (especially ≥8192) are slow in the browser — use Refresh for those sizes.
-            </ToolHint>
-          }
-        />
-
-        <ToolInput
+    <ToolFrame>
+      <Panel
+        title="RSA key pair"
+        titleId="rsa-heading"
+        description="Choose a modulus length and generate a fresh RSA-OAEP key pair as PEM. Keys ≥4096 bits (especially ≥8192) are slow in the browser — use Refresh for those sizes."
+        actions={
+          <Button
+            variant="primary"
+            iconStart="arrows-clockwise"
+            onClick={refreshKeys}
+            disabled={pending || !bitsValid}
+            data-testid="refresh"
+          >
+            {pending ? "Generating…" : "Refresh key-pair"}
+          </Button>
+        }
+      >
+        <Input
           id="rsa-bits"
           label="Bits"
-          full
           type="number"
           min={RSA_BITS_MIN}
           max={RSA_BITS_MAX}
           step={8}
           value={bitsFieldValue}
           onChange={(event) => onBitsChange(event.target.value)}
-          aria-invalid={bitsError ? true : undefined}
+          error={bitsError ?? undefined}
         />
 
-        {bitsError ? (
-          <ToolStatus tone="error" live="polite">
-            {bitsError}
-          </ToolStatus>
-        ) : null}
-
         {slowHint && !bitsError ? (
-          <ToolStatus tone="default" live="polite">
+          <Notice tone="warning" live="polite">
             {slowHint}
-          </ToolStatus>
+          </Notice>
         ) : null}
 
         {bitsValid && bitsInput > RSA_BITS_AUTO_REGEN_MAX && !pending ? (
-          <ToolHint>
-            Auto-refresh is off above {RSA_BITS_AUTO_REGEN_MAX} bits — press Refresh key-pair to
-            generate ({normalizeRsaBits(bitsInput)}-bit).
-          </ToolHint>
+          <Notice tone="info">
+            Auto-refresh is off above {RSA_BITS_AUTO_REGEN_MAX} bits — press Refresh key-pair to generate (
+            {normalizeRsaBits(bitsInput)}-bit).
+          </Notice>
         ) : null}
 
-        <ToolActionRow>
-          <ToolButton
-            type="button"
-            onClick={refreshKeys}
-            disabled={pending || !bitsValid}
-            data-testid="refresh"
-          >
-            {pending ? "Generating…" : "Refresh key-pair"}
-          </ToolButton>
-        </ToolActionRow>
-
-        <ToolTextarea
-          id="rsa-public-key"
-          label="Public key"
-          full
-          code
-          readOnly
-          rows={8}
-          value={publicKeyPem}
-          placeholder={pending ? "Generating public key…" : "Public key PEM"}
-          className="rsa-tool__pem"
-          aria-busy={pending || undefined}
-        />
-
-        <ToolActionRow>
-          <ToolButton
-            type="button"
-            onClick={() => void copyPublic()}
-            disabled={pending || !publicKeyPem}
-          >
-            Copy public key
-          </ToolButton>
-        </ToolActionRow>
-
-        <ToolTextarea
-          id="rsa-private-key"
-          label="Private key"
-          full
-          code
-          readOnly
-          rows={12}
-          value={privateKeyPem}
-          placeholder={pending ? "Generating private key…" : "Private key PEM"}
-          className="rsa-tool__pem"
-          aria-busy={pending || undefined}
-        />
-
-        <ToolActionRow>
-          <ToolButton
-            type="button"
-            onClick={() => void copyPrivate()}
-            disabled={pending || !privateKeyPem}
-          >
-            Copy private key
-          </ToolButton>
-        </ToolActionRow>
-
         {pending ? (
-          <ToolStatus tone="default" live="polite">
-            Generating {isValidRsaBits(request.bits) ? `${request.bits}-bit` : ""} key pair…
-          </ToolStatus>
+          <Progress
+            indeterminate
+            size="sm"
+            label={`Generating ${isValidRsaBits(request.bits) ? `${request.bits}-bit` : ""} key pair…`}
+          />
         ) : null}
 
         {errorStatus ? (
-          <ToolStatus tone="error" live="assertive">
+          <Notice tone="danger" live="assertive">
             {errorStatus}
-          </ToolStatus>
+          </Notice>
         ) : null}
 
         {!pending && actionStatus ? (
-          <ToolStatus tone="success" live="polite">
+          <Notice tone="success" live="polite">
             {actionStatus}
-          </ToolStatus>
+          </Notice>
         ) : null}
-      </ToolPanel>
-    </ToolIsland>
+
+        <div aria-busy={pending || undefined}>
+          <OutputField
+            id="rsa-public-key"
+            label="Public key"
+            multiline
+            rows={8}
+            copy={false}
+            value={publicKeyPem}
+            placeholder={pending ? "Generating public key…" : "Public key PEM"}
+          />
+        </div>
+        <div>
+          <CopyButton value={publicKeyPem} label="Copy public key" disabled={pending || !publicKeyPem} />
+        </div>
+
+        <div aria-busy={pending || undefined}>
+          <OutputField
+            id="rsa-private-key"
+            label="Private key"
+            multiline
+            rows={12}
+            copy={false}
+            value={privateKeyPem}
+            placeholder={pending ? "Generating private key…" : "Private key PEM"}
+          />
+        </div>
+        <div>
+          <CopyButton value={privateKeyPem} label="Copy private key" disabled={pending || !privateKeyPem} />
+        </div>
+      </Panel>
+    </ToolFrame>
   );
 }

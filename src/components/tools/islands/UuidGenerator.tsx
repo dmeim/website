@@ -1,18 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolField,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Button, ButtonGroup, CopyButton, Input, Notice, OutputField, Panel, SegmentedControl, ToolFrame } from "@/ui/react";
 import {
   UUID_NAMESPACE_DEFAULT,
   UUID_NAMESPACE_OPTIONS,
@@ -28,20 +16,20 @@ import {
   normalizeUuidVersion,
 } from "@/lib/tools/uuid-generator";
 
-import "./UuidGenerator.css";
+const CUSTOM_NAMESPACE = "__custom__";
 
 export default function UuidGenerator() {
   const [version, setVersion] = useState<UuidVersion>(UUID_VERSION_DEFAULT);
   const [quantity, setQuantity] = useState(UUID_QUANTITY_DEFAULT);
-  const [namespace, setNamespace] = useState(UUID_NAMESPACE_DEFAULT);
+  const [namespace, setNamespace] = useState<string>(UUID_NAMESPACE_DEFAULT);
   const [name, setName] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
-  const [actionStatus, setActionStatus] = useState("");
 
   const safeVersion = normalizeUuidVersion(version);
   const safeQuantity = clampUuidQuantity(quantity);
   const needsNameArgs = safeVersion === "v3" || safeVersion === "v5";
   const namespaceValid = !needsNameArgs || isValidUuidNamespace(namespace);
+  const presetMatch = UUID_NAMESPACE_OPTIONS.find((option) => option.value === namespace);
 
   const uuids = useMemo(() => {
     void refreshKey;
@@ -55,65 +43,26 @@ export default function UuidGenerator() {
 
   const refreshUuids = useCallback(() => {
     setRefreshKey((value) => value + 1);
-    setActionStatus("UUIDs refreshed.");
   }, []);
 
-  const copyUuids = useCallback(async () => {
-    if (!uuids) {
-      setActionStatus(
-        needsNameArgs && !namespaceValid
-          ? "Enter a valid namespace UUID before copying."
-          : "Nothing to copy yet.",
-      );
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(uuids);
-      setActionStatus(safeQuantity === 1 ? "UUID copied." : "UUIDs copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the output and copy it manually.");
-    }
-  }, [uuids, needsNameArgs, namespaceValid, safeQuantity]);
-
   return (
-    <ToolIsland className="ug-tool">
-      <ToolPanel labelledBy="ug-settings-heading" className="ug-tool__panel">
-        <ToolSectionHeading
-          title="UUID settings"
-          titleId="ug-settings-heading"
-          description={
-            <ToolHint>
-              Pick a UUID version and quantity, then copy or refresh the generated identifiers.
-            </ToolHint>
-          }
+    <ToolFrame>
+      <Panel
+        title="UUID settings"
+        titleId="ug-settings-heading"
+        description="Pick a UUID version and quantity, then copy or refresh the generated identifiers."
+      >
+        <SegmentedControl
+          name="ug-version"
+          label="UUID version"
+          options={UUID_VERSIONS.map((option) => ({ value: option, label: option }))}
+          value={safeVersion}
+          onChange={(value) => setVersion(value as UuidVersion)}
         />
 
-        <ToolField label="UUID version" full>
-          <div className="ug-segment" role="radiogroup" aria-label="UUID version">
-            {UUID_VERSIONS.map((option) => {
-              const selected = safeVersion === option;
-
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  className={`ug-segment__btn${selected ? " is-selected" : ""}`}
-                  onClick={() => setVersion(option)}
-                >
-                  {option}
-                </button>
-              );
-            })}
-          </div>
-        </ToolField>
-
-        <ToolInput
+        <Input
           id="ug-quantity"
           label="Quantity"
-          full
           type="number"
           min={UUID_QUANTITY_MIN}
           max={UUID_QUANTITY_MAX}
@@ -123,82 +72,60 @@ export default function UuidGenerator() {
         />
 
         {needsNameArgs ? (
-          <div className="ug-name-args">
-            <ToolField label="Namespace" full>
-              <div className="ug-segment" role="radiogroup" aria-label="Namespace preset">
-                {UUID_NAMESPACE_OPTIONS.map((option) => {
-                  const selected = namespace === option.value;
+          <>
+            <SegmentedControl
+              name="ug-namespace-preset"
+              label="Namespace"
+              options={UUID_NAMESPACE_OPTIONS.map((option) => ({ value: option.value, label: option.label }))}
+              value={presetMatch ? presetMatch.value : CUSTOM_NAMESPACE}
+              onChange={(value) => setNamespace(value)}
+            />
 
-                  return (
-                    <button
-                      key={option.key}
-                      type="button"
-                      role="radio"
-                      aria-checked={selected}
-                      className={`ug-segment__btn${selected ? " is-selected" : ""}`}
-                      onClick={() => setNamespace(option.value)}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </ToolField>
-
-            <ToolInput
+            <Input
               id="ug-namespace"
               label="Custom namespace"
-              full
+              mono
               value={namespace}
               placeholder="Namespace UUID"
               spellCheck={false}
               autoComplete="off"
-              aria-invalid={namespaceValid ? undefined : true}
+              error={namespaceValid ? undefined : "Invalid UUID namespace."}
               onChange={(event) => setNamespace(event.target.value)}
-              className="ug-namespace-input"
             />
 
-            {!namespaceValid ? (
-              <ToolStatus tone="error">Invalid UUID namespace.</ToolStatus>
-            ) : null}
-
-            <ToolInput
+            <Input
               id="ug-name"
               label="Name"
-              full
               value={name}
               placeholder="Name"
               spellCheck={false}
               autoComplete="off"
               onChange={(event) => setName(event.target.value)}
             />
-          </div>
+          </>
         ) : null}
 
-        <ToolTextarea
+        <OutputField
           id="ug-output"
           label="UUIDs"
-          full
-          code
-          readOnly
+          multiline
+          copy={false}
           rows={Math.min(8, Math.max(2, safeQuantity))}
           value={uuids}
           placeholder="Your UUIDs"
-          className="ug-output"
-          aria-live="polite"
         />
 
-        <ToolActionRow>
-          <ToolButton type="button" onClick={() => void copyUuids()} disabled={!uuids}>
-            Copy
-          </ToolButton>
-          <ToolButton type="button" variant="ghost" onClick={refreshUuids}>
-            Refresh
-          </ToolButton>
-        </ToolActionRow>
+        {!uuids && needsNameArgs && !namespaceValid ? (
+          <Notice tone="danger">Enter a valid namespace UUID before copying.</Notice>
+        ) : null}
 
-        {actionStatus ? <ToolStatus tone="success">{actionStatus}</ToolStatus> : null}
-      </ToolPanel>
-    </ToolIsland>
+        <ButtonGroup>
+          <CopyButton value={uuids} disabled={!uuids} variant="primary" />
+          <Button variant="ghost" iconStart="arrows-clockwise" onClick={refreshUuids}>
+            Refresh
+          </Button>
+        </ButtonGroup>
+      </Panel>
+    </ToolFrame>
   );
 }

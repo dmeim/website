@@ -1,19 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolFormGrid,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolSelect,
-  ToolStatus,
-  ToolTextarea,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Button, ButtonGroup, CopyButton, FormGrid, Input, Panel, Select, Textarea, ToolFrame } from "@/ui/react";
 import {
   BIP39_LANGUAGE_DEFAULT,
   BIP39_LANGUAGES,
@@ -30,8 +17,6 @@ import {
   normalizeBip39Language,
   normalizeBip39Strength,
 } from "@/lib/tools/bip39-generator";
-
-import "./Bip39Generator.css";
 
 function createSeed(
   strength: Bip39Strength = BIP39_STRENGTH_DEFAULT,
@@ -80,7 +65,6 @@ export default function Bip39Generator() {
   const [strength, setStrength] = useState<Bip39Strength>(BIP39_STRENGTH_DEFAULT);
   const [entropy, setEntropy] = useState(seed.entropy);
   const [mnemonic, setMnemonic] = useState(seed.mnemonic);
-  const [actionStatus, setActionStatus] = useState("");
 
   const safeLanguage = normalizeBip39Language(language);
   const safeStrength = normalizeBip39Strength(strength);
@@ -91,11 +75,6 @@ export default function Bip39Generator() {
     [mnemonic, safeLanguage],
   );
 
-  const languageLabel = useCallback(
-    (id: Bip39LanguageId) => BIP39_LANGUAGES.find((entry) => entry.id === id)?.label ?? id,
-    [],
-  );
-
   const onLanguageChange = useCallback(
     (next: Bip39LanguageId) => {
       const lang = normalizeBip39Language(next);
@@ -103,7 +82,6 @@ export default function Bip39Generator() {
 
       if (isValidEntropyHex(entropy)) {
         setMnemonic(entropyHexToMnemonic(entropy, lang));
-        setActionStatus(`Language set to ${languageLabel(lang)}.`);
         return;
       }
 
@@ -111,10 +89,9 @@ export default function Bip39Generator() {
         const hex = mnemonicToEntropyHex(mnemonic, safeLanguage);
         setEntropy(hex);
         setMnemonic(entropyHexToMnemonic(hex, lang));
-        setActionStatus(`Language set to ${languageLabel(lang)}.`);
       }
     },
-    [entropy, languageLabel, mnemonic, safeLanguage],
+    [entropy, mnemonic, safeLanguage],
   );
 
   const onStrengthChange = useCallback(
@@ -124,7 +101,6 @@ export default function Bip39Generator() {
       const nextSeed = createSeed(bits, normalizeBip39Language(language));
       setEntropy(nextSeed.entropy);
       setMnemonic(nextSeed.mnemonic);
-      setActionStatus(`Strength set to ${bits}-bit (${bip39WordCount(bits)} words).`);
     },
     [language],
   );
@@ -155,145 +131,71 @@ export default function Bip39Generator() {
     const nextSeed = createSeed(safeStrength, safeLanguage);
     setEntropy(nextSeed.entropy);
     setMnemonic(nextSeed.mnemonic);
-    setActionStatus("Entropy refreshed.");
   }, [safeLanguage, safeStrength]);
 
-  const copyEntropy = useCallback(async () => {
-    if (!isValidEntropyHex(entropy)) {
-      setActionStatus("Enter valid entropy before copying.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(entropy.trim());
-      setActionStatus("Entropy copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the entropy and copy it manually.");
-    }
-  }, [entropy]);
-
-  const copyMnemonic = useCallback(async () => {
-    if (!isValidMnemonic(mnemonic, safeLanguage)) {
-      setActionStatus("Enter a valid mnemonic before copying.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(mnemonic.trim());
-      setActionStatus("Mnemonic copied.");
-    } catch {
-      setActionStatus("Copy failed. Select the mnemonic and copy it manually.");
-    }
-  }, [mnemonic, safeLanguage]);
+  const entropyValid = isValidEntropyHex(entropy);
+  const mnemonicValid = isValidMnemonic(mnemonic, safeLanguage);
 
   return (
-    <ToolIsland className="bip39-tool">
-      <ToolPanel labelledBy="bip39-heading" className="bip39-tool__panel">
-        <ToolSectionHeading
-          title="BIP39 passphrase"
-          titleId="bip39-heading"
-          description={
-            <ToolHint>
-              Pick a language and strength, refresh or paste entropy, or enter a mnemonic. Valid
-              inputs convert both ways.
-            </ToolHint>
-          }
-        />
-
-        <ToolFormGrid>
-          <ToolSelect
+    <ToolFrame>
+      <Panel
+        title="BIP39 passphrase"
+        titleId="bip39-heading"
+        description="Pick a language and strength, refresh or paste entropy, or enter a mnemonic. Valid inputs convert both ways."
+      >
+        <FormGrid columns={2}>
+          <Select
             id="bip39-language"
             label="Language"
-            full
             value={safeLanguage}
             onChange={(event) => onLanguageChange(normalizeBip39Language(event.target.value))}
-          >
-            {BIP39_LANGUAGES.map((entry) => (
-              <option key={entry.id} value={entry.id}>
-                {entry.label}
-              </option>
-            ))}
-          </ToolSelect>
-
-          <ToolSelect
+            options={BIP39_LANGUAGES.map((entry) => ({ value: entry.id, label: entry.label }))}
+          />
+          <Select
             id="bip39-strength"
             label="Strength"
-            full
             value={String(safeStrength)}
             onChange={(event) => onStrengthChange(normalizeBip39Strength(event.target.value))}
-          >
-            {BIP39_STRENGTHS.map((bits) => (
-              <option key={bits} value={bits}>
-                {bits}-bit ({bip39WordCount(bits)} words)
-              </option>
-            ))}
-          </ToolSelect>
-        </ToolFormGrid>
+            options={BIP39_STRENGTHS.map((bits) => ({ value: String(bits), label: `${bits}-bit (${bip39WordCount(bits)} words)` }))}
+          />
+        </FormGrid>
 
-        <ToolInput
+        <Input
           id="bip39-entropy"
           label="Entropy (seed)"
-          full
-          className="tool-code bip39-tool__entropy"
+          mono
           value={entropy}
           placeholder="Hex entropy…"
           onChange={(event) => onEntropyChange(event.target.value)}
           autoComplete="off"
           spellCheck={false}
           autoFocus
-          aria-invalid={entropyError ? true : undefined}
+          error={entropyError ?? undefined}
         />
 
-        {entropyError ? (
-          <ToolStatus tone="error" live="polite">
-            {entropyError}
-          </ToolStatus>
-        ) : null}
-
-        <ToolActionRow>
-          <ToolButton type="button" variant="ghost" onClick={refreshEntropy}>
+        <ButtonGroup>
+          <Button variant="ghost" iconStart="arrows-clockwise" onClick={refreshEntropy}>
             Refresh entropy
-          </ToolButton>
-          <ToolButton
-            type="button"
-            onClick={() => void copyEntropy()}
-            disabled={!isValidEntropyHex(entropy)}
-          >
-            Copy entropy
-          </ToolButton>
-        </ToolActionRow>
+          </Button>
+          <CopyButton getValue={() => entropy.trim()} label="Copy entropy" disabled={!entropyValid} />
+        </ButtonGroup>
 
-        <ToolTextarea
+        <Textarea
           id="bip39-mnemonic"
           label="Passphrase (mnemonic)"
-          full
+          mono
           rows={3}
           value={mnemonic}
           placeholder="BIP39 mnemonic…"
           onChange={(event) => onMnemonicChange(event.target.value)}
           spellCheck={false}
-          className="tool-code bip39-tool__mnemonic"
-          aria-invalid={mnemonicError ? true : undefined}
+          error={mnemonicError ?? undefined}
         />
 
-        {mnemonicError ? (
-          <ToolStatus tone="error" live="polite">
-            {mnemonicError}
-          </ToolStatus>
-        ) : null}
-
-        <ToolActionRow>
-          <ToolButton
-            type="button"
-            onClick={() => void copyMnemonic()}
-            disabled={!isValidMnemonic(mnemonic, safeLanguage)}
-          >
-            Copy mnemonic
-          </ToolButton>
-        </ToolActionRow>
-
-        {actionStatus ? <ToolStatus tone="success">{actionStatus}</ToolStatus> : null}
-      </ToolPanel>
-    </ToolIsland>
+        <div>
+          <CopyButton getValue={() => mnemonic.trim()} label="Copy mnemonic" disabled={!mnemonicValid} />
+        </div>
+      </Panel>
+    </ToolFrame>
   );
 }

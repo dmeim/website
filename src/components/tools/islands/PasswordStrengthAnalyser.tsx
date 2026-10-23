@@ -1,15 +1,7 @@
 import { useMemo, useState } from "react";
 
-import {
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-} from "@/components/tools/ui";
+import { Input, KeyValue, Notice, Panel, Stat, ToolFrame } from "@/ui/react";
 import { getPasswordCrackTimeEstimation } from "@/lib/tools/password-strength-analyser";
-
-import "./PasswordStrengthAnalyser.css";
 
 export default function PasswordStrengthAnalyser() {
   const [password, setPassword] = useState("");
@@ -22,31 +14,18 @@ export default function PasswordStrengthAnalyser() {
   const entropyDisplay = Math.round(estimation.entropy * 100) / 100;
   const scoreDisplay = `${Math.round(estimation.score * 100)} / 100`;
 
-  const details = [
-    { label: "Password length", value: estimation.passwordLength },
-    { label: "Entropy", value: entropyDisplay },
-    { label: "Character set size", value: estimation.charsetLength },
-    { label: "Score", value: scoreDisplay },
-  ] as const;
-
   return (
-    <ToolIsland className="psa-tool">
-      <ToolPanel labelledBy="psa-heading" className="psa-tool__panel">
-        <ToolSectionHeading
-          title="Password strength"
-          titleId="psa-heading"
-          description={
-            <ToolHint>
-              Type a password to estimate brute-force crack time from entropy and charset size.
-            </ToolHint>
-          }
-        />
-
-        <ToolInput
+    <ToolFrame>
+      <Panel
+        title="Password strength"
+        titleId="psa-heading"
+        description="Type a password to estimate brute-force crack time from entropy and charset size."
+      >
+        <Input
           id="psa-password"
           label="Password"
-          full
           type="password"
+          revealable
           autoComplete="new-password"
           autoFocus
           value={password}
@@ -55,29 +34,29 @@ export default function PasswordStrengthAnalyser() {
           data-testid="password-input"
         />
 
-        <div className="psa-hero" aria-live="polite">
-          <p className="psa-hero__label">Duration to crack this password with brute force</p>
-          <p className="psa-hero__value" data-testid="crack-duration">
-            {estimation.crackDurationFormatted}
-          </p>
-        </div>
+        <Stat
+          label="Duration to crack this password with brute force"
+          value={estimation.crackDurationFormatted}
+          size="lg"
+          live
+          data-testid="crack-duration"
+        />
 
-        <dl className="psa-details">
-          {details.map(({ label, value }) => (
-            <div key={label} className="psa-details__row">
-              <dt>{label}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
-        </dl>
+        <Stat label="Score" value={scoreDisplay} mono />
 
-        <p className="psa-note">
-          <span className="psa-note__label">Note: </span>
-          The computed strength is based on the time it would take to crack the password using a
-          brute force approach; it does not take into account the possibility of a dictionary
-          attack.
-        </p>
-      </ToolPanel>
-    </ToolIsland>
+        <KeyValue
+          items={[
+            { label: "Password length", value: estimation.passwordLength, mono: true },
+            { label: "Entropy", value: entropyDisplay, mono: true },
+            { label: "Character set size", value: estimation.charsetLength, mono: true },
+          ]}
+        />
+
+        <Notice tone="neutral">
+          The computed strength is based on the time it would take to crack the password using a brute force
+          approach; it does not take into account the possibility of a dictionary attack.
+        </Notice>
+      </Panel>
+    </ToolFrame>
   );
 }
