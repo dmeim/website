@@ -40,14 +40,14 @@ const current = value ?? defaultValue ?? min;
 const range = Array.isArray(current);
 const [low, high] = range ? current : [min, current];
 const labelId = `${baseId}-label`;
-const inputId = `${baseId}-input`;
+const inputId = range ? `${baseId}-input` : (id ?? `${baseId}-input`);
 const text = range ? `${formatValue(low)} – ${formatValue(high)}` : formatValue(high);
 const vars = `--ui-slider-start: ${range ? rangePct(low, min, max) : 0}%; --ui-slider-pct: ${rangePct(high, min, max)}%;${typeof style === "string" ? ` ${style}` : ""}`;
 ---
 
 <div
   {...rest}
-  id={id}
+  id={range ? id : undefined}
   class:list={["ui-slider", className]}
   data-range={range ? "true" : undefined}
   role={range ? "group" : undefined}

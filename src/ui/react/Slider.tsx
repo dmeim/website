@@ -58,13 +58,13 @@ export function Slider({
 
   const text = range ? `${formatValue(low)} – ${formatValue(high)}` : formatValue(high);
   const labelId = `${baseId}-label`;
-  const inputId = `${baseId}-input`;
+  const inputId = range ? `${baseId}-input` : (id ?? `${baseId}-input`);
   const common = { type: "range", min, max, step, disabled, className: "ui-slider__input" } as const;
 
   return (
     <div
       {...rest}
-      id={id}
+      id={range ? id : undefined}
       className={cx("ui-slider", className)}
       data-range={range ? "true" : undefined}
       role={range ? "group" : undefined}
