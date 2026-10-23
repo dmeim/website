@@ -1,16 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Button, Input, KeyValue, Notice, Panel, ToolFrame } from "@/ui/react";
 import {
   DEFAULT_MAC_ADDRESS,
   emptyUlaSections,
@@ -18,8 +8,6 @@ import {
   isValidMacAddress,
   type Ipv6UlaSection,
 } from "@/lib/tools/ipv6-ula-generator";
-
-import "./Ipv6UlaGenerator.css";
 
 export default function Ipv6UlaGenerator() {
   const [macAddress, setMacAddress] = useState(DEFAULT_MAC_ADDRESS);
@@ -72,34 +60,29 @@ export default function Ipv6UlaGenerator() {
     setActionStatus("ULA regenerated.");
   }, []);
 
-  const copyValue = useCallback(async (label: string, value: string) => {
-    try {
-      await copyTextToClipboard(value);
-      setActionStatus(`${label} copied.`);
-    } catch {
-      setActionStatus("Copy failed. Select the value and copy it manually.");
-    }
-  }, []);
-
   return (
-    <ToolIsland className="ipv6ula-tool">
-      <ToolPanel labelledBy="ipv6ula-heading" className="ipv6ula-tool__panel">
-        <ToolSectionHeading
-          title="IPv6 ULA generator"
-          titleId="ipv6ula-heading"
-          description={
-            <ToolHint>
-              Uses the IETF-suggested method: current timestamp plus MAC address,
-              SHA-1 hashed, lower 40 bits → a random Unique Local Address prefix
-              (RFC 4193).
-            </ToolHint>
-          }
-        />
-
-        <ToolInput
+    <ToolFrame>
+      <Panel
+        title="IPv6 ULA generator"
+        titleId="ipv6ula-heading"
+        description="Uses the IETF-suggested method: current timestamp plus MAC address, SHA-1 hashed, lower 40 bits give a random Unique Local Address prefix (RFC 4193)."
+        actions={
+          <Button
+            variant="ghost"
+            size="sm"
+            iconStart="arrows-clockwise"
+            onClick={refresh}
+            disabled={!macValid || busy}
+            data-testid="refresh"
+          >
+            Refresh
+          </Button>
+        }
+      >
+        <Input
           id="ipv6ula-mac"
           label="MAC address"
-          full
+          mono
           value={macAddress}
           placeholder="Type a MAC address"
           spellCheck={false}
@@ -108,79 +91,23 @@ export default function Ipv6UlaGenerator() {
             setMacAddress(event.target.value);
             setActionStatus("");
           }}
-          aria-invalid={!macValid || undefined}
+          error={!macValid ? "Invalid MAC address" : undefined}
         />
 
-        {!macValid ? (
-          <ToolStatus tone="error" live="polite">
-            Invalid MAC address
-          </ToolStatus>
-        ) : null}
-
-        <div
-          className="ipv6ula-table-wrap"
-          role="region"
+        <KeyValue
           aria-label="Generated ULA values"
           aria-busy={busy || undefined}
-        >
-          <table className="ipv6ula-table">
-            <tbody>
-              {sections.map((section) => {
-                const canCopy = Boolean(section.value);
-                return (
-                  <tr key={section.key}>
-                    <th scope="row" className="ipv6ula-table__label">
-                      {section.label}
-                    </th>
-                    <td className="ipv6ula-table__value">
-                      {canCopy ? (
-                        <div className="ipv6ula-value-row">
-                          <span
-                            className="ipv6ula-value tool-code"
-                            data-testid={section.key}
-                          >
-                            {section.value}
-                          </span>
-                          <ToolButton
-                            type="button"
-                            variant="ghost"
-                            onClick={() =>
-                              void copyValue(section.label, section.value)
-                            }
-                          >
-                            Copy
-                          </ToolButton>
-                        </div>
-                      ) : (
-                        <span
-                          className="ipv6ula-fallback"
-                          data-testid={section.key}
-                        >
-                          Enter a valid MAC address
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+          items={sections.map((section) => ({
+            label: section.label,
+            value: <span data-testid={section.key}>{section.value || "Enter a valid MAC address"}</span>,
+            mono: Boolean(section.value),
+            tone: section.value ? "default" : "muted",
+            copy: section.value ? section.value : false,
+          }))}
+        />
 
-        <ToolActionRow>
-          <ToolButton
-            type="button"
-            variant="ghost"
-            onClick={refresh}
-            disabled={!macValid || busy}
-            data-testid="refresh"
-          >
-            Refresh
-          </ToolButton>
-        </ToolActionRow>
-
-        {actionStatus ? <ToolStatus tone="success">{actionStatus}</ToolStatus> : null}
-      </ToolPanel>
-    </ToolIsland>
+        {actionStatus ? <Notice tone="success">{actionStatus}</Notice> : null}
+      </Panel>
+    </ToolFrame>
   );
 }

@@ -1,18 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolField,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Button, ButtonGroup, CopyButton, Input, Notice, OutputField, Panel, SegmentedControl, ToolFrame } from "@/ui/react";
 import {
   DEFAULT_MAC_CASE,
   DEFAULT_MAC_PREFIX,
@@ -30,8 +18,6 @@ import {
   normalizeMacCase,
   normalizeMacSeparator,
 } from "@/lib/tools/mac-address-generator";
-
-import "./MacAddressGenerator.css";
 
 const CASE_LABELS: Record<MacCase, string> = {
   upper: "Uppercase",
@@ -73,42 +59,18 @@ export default function MacAddressGenerator() {
     setActionStatus("MAC addresses refreshed.");
   }, []);
 
-  const copyAddresses = useCallback(async () => {
-    if (!macAddresses) {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(macAddresses);
-      setActionStatus(
-        safeQuantity === 1 ? "MAC address copied." : "MAC addresses copied.",
-      );
-    } catch {
-      setActionStatus("Copy failed. Select the output and copy it manually.");
-    }
-  }, [macAddresses, safeQuantity]);
-
   const outputRows = Math.min(8, Math.max(2, safeQuantity));
 
   return (
-    <ToolIsland className="macgen-tool">
-      <ToolPanel labelledBy="macgen-heading" className="macgen-tool__panel">
-        <ToolSectionHeading
-          title="MAC address generator"
-          titleId="macgen-heading"
-          description={
-            <ToolHint>
-              Set quantity and an optional prefix, then choose case and separator.
-              Refresh to regenerate; copy to put the list on the clipboard.
-            </ToolHint>
-          }
-        />
-
-        <ToolInput
+    <ToolFrame>
+      <Panel
+        title="MAC address generator"
+        titleId="macgen-heading"
+        description="Set quantity and an optional prefix, then choose case and separator. Refresh to regenerate; copy to put the list on the clipboard."
+      >
+        <Input
           id="macgen-quantity"
           label="Quantity"
-          full
           type="number"
           min={MAC_QUANTITY_MIN}
           max={MAC_QUANTITY_MAX}
@@ -120,10 +82,10 @@ export default function MacAddressGenerator() {
           }}
         />
 
-        <ToolInput
+        <Input
           id="macgen-prefix"
           label="MAC address prefix"
-          full
+          mono
           value={prefix}
           placeholder="Set a prefix, e.g. 64:16:7F"
           spellCheck={false}
@@ -131,103 +93,56 @@ export default function MacAddressGenerator() {
             setPrefix(event.target.value);
             setActionStatus("");
           }}
-          aria-invalid={!prefixValid || undefined}
+          error={!prefixValid ? "Invalid partial MAC address" : undefined}
         />
 
-        {!prefixValid ? (
-          <ToolStatus tone="error" live="polite">
-            Invalid partial MAC address
-          </ToolStatus>
-        ) : null}
+        <SegmentedControl
+          name="macgen-case"
+          label="Case"
+          options={MAC_CASES.map((option) => ({ value: option, label: CASE_LABELS[option] }))}
+          value={safeCase}
+          onChange={(value) => {
+            setCaseStyle(value as MacCase);
+            setActionStatus("");
+          }}
+        />
 
-        <ToolField label="Case" full>
-          <div className="macgen-segment" role="radiogroup" aria-label="Case">
-            {MAC_CASES.map((option) => {
-              const selected = safeCase === option;
+        <SegmentedControl
+          name="macgen-separator"
+          label="Separator"
+          options={MAC_SEPARATORS.map((option) => ({ value: option, label: SEPARATOR_LABELS[option] }))}
+          value={safeSeparator}
+          onChange={(value) => {
+            setSeparator(value as MacSeparator);
+            setActionStatus("");
+          }}
+        />
 
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  className={`macgen-segment__btn${selected ? " is-selected" : ""}`}
-                  onClick={() => {
-                    setCaseStyle(option);
-                    setActionStatus("");
-                  }}
-                >
-                  {CASE_LABELS[option]}
-                </button>
-              );
-            })}
-          </div>
-        </ToolField>
-
-        <ToolField label="Separator" full>
-          <div
-            className="macgen-segment"
-            role="radiogroup"
-            aria-label="Separator"
-          >
-            {MAC_SEPARATORS.map((option) => {
-              const selected = safeSeparator === option;
-              const key = option === "" ? "none" : option;
-
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  className={`macgen-segment__btn${selected ? " is-selected" : ""}`}
-                  onClick={() => {
-                    setSeparator(option);
-                    setActionStatus("");
-                  }}
-                >
-                  {SEPARATOR_LABELS[option]}
-                </button>
-              );
-            })}
-          </div>
-        </ToolField>
-
-        <ToolTextarea
+        <OutputField
           id="macgen-output"
           label="MAC addresses"
-          full
-          code
-          readOnly
+          multiline
+          copy={false}
           rows={outputRows}
           value={macAddresses}
           placeholder="Your MAC addresses"
-          className="macgen-output"
-          aria-live="polite"
-          data-testid="mac-addresses"
         />
 
-        <ToolActionRow>
-          <ToolButton
-            type="button"
-            onClick={() => void copyAddresses()}
-            disabled={!macAddresses}
-          >
-            Copy
-          </ToolButton>
-          <ToolButton
-            type="button"
+        <ButtonGroup>
+          <CopyButton value={macAddresses} disabled={!macAddresses} variant="primary" />
+          <Button
             variant="ghost"
+            iconStart="arrows-clockwise"
             onClick={refreshAddresses}
             disabled={!prefixValid}
             data-testid="refresh"
           >
             Refresh
-          </ToolButton>
-        </ToolActionRow>
+          </Button>
+        </ButtonGroup>
 
-        {actionStatus ? <ToolStatus tone="success">{actionStatus}</ToolStatus> : null}
-      </ToolPanel>
-    </ToolIsland>
+        {actionStatus ? <Notice tone="success">{actionStatus}</Notice> : null}
+      </Panel>
+    </ToolFrame>
   );
 }

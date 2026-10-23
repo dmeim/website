@@ -1,18 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { CountryCode } from "libphonenumber-js/max";
 
-import {
-  ToolActionRow,
-  ToolButton,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolSelect,
-  ToolStatus,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+import { Input, KeyValue, Panel, Select, ToolFrame } from "@/ui/react";
 import {
   booleanToHumanReadable,
   getCountryOptions,
@@ -21,8 +10,6 @@ import {
   parsePhone,
   type PhoneParseResult,
 } from "@/lib/tools/phone-parser-and-formatter";
-
-import "./PhoneParserAndFormatter.css";
 
 type InfoRow = {
   key: string;
@@ -103,7 +90,6 @@ export default function PhoneParserAndFormatter() {
     getDefaultCountryCode(),
   );
   const [rawPhone, setRawPhone] = useState("");
-  const [actionStatus, setActionStatus] = useState("");
 
   const countryOptions = useMemo(() => getCountryOptions(), []);
 
@@ -117,113 +103,49 @@ export default function PhoneParserAndFormatter() {
 
   const rows = useMemo(() => (info ? buildRows(info) : []), [info]);
 
-  const copyValue = useCallback(async (label: string, value: string) => {
-    if (!value || value === "Unknown") {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(value);
-      setActionStatus(`${label} copied.`);
-    } catch {
-      setActionStatus("Copy failed. Select the value and copy it manually.");
-    }
-  }, []);
-
   return (
-    <ToolIsland className="phone-tool">
-      <ToolPanel labelledBy="phone-heading" className="phone-tool__panel">
-        <ToolSectionHeading
-          title="Phone parser"
-          titleId="phone-heading"
-          description={
-            <ToolHint>
-              Enter a phone number to validate it and see country, type, and
-              standard formats. Default country applies when no country prefix
-              is present.
-            </ToolHint>
-          }
-        />
-
-        <ToolSelect
+    <ToolFrame>
+      <Panel
+        title="Phone parser"
+        titleId="phone-heading"
+        description="Enter a phone number to validate it and see country, type, and standard formats. Default country applies when no country prefix is present."
+      >
+        <Select
           id="phone-default-country"
           label="Default country code"
-          full
           value={defaultCountry}
-          onChange={(event) => {
-            setDefaultCountry(event.target.value as CountryCode);
-            setActionStatus("");
-          }}
-        >
-          {countryOptions.map((option) => (
-            <option key={option.code} value={option.code}>
-              {option.label}
-            </option>
-          ))}
-        </ToolSelect>
+          options={countryOptions.map((option) => ({ value: option.code, label: option.label }))}
+          onChange={(event) => setDefaultCountry(event.target.value as CountryCode)}
+        />
 
-        <ToolInput
+        <Input
           id="phone-input"
           label="Phone number"
-          full
+          mono
           value={rawPhone}
           placeholder="Enter a phone number"
           spellCheck={false}
           autoFocus
           autoComplete="tel"
           inputMode="tel"
-          aria-invalid={rawPhone !== "" && !inputValid ? true : undefined}
-          onChange={(event) => {
-            setRawPhone(event.target.value);
-            setActionStatus("");
-          }}
+          error={rawPhone !== "" && !inputValid ? "Invalid phone number" : undefined}
+          onChange={(event) => setRawPhone(event.target.value)}
         />
 
-        {rawPhone !== "" && !inputValid ? (
-          <ToolStatus tone="error">Invalid phone number</ToolStatus>
-        ) : null}
-
         {rows.length > 0 ? (
-          <div
-            className="phone-results"
-            role="list"
+          <KeyValue
             aria-label="Phone number details"
-          >
-            {rows.map((row) => (
-              <div key={row.key} className="phone-row" role="listitem">
-                <span className="phone-row__label">{row.label}</span>
-                <div className="phone-row__body">
-                  <span
-                    className={
-                      row.value === "Unknown"
-                        ? "phone-row__value phone-row__value--unknown"
-                        : "phone-row__value tool-code"
-                    }
-                    aria-live="polite"
-                  >
-                    {row.value}
-                  </span>
-                  {row.copyable ? (
-                    <ToolActionRow className="phone-row__actions">
-                      <ToolButton
-                        type="button"
-                        onClick={() => void copyValue(row.label, row.value)}
-                      >
-                        Copy
-                      </ToolButton>
-                    </ToolActionRow>
-                  ) : null}
-                </div>
-              </div>
-            ))}
-          </div>
+            aria-live="polite"
+            items={rows.map((row) => ({
+              label: row.label,
+              value: row.value,
+              mono: row.value !== "Unknown",
+              tone: row.value === "Unknown" ? "muted" : "default",
+              copy: row.copyable,
+            }))}
+          />
         ) : null}
-
-        {actionStatus ? (
-          <ToolStatus tone="success">{actionStatus}</ToolStatus>
-        ) : null}
-      </ToolPanel>
-    </ToolIsland>
+      </Panel>
+    </ToolFrame>
   );
 }
