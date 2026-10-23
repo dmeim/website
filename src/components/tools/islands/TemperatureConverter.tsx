@@ -1,12 +1,6 @@
 import { useCallback, useState } from "react";
 
-import {
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-} from "@/components/tools/ui";
+import { FormGrid, Input, Panel, ToolFrame } from "@/ui/react";
 import {
   TEMPERATURE_SCALES,
   convertFromScale,
@@ -14,8 +8,6 @@ import {
   parseTemperatureInput,
   type TemperatureScale,
 } from "@/lib/tools/temperature-converter";
-
-import "./TemperatureConverter.css";
 
 function formatScaleValue(value: number): string {
   return String(value);
@@ -47,43 +39,33 @@ export default function TemperatureConverter() {
       return { ...valuesToStrings(convertFromScale(scale, parsed)), [scale]: raw };
     });
   }, []);
-  return (
-    <ToolIsland className="temp-tool">
-      <ToolPanel labelledBy="temp-heading" className="temp-tool__panel">
-        <ToolSectionHeading
-          title="Temperature converter"
-          titleId="temp-heading"
-          description={
-            <ToolHint>
-              Convert between Kelvin, Celsius, Fahrenheit, Rankine, Delisle,
-              Newton, Réaumur, and Rømer. Edit any scale to update the rest.
-            </ToolHint>
-          }
-        />
 
-        <div className="temp-list" role="group" aria-label="Temperature scales">
+  return (
+    <ToolFrame>
+      <Panel
+        title="Temperature converter"
+        titleId="temp-heading"
+        description="Convert between Kelvin, Celsius, Fahrenheit, Rankine, Delisle, Newton, Réaumur, and Rømer. Edit any scale to update the rest."
+      >
+        <FormGrid columns={2} role="group" aria-label="Temperature scales">
           {TEMPERATURE_SCALES.map((scale, index) => (
-            <div key={scale.id} className="temp-row">
-              <ToolInput
-                id={`temp-${scale.id}`}
-                label={scale.title}
-                type="number"
-                inputMode="decimal"
-                step="any"
-                value={values[scale.id]}
-                autoFocus={index === 0}
-                onChange={(event) => onScaleChange(scale.id, event.target.value)}
-                data-testid={`temp-${scale.id}`}
-                fieldClassName="temp-row__field"
-                className="temp-row__input"
-              />
-              <span className="temp-row__unit" aria-hidden="true">
-                {scale.unit}
-              </span>
-            </div>
+            <Input
+              key={scale.id}
+              id={`temp-${scale.id}`}
+              label={scale.title}
+              type="number"
+              inputMode="decimal"
+              step="any"
+              mono
+              suffix={scale.unit}
+              value={values[scale.id]}
+              autoFocus={index === 0}
+              onChange={(event) => onScaleChange(scale.id, event.target.value)}
+              data-testid={`temp-${scale.id}`}
+            />
           ))}
-        </div>
-      </ToolPanel>
-    </ToolIsland>
+        </FormGrid>
+      </Panel>
+    </ToolFrame>
   );
 }

@@ -1,16 +1,7 @@
 import { useMemo, useState } from "react";
 
-import {
-  ToolHint,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolStatus,
-  ToolTextarea,
-} from "@/components/tools/ui";
+import { Code, KeyValue, Notice, Panel, Textarea, ToolFrame } from "@/ui/react";
 import { evaluateExpression } from "@/lib/tools/math-evaluator";
-
-import "./MathEvaluator.css";
 
 export default function MathEvaluator() {
   const [expression, setExpression] = useState("");
@@ -21,25 +12,21 @@ export default function MathEvaluator() {
   );
 
   return (
-    <ToolIsland className="math-eval-tool">
-      <ToolPanel labelledBy="math-eval-heading" className="math-eval-tool__panel">
-        <ToolSectionHeading
-          title="Math evaluator"
-          titleId="math-eval-heading"
-          description={
-            <ToolHint>
-              Evaluate expressions with functions like{" "}
-              <code>sqrt</code>, <code>sin</code>, <code>cos</code>,{" "}
-              <code>abs</code>, and more.
-            </ToolHint>
-          }
-        />
-
-        <ToolTextarea
+    <ToolFrame>
+      <Panel
+        title="Math evaluator"
+        titleId="math-eval-heading"
+        description={
+          <>
+            Evaluate expressions with functions like <Code>sqrt</Code>,{" "}
+            <Code>sin</Code>, <Code>cos</Code>, <Code>abs</Code>, and more.
+          </>
+        }
+      >
+        <Textarea
           id="math-eval-expression"
           label="Expression"
-          full
-          code
+          mono
           rows={3}
           autoFocus
           spellCheck={false}
@@ -50,21 +37,23 @@ export default function MathEvaluator() {
         />
 
         {result !== "" ? (
-          <div className="math-eval-result" aria-live="polite">
-            <p className="math-eval-result__label">Result</p>
-            <p
-              className="math-eval-result__value"
-              data-testid="math-eval-result"
-            >
-              {result}
-            </p>
-          </div>
+          <KeyValue
+            aria-live="polite"
+            items={[
+              {
+                label: "Result",
+                value: <span data-testid="math-eval-result">{result}</span>,
+                mono: true,
+                copy: result,
+              },
+            ]}
+          />
         ) : (
-          <ToolStatus live="polite">
+          <Notice live="polite">
             Enter a valid math expression to see the result.
-          </ToolStatus>
+          </Notice>
         )}
-      </ToolPanel>
-    </ToolIsland>
+      </Panel>
+    </ToolFrame>
   );
 }

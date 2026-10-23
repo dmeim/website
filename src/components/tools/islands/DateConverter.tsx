@@ -1,18 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
-  ToolActionRow,
-  ToolButton,
-  ToolFormGrid,
-  ToolHint,
-  ToolInput,
-  ToolIsland,
-  ToolPanel,
-  ToolSectionHeading,
-  ToolSelect,
-  ToolStatus,
-} from "@/components/tools/ui";
-import { copyTextToClipboard } from "@/lib/tools/clipboard";
+  FormGrid,
+  Input,
+  KeyValue,
+  Notice,
+  Panel,
+  Select,
+  ToolFrame,
+} from "@/ui/react";
 import {
   DATE_FORMATS,
   DEFAULT_FORMAT_INDEX,
@@ -22,13 +18,10 @@ import {
   resolveDate,
 } from "@/lib/tools/date-converter";
 
-import "./DateConverter.css";
-
 export default function DateConverter() {
   const [input, setInput] = useState("");
   const [formatIndex, setFormatIndex] = useState(DEFAULT_FORMAT_INDEX);
   const [now, setNow] = useState(() => new Date());
-  const [actionStatus, setActionStatus] = useState("");
 
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 1000);
@@ -58,40 +51,17 @@ export default function DateConverter() {
     }
   }, []);
 
-  const copyFormat = useCallback(async (label: string, value: string) => {
-    if (!value) {
-      setActionStatus("Nothing to copy yet.");
-      return;
-    }
-
-    try {
-      await copyTextToClipboard(value);
-      setActionStatus(`${label} copied.`);
-    } catch {
-      setActionStatus("Copy failed. Select the value and copy it manually.");
-    }
-  }, []);
-
   return (
-    <ToolIsland className="dc-tool">
-      <ToolPanel labelledBy="dc-heading" className="dc-tool__panel">
-        <ToolSectionHeading
-          title="Date-time converter"
-          titleId="dc-heading"
-          description={
-            <ToolHint>
-              Paste a date string (or leave blank for now) to see ISO, RFC,
-              Unix, Mongo, Excel, and other formats update live — then copy any
-              result.
-            </ToolHint>
-          }
-        />
-
-        <ToolFormGrid className="dc-controls">
-          <ToolInput
+    <ToolFrame>
+      <Panel
+        title="Date-time converter"
+        titleId="dc-heading"
+        description="Paste a date string (or leave blank for now) to see ISO, RFC, Unix, Mongo, Excel, and other formats update live — then copy any result."
+      >
+        <FormGrid columns={2}>
+          <Input
             id="dc-input"
             label="Date string"
-            full
             value={input}
             placeholder="Put your date string here..."
             spellCheck={false}
@@ -99,60 +69,36 @@ export default function DateConverter() {
             onChange={(event) => onInputChange(event.target.value)}
             aria-invalid={valid ? undefined : true}
           />
-
-          <ToolSelect
+          <Select
             id="dc-format"
             label="Input format"
-            full
-            value={formatIndex}
+            value={String(formatIndex)}
             onChange={(event) => setFormatIndex(Number(event.target.value))}
-            fieldClassName="dc-format-select"
-          >
-            {DATE_FORMATS.map((format, index) => (
-              <option key={format.id} value={index}>
-                {format.name}
-              </option>
-            ))}
-          </ToolSelect>
-        </ToolFormGrid>
+            options={DATE_FORMATS.map((format, index) => ({
+              value: String(index),
+              label: format.name,
+            }))}
+          />
+        </FormGrid>
 
         {!valid ? (
-          <ToolStatus tone="error" live="polite">
+          <Notice tone="danger" live="polite">
             This date is invalid for this format
-          </ToolStatus>
+          </Notice>
         ) : null}
 
-        <div className="dc-formats" role="list" aria-label="Date formats">
-          {formats.map((format) => (
-            <div key={format.id} className="dc-format" role="listitem">
-              <span className="dc-format__label">{format.name}</span>
-              <ToolInput
-                id={`dc-format-${format.id}`}
-                label={format.name}
-                full
-                readOnly
-                value={format.value}
-                placeholder="Invalid date..."
-                className="dc-format__value tool-code"
-                aria-live="polite"
-              />
-              <ToolActionRow className="dc-format__actions">
-                <ToolButton
-                  type="button"
-                  onClick={() => void copyFormat(format.name, format.value)}
-                  disabled={!format.value}
-                >
-                  Copy
-                </ToolButton>
-              </ToolActionRow>
-            </div>
-          ))}
-        </div>
-
-        {actionStatus ? (
-          <ToolStatus tone="success">{actionStatus}</ToolStatus>
-        ) : null}
-      </ToolPanel>
-    </ToolIsland>
+        <KeyValue
+          aria-label="Date formats"
+          aria-live="polite"
+          items={formats.map((format) => ({
+            label: format.name,
+            value: format.value || "Invalid date...",
+            mono: true,
+            copy: format.value ? format.value : false,
+            tone: format.value ? "default" : "muted",
+          }))}
+        />
+      </Panel>
+    </ToolFrame>
   );
 }
