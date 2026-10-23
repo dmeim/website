@@ -8,6 +8,7 @@ import {
   listMimeInfos,
   listMimeTypes,
 } from "@/lib/tools/mime-types";
+import "./MimeTypes.css";
 
 const MIME_OPTIONS = listMimeTypes();
 const EXTENSION_OPTIONS = listExtensions();

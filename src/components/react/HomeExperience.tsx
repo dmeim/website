@@ -261,7 +261,7 @@ function HeroSection({
                   <a
                     href={cta.href}
                     className={
-                      i === 0 ? "btn btn--primary" : "btn btn--ghost"
+                      i === 0 ? "he-btn he-btn--primary" : "he-btn he-btn--ghost"
                     }
                   >
                     {cta.label}
@@ -908,7 +908,7 @@ function CloseSection({
 
         <Reveal delay={0.18}>
           <Magnetic strength={0.25}>
-            <a className="btn btn--primary he-close__cta" href="/connect">
+            <a className="he-btn he-btn--primary he-close__cta" href="/connect">
               Get in Touch
             </a>
           </Magnetic>

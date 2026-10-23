@@ -9,6 +9,7 @@ import {
   cronValidationMessage,
   describeCron,
 } from "@/lib/tools/crontab-generator";
+import "./CrontabGenerator.css";
 
 export default function CrontabGenerator() {
   const [expression, setExpression] = useState(DEFAULT_CRON_EXPRESSION);
