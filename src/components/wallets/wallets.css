@@ -1,0 +1,86 @@
+/* Size to the address so it sits on one line; wrap only when the viewport is too narrow. */
+.wallet-dialog {
+  width: fit-content;
+  min-width: min(var(--_w), calc(100vw - 2 * var(--ui-space-md)));
+  max-width: calc(100vw - 2 * var(--ui-space-md));
+}
+
+/* Balance the header so the title centres on the dialog, not beside the close button. */
+.wallet-dialog .ui-dialog__header {
+  padding-inline-start: calc(var(--ui-control-sm) + 2 * var(--ui-space-sm));
+}
+
+.wallet-dialog .ui-dialog__title {
+  font-size: var(--ui-fs-2xl);
+  text-align: center;
+}
+
+.wallet-dialog .ui-dialog__title-icon {
+  font-size: 1em;
+}
+
+.wallet-dialog .ui-dialog__body {
+  display: grid;
+  justify-items: center;
+  gap: var(--ui-space-lg);
+}
+
+/* Always dark-on-light so wallets scan it reliably in dark mode too. */
+.wallet-dialog__qr {
+  width: min(100%, 13rem);
+  padding: var(--ui-space-md);
+  border-radius: var(--ui-radius-panel);
+  background: #fff;
+  line-height: 0;
+}
+
+.wallet-dialog__qr svg {
+  width: 100%;
+  height: auto;
+}
+
+.wallet-dialog__address {
+  display: grid;
+  justify-items: center;
+  gap: var(--ui-space-sm);
+  width: 100%;
+  padding: var(--ui-space-sm);
+  border: var(--ui-border-width) solid var(--ui-line);
+  border-radius: var(--ui-radius-control);
+  background: var(--ui-bg-inset);
+}
+
+.wallet-dialog__address code {
+  max-width: 100%;
+  text-align: center;
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-lg);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+/* Flex so the plain words line up with the icon+label chips; wraps on narrow screens. */
+.wallet-dialog__also {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--ui-space-2xs) 0.35em;
+  width: 100%;
+  margin: 0;
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-sm);
+  text-align: center;
+}
+
+.wallet-dialog__token {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ui-space-2xs);
+  white-space: nowrap;
+}
+
+.wallet-dialog__token .ui-icon {
+  color: var(--ui-text);
+  font-size: 1.25em;
+}

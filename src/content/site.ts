@@ -70,6 +70,7 @@ export type ConnectContent = {
   location: string;
   locationDetail: string;
   socialUrl: string;
+  forgejoUrl: string;
   socialHandle: string;
   socialLabel: string;
   intro: string;
@@ -121,7 +122,7 @@ export const meta: SiteMeta = {
 
 export const hero: HeroContent = {
   name: "dmeim",
-  role: "Builder · Operator · Security-minded engineer",
+  role: "definitely, semi, kinda, sorta, maybe, know what im doing",
   sentence:
     "Portfolios, public keys, verification tools, and experiments — a quiet stage for the work.",
   ctas: [
@@ -222,6 +223,7 @@ export const connect: ConnectContent = {
   location: "Remote",
   locationDetail: "Available for thoughtful collaborations and questions",
   socialUrl: "https://github.com/dmeim",
+  forgejoUrl: "https://git.mlabz.io/dmeim",
   socialHandle: "@dmeim",
   socialLabel: "GitHub",
   intro:
@@ -367,3 +369,30 @@ export const site: SiteContent = {
 };
 
 export default site;
+
+export type CryptoWallet = {
+  id: string;
+  name: string;
+  ticker: string;
+  /** web3icons mark, by its `@/ui/icons/registry` name. */
+  icon: TokenIcon;
+  address: string;
+  /** Tokens this same address can receive, on this wallet's network only. */
+  alsoAccepts?: { ticker: string; icon: TokenIcon }[];
+};
+
+type TokenIcon = "token-btc" | "token-eth" | "token-sol" | "token-xrp" | "token-doge" | "token-trx" | "token-usdt" | "token-usdc";
+
+type AcceptedToken = NonNullable<CryptoWallet["alsoAccepts"]>[number];
+const usdt: AcceptedToken = { ticker: "USDT", icon: "token-usdt" };
+const usdc: AcceptedToken = { ticker: "USDC", icon: "token-usdc" };
+
+/** Donation addresses shown in the rail's wallet row. */
+export const cryptoWallets: CryptoWallet[] = [
+  { id: "btc", name: "Bitcoin", ticker: "BTC", icon: "token-btc", address: "bc1qah9gl4fmnpyaqlkfgmac7vdxg75gta4njtlud3" },
+  { id: "eth", name: "Ethereum", ticker: "ETH", icon: "token-eth", address: "0x9bF99996EF954F31BA1e703b7c465Dfd933ca6BF", alsoAccepts: [usdt, usdc] },
+  { id: "sol", name: "Solana", ticker: "SOL", icon: "token-sol", address: "6VhNP9MswgLyQzP2Y5Hmk6ydujbfKvfaFu4Vq1ZiUhMy", alsoAccepts: [usdt, usdc] },
+  { id: "xrp", name: "XRP", ticker: "XRP", icon: "token-xrp", address: "rwQF3wyw32yVbwdsLW4pGfszZpA7foYK79" },
+  { id: "trx", name: "Tron", ticker: "TRX", icon: "token-trx", address: "TJBHTc8vWMw2arEUD6wGPF3zUpo4EVGfh2", alsoAccepts: [usdt] },
+  { id: "doge", name: "Dogecoin", ticker: "DOGE", icon: "token-doge", address: "DQEi5ngcDUWLho2Rm4v7vmcxqwVjeN6Dgk" },
+];

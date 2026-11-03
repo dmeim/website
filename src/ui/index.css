@@ -74,6 +74,7 @@
 /* group: navigation */
 @import "./styles/layout/site-nav.css";
 @import "./styles/layout/site-header.css";
+@import "./styles/layout/site-identity.css";
 @import "./styles/layout/site-footer.css";
 @import "./styles/components/theme-control.css";
 @import "./styles/components/breadcrumbs.css";

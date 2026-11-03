@@ -1,0 +1,30 @@
+---
+import { Image } from "astro:assets";
+import portrait from "../../../assets/images/photoshoot/gpt-headshot-test-2.png";
+import { hero } from "@/content/site";
+import { fullName } from "@/ui/lib/identity";
+import IdentityLinks from "./IdentityLinks.astro";
+
+/**
+ * Identity header at the top of main on rail pages, at every width: portrait
+ * beside name, handle, role and the icon rows.
+ */
+---
+
+<section class="ui-site-identity" aria-label="About Dimitrios">
+  <div class="ui-site-identity__head">
+    <span class="ui-site-header__portrait ui-site-identity__portrait" aria-hidden="true">
+      <Image src={portrait} alt="" widths={[192, 288]} sizes="128px" loading="eager" />
+    </span>
+    <div class="ui-site-identity__body">
+      <div class="ui-site-identity__text">
+        <p class="ui-site-header__name">{fullName}</p>
+        <p class="ui-site-header__handle">@dmeim</p>
+        <p class="ui-site-identity__role">{hero.role}</p>
+      </div>
+      <div class="ui-site-identity__links">
+        <IdentityLinks />
+      </div>
+    </div>
+  </div>
+</section>

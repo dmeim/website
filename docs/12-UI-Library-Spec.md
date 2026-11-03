@@ -460,6 +460,8 @@ import { Icon } from "@/ui/icons";
 
 `src/ui/icons/registry.ts` is a **closed set** keyed by Phosphor's kebab-case name. To use a new icon, add the import and the entry, in alphabetical order. This is the one shared file all three teams may append to. Expect trivial merge conflicts, and resolve them by keeping both entries.
 
+**Exception: crypto token marks.** Every cryptocurrency mark comes from [web3icons](https://github.com/0xa3k5/web3icons) (`@web3icons/react`, MIT), never Phosphor, so the set never mixes packs. `src/ui/icons/token-icons.tsx` imports each mark by its deep path (`@web3icons/react/icons/tokens/TokenBTC`) so only used icons ship, forces the `mono` variant so it inherits `currentColor`, and wraps it in Phosphor's props. Registry keys are `token-<ticker>` (`token-btc`, `token-eth`, `token-sol`, `token-xrp`, `token-doge`). To add another token, wrap it there, add the key, and add its ticker to the web3icons list in `CLOUDFLARE_SSR_OPTIMIZE_DEPS` (`astro.config.ts`); otherwise the dev server discovers it mid-request and throws "Invalid hook call". Everything that is not a crypto mark stays Phosphor.
+
 ### Weight convention (same in all designs)
 
 | Weight | When to use |

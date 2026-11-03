@@ -1,0 +1,74 @@
+/* SiteIdentity: portrait, name, handle, role and icon rows at the top of main. */
+.ui-site-identity {
+  display: grid;
+  gap: var(--ui-space-md);
+  margin-block-end: var(--ui-space-2xl);
+}
+
+/* Fixed-width portrait that stretches to the column's height, so it lines up
+   with all four lines whatever they wrap to; the image crops to fill it. */
+.ui-site-identity__head {
+  display: flex;
+  align-items: stretch;
+  gap: var(--ui-space-md);
+}
+
+.ui-site-identity__portrait {
+  --_w: clamp(5.5rem, 25vw, 8rem);
+  flex: none;
+  width: var(--_w);
+  height: auto;
+  aspect-ratio: auto;
+  border-radius: 8px;
+}
+
+.ui-site-identity__portrait img {
+  object-position: 50% 20%;
+}
+
+.ui-site-identity__body {
+  display: grid;
+  flex: 1 1 0;
+  align-content: center;
+  gap: 3.5px;
+  min-width: 0;
+}
+
+.ui-site-identity .ui-site-header__name {
+  font-size: clamp(1.25rem, 1rem + 1.5vw, 1.5rem);
+}
+
+.ui-site-identity__text {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+}
+
+.ui-site-identity__text p {
+  margin: 0;
+}
+
+/*
+ * Both visible gaps (handle text to role text, role text to icon glyphs) are
+ * exactly 14px. The odd values cancel the fractional half-leading of 14px/15px
+ * text at line-height 1.6 and the 7.5px inset of a 17px icon in a 32px button.
+ */
+.ui-site-identity__text .ui-site-identity__role {
+  margin-block-start: 8.1px;
+  font-size: var(--ui-fs-md);
+}
+
+/* Contact and crypto rows sit side by side; on narrow phones they stack. */
+.ui-site-identity__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--ui-space-md);
+  row-gap: var(--ui-space-2xs);
+  margin-inline-start: calc(-1 * var(--ui-space-2xs));
+}
+
+.ui-site-identity__links .ui-site-header__links[data-variant="icons"] {
+  margin: 0;
+}
+

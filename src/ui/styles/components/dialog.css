@@ -53,6 +53,12 @@
   letter-spacing: var(--ui-tracking-tight);
 }
 
+.ui-dialog__title-icon {
+  margin-inline-end: var(--ui-space-xs);
+  font-size: 1.15em;
+  vertical-align: -0.2em;
+}
+
 .ui-dialog__close { margin-inline-start: auto; }
 
 .ui-dialog__description {

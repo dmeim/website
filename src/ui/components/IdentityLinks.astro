@@ -1,0 +1,35 @@
+---
+import { cryptoWallets } from "@/content/site";
+import Icon from "@/ui/icons/Icon.astro";
+import { contactLinks } from "@/ui/lib/identity";
+
+/** The contact and crypto icon rows, shared by the rail and the small-screen SiteIdentity. */
+---
+
+<ul class="ui-site-header__links" data-variant="icons" aria-label="Contact">
+  {
+    contactLinks.map(({ label, href, icon, external }) => (
+      <li>
+        <a
+          href={href}
+          aria-label={external ? `${label} (opens in a new tab)` : label}
+          title={label}
+          {...(external && { target: "_blank", rel: "noopener noreferrer" })}
+        >
+          <Icon name={icon} />
+        </a>
+      </li>
+    ))
+  }
+</ul>
+<ul class="ui-site-header__links" data-variant="icons" aria-label="Crypto addresses">
+  {
+    cryptoWallets.map(({ id, name, icon }) => (
+      <li>
+        <button type="button" aria-label={`${name} address`} title={name} data-ui-dialog-open={`wallet-${id}`}>
+          <Icon name={icon} />
+        </button>
+      </li>
+    ))
+  }
+</ul>

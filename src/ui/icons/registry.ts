@@ -6,11 +6,11 @@ import {
   ArrowElbowDownLeft,
   ArrowLeft,
   ArrowRight,
+  ArrowsClockwise,
+  ArrowsLeftRight,
   ArrowSquareOut,
   ArrowUp,
   ArrowUpRight,
-  ArrowsClockwise,
-  ArrowsLeftRight,
   At,
   Bell,
   Books,
@@ -47,6 +47,7 @@ import {
   Gear,
   GitBranch,
   GitFork,
+  GithubLogo,
   Globe,
   House,
   Image,
@@ -106,6 +107,7 @@ import {
   XCircle,
 } from "@phosphor-icons/react/dist/ssr";
 import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
+import { TokenBtc, TokenDoge, TokenEth, TokenSol, TokenTrx, TokenUsdc, TokenUsdt, TokenXrp } from "./token-icons";
 
 /**
  * Closed set of Phosphor icons the site may use, keyed by Phosphor's own
@@ -162,6 +164,7 @@ export const icons = {
   "gear": Gear,
   "git-branch": GitBranch,
   "git-fork": GitFork,
+  "github-logo": GithubLogo,
   "globe": Globe,
   "house": House,
   "image": Image,
@@ -211,6 +214,14 @@ export const icons = {
   "text-strikethrough": TextStrikethrough,
   "timer": Timer,
   "toolbox": Toolbox,
+  "token-btc": TokenBtc,
+  "token-doge": TokenDoge,
+  "token-eth": TokenEth,
+  "token-sol": TokenSol,
+  "token-trx": TokenTrx,
+  "token-usdc": TokenUsdc,
+  "token-usdt": TokenUsdt,
+  "token-xrp": TokenXrp,
   "trash": Trash,
   "upload-simple": UploadSimple,
   "video-camera": VideoCamera,

@@ -11,40 +11,24 @@
   width: 144px;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: var(--ui-radius-panel);
+  border-radius: 33%;
   background: var(--ui-site-tile);
 }
 
 .ui-site-header__portrait[data-size="sm"] {
   width: 32px;
-  border-radius: 6px;
 }
 
-/* Crop the full-length cut-out to head and shoulders. */
 .ui-site-header__portrait img {
-  position: absolute;
-  top: -1%;
-  left: -42%;
-  width: 200%;
-  max-width: none;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 25%;
 }
 
 /* Rail (content pages, >=960px) */
 .ui-site-header__rail {
   display: none;
-}
-
-.ui-site-header__identity {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--ui-space-md);
-}
-
-.ui-site-header__names {
-  display: grid;
-  gap: var(--ui-space-3xs);
 }
 
 .ui-site-header__name {
@@ -56,39 +40,10 @@
   text-decoration: none;
 }
 
-.ui-site-header__handle,
-.ui-site-header__status {
+.ui-site-header__handle {
   margin: 0;
   color: var(--ui-text-muted);
   font-size: var(--ui-fs-sm);
-}
-
-.ui-site-header__role {
-  margin: 0;
-  max-width: 24rem;
-  font-size: var(--ui-fs-md);
-}
-
-.ui-site-header__status {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-space-xs);
-  margin-top: calc(-1 * var(--ui-space-md));
-}
-
-.ui-site-header__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--ui-accent);
-}
-
-.ui-site-header__meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--ui-space-lg);
-  margin-top: auto;
 }
 
 .ui-site-header__links {
@@ -111,6 +66,41 @@
 }
 
 .ui-site-header__links a:hover {
+  color: var(--ui-accent);
+}
+
+.ui-site-header__links[data-variant="icons"] {
+  flex-direction: row;
+  gap: 0;
+  margin: var(--ui-space-2xs) 0 0 calc(-1 * var(--ui-space-2xs));
+}
+
+/* Keep 32px tap targets but pull them together so glyphs sit ~10px apart; neighbours overlap by 5px. */
+.ui-site-header__links[data-variant="icons"] li + li {
+  margin-inline-start: -5px;
+}
+
+.ui-site-header__links[data-variant="icons"] :is(a, button) {
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--ui-radius-control);
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-lg);
+}
+
+.ui-site-header__links[data-variant="icons"] button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+.ui-site-header__links[data-variant="icons"] :is(a, button):hover,
+.ui-site-header__links[data-variant="icons"] :is(a, button):focus-visible {
   color: var(--ui-accent);
 }
 
@@ -138,6 +128,17 @@
   text-decoration: none;
 }
 
+.ui-site-header__brand-name {
+  white-space: nowrap;
+}
+
+/* Phones: the menu button and theme control leave no room for the full name. */
+@media (max-width: 29.99rem) {
+  .ui-site-header__brand-name {
+    display: none;
+  }
+}
+
 .ui-site-header__bar-nav {
   display: none;
   align-self: stretch;
@@ -150,9 +151,6 @@
   margin-left: auto;
 }
 
-.ui-site-header__bar-theme {
-  display: none;
-}
 
 .ui-site-header__drawer .ui-drawer__body {
   display: flex;
@@ -165,8 +163,7 @@
     display: none;
   }
 
-  .ui-site-header[data-shell="app"] .ui-site-header__bar-nav,
-  .ui-site-header[data-shell="app"] .ui-site-header__bar-theme {
+  .ui-site-header[data-shell="app"] .ui-site-header__bar-nav {
     display: block;
   }
 

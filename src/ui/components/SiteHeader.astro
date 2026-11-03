@@ -1,10 +1,9 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { Image } from "astro:assets";
-import portrait from "../../../assets/images/photoshoot/gpt-crossarmed-transparent.png";
-import { connect, hero } from "@/content/site";
-import Icon from "@/ui/icons/Icon.astro";
+import portrait from "../../../assets/images/photoshoot/gpt-headshot-test-2.png";
 import { cx } from "@/ui/lib/cx";
+import { fullName } from "@/ui/lib/identity";
 import { defaultNavItems, shellMode, type NavItem } from "@/ui/lib/site-nav";
 import Drawer from "./Drawer.astro";
 import IconButton from "./IconButton.astro";
@@ -13,8 +12,8 @@ import ThemeControl from "./ThemeControl.astro";
 
 /**
  * Site chrome. Mode comes from `currentPath`: `app` for /tools and /chat
- * (slim top bar), otherwise `rail` (sticky identity column at >=960px, top
- * bar below). `immersive` renders nothing. `menuId` exists only so the /ui
+ * (slim top bar), otherwise `rail` (sticky theme + nav column at >=960px, top
+ * bar below; the identity lives in SiteIdentity at the top of main). `immersive` renders nothing. `menuId` exists only so the /ui
  * showcase can render several headers; the site keeps `mobile-nav`.
  */
 interface Props extends Omit<HTMLAttributes<"header">, "class"> {
@@ -42,73 +41,40 @@ const toggleId = menuId === "mobile-nav" ? "nav-toggle" : `${menuId}-toggle`;
     <header {...rest} class={cx("ui-site-header", className)} data-shell={mode} data-ui-site-header>
       {mode === "rail" && (
         <div class="ui-site-header__rail">
-          <div class="ui-site-header__identity">
-            <a class="ui-site-header__portrait" href="/" tabindex="-1" aria-hidden="true">
-              <Image src={portrait} alt="" widths={[280, 420]} sizes="144px" loading="eager" />
-            </a>
-            <div class="ui-site-header__names">
-              <a class="ui-site-header__name" href="/" aria-current={currentPath === "/" ? "page" : undefined}>Dimitri</a>
-              <p class="ui-site-header__handle">@dmeim</p>
-            </div>
-          </div>
-          <p class="ui-site-header__role">{hero.role}</p>
-          <p class="ui-site-header__status">
-            <span class="ui-site-header__dot" aria-hidden="true"></span>
-            Open to thoughtful collaborations
-          </p>
+          <ThemeControl size="sm" class="ui-site-header__rail-theme" />
           <SiteNav items={items} currentPath={currentPath} orientation="vertical" class="ui-site-header__nav" data-ui-site-spy />
-          <div class="ui-site-header__meta">
-            <ul class="ui-site-header__links" aria-label="Contact">
-              <li>
-                <a href={`mailto:${connect.email}`}><Icon name="envelope-simple" />Email</a>
-              </li>
-              <li>
-                <a href={connect.socialUrl} target="_blank" rel="noopener noreferrer">
-                  <Icon name="git-branch" />GitHub<span class="ui-visually-hidden"> (opens in a new tab)</span>
-                </a>
-              </li>
-            </ul>
-            <ThemeControl size="sm" />
-          </div>
         </div>
       )}
 
       <div class="ui-site-header__bar">
-        <a class="ui-site-header__brand" href="/">
-          <span class="ui-site-header__portrait" data-size="sm">
-            <Image src={portrait} alt="" widths={[96]} sizes="32px" loading="eager" />
-          </span>
-          <span class="ui-site-header__brand-name">Dimitri</span>
-        </a>
+        <IconButton
+          icon="list"
+          label="Open menu"
+          tooltip={false}
+          class="ui-site-header__toggle"
+          id={toggleId}
+          aria-controls={menuId}
+          aria-expanded="false"
+          data-ui-drawer-toggle={menuId}
+        />
+        {
+          mode === "app" && (
+            <a class="ui-site-header__brand" href="/">
+              <span class="ui-site-header__portrait" data-size="sm">
+                <Image src={portrait} alt="" widths={[96]} sizes="32px" loading="eager" />
+              </span>
+              <span class="ui-site-header__brand-name">{fullName}</span>
+            </a>
+          )
+        }
         {mode === "app" && <SiteNav items={items} currentPath={currentPath} class="ui-site-header__bar-nav" />}
         <div class="ui-site-header__actions">
           <ThemeControl size="sm" class="ui-site-header__bar-theme" />
-          <IconButton
-            icon="list"
-            label="Open menu"
-            tooltip={false}
-            class="ui-site-header__toggle"
-            id={toggleId}
-            aria-controls={menuId}
-            aria-expanded="false"
-            data-ui-drawer-toggle={menuId}
-          />
         </div>
       </div>
 
-      <Drawer id={menuId} side="end" title="Menu" class="ui-site-header__drawer" data-open="false" data-ui-site-menu>
-        <SiteNav items={items} currentPath={currentPath} orientation="vertical" aria-label="Mobile" />
-        <ul class="ui-site-header__links" aria-label="Contact">
-          <li>
-            <a href={`mailto:${connect.email}`}><Icon name="envelope-simple" />Email</a>
-          </li>
-          <li>
-            <a href={connect.socialUrl} target="_blank" rel="noopener noreferrer">
-              <Icon name="git-branch" />GitHub<span class="ui-visually-hidden"> (opens in a new tab)</span>
-            </a>
-          </li>
-        </ul>
-        <ThemeControl />
+      <Drawer id={menuId} side="start" title="Menu" class="ui-site-header__drawer" data-open="false" data-ui-site-menu>
+        <SiteNav items={items} currentPath={currentPath} orientation="vertical" aria-label="Mobile" data-ui-site-spy />
       </Drawer>
     </header>
   )

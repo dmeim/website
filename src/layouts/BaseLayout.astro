@@ -5,6 +5,9 @@ import "@/ui/index.css";
 import Fonts from "@/ui/fonts/Fonts.astro";
 import SiteFooter from "@/ui/components/SiteFooter.astro";
 import SiteHeader from "@/ui/components/SiteHeader.astro";
+import WalletDialogs from "@/components/wallets/WalletDialogs.astro";
+import SiteIdentity from "@/ui/components/SiteIdentity.astro";
+import { Container } from "@/ui/components";
 import SkipLink from "@/ui/components/SkipLink.astro";
 import Toaster from "@/ui/components/Toaster.astro";
 import { shellMode } from "@/ui/lib/site-nav";
@@ -39,7 +42,8 @@ const mode = shellMode(pathname, immersive && shellMode(pathname) !== "app");
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <Fonts />
     {noindex ? <meta name="robots" content="noindex" /> : null}
     <title>{pageTitle}</title>
@@ -79,9 +83,17 @@ const mode = shellMode(pathname, immersive && shellMode(pathname) !== "app");
         class:list={["site-main", { "site-main--immersive": immersive }]}
         id="main"
       >
+        {
+          mode === "rail" && (
+            <Container width="narrow">
+              <SiteIdentity />
+            </Container>
+          )
+        }
         <slot />
       </main>
       <SiteFooter immersive={immersive} />
+      {mode !== "immersive" && <WalletDialogs />}
     </div>
 
     <Toaster />

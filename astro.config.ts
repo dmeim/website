@@ -28,6 +28,10 @@ const CLOUDFLARE_SSR_OPTIMIZE_DEPS = [
   "lucide",
   "@lucide/astro",
   "@phosphor-icons/react/dist/ssr",
+  // Keep in sync with the deep imports in src/ui/icons/token-icons.tsx.
+  ...["BTC", "DOGE", "ETH", "SOL", "TRX", "USDC", "USDT", "XRP"].map(
+    (ticker) => `@web3icons/react/icons/tokens/Token${ticker}`,
+  ),
   "ai",
   "@ai-sdk/react",
   "@ai-sdk/openai-compatible",
@@ -66,6 +70,12 @@ export default defineConfig({
   integrations: [react()],
   vite: {
     plugins: [optimizeCloudflareSsrDeps()],
+    server: {
+      // Dev server only: reach it from NetBird peers. Vite checks hostnames
+      // only and always allows raw IPs, so 100.100.0.0/16 and
+      // fd10:100:100::/64 need no entry; this adds the NetBird DNS names.
+      allowedHosts: [".netbird.selfhosted"],
+    },
     resolve: {
       dedupe: ["react", "react-dom"],
       // workerd (astro + Cloudflare adapter) needs the edge server build
