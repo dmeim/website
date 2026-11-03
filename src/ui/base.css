@@ -201,3 +201,18 @@ html.js [data-reveal][data-revealed="true"] {
     transition: none;
   }
 }
+
+/* Page transitions (ClientRouter): content steps out, the next page rises in.
+   Astro turns them off under prefers-reduced-motion. */
+@keyframes ui-page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ui-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}

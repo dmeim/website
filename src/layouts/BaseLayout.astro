@@ -36,10 +36,17 @@ const mode = shellMode(immersive);
 const canonicalPath = pathname.replace(/(\.html|\/)$/, "").replace(/\/index$/, "") || "/";
 const canonical = new URL(canonicalPath, Astro.site).href;
 const isNotFound = canonicalPath === "/404";
+
+// Rail and identity hold still; only the page content fades and rises (ui-page-* in base.css).
+const pageStep = {
+  old: { name: "ui-page-out", duration: "120ms", easing: "ease-in", fillMode: "both" },
+  new: { name: "ui-page-in", duration: "240ms", delay: "60ms", easing: "cubic-bezier(0.2, 0.7, 0.2, 1)", fillMode: "both" },
+};
+const pageTransition = { forwards: pageStep, backwards: pageStep };
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" transition:animate="none">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -96,10 +103,11 @@ const isNotFound = canonicalPath === "/404";
       <main
         class:list={["site-main", { "site-main--immersive": immersive }]}
         id="main"
+        transition:animate={pageTransition}
       >
         {
           mode === "rail" && (
-            <Container width="narrow">
+            <Container width="narrow" transition:name="site-identity" transition:animate="none">
               <SiteIdentity />
             </Container>
           )
