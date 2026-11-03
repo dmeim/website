@@ -1,0 +1,94 @@
+/*
+ * Print: any page prints as plain black-on-white text. On the homepage that
+ * gives a clean resume: identity, About, Experience, Skills and Education,
+ * without the site chrome.
+ */
+@media print {
+  @page {
+    margin: 14mm 16mm;
+  }
+
+  :root,
+  :root[data-theme],
+  [data-theme] {
+    color-scheme: light;
+
+    --ui-bg: #fff;
+    --ui-bg-inset: #fff;
+    --ui-surface: #f4f4f4;
+    --ui-line: #d9d9d9;
+    --ui-line-strong: #bfbfbf;
+    --ui-text: #000;
+    --ui-text-muted: #444;
+    --ui-text-subtle: #555;
+    --ui-ink: #000;
+    --ui-accent: #000;
+    --ui-accent-text: #000;
+  }
+
+  html,
+  body {
+    background: #fff;
+    font-size: 10.5pt;
+  }
+
+  .ui-site-header,
+  .ui-site-footer,
+  .ui-skip-link,
+  .ui-toaster__list,
+  .ui-site-identity__links,
+  .ui-site-identity__role,
+  .home-explore,
+  dialog {
+    display: none !important;
+  }
+
+  .ui-site-shell,
+  .site-main,
+  .ui-container {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  :root {
+    --ui-section-gap: 1.25rem;
+  }
+
+  .ui-site-identity__portrait {
+    width: 72px;
+  }
+
+  /* No URL on paper is clickable, so the handle carries the address. */
+  .ui-site-header__handle::after {
+    content: " · dmeim.com";
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  html.js [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  .home-entry,
+  .ui-list-row,
+  li {
+    break-inside: avoid;
+  }
+
+  .ui-nav-marker {
+    display: none;
+  }
+}
