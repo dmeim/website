@@ -14,6 +14,13 @@ The whole site moves onto a new UI library (`src/ui`) in the Profile design. The
 - Gallery: every image the site uses now lives in `src/assets/gallery/`. New Icons album (the Orthodox icons, by month) and a Projects row with each project's screenshots. Sub-folders become sections of their album, and an album can turn off downloads with `download: false`.
 - Tools: loading skeleton, error boundary and focus moved to the title after client navigation.
 - Tools: the tool groups now expand under Tools in the left nav, like Home's sections. One group opens at a time with its tools beneath it, and the gold marker follows the current tool. The phone menu has the same list.
+- Security headers on every response, `/.well-known/security.txt`, `robots.txt`, `llms.txt`, and a sitemap.
+- Canonical URLs, per-page titles and descriptions, `Person` structured data on the homepage, and `rel="me"` on the GitHub and Forgejo links.
+- A web manifest with app icons, so the site can be added to the home screen, and a `theme-color` that follows the light or dark theme.
+- Print styles: printing the homepage gives a clean resume.
+- Page transitions: the rail and identity stay put while the page content fades and rises in.
+- Game of Life in the nav, below Keys; Screensaver listed under Orthodox.
+- Cloudflare Web Analytics, switched on by setting its token in `src/content/site.ts`.
 
 ## Changed
 - The name and portrait at the top of each page link home.
@@ -26,6 +33,9 @@ The whole site moves onto a new UI library (`src/ui`) in the Profile design. The
 - `/tools` now uses the identity rail like the content pages, replacing the tools sidebar. The landing page is slimmed to an intro and one search across every tool.
 - The tools workspace, all 86 tools, the orthodox screensaver, and Game of Life are restyled. Their behaviour is unchanged.
 - The ambient Life field and grain are off by default.
+- Pages are served at slash-free URLs (`/tools`, not `/tools/`), saving a redirect on every navigation.
+- Inter is served from the site instead of Google Fonts.
+- `/connect` now redirects home.
 
 ## Fixed
 - ASCII text drawer: fonts failed to load because of a double slash in the font path.

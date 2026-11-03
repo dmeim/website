@@ -20,5 +20,5 @@ Compact reference for any collaborator or AI assistant. Keep this up to date whe
 - Design reference: `reference/georgios-zerdalis` (branch `pre-retro-pop`, gitignored)
 - Accent palette (Midnight Concert Hall): champagne `#d4bc8a`, steel `#8fa3b0`, ground `#050607`
 - Verification: Browser (OpenPGP + Ed25519), CLI (gpg, ssh-keygen -Y) — planned
-- Security: Publish fingerprints; `/.well-known/security.txt`; strong headers at Cloudflare
+- Security: Publish fingerprints; `/.well-known/security.txt` (renew `Expires` before 2027-11-03); security headers in `public/_headers`
 - Performance: Static-first, minimal JS (Astro islands where needed), plain CSS, optimize images
