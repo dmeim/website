@@ -107,7 +107,8 @@ export function bindSiteNavSpies(root: ParentNode = document): void {
       sub.appendChild(li);
       return { section, link };
     });
-    item.appendChild(sub);
+    // Sections first, then any child pages the nav already lists.
+    item.insertBefore(sub, item.querySelector(":scope > [data-ui-nav-children]"));
     registerSpy(createSpy(targets));
   });
 }

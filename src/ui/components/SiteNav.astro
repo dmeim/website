@@ -38,7 +38,7 @@ const vertical = orientation === "vertical";
   <span class="ui-nav-marker" data-axis={vertical ? "y" : "x"} data-visible="false" aria-hidden="true"></span>
   <ul class="ui-site-nav__list" data-ui-marker-rail={vertical ? "" : undefined}>
     {
-      items.map(({ href, label, glyph, ariaLabel: itemLabel }) => {
+      items.map(({ href, label, glyph, ariaLabel: itemLabel, children }) => {
         const current = isCurrentPath(href, currentPath);
         const link = (
           <a
@@ -62,6 +62,22 @@ const vertical = orientation === "vertical";
           <li class="ui-site-nav__item">
             {glyph && !vertical ? <Tooltip content={itemLabel ?? label} placement="bottom">{link}</Tooltip> : link}
             {vertical && current && href === "/tools" && <SiteNavTools currentPath={currentPath} />}
+            {vertical && current && children && (
+              <ul class="ui-site-nav__sub" data-ui-nav-children>
+                {children.map((child) => (
+                  <li>
+                    <a
+                      class="ui-site-nav__sublink"
+                      href={child.href}
+                      aria-current={isCurrentPath(child.href, currentPath) ? "page" : undefined}
+                      data-ui-marker-target
+                    >
+                      {child.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         );
       })
