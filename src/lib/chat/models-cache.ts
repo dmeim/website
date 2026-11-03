@@ -38,8 +38,3 @@ export async function getCachedGoModels(
     return [...FALLBACK_GO_MODELS];
   }
 }
-
-/** Test helper — clear the in-memory cache. */
-export function clearGoModelsCache(): void {
-  cache = null;
-}

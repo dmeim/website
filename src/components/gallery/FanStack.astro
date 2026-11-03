@@ -1,0 +1,74 @@
+---
+import Icon from "@/ui/icons/Icon.astro";
+import type { IconName } from "@/ui/icons";
+import type { GalleryItem } from "@/lib/gallery/types";
+import ItemThumb from "./ItemThumb.astro";
+
+interface Props {
+  href: string;
+  title: string;
+  /** Right side of the caption, e.g. "12 items". Use the `meta` slot for markup. */
+  meta?: string;
+  /** Muted line under the caption. */
+  description?: string;
+  /** Item on top of the stack. */
+  cover?: GalleryItem;
+  /** Everything in the set; the first two besides the cover peek out behind it. */
+  items?: GalleryItem[];
+  /** Shown on a single card when there is nothing to show yet. */
+  placeholderIcon?: IconName;
+  /** Card shape: portrait for photos, landscape (top-anchored) for screenshots. */
+  shape?: "portrait" | "landscape";
+  /** Eager-load the first row. */
+  eager?: boolean;
+}
+
+const {
+  href,
+  title,
+  meta,
+  description,
+  cover,
+  items = [],
+  placeholderIcon = "images",
+  shape = "portrait",
+  eager = false,
+} = Astro.props;
+
+const top = cover ?? items[0];
+const behind = top ? items.filter((item) => item.id !== top.id).slice(0, 2) : [];
+const cards = [
+  ...behind.map((item, index) => ({ item, slot: index === 0 ? "left" : "right" })),
+  ...(top ? [{ item: top, slot: "center" }] : []),
+];
+---
+
+<a class="gallery-stack" href={href} data-shape={shape}>
+  <span class="gallery-stack__fan" aria-hidden="true">
+    {
+      cards.length > 0 ? (
+        cards.map(({ item, slot }) => (
+          <span class="gallery-stack__card" data-slot={slot}>
+            <ItemThumb item={item} eager={eager} />
+          </span>
+        ))
+      ) : (
+        <span class="gallery-stack__card" data-slot="center">
+          <span class="gallery-thumb">
+            <span class="gallery-thumb__placeholder">
+              <Icon name={placeholderIcon} weight="light" />
+            </span>
+          </span>
+        </span>
+      )
+    }
+  </span>
+  <span class="gallery-stack__caption">
+    <span class="gallery-stack__title">{title}</span>
+    <span class="gallery-stack__meta">
+      <slot name="meta">{meta}</slot>
+      <Icon name="arrow-right" class="gallery-stack__arrow" />
+    </span>
+  </span>
+  {description && <span class="gallery-stack__description">{description}</span>}
+</a>

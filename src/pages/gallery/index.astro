@@ -1,0 +1,50 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Container, EmptyState, PageHeader, Section } from "@/ui/components";
+import AlbumStack from "@/components/gallery/AlbumStack.astro";
+import { loadAlbums } from "@/lib/gallery/assets";
+import { loadProjectAlbums } from "@/lib/gallery/project-albums";
+import "@/components/gallery/gallery.css";
+
+const [albums, projectAlbums] = await Promise.all([loadAlbums(), loadProjectAlbums()]);
+---
+
+<BaseLayout
+  title="Gallery"
+  description="Photos, wallpapers, icons and project screenshots, kept in albums."
+>
+  <Container width="wide">
+    <PageHeader
+      title="Gallery"
+      lede="Every image on the site lives here, kept in albums. Open one to flip through it at full quality."
+    />
+    <Section title="Albums" spy>
+      {
+        albums.length === 0 ? (
+          <EmptyState icon="images" title="No albums yet" description="Check back soon." />
+        ) : (
+          <ul class="gallery-albums" role="list">
+            {albums.map((album, index) => (
+              <li>
+                <AlbumStack album={album} eager={index < 3} />
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </Section>
+    {
+      projectAlbums.length > 0 && (
+        <Section title="Projects" spy>
+          <ul class="gallery-albums" role="list">
+            {projectAlbums.map((album) => (
+              <li>
+                <AlbumStack album={album} shape="landscape" />
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )
+    }
+  </Container>
+</BaseLayout>

@@ -18,9 +18,9 @@ function urls(src: string) {
 describe("imagesFromGlob", () => {
   it("derives collection and id from the folder layout", () => {
     const images = imagesFromGlob({
-      "/src/assets/orthodox/icons/saints/02-st-george.jpg":
+      "/src/assets/gallery/icons/saints/02-st-george.jpg":
         urls("/_astro/b.jpg"),
-      "/src/assets/orthodox/icons/feasts/nativity.png": urls("/_astro/a.png"),
+      "/src/assets/gallery/icons/feasts/nativity.png": urls("/_astro/a.png"),
     });
     expect(images).toEqual([
       {

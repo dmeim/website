@@ -1,0 +1,63 @@
+---
+import { getCategoryForTool, toolCategories, toolRoute } from "@/content/tools";
+
+/**
+ * Tool groups under the rail nav's Tools item. One group is open at a time;
+ * src/ui/lib/tools-nav.ts toggles groups and follows in-app tool switches.
+ */
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const slug = currentPath.match(/^\/tools\/([^/]+)/)?.[1];
+const currentGroup = slug ? getCategoryForTool(slug)?.id : undefined;
+---
+
+<ul class="ui-site-nav__sub ui-site-nav__groups" data-ui-tools-nav>
+  {
+    toolCategories.map((category) => {
+      const open = category.id === currentGroup;
+      const listId = `site-nav-tools-${category.id}`;
+      return (
+        <li class="ui-site-nav__group" data-group={category.id}>
+          <button
+            type="button"
+            class="ui-site-nav__sublink ui-site-nav__group-toggle"
+            aria-expanded={String(open)}
+            aria-controls={listId}
+            data-ui-marker-target
+          >
+            <span>{category.name}</span>
+            <span class="ui-site-nav__count">{category.tools.length}</span>
+          </button>
+          <ul class="ui-site-nav__sub" id={listId} hidden={!open}>
+            {category.tools.map((tool) => {
+              const href = toolRoute(tool);
+              return (
+                <li>
+                  {href ? (
+                    <a
+                      class="ui-site-nav__sublink"
+                      href={href}
+                      aria-current={tool.id === slug ? "page" : undefined}
+                      data-tool-slug={tool.id}
+                      data-ui-marker-target
+                    >
+                      {tool.title}
+                    </a>
+                  ) : (
+                    <span class="ui-site-nav__sublink ui-site-nav__wip" aria-disabled="true">
+                      {tool.title}
+                      <span class="ui-site-nav__badge">WIP</span>
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </li>
+      );
+    })
+  }
+</ul>

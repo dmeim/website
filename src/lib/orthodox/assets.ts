@@ -13,14 +13,15 @@ import type {
   WallBackground,
 } from "./types";
 
-// Drop files into these folders; nothing else needs registering.
+// The wall reads the gallery's Icons and Backgrounds albums; drop files into
+// those folders and nothing else needs registering.
 const iconModules = import.meta.glob<ImageMetadata>(
-  "/src/assets/orthodox/icons/*/*.{jpg,jpeg,png,webp,avif,svg}",
+  "/src/assets/gallery/icons/*/*.{jpg,jpeg,png,webp,avif}",
   { eager: true, import: "default" },
 );
 
 const backgroundModules = import.meta.glob<ImageMetadata>(
-  "/src/assets/orthodox/backgrounds/*.{jpg,jpeg,png,webp,avif}",
+  "/src/assets/gallery/backgrounds/*.{jpg,jpeg,png,webp,avif}",
   { eager: true, import: "default" },
 );
 
@@ -36,7 +37,6 @@ export type OrthodoxCatalog = {
 };
 
 async function optimizedUrl(image: ImageMetadata, width: number) {
-  if (image.format === "svg") return image.src;
   const result = await getImage({
     src: image,
     width: Math.min(width, image.width),

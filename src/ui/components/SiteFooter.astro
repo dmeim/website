@@ -1,7 +1,10 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { cx } from "@/ui/lib/cx";
+import { fullName } from "@/ui/lib/identity";
+import IdentityLinks from "./IdentityLinks.astro";
 
+/** Copyright beside the same contact and crypto rows as SiteIdentity. */
 interface Props extends Omit<HTMLAttributes<"footer">, "class"> {
   immersive?: boolean;
   class?: string;
@@ -14,13 +17,10 @@ const year = new Date().getFullYear();
 {
   !immersive && (
     <footer {...rest} class={cx("ui-site-footer", className)}>
-      <p class="ui-site-footer__line">
-        <span>&copy; {year} Dimitri</span>
-        <span class="ui-site-footer__sep" aria-hidden="true">·</span>
-        <a href="/connect">Connect</a>
-        <span class="ui-site-footer__sep" aria-hidden="true">·</span>
-        <a href="/keys">Keys</a>
-      </p>
+      <p class="ui-site-footer__copy">&copy; {year} {fullName}</p>
+      <div class="ui-site-footer__links">
+        <IdentityLinks />
+      </div>
     </footer>
   )
 }

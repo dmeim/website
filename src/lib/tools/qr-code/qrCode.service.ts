@@ -30,10 +30,6 @@ export function normalizeQrText(text: string): string {
   return text.trim();
 }
 
-export function isQrTextValid(text: string): boolean {
-  return normalizeQrText(text).length > 0;
-}
-
 export async function renderQrPngDataUrl(options: QrRenderOptions): Promise<string> {
   const text = normalizeQrText(options.text);
 

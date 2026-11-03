@@ -80,7 +80,6 @@ export const uiTokenNames = [
   "--ui-z-dialog",
   "--ui-z-toast",
   "--ui-z-tooltip",
-  "--ui-z-grain",
   "--ui-bg",
   "--ui-bg-inset",
   "--ui-surface",

@@ -1,8 +1,4 @@
-import {
-  MCP_SERVERS,
-  type McpServerId,
-  getMcpServer,
-} from "./registry";
+import { type McpServerId, getMcpServer } from "./registry";
 
 export type McpServerSettings = {
   enabled: boolean;
@@ -99,8 +95,4 @@ export function isMcpToolEnabled(
   const server = settings[serverId];
   if (!server?.enabled) return false;
   return server.tools[toolName] === true;
-}
-
-export function mcpServerIds(): McpServerId[] {
-  return MCP_SERVERS.map((s) => s.id);
 }

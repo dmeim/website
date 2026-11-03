@@ -1,6 +1,6 @@
 # Redesign: Profile (concept 5, site-wide)
 
-Branch `feat/redesign-profile`. This is the full-site implementation of concept 5 ("Profile", `/home5`) on the shared contract in `docs/12-UI-Library-Spec.md`. Every page, tool and app runs on the `src/ui` library. Letter and Plain implement the same contract on their own branches, so pages can move between branches without code changes.
+The site's current design, merged to `main` from `full-site-redesign`. It is the full-site implementation of concept 5 ("Profile") on the contract in `docs/12-UI-Library-Spec.md`, and every page, tool and app runs on the `src/ui` library. The Letter and Plain alternatives were dropped; their branches are history only.
 
 ## Run it
 
@@ -29,7 +29,7 @@ The site reads like a refined online CV. It is flat and quiet, and colour, spaci
 - **Signature interaction.** A 2px gold marker glides (320ms) along a hairline to the current item:
   - the rail nav, including in-page section sub-links driven by scroll-spy;
   - the app-bar nav, horizontally;
-  - the tools sidebar (current tool) and the chat list (current chat);
+  - the tool groups under Tools in the rail (current tool, or its collapsed group) and the chat list (current chat);
   - Tabs.
 - **Other motion.** Hover colour and fill shifts take 160ms. The reveal fade-up is 6px over 360ms and is gated on `html.js`. Copy changes to "Copied". Under `prefers-reduced-motion` every `--ui-dur-*` collapses to 0.01ms. There is no parallax, tilt, magnetic effect or marquee.
 
@@ -39,17 +39,15 @@ The site reads like a refined online CV. It is flat and quiet, and colour, spaci
 
 | Mode | Routes | Desktop (≥960px) | Phone |
 | --- | --- | --- | --- |
-| **rail** | `/`, `/projects`, `/keys`, `/colors`, `/connect`, `/orthodox`, `/game-of-life`, `/404`, `/ui` | Sticky 320px identity rail, described below. Content sits in the column beside it. | Sticky top bar (portrait, name, menu) with a `#mobile-nav` Drawer. |
-| **app** | `/tools*`, `/chat*` | 56px top bar with brand, horizontal nav (gold underline marker) and ThemeControl. `AppShell` fills the rest. | Same bar, with the Drawer. |
+| **rail** | `/`, `/projects*`, `/gallery*`, `/tools*`, `/keys`, `/colors`, `/orthodox`, `/game-of-life`, `/404`, `/ui` | Sticky 320px identity rail, described below. Content sits in the column beside it. | Sticky top bar (portrait, name, menu) with a `#mobile-nav` Drawer. |
+| **app** | `/chat*` | 56px top bar with brand, horizontal nav (gold underline marker) and ThemeControl. `AppShell` fills the rest. | Same bar, with the Drawer. |
 | **immersive** | `/game-of-life/simulation`, `/orthodox/screensaver` | No chrome; `ImmersiveStage` with a floating `Toolbar`. | Same. |
 
-The rail holds, from top to bottom:
-- the portrait tile;
-- the name "Dimitri" (a link, not the h1);
-- the role line and the status dot;
-- the vertical SiteNav, where the current page expands into its spy Sections;
-- Email and GitHub links;
-- the segmented ThemeControl.
+The rail holds the segmented ThemeControl above the vertical SiteNav, where the current page expands into its spy Sections (and Tools into its groups). The identity sits at the top of main on every rail page (`SiteIdentity`): the portrait and the name "Dimitrios Meimaridis", both linking home (not the h1), the handle and tagline, then the contact and crypto icon rows (`IdentityLinks`). Those rows are the site's ways to reach Dimitri, so there is no Connect page; the addresses live in `contact` in `src/content/site.ts`.
+
+The footer (`SiteFooter`) is "© <year> Dimitrios Meimaridis" on the left and the same icon rows on the right, inset `--ui-footer-inset` (24px) from the ends of its hairline. When its content box is under 30rem (a container query, so it tracks the real space rather than the viewport) the two stack on centered lines.
+
+Scroll-spy makes the last section active once the page is scrolled to the bottom, since a short final section can never reach the spy line.
 
 The page grid lives in `src/ui/styles/layout/site-shell.css`. Beside the rail, `Container` drops its own gutter and only caps the measure:
 
@@ -58,6 +56,39 @@ The page grid lives in `src/ui/styles/layout/site-shell.css`. Beside the rail, `
 | narrow | 40rem |
 | default | 46rem |
 | wide | 64rem |
+
+## Gallery
+
+`src/assets/gallery/` is the home of every image the site uses, and other pages read from it: the Orthodox wall hangs the Icons album, project pages show `projects/<slug>/`, and the site portrait and the `/ui` figure come from Studio and Cutouts. `/gallery` lists albums as fanned stacks (cover on top, two items peeking behind; they fan wider on hover) in two spy Sections, Albums and Projects. Each album is a static page at `/gallery/<folder>` (projects at `/gallery/projects/<slug>`, with a link to the project page), not a modal.
+
+- **Add files.** Every folder in `src/assets/gallery/` is an album, and a sub-folder is a section of it: the album page shows a heading and grid per section (Icons has one per month). Deeper nesting, or a file loose in the root, fails the build. `projects/` is the exception: each sub-folder there is a project's own album. Supported files:
+  - images: jpg, jpeg, png, webp, avif, and gif (animated);
+  - video: mp4, webm, mov, m4v. `.mov` only plays in Safari, so prefer mp4 (H.264) or webm;
+  - audio: mp3, m4a, aac, ogg, oga, opus, wav, flac.
+- **Posters and cover art.** An image with the same name as a video or audio file (`clip.mp4` + `clip.jpg`) becomes its poster or cover art and is not listed on its own. Without one, the thumbnail shows a film or music glyph. Two images or two media files with the same name in one folder fail the build.
+- **Words and order.** `src/content/gallery.ts` gives albums a title, description, cover, section order (`sections`), section headings (`sectionLabels`) and `download: false` to hide the download button, and items a title, description and alt text, keyed by file name without the extension (`<section>/<stem>` inside a sub-folder; that is also the item's `#` link). Icons takes its month order from `collectionOrder` in `src/content/orthodox.ts`. Items listed there come first in that order; the rest follow by file name. Missing entries fall back to a title from the file name. Metadata that names a folder, item or cover that does not exist fails the build.
+- **Album page.** A fixed-height preview box (portrait and landscape swap without the page jumping) holding an image, a video player or an audio player with cover art, then the item's title and description, a counter, previous/next and a download button, then a square thumbnail grid. Thumbnails of video, audio and GIFs carry a small kind badge. Clicking a thumbnail swaps the preview in place (the page does not scroll), pauses anything playing and sets `#<file-stem>` so the item can be linked. ← and → step through the album, except while a player or form control has focus.
+- **Full quality.** The preview box shows the original file, and every album offers it for download unless it sets `download: false`. Only the 480w grid and stack thumbnails are resized (WebP). `src/lib/gallery/assets.ts` holds the one pair of globs (`src/assets/gallery/**`): originals are emitted byte-for-byte through `?url` imports. `loadFolder("projects")` hands the projects loader its files. Grouping, pairing and ordering live in `src/lib/gallery/catalog.ts` with tests beside it (including a check that the literal glob lists match the supported extensions).
+- **Cloudflare limits.** Workers Static Assets serves files up to 25 MiB each, and 20,000 files per deploy on Workers Free (100,000 on Paid). There is no total-size limit. Each still produces two files (the original and a thumbnail); video and audio produce one. The Orthodox wall adds its own 1200w and 240w WebPs per icon. The build is currently about 1,200 files and 490 MB, most of it the icon originals. The `cloudflare-asset-limits` integration in `astro.config.ts` fails the build naming any output file over 25 MiB and logs the file count, warning above 90% of the free cap. Media over 25 MiB needs re-encoding or hosting in R2.
+- **Seed content.** Studio and Cutouts are the generated portraits from the photoshoot; the duplicate copies that used to sit in `assets/images/photoshoot/` and `public/gpt-photoshoot/` are gone. The `reference-*` source photos stay in `assets/images/photoshoot/`, unpublished. Icons is the Orthodox icon set, moved from `src/assets/orthodox/icons/` with its month folders and file names unchanged, so icon ids (`<Month>/<stem>`) and custom-wall locks still match.
+
+## Projects
+
+`/projects` uses the gallery's fanned stacks in a landscape shape (cards anchored to the top of each screenshot), with the status dot in the caption and the summary underneath. Each project is a static page at `/projects/<slug>`. The homepage Work list links to the same pages.
+
+- **Write-up.** One Markdown file per project in `src/content/projects/<slug>.md`, validated by the `projects` collection in `src/content.config.ts`. Frontmatter: `title`, `summary`, `status` (`live` / `wip` / `archived`), optional `order`, `year`, `role`, `tags`, `links` (each `{ label, href, kind: site | source | other }`; the first is the primary button), `cover` and `media` (words for media files, keyed by file stem, same shape as gallery items). The body is the write-up.
+- **Media.** Photos, GIFs and video go in `src/assets/gallery/projects/<slug>/` and follow every gallery rule. Each project with media is also an album on `/gallery`. Rules: same file types, posters by matching name, untouched downloads, the 25 MiB limit. A folder with no matching `.md`, or `media`/`cover` in a project with no folder, fails the build.
+- **Page.** Breadcrumbs, the title and summary, status, year and role, link buttons (opening in a new tab), then the gallery viewer with landscape thumbnails when there is media, then the write-up beside an "at a glance" list (status, when, role, built with; it sits below the write-up under 1100px), then previous/next links.
+- **Code.** Loading and sorting live in `src/lib/projects/projects.ts`; media pairing and ordering live in `src/lib/projects/catalog.ts` with tests beside it. `FanStack.astro` and `AlbumViewer.astro` in `src/components/gallery/` are shared with the gallery.
+- **Seed content.** dmeim.com and Georgios Zerdalis have screenshots taken from production builds (light theme, reduced motion, 2x). Verification lab and Edge experiments have no media yet and show a code glyph. The old `projects` array in `src/content/site.ts` is gone; Markdown is the only source.
+
+## Tools
+
+`/tools` and `/tools/[slug]` use the rail shell. `ToolsShell` (React, `client:only`) renders only the stage; the navigation lives in the rail.
+
+- **Rail tree** (`src/ui/components/SiteNavTools.astro`, rendered by the vertical `SiteNav` under the current Tools item). The 11 groups are sub-items with tool counts, and one group is open at a time with its tools beneath it, the same way Home shows its sections. On a tool page its group is open on load. The gold marker sits on the current tool, or on its group while that group is collapsed (the marker now follows the deepest visible `aria-current`). WIP tools are listed but cannot be clicked. The phone menu gets the same tree.
+- **Switching** (`src/ui/lib/tools-nav.ts`). While `ToolsShell` is mounted, a plain click on a tool link sends `tools:select`; the shell swaps the tool in place with `history.pushState(null, …)` and answers with `tools:route`, which every copy of the tree follows, and the phone menu closes. Back and forward work the same way. Modified clicks open the static page as normal.
+- **Landing** (`ToolCatalog`): a page header with counts and one search across every tool. Results appear as you type and show their group. Nothing else is listed, because the rail already holds the groups.
 
 ## Tokens (values)
 
@@ -108,12 +139,12 @@ All 70 catalogue entries exist with the spec'd APIs, in `src/ui/components` (Ast
 
 ## Decisions made during the run
 
-- `/` is the Profile homepage, rebuilt on the library from `src/components/home/*`. It has six spy Sections: Now, Work, Tools, Principles, Keys and Contact. `HomeExperience` and `PhotoLightbox` stay in the repo unused; their CSS was moved onto tokens so the build stays clean.
+- `/` is the Profile homepage, rebuilt on the library from `src/components/home/*`. It has four spy Sections: About (the h1 summary and a button for each page in the site nav, in the same order, built from `defaultNavItems`), Experience, Skills and Education. The buttons are the homepage's only pointers into the rest of the site; there are no Projects, Tools, Stack or Principles sections. Experience, Skills (one labelled list: Platforms, Systems, Tools, Coding, Hardware, Strengths, Languages) and Education come from Dimitri's 2026 resume, kept as data in `src/content/resume.ts` without the address, phone or email; Experience and Education entries put the dates in the list rows' 7rem label column. The full keys live only on `/keys`. The old `HomeExperience` homepage, `PhotoLightbox` and the unused motion helpers (TextReveal, Reveal, Magnetic, PhotoTilt, Grain) are deleted; `src/components/motion/` keeps only `MotionConfigProvider`. Content fields only they read (hero CTAs and sentence, image fields, pedagogy bodies) and every placeholder SVG in `public/images/` are gone too.
 - `/colors` is generated from `uiColorTokenNames`. It shows a light and a dark swatch per token, with the resolved values read at runtime.
-- The ambient LifeField and the grain are off (`AMBIENT_ENABLED = false` in `SiteEffects`), with the mount and the hidden-route list kept. The Life and Glyph fields read `--ui-ambient`.
+- There is no ambient field or grain. `SiteEffects`, `LifeField` and `GlyphField` were removed: with the field off they still loaded React on every content page (about 63 KB gzip) to render nothing. Content pages now ship no React unless a page has its own island.
 - Dark-mode portrait contrast, a known rough edge of the concept, is fixed: in dark the portrait tile uses a lighter mix of text into bg.
 - Legacy CSS is gone: `global.css`, `legacy.css`, `sliding-thumb.*`, `theme-toggle.ts`, `site-nav-thumb.ts`, the `tools/ui` adapters and `toolIsland.css`. About 20 slim per-tool stylesheets remain for layout unique to one tool, and they use `--ui-*` tokens only.
-- Lucide stays installed, and stays in `CLOUDFLARE_SSR_OPTIMIZE_DEPS`, because the concept pages still import it. Nothing else uses it.
+- Lucide (`lucide`, `@lucide/astro`) is uninstalled and out of `CLOUDFLARE_SSR_OPTIMIZE_DEPS`; the concept pages were its last users and are deleted.
 - Copy feedback across the tools is now `CopyButton`'s "Copied" swap instead of per-tool "X copied." status lines.
 
 ## Behaviour notes (review these)
@@ -127,7 +158,7 @@ Behaviour was kept frozen; the presentational side effects are listed here.
 - **Chat Escape listener:** the composer's capture-phase Escape listener now calls only `preventDefault`, not `stopImmediatePropagation`. This lets library popovers dismiss and restore focus. `ChatShell` already ignores an Escape that was prevented.
 - **Chat code blocks:** the markup string in `src/lib/chat/markdown.ts` follows the `.ui-code-block` contract (`data-chat-copy` plus `data-copy`), and its test was updated. This is a markup-only change.
 - **AsciiTextDrawer fix:** this is a real bug fix in `src/lib/tools/ascii-text-drawer/asciiTextDrawer.service.ts`, made in its own `fix:` commit. The font path ended in `/`, so figlet requested `fonts//Standard.flf` and got a 404. It had been broken since the tool was added.
-- **WordCode scroll guard:** `tools-stage__body` was re-added to the tools AppShell scroll container, so WordCode's existing scroll guard works again.
+- **WordCode scroll guard:** tools now scroll with the page, so the guard checks the heading against the window instead of a `tools-stage__body` container.
 
 ## Known issues / not verified
 

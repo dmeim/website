@@ -38,6 +38,11 @@
   letter-spacing: var(--ui-tracking-tight);
   line-height: 1.2;
   text-decoration: none;
+  transition: color var(--ui-dur-fast) var(--ui-ease-out);
+}
+
+a.ui-site-header__name:hover {
+  color: var(--ui-accent);
 }
 
 .ui-site-header__handle {

@@ -36,10 +36,6 @@ export function resolveTheme(preference: ThemePreference): ResolvedTheme {
   return window.matchMedia(DARK_QUERY).matches ? "dark" : "light";
 }
 
-export function getResolvedTheme(): ResolvedTheme {
-  return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
-}
-
 function applyTheme(preference: ThemePreference): void {
   const root = document.documentElement;
   const theme = resolveTheme(preference);

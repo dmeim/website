@@ -1,0 +1,28 @@
+---
+/** Experience: each role with its dates in the label column, then what the job involved. */
+import Section from "@/ui/components/Section.astro";
+import { experience } from "@/content/resume";
+---
+
+<Section id="experience" title="Experience" spy class="home-section" data-reveal-group>
+  <ol class="home-entries">
+    {
+      experience.map((role) => (
+        <li class="home-entry" data-reveal>
+          <p class="home-entry__when">{role.dates}</p>
+          <div class="home-entry__body">
+            <h3 class="home-entry__title">{role.title}</h3>
+            <p class="home-entry__where">
+              {role.organization} · {role.place}
+            </p>
+            <ul class="home-entry__points">
+              {role.points.map((point) => (
+                <li>{point}</li>
+              ))}
+            </ul>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</Section>

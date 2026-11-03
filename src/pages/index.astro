@@ -1,11 +1,9 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import HomeIntro from "@/components/home/HomeIntro.astro";
-import HomeWork from "@/components/home/HomeWork.astro";
-import HomeTools from "@/components/home/HomeTools.astro";
-import HomePrinciples from "@/components/home/HomePrinciples.astro";
-import HomeKeys from "@/components/home/HomeKeys.astro";
-import HomeContact from "@/components/home/HomeContact.astro";
+import HomeExperience from "@/components/home/HomeExperience.astro";
+import HomeSkills from "@/components/home/HomeSkills.astro";
+import HomeEducation from "@/components/home/HomeEducation.astro";
 import { meta } from "@/content/site";
 import { Container } from "@/ui/components";
 import "@/components/home/home.css";
@@ -14,10 +12,8 @@ import "@/components/home/home.css";
 <BaseLayout title="dmeim.com" description={meta.description}>
   <Container width="narrow">
     <HomeIntro />
-    <HomeWork />
-    <HomeTools />
-    <HomePrinciples />
-    <HomeKeys />
-    <HomeContact />
+    <HomeExperience />
+    <HomeSkills />
+    <HomeEducation />
   </Container>
 </BaseLayout>

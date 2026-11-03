@@ -1,0 +1,104 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Breadcrumbs, Button, Container, KeyValue, PageHeader, Prose, StatusDot } from "@/ui/components";
+import AlbumViewer from "@/components/gallery/AlbumViewer.astro";
+import { statusLabel } from "@/lib/projects/catalog";
+import { loadProjects, type Project } from "@/lib/projects/projects";
+import "@/components/gallery/gallery.css";
+import "@/components/content-pages/projects.css";
+
+export const getStaticPaths = (async () => {
+  const projects = await loadProjects();
+  return projects.map((project, index) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      previous: projects[index - 1],
+      next: projects[index + 1],
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  project: Project;
+  previous?: Project;
+  next?: Project;
+}
+
+const { project, previous, next } = Astro.props;
+const { data, album } = project;
+const { Content } = await render(project.entry);
+
+const linkIcon = { site: "arrow-up-right", source: "github-logo", other: "arrow-up-right" } as const;
+const facts = [
+  { label: "Status", value: statusLabel[data.status] },
+  ...(data.year ? [{ label: "When", value: data.year }] : []),
+  ...(data.role ? [{ label: "Role", value: data.role }] : []),
+  ...(data.tags.length ? [{ label: "Built with", value: data.tags.join(", ") }] : []),
+];
+---
+
+<BaseLayout title={`${data.title} · Projects`} description={data.summary}>
+  <Container width="wide">
+    <Breadcrumbs items={[{ label: "Projects", href: "/projects" }, { label: data.title }]} />
+    <PageHeader title={data.title} lede={data.summary}>
+      <Fragment slot="meta">
+        <StatusDot status={data.status} label={statusLabel[data.status]} />
+        {data.year && <span>{data.year}</span>}
+        {data.role && <span>{data.role}</span>}
+      </Fragment>
+      {
+        data.links.length > 0 && (
+          <Fragment slot="actions">
+            {data.links.map((link, index) => (
+              <Button
+                href={link.href}
+                variant={index === 0 ? "primary" : "secondary"}
+                iconEnd={linkIcon[link.kind]}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${link.label} (opens in a new tab)`}
+              >
+                {link.label}
+              </Button>
+            ))}
+          </Fragment>
+        )
+      }
+    </PageHeader>
+
+    {album && <AlbumViewer album={album} thumbs="landscape" />}
+
+    <div class="project-detail">
+      <Prose as="article" class="project-detail__body">
+        <Content />
+      </Prose>
+      <aside class="project-detail__facts" aria-label="At a glance">
+        <KeyValue items={facts} />
+      </aside>
+    </div>
+
+    {
+      (previous || next) && (
+        <nav class="project-pager" aria-label="More projects">
+          {previous ? (
+            <a class="project-pager__link" href={`/projects/${previous.slug}`} data-dir="previous">
+              <span class="project-pager__label">Previous</span>
+              <span class="project-pager__title">{previous.data.title}</span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {next && (
+            <a class="project-pager__link" href={`/projects/${next.slug}`} data-dir="next">
+              <span class="project-pager__label">Next</span>
+              <span class="project-pager__title">{next.data.title}</span>
+            </a>
+          )}
+        </nav>
+      )
+    }
+  </Container>
+</BaseLayout>

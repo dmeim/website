@@ -61,6 +61,49 @@
   padding-block: var(--ui-space-3xs);
 }
 
+/* Tool groups under the rail's Tools item (SiteNavTools). */
+.ui-site-nav__group-toggle {
+  justify-content: space-between;
+  width: 100%;
+  padding-inline: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--ui-fs-xs);
+  text-align: start;
+  cursor: pointer;
+}
+
+.ui-site-nav__group-toggle[aria-expanded="true"],
+.ui-site-nav__group-toggle[aria-current] {
+  color: var(--ui-text);
+}
+
+.ui-site-nav__count {
+  color: var(--ui-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-site-nav__group > .ui-site-nav__sub {
+  padding-bottom: var(--ui-space-2xs);
+}
+
+.ui-site-nav__wip {
+  gap: var(--ui-space-xs);
+  opacity: 0.6;
+  cursor: default;
+}
+
+.ui-site-nav__wip:hover {
+  color: var(--ui-text-muted);
+}
+
+.ui-site-nav__badge {
+  font-size: 0.625rem;
+  letter-spacing: var(--ui-tracking-wide);
+  text-transform: uppercase;
+}
+
 /* horizontal */
 .ui-site-nav[data-orientation="horizontal"] .ui-site-nav__list {
   display: flex;

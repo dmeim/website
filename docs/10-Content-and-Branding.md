@@ -15,7 +15,7 @@
 ## Assets
 
 - Place logos in `assets/logos/`
-- Place images in `assets/images/`
+- Place images the site shows in the gallery, `src/assets/gallery/<album>/` (see `src/content/gallery.ts`); `assets/images/` only keeps unpublished reference photos
 - vCards in `assets/vcards/`
 - Keys in `assets/keys/`
 - Downloads in `assets/downloads/`

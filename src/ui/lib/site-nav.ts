@@ -14,9 +14,9 @@ export const defaultNavItems: NavItem[] = [
   { href: "/", label: "Home" },
   { href: "/orthodox", label: "Orthodox", glyph: "☦︎", ariaLabel: "Orthodox" },
   { href: "/projects", label: "Projects" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/tools", label: "Tools" },
   { href: "/keys", label: "Keys" },
-  { href: "/connect", label: "Connect" },
 ];
 
 export function isCurrentPath(href: string, currentPath: string): boolean {
@@ -26,5 +26,5 @@ export function isCurrentPath(href: string, currentPath: string): boolean {
 
 export function shellMode(currentPath: string, immersive = false): ShellMode {
   if (immersive) return "immersive";
-  return /^\/(tools|chat)(\/|$)/.test(currentPath) ? "app" : "rail";
+  return /^\/chat(\/|$)/.test(currentPath) ? "app" : "rail";
 }

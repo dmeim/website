@@ -13,7 +13,8 @@ export default defineConfig({
       "src/lib/tools/**/*.service.test.ts",
       "src/lib/chat/**/*.test.ts",
       "src/lib/orthodox/**/*.test.ts",
-      "src/scripts/**/*.test.ts",
+      "src/lib/gallery/**/*.test.ts",
+      "src/lib/projects/**/*.test.ts",
     ],
     globals: false,
     server: {

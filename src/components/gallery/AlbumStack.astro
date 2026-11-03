@@ -1,0 +1,24 @@
+---
+import type { GalleryAlbum } from "@/lib/gallery/types";
+import FanStack from "./FanStack.astro";
+
+interface Props {
+  album: GalleryAlbum;
+  /** Eager-load the first row. */
+  eager?: boolean;
+  shape?: "portrait" | "landscape";
+}
+
+const { album, eager = false, shape = "portrait" } = Astro.props;
+const total = album.items.length;
+---
+
+<FanStack
+  href={`/gallery/${album.slug}`}
+  title={album.title}
+  meta={`${total} ${total === 1 ? "item" : "items"}`}
+  cover={album.cover}
+  items={album.items}
+  shape={shape}
+  eager={eager}
+/>

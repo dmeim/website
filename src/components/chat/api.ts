@@ -1,7 +1,6 @@
 import type {
   ChatMessageDto,
   ChatMcpSettings,
-  ChatStatusDto,
   ChatSummary,
   GoModelInfo,
   LibraryAssetSummary,
@@ -47,12 +46,6 @@ export async function fetchChat(
   id: string,
 ): Promise<{ chat: ChatSummary; messages: ChatMessageDto[] }> {
   return readJson(await fetch(`/api/chats/${encodeURIComponent(id)}`));
-}
-
-export async function fetchChatStatus(id: string): Promise<ChatStatusDto> {
-  return readJson(
-    await fetch(`/api/chats/${encodeURIComponent(id)}/status`),
-  );
 }
 
 export async function patchChat(

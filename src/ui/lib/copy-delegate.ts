@@ -44,9 +44,11 @@ async function handleClick(event: MouseEvent): Promise<void> {
  * Document-level copy handler for Astro CopyButton (`[data-ui-copy]`) and generated
  * `.ui-code-block [data-copy]` HTML. Delegated so it survives ClientRouter swaps; idempotent.
  */
+// Module flag, not a DOM one: ClientRouter resets <html> attributes on navigation.
+let bound = false;
+
 export function bindCopyDelegate(): void {
-  const root = document.documentElement;
-  if (root.dataset.uiCopyBound === "1") return;
-  root.dataset.uiCopyBound = "1";
+  if (bound) return;
+  bound = true;
   document.addEventListener("click", (event) => void handleClick(event));
 }

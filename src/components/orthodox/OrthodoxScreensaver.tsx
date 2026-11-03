@@ -211,7 +211,7 @@ export function OrthodoxScreensaver({
           {images.length === 0 ? (
             <p className="ow-empty">
               No icons yet. Add images to
-              <code>src/assets/orthodox/icons/&lt;collection&gt;/</code>
+              <code>src/assets/gallery/icons/&lt;collection&gt;/</code>
             </p>
           ) : custom && boards.length === 0 && !arranging ? (
             <p className="ow-empty">

@@ -16,6 +16,7 @@ import {
 } from "@/ui/react/groups/display";
 import { IconButton } from "@/ui/react/IconButton";
 import { ThemePair } from "./ThemePair";
+import figureSrc from "@/assets/gallery/cutouts/jackethold.png?url";
 
 const stack = { display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: "var(--ui-space-sm)" } as const;
 const row = { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "var(--ui-space-sm)" } as const;
@@ -24,7 +25,6 @@ const grid = { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(1
 const tones = ["neutral", "accent", "success", "warning", "danger", "info"] as const;
 const variants = ["soft", "outline", "solid"] as const;
 const statuses = ["live", "wip", "archived", "idle", "busy", "success", "error"] as const;
-const figureSrc = "/gpt-photoshoot/gpt-jackethold-transparent.png";
 const swatches = [
   { color: "#8a6d3b", label: "Gold" },
   { color: "#3d6b48", label: "Green" },

@@ -2,12 +2,12 @@ import type { WallBackground } from "../lib/orthodox/types";
 
 /**
  * Display names for icon collections. A collection is any folder under
- * `src/assets/orthodox/icons/`; folders without an entry here get a title
+ * `src/assets/gallery/icons/` (the gallery's Icons album); folders without an entry here get a title
  * derived from the folder name ("great-feasts" → "Great Feasts").
  */
 export const collectionLabels: Record<string, string> = {};
 
-/** Picker order for collections; folders not listed sort alphabetically after these. */
+/** Picker order for collections (also the Icons album's section order); folders not listed sort alphabetically after these. */
 export const collectionOrder: readonly string[] = [
   "January",
   "February",
@@ -24,8 +24,8 @@ export const collectionOrder: readonly string[] = [
 ];
 
 /**
- * Painted-wall presets that need no image. Uploaded photos in
- * `src/assets/orthodox/backgrounds/` are listed ahead of these.
+ * Painted-wall presets that need no image. Photos in the gallery's
+ * `src/assets/gallery/backgrounds/` album are listed ahead of these.
  */
 export const wallPresets: WallBackground[] = [
   {

@@ -3,7 +3,6 @@
 @import "./base.css";
 
 /* Layout stylesheets (styles/layout/*.css) */
-@import "./styles/layout/showcase.css";
 @import "./styles/layout/site-shell.css";
 
 /* Component stylesheets (styles/components/*.css): append one line per component. */

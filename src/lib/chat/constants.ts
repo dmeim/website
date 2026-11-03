@@ -6,8 +6,6 @@ export const CHAT_CONTEXT_MAX_MESSAGES = 40;
 
 export const OPENCODE_GO_BASE = "https://opencode.ai/zen/go/v1";
 export const OPENCODE_GO_MODELS_URL = `${OPENCODE_GO_BASE}/models`;
-export const OPENCODE_GO_CHAT_COMPLETIONS_URL = `${OPENCODE_GO_BASE}/chat/completions`;
-export const OPENCODE_GO_MESSAGES_URL = `${OPENCODE_GO_BASE}/messages`;
 
 /** Max Library upload size (25 MiB). */
 export const LIBRARY_MAX_BYTES = 25 * 1024 * 1024;

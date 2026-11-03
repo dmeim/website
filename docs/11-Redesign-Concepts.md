@@ -1,5 +1,7 @@
 # Redesign Concepts (/home1 – /home6)
 
+> **Removed.** The concept pages, `src/components/concepts/` and `ConceptLayout.astro` were deleted once the combined Profile + Letter design shipped site-wide on `full-site-redesign`. This document stays as a record of what each concept proposed. The code is in git history (commit `12588e8` added them).
+
 Six homepage concepts, in two rounds, for a flatter, more professional direction. They keep the existing palette (cream/white, black/gray, gold) and the motion-forward feel, but each proposes its own type, shape language and component vocabulary. The live site is untouched; these routes exist only for comparison.
 
 Next step: pick a direction (or a blend), then extract its tokens and components into a shared UI library and roll it out site-wide.

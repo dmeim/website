@@ -165,23 +165,7 @@
   align-items: center;
 }
 
-.chat-btn {
-  font: inherit;
-  cursor: pointer;
-  border: var(--ui-border-width) solid var(--ui-line);
-  border-radius: var(--ui-radius-control);
-  background: transparent;
-  color: var(--ui-text);
-  transition:
-    border-color var(--ui-dur-fast) var(--ui-ease-out),
-    background var(--ui-dur-fast) var(--ui-ease-out),
-    color var(--ui-dur-fast) var(--ui-ease-out);
-}
 
-.chat-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
 
 /* Library and Archive panes */
 .chat-pane-body {

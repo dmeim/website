@@ -1,7 +1,8 @@
 /**
  * Scroll-spy: a thin observation band ~30% down the viewport. The active
  * section is the last one whose top has crossed the band; above the first
- * section nothing is active. Links get `aria-current="location"`, which the
+ * section nothing is active. At the bottom of the page the last section is
+ * active, since a short final section can never reach the band. Links get `aria-current="location"`, which the
  * nav marker follows.
  */
 
@@ -23,6 +24,8 @@ export function createSpy(targets: SpyTarget[]): () => void {
     for (const { section, link } of targets) {
       if (section.getBoundingClientRect().top <= line) next = link;
     }
+    const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    if (atBottom && next) next = targets[targets.length - 1].link;
     if (next === active) return;
     active?.removeAttribute("aria-current");
     next?.setAttribute("aria-current", "location");
@@ -31,8 +34,22 @@ export function createSpy(targets: SpyTarget[]): () => void {
 
   const observer = new IntersectionObserver(update, { rootMargin: BAND, threshold: 0 });
   targets.forEach(({ section }) => observer.observe(section));
+  // Reaching the bottom crosses no band, so watch scroll too (one update per frame).
+  let frame = 0;
+  const onScroll = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      update();
+    });
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
   update();
-  return () => observer.disconnect();
+  return () => {
+    observer.disconnect();
+    window.removeEventListener("scroll", onScroll);
+    cancelAnimationFrame(frame);
+  };
 }
 
 let cleanups: Array<() => void> = [];

@@ -1,6 +1,5 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import SiteEffects from "../components/react/SiteEffects";
 import "@/ui/index.css";
 import Fonts from "@/ui/fonts/Fonts.astro";
 import SiteFooter from "@/ui/components/SiteFooter.astro";
@@ -97,7 +96,6 @@ const mode = shellMode(pathname, immersive && shellMode(pathname) !== "app");
     </div>
 
     <Toaster />
-    <SiteEffects client:load />
 
     <script>
       import { initReveals } from "@/ui/lib/reveal";

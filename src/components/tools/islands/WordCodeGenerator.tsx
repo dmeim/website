@@ -103,15 +103,7 @@ export default function WordCodeGenerator() {
     if (!lastCodes.length && !outputMessage) return;
     const heading = outputHeadingRef.current;
     const bounds = heading?.getBoundingClientRect();
-    const viewport = heading
-      ?.closest(".tools-stage__body")
-      ?.getBoundingClientRect();
-    if (
-      bounds &&
-      viewport &&
-      bounds.top >= viewport.top &&
-      bounds.bottom <= viewport.bottom
-    )
+    if (bounds && bounds.top >= 0 && bounds.bottom <= window.innerHeight)
       return;
     heading?.scrollIntoView({
       block: "start",

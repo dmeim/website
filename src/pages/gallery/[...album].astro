@@ -1,0 +1,50 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Breadcrumbs, Button, Container, PageHeader } from "@/ui/components";
+import AlbumViewer from "@/components/gallery/AlbumViewer.astro";
+import { loadAlbums, PROJECTS_FOLDER } from "@/lib/gallery/assets";
+import { loadProjectAlbums } from "@/lib/gallery/project-albums";
+import type { GalleryAlbum } from "@/lib/gallery/types";
+import "@/components/gallery/gallery.css";
+
+export const getStaticPaths = (async () => {
+  const [albums, projectAlbums] = await Promise.all([loadAlbums(), loadProjectAlbums()]);
+  return [...albums, ...projectAlbums].map((album) => ({ params: { album: album.slug }, props: { album } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  album: GalleryAlbum;
+}
+
+const { album } = Astro.props;
+const count = `${album.items.length} ${album.items.length === 1 ? "item" : "items"}`;
+const projectSlug = album.slug.startsWith(`${PROJECTS_FOLDER}/`) ? album.slug.slice(PROJECTS_FOLDER.length + 1) : undefined;
+const crumbs = [
+  { label: "Gallery", href: "/gallery" },
+  ...(projectSlug ? [{ label: "Projects", href: "/gallery#projects" }] : []),
+  { label: album.title },
+];
+---
+
+<BaseLayout
+  title={`${album.title} · Gallery`}
+  description={album.description || `${album.title}: ${count} in Dimitri's gallery.`}
+>
+  <Container width="wide">
+    <Breadcrumbs items={crumbs} class="gallery-crumbs" />
+    <PageHeader title={album.title} lede={album.description || undefined}>
+      <span slot="meta">{count}</span>
+      {
+        projectSlug && (
+          <Fragment slot="actions">
+            <Button href={`/projects/${projectSlug}`} variant="secondary" iconEnd="arrow-right">
+              About this project
+            </Button>
+          </Fragment>
+        )
+      }
+    </PageHeader>
+    <AlbumViewer album={album} thumbs={projectSlug ? "landscape" : "square"} />
+  </Container>
+</BaseLayout>

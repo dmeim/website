@@ -1,23 +1,45 @@
 .ui-site-footer {
-  padding-block: var(--ui-space-lg);
+  /* Keeps the copyright and icons off the hairline's ends; the shell adds it to the gutter. */
+  --ui-footer-inset: var(--ui-space-lg);
+  container-type: inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-xs) var(--ui-space-lg);
+  padding-block: var(--ui-space-md);
   border-top: var(--ui-border-width) solid var(--ui-line);
   color: var(--ui-text-muted);
   font-size: var(--ui-fs-xs);
 }
 
-.ui-site-footer__line {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-space-xs);
+.ui-site-footer__copy {
   margin: 0;
 }
 
-.ui-site-footer a {
-  color: inherit;
-  text-decoration: none;
-  transition: color var(--ui-dur-fast) var(--ui-ease-out);
+/* Same rows as SiteIdentity; glyphs sit flush with the edges. */
+.ui-site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: var(--ui-space-md);
+  margin-inline: calc(-1 * var(--ui-space-2xs));
 }
 
-.ui-site-footer a:hover {
-  color: var(--ui-text);
+.ui-site-footer__links .ui-site-header__links[data-variant="icons"] {
+  margin: 0;
+}
+
+/* Too narrow for one line (copyright + icons need about 30rem): two centered lines. */
+@container (max-width: 30rem) {
+  .ui-site-footer__copy,
+  .ui-site-footer__links {
+    flex-basis: 100%;
+    text-align: center;
+  }
+
+  .ui-site-footer__links {
+    margin-inline: 0;
+  }
 }

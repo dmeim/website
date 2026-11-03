@@ -1,0 +1,53 @@
+---
+import Icon from "@/ui/icons/Icon.astro";
+import type { IconName } from "@/ui/icons";
+import type { GalleryItem } from "@/lib/gallery/types";
+
+interface Props {
+  item: GalleryItem;
+  eager?: boolean;
+  /** Give the thumbnail an accessible name (the item title); off for decorative stacks. */
+  label?: boolean;
+}
+
+const { item, eager = false, label = false } = Astro.props;
+
+// Without a still, video and audio show their kind as a large glyph instead.
+const placeholder: IconName = item.kind === "audio" ? "music-notes" : "film-strip";
+const badge: { icon: IconName; label: string } | undefined =
+  item.kind === "video"
+    ? { icon: "play", label: "Video" }
+    : item.kind === "audio"
+      ? { icon: "waveform", label: "Audio" }
+      : item.animated
+        ? { icon: "gif", label: "GIF" }
+        : undefined;
+const name = label ? (badge ? `${item.title} (${badge.label})` : item.title) : "";
+---
+
+<span class="gallery-thumb" data-kind={item.kind}>
+  {
+    item.still ? (
+      <img
+        class="gallery-thumb__img"
+        src={item.still.thumb}
+        alt={name}
+        width={item.still.width}
+        height={item.still.height}
+        loading={eager ? "eager" : "lazy"}
+        decoding="async"
+      />
+    ) : (
+      <span class="gallery-thumb__placeholder" role={label ? "img" : undefined} aria-label={name || undefined}>
+        <Icon name={placeholder} weight="light" />
+      </span>
+    )
+  }
+  {
+    badge && (
+      <span class="gallery-thumb__badge" aria-hidden="true">
+        <Icon name={badge.icon} weight="fill" />
+      </span>
+    )
+  }
+</span>

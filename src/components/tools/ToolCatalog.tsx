@@ -1,13 +1,7 @@
 import { useState } from "react";
-import {
-  plannedTools,
-  toolCategories,
-  toolRoute,
-  type Tool,
-  type ToolCategory,
-} from "@/content/tools";
-import { Badge, Disclosure, List, ListRow, PageHeader, ReferenceList } from "@/ui/react";
-import { isPlainClick } from "./ToolsSidebar";
+import { allTools, getCategoryForTool, plannedTools, toolCategories, toolRoute, toolsCatalogue, type Tool } from "@/content/tools";
+import { List, ListRow, PageHeader, ReferenceList } from "@/ui/react";
+import { isPlainClick, toolMatches } from "./tool-links";
 
 type Props = {
   onOpenTool: (slug: string) => void;
@@ -15,11 +9,12 @@ type Props = {
 
 function CatalogRow({ tool, onOpenTool }: { tool: Tool; onOpenTool: (slug: string) => void }) {
   const href = toolRoute(tool);
+  const description = `${getCategoryForTool(tool.id)?.name} · ${tool.description}`;
   if (!href) {
     return (
       <ListRow
         title={tool.title}
-        description={tool.description}
+        description={description}
         badge={{ children: "WIP" }}
         aria-label={`${tool.title} is work in progress`}
       />
@@ -28,7 +23,7 @@ function CatalogRow({ tool, onOpenTool }: { tool: Tool; onOpenTool: (slug: strin
   return (
     <ListRow
       title={tool.title}
-      description={tool.description}
+      description={description}
       href={href}
       onClick={(event) => {
         if (!isPlainClick(event)) return;
@@ -39,36 +34,23 @@ function CatalogRow({ tool, onOpenTool }: { tool: Tool; onOpenTool: (slug: strin
   );
 }
 
-function categoryHasWip(category: ToolCategory): boolean {
-  return category.tools.some((tool) => !toolRoute(tool));
-}
-
+/** /tools landing: intro and a flat search over every tool. Groups live in the rail nav (SiteNavTools). */
 export function ToolCatalog({ onOpenTool }: Props) {
   const [query, setQuery] = useState("");
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(() => new Set(["personal"]));
-  const normalizedQuery = query.trim().toLowerCase();
-  const visibleCategories = toolCategories
-    .map((category) => ({
-      ...category,
-      tools: category.tools.filter((tool) =>
-        `${tool.title} ${tool.description} ${(tool.tags ?? []).join(" ")}`.toLowerCase().includes(normalizedQuery),
-      ),
-    }))
-    .filter((category) => category.tools.length > 0);
-  const matchingCount = visibleCategories.reduce((sum, category) => sum + category.tools.length, 0);
-  const total = toolCategories.reduce((sum, category) => sum + category.tools.length, 0);
+  const normalized = query.trim().toLowerCase();
+  const tools = allTools();
+  const matches = normalized ? tools.filter((tool) => toolMatches(tool, normalized)) : [];
   const wipCount = plannedTools().length;
 
   return (
     <section className="tools-catalog" aria-labelledby="tools-catalog-heading">
       <PageHeader
-        eyebrow="Browse"
-        title="All tools"
+        title="Tools"
         titleId="tools-catalog-heading"
-        lede="A collection of practical utilities for everyday work. Find a tool or browse by category."
+        lede={toolsCatalogue.tagline}
         meta={
           <span>
-            {total} total
+            {tools.length} tools in {toolCategories.length} groups
             {wipCount > 0 ? ` · ${wipCount} WIP` : null}
           </span>
         }
@@ -78,48 +60,16 @@ export function ToolCatalog({ onOpenTool }: Props) {
         searchLabel="Find a tool"
         query={query}
         onQueryChange={setQuery}
-        count={normalizedQuery ? matchingCount : undefined}
+        count={normalized ? matches.length : undefined}
         empty={{ icon: "magnifying-glass", title: "No matching tools", size: "sm" }}
       >
-        <div className="tools-catalog__stack">
-          {visibleCategories.map((category) => (
-            <Disclosure
-              key={category.id}
-              id={`category-${category.id}`}
-              className="tools-catalog__category"
-              summary={
-                <>
-                  {category.name}
-                  {categoryHasWip(category) ? (
-                    <>
-                      {" "}
-                      <Badge size="sm" title="Contains WIP tools">WIP</Badge>
-                    </>
-                  ) : null}
-                </>
-              }
-              meta={category.tools.length}
-              open={Boolean(normalizedQuery) || expandedCategories.has(category.id)}
-              onToggle={(open) => {
-                if (normalizedQuery) return;
-                setExpandedCategories((current) => {
-                  if (current.has(category.id) === open) return current;
-                  const next = new Set(current);
-                  if (open) next.add(category.id);
-                  else next.delete(category.id);
-                  return next;
-                });
-              }}
-            >
-              <p className="tools-catalog__category-desc">{category.description}</p>
-              <List label={category.name}>
-                {category.tools.map((tool) => (
-                  <CatalogRow key={tool.id} tool={tool} onOpenTool={onOpenTool} />
-                ))}
-              </List>
-            </Disclosure>
-          ))}
-        </div>
+        {normalized && (
+          <List label="Matching tools">
+            {matches.map((tool) => (
+              <CatalogRow key={tool.id} tool={tool} onOpenTool={onOpenTool} />
+            ))}
+          </List>
+        )}
       </ReferenceList>
     </section>
   );

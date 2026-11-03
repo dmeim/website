@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from "astro/types";
 import { Image } from "astro:assets";
-import portrait from "../../../assets/images/photoshoot/gpt-headshot-test-2.png";
+import portrait from "@/assets/gallery/studio/headshot.png";
 import { cx } from "@/ui/lib/cx";
 import { fullName } from "@/ui/lib/identity";
 import { defaultNavItems, shellMode, type NavItem } from "@/ui/lib/site-nav";
@@ -11,7 +11,7 @@ import SiteNav from "./SiteNav.astro";
 import ThemeControl from "./ThemeControl.astro";
 
 /**
- * Site chrome. Mode comes from `currentPath`: `app` for /tools and /chat
+ * Site chrome. Mode comes from `currentPath`: `app` for /chat
  * (slim top bar), otherwise `rail` (sticky theme + nav column at >=960px, top
  * bar below; the identity lives in SiteIdentity at the top of main). `immersive` renders nothing. `menuId` exists only so the /ui
  * showcase can render several headers; the site keeps `mobile-nav`.

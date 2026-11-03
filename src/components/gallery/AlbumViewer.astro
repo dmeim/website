@@ -1,0 +1,310 @@
+---
+import IconButton from "@/ui/components/IconButton.astro";
+import Icon from "@/ui/icons/Icon.astro";
+import type { GalleryAlbum } from "@/lib/gallery/types";
+import ItemThumb from "./ItemThumb.astro";
+
+interface Props {
+  album: GalleryAlbum;
+  /** Thumbnail shape: square crops for photos, top-anchored landscape for screenshots. */
+  thumbs?: "square" | "landscape";
+}
+
+const { album, thumbs = "square" } = Astro.props;
+const [first] = album.items;
+const total = album.items.length;
+
+// One grid per section (loose files first); a flat album is a single unlabeled grid.
+const groups = [
+  { id: undefined as string | undefined, label: "", items: album.items.filter((item) => !item.section) },
+  ...album.sections.map(({ id, label }) => ({ id, label, items: album.items.filter((item) => item.section === id) })),
+].filter((group) => group.items.length > 0);
+const indexOf = new Map(album.items.map((item, index) => [item.id, index]));
+
+const items = album.items.map(({ id, kind, title, description, alt, still, media, original }) => ({
+  id,
+  kind,
+  title,
+  description,
+  alt,
+  still: still && { src: still.src, width: still.width, height: still.height },
+  media,
+  original,
+}));
+// Inline JSON: keep "</script" in a description from closing the tag.
+const itemsJson = JSON.stringify(items).replace(/</g, "\\u003c");
+
+const image = first.kind === "image" ? first.still : undefined;
+const cover = first.kind === "audio" ? first.still : undefined;
+---
+
+<section
+  class="gallery-viewer"
+  aria-label={`${album.title} gallery`}
+  data-gallery-viewer
+  data-kind={first.kind}
+  data-has-still={first.still ? "" : undefined}
+>
+  <figure class="gallery-preview">
+    <div class="gallery-preview__frame">
+      <img
+        class="gallery-preview__img"
+        src={image?.src}
+        alt={first.kind === "image" ? first.alt : ""}
+        width={image?.width}
+        height={image?.height}
+        fetchpriority="high"
+        decoding="async"
+        data-gallery-img
+      />
+      <video
+        class="gallery-preview__video"
+        controls
+        playsinline
+        preload="metadata"
+        src={first.kind === "video" ? first.media?.src : undefined}
+        poster={first.kind === "video" ? first.still?.src : undefined}
+        aria-label={first.kind === "video" ? first.title : undefined}
+        data-gallery-video
+      ></video>
+      <div class="gallery-preview__audio" data-gallery-audio-slot>
+        <div class="gallery-preview__cover">
+          <img
+            class="gallery-preview__cover-img"
+            src={cover?.src}
+            alt={cover ? first.alt : ""}
+            decoding="async"
+            data-gallery-cover
+          />
+          <Icon name="music-notes" class="gallery-preview__cover-icon" />
+        </div>
+        <audio
+          class="gallery-preview__audio-el"
+          controls
+          preload="metadata"
+          src={first.kind === "audio" ? first.media?.src : undefined}
+          aria-label={first.kind === "audio" ? first.title : undefined}
+          data-gallery-audio
+        ></audio>
+      </div>
+    </div>
+    <figcaption class="gallery-preview__caption">
+      <div class="gallery-preview__text" aria-live="polite">
+        <h2 class="gallery-preview__title" data-gallery-title>{first.title}</h2>
+        <p class="gallery-preview__description" data-gallery-description hidden={!first.description}>
+          {first.description}
+        </p>
+      </div>
+      <div class="gallery-preview__controls">
+        <span class="gallery-preview__count" data-gallery-count>1 / {total}</span>
+        {
+          total > 1 && (
+            <>
+              <IconButton icon="caret-left" label="Previous" data-gallery-step="-1" />
+              <IconButton icon="caret-right" label="Next" data-gallery-step="1" />
+            </>
+          )
+        }
+        {
+          album.download && (
+            <IconButton
+              icon="download-simple"
+              label="Download original"
+              href={first.original}
+              download
+              data-gallery-download
+            />
+          )
+        }
+      </div>
+    </figcaption>
+  </figure>
+
+  {
+    groups.map((group) => (
+      <div class="gallery-group">
+        {group.id && <h2 class="gallery-group__title" id={`section-${group.id}`}>{group.label}</h2>}
+        <ul
+          class="gallery-thumbs"
+          role="list"
+          aria-label={group.id ? group.label : "Everything in this album"}
+          data-shape={thumbs}
+        >
+          {group.items.map((item) => {
+            const index = indexOf.get(item.id) ?? 0;
+            return (
+              <li>
+                <a
+                  class="gallery-thumbs__item"
+                  href={`#${item.id}`}
+                  aria-current={index === 0 ? "true" : undefined}
+                  data-gallery-thumb={item.id}
+                >
+                  <ItemThumb item={item} eager={index < 12} label />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ))
+  }
+
+  <script type="application/json" data-gallery-items set:html={itemsJson} />
+</section>
+
+<script>
+  import type { GalleryKind } from "@/lib/gallery/types";
+
+  type Still = { src: string; width: number; height: number };
+  type Item = {
+    id: string;
+    kind: GalleryKind;
+    title: string;
+    description: string;
+    alt: string;
+    still?: Still;
+    media?: { src: string; mime: string };
+    original: string;
+  };
+
+  let teardown: AbortController | undefined;
+
+  function required<T extends Element>(root: Element, selector: string): T {
+    const el = root.querySelector<T>(selector);
+    if (!el) throw new Error(`[gallery] viewer is missing ${selector}`);
+    return el;
+  }
+
+  /** Decode off-screen first so a swap never shows a half-loaded frame. */
+  async function decoded(still: Still, id: string) {
+    const loader = new Image();
+    loader.src = still.src;
+    try {
+      await loader.decode();
+    } catch (error) {
+      console.warn("[gallery] preview decode failed", { id, error });
+    }
+  }
+
+  function setStill(img: HTMLImageElement, still: Still | undefined, alt: string) {
+    if (!still) {
+      img.removeAttribute("src");
+      img.alt = "";
+      return;
+    }
+    img.src = still.src;
+    img.alt = alt;
+    img.width = still.width;
+    img.height = still.height;
+  }
+
+  function setMedia(el: HTMLMediaElement, item: Item | undefined) {
+    if (!item?.media) {
+      if (!el.hasAttribute("src")) return;
+      el.removeAttribute("src");
+      el.removeAttribute("aria-label");
+      el.load();
+      return;
+    }
+    el.src = item.media.src;
+    el.setAttribute("aria-label", item.title);
+  }
+
+  function initViewer() {
+    teardown?.abort();
+    const root = document.querySelector<HTMLElement>("[data-gallery-viewer]");
+    if (!root) return;
+    const data = root.querySelector("[data-gallery-items]")?.textContent;
+    if (!data) throw new Error("[gallery] viewer is missing its item data");
+
+    const items = JSON.parse(data) as Item[];
+    const img = required<HTMLImageElement>(root, "[data-gallery-img]");
+    const video = required<HTMLVideoElement>(root, "[data-gallery-video]");
+    const audio = required<HTMLAudioElement>(root, "[data-gallery-audio]");
+    const cover = required<HTMLImageElement>(root, "[data-gallery-cover]");
+    const title = required<HTMLElement>(root, "[data-gallery-title]");
+    const description = required<HTMLElement>(root, "[data-gallery-description]");
+    const count = required<HTMLElement>(root, "[data-gallery-count]");
+    const download = root.querySelector<HTMLAnchorElement>("[data-gallery-download]");
+    const thumbs = [...root.querySelectorAll<HTMLAnchorElement>("[data-gallery-thumb]")];
+
+    teardown = new AbortController();
+    const { signal } = teardown;
+    let current = 0;
+    let request = 0;
+
+    async function show(index: number) {
+      const next = (index + items.length) % items.length;
+      if (next === current) return;
+      current = next;
+      const item = items[next];
+      const ticket = ++request;
+
+      video.pause();
+      audio.pause();
+      thumbs.forEach((thumb, i) => {
+        if (i === next) thumb.setAttribute("aria-current", "true");
+        else thumb.removeAttribute("aria-current");
+      });
+      title.textContent = item.title;
+      description.textContent = item.description;
+      description.hidden = !item.description;
+      count.textContent = `${next + 1} / ${items.length}`;
+      if (download) download.href = item.original;
+      history.replaceState(history.state, "", `#${item.id}`);
+
+      if (item.kind === "image" && item.still) {
+        root.dataset.loading = "true";
+        await decoded(item.still, item.id);
+        if (ticket !== request) return;
+      }
+
+      root.dataset.kind = item.kind;
+      if (item.still) root.dataset.hasStill = "";
+      else delete root.dataset.hasStill;
+      setStill(img, item.kind === "image" ? item.still : undefined, item.alt);
+      setStill(cover, item.kind === "audio" ? item.still : undefined, item.alt);
+      video.poster = item.kind === "video" ? (item.still?.src ?? "") : "";
+      setMedia(video, item.kind === "video" ? item : undefined);
+      setMedia(audio, item.kind === "audio" ? item : undefined);
+      delete root.dataset.loading;
+    }
+
+    thumbs.forEach((thumb, index) => {
+      thumb.addEventListener(
+        "click",
+        (event) => {
+          event.preventDefault();
+          void show(index);
+        },
+        { signal },
+      );
+    });
+
+    root.querySelectorAll<HTMLElement>("[data-gallery-step]").forEach((button) => {
+      const step = Number(button.dataset.galleryStep);
+      button.addEventListener("click", () => void show(current + step), { signal });
+    });
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+        if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+        const target = event.target as HTMLElement | null;
+        // Arrows seek inside players and move inside form controls.
+        if (target?.closest("input, textarea, select, video, audio, [contenteditable], [role='slider'], dialog[open]")) return;
+        event.preventDefault();
+        void show(current + (event.key === "ArrowRight" ? 1 : -1));
+      },
+      { signal },
+    );
+
+    const linked = items.findIndex((item) => `#${item.id}` === decodeURIComponent(location.hash));
+    if (linked > 0) void show(linked);
+  }
+
+  initViewer();
+  document.addEventListener("astro:page-load", initViewer);
+</script>

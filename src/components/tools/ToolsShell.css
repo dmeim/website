@@ -1,44 +1,14 @@
-/* Tools app: layout unique to the tools shell. Frame, drawer and scroll come from AppShell. */
-
-.tools-shell .ui-app-shell__sidebar,
-.tools-shell .ui-app-shell__drawer .tools-sidebar {
-  padding: var(--ui-space-lg) var(--ui-space-md) var(--ui-space-2xl);
-}
-
-.tools-sidebar .ui-side-nav__header {
-  gap: var(--ui-space-sm);
-}
-
-.tools-sidebar__home .ui-list-row__body {
-  font-size: var(--ui-fs-sm);
-}
-
-.tools-shell__bar {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-space-xs);
-  padding: var(--ui-space-2xs) var(--ui-gutter);
-}
-
-.tools-shell__bar-title {
-  color: var(--ui-text-muted);
-  font-size: var(--ui-fs-xs);
-  font-weight: var(--ui-fw-medium);
-  letter-spacing: var(--ui-tracking-wide);
-  text-transform: uppercase;
-}
-
-@media (min-width: 900px) {
-  .tools-shell .ui-app-shell__header {
-    display: none;
-  }
-}
+/* Tools: the stage in the rail shell's main column. Tool groups live in the rail nav (SiteNavTools). */
 
 .tools-main {
-  width: 100%;
-  max-width: calc(var(--ui-content-wide) + 2 * var(--ui-gutter));
-  margin-inline: auto;
-  padding: var(--ui-space-2xl) var(--ui-gutter) var(--ui-space-4xl);
+  min-width: 0;
+  padding-inline: var(--ui-gutter);
+}
+
+@media (min-width: 960px) {
+  .tools-main {
+    padding-inline: 0;
+  }
 }
 
 .tools-stage__crumbs {
@@ -53,31 +23,6 @@
   padding-top: 0;
 }
 
-.tools-catalog__stack {
-  display: grid;
-  margin-top: var(--ui-space-lg);
-  border-bottom: 1px solid var(--ui-line);
-}
-
-.tools-catalog__category {
-  border-top: 1px solid var(--ui-line);
-}
-
-.tools-catalog__category > .ui-disclosure__summary {
-  padding-block: var(--ui-space-md);
-  font-weight: var(--ui-fw-semibold);
-}
-
-.tools-catalog__category-desc {
-  margin: 0 0 var(--ui-space-sm);
-  color: var(--ui-text-muted);
-  font-size: var(--ui-fs-sm);
-}
-
-.tools-catalog__category .ui-list {
-  margin-bottom: var(--ui-space-lg);
-}
-
 .tools-mount__loading {
   display: grid;
   gap: var(--ui-space-md);
@@ -89,15 +34,11 @@
 .tools-shell-fallback {
   display: grid;
   gap: var(--ui-space-md);
-  width: 100%;
-  max-width: calc(var(--ui-content-wide) + 2 * var(--ui-gutter));
-  margin-inline: auto;
-  padding: var(--ui-space-2xl) var(--ui-gutter);
+  padding-inline: var(--ui-gutter);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 960px) {
   .tools-shell-fallback {
-    padding-inline-start: calc(var(--ui-sidebar-width) + var(--ui-gutter));
-    max-width: none;
+    padding-inline: 0;
   }
 }

@@ -59,12 +59,6 @@ export interface LibraryAssetRow {
   created_at: string;
 }
 
-export interface MessageAttachmentRow {
-  id: string;
-  message_id: string;
-  library_asset_id: string;
-}
-
 export interface ChatSummary {
   id: string;
   title: string;
@@ -129,8 +123,4 @@ export interface GoModelInfo {
   chatProvider: "opencode-go";
   /** Thinking levels this model accepts in the UI. */
   thinkingLevels: ThinkingLevel[];
-}
-
-export interface ChatShellView {
-  mode: "chat" | "library";
 }

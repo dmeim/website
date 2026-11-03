@@ -90,14 +90,3 @@ export function buildWifiQrPayload(input: WifiQrCodeInput): WifiQrPayloadResult 
     isValid: true,
   };
 }
-
-export function getWifiExportBaseName(ssid: string): string {
-  const slug = ssid
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40);
-
-  return slug ? `wifi-qr-${slug}` : "wifi-qr-code";
-}

@@ -1,0 +1,25 @@
+---
+/** Education: one entry in the same shape as Experience. */
+import Section from "@/ui/components/Section.astro";
+import { education } from "@/content/resume";
+---
+
+<Section id="education" title="Education" spy class="home-section" data-reveal-group>
+  <ol class="home-entries">
+    <li class="home-entry" data-reveal>
+      <p class="home-entry__when">{education.dates}</p>
+      <div class="home-entry__body">
+        <h3 class="home-entry__title">{education.degree}</h3>
+        <p class="home-entry__where">
+          {education.school} · {education.place} · {education.note}
+        </p>
+        <dl class="home-entry__facts">
+          <dt>Scholarships &amp; grants</dt>
+          <dd>{education.honors.join(", ")}</dd>
+          <dt>Coursework</dt>
+          <dd>{education.coursework.join(", ")}</dd>
+        </dl>
+      </div>
+    </li>
+  </ol>
+</Section>

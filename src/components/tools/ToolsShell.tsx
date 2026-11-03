@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { getCategoryForTool, getToolById } from "@/content/tools";
-import { AppShell, Breadcrumbs, IconButton, PageHeader } from "@/ui/react";
+import { Breadcrumbs, PageHeader } from "@/ui/react";
+import type { ToolsRouteDetail, ToolsSelectDetail } from "@/ui/lib/tools-nav";
 import { ToolCatalog } from "./ToolCatalog";
 import { ToolMount } from "./ToolMount";
-import { isPlainClick, ToolsSidebar } from "./ToolsSidebar";
+import { isPlainClick } from "./tool-links";
 import "./ToolsShell.css";
 
 type Props = {
@@ -50,14 +51,14 @@ function pageTitle(slug: string | null): string {
  */
 export default function ToolsShell({ initialSlug = null }: Props) {
   const [activeSlug, setActiveSlug] = useState<string | null>(initialSlug);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigatedRef = useRef(false);
 
   const applySlug = useCallback((slug: string | null) => {
     navigatedRef.current = true;
     setActiveSlug(slug);
-    setSidebarOpen(false);
     document.title = pageTitle(slug);
+    // The rail's tool groups (src/ui/lib/tools-nav.ts) follow along.
+    window.dispatchEvent(new CustomEvent<ToolsRouteDetail>("tools:route", { detail: { slug } }));
   }, []);
 
   const syncUrl = useCallback((slug: string | null, mode: "push" | "replace") => {
@@ -89,6 +90,12 @@ export default function ToolsShell({ initialSlug = null }: Props) {
   }, [activeSlug]);
 
   useEffect(() => {
+    const onSelect = (event: Event) => selectSlug((event as CustomEvent<ToolsSelectDetail>).detail.slug);
+    window.addEventListener("tools:select", onSelect);
+    return () => window.removeEventListener("tools:select", onSelect);
+  }, [selectSlug]);
+
+  useEffect(() => {
     const onPopState = () => {
       if (!isToolsPath(window.location.pathname)) return;
       applySlug(slugFromPath(window.location.pathname));
@@ -117,21 +124,6 @@ export default function ToolsShell({ initialSlug = null }: Props) {
     return () => document.removeEventListener("astro:before-preparation", onPrep);
   }, [applySlug]);
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && sidebarOpen) {
-        setSidebarOpen(false);
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [sidebarOpen]);
-
-  // Tool islands (e.g. WordCodeGenerator) look up the stage's scroll viewport by this class.
-  useEffect(() => {
-    document.querySelector(".tools-shell .ui-app-shell__content")?.classList.add("tools-stage__body");
-  }, []);
-
   const activeTool = activeSlug ? getToolById(activeSlug) : null;
   const activeCategory = activeSlug ? getCategoryForTool(activeSlug) : undefined;
 
@@ -143,25 +135,7 @@ export default function ToolsShell({ initialSlug = null }: Props) {
   };
 
   return (
-    <AppShell
-      className="tools-shell"
-      sidebarLabel="Tool categories"
-      sidebarOpen={sidebarOpen}
-      onSidebarOpenChange={setSidebarOpen}
-      header={
-        <div className="tools-shell__bar">
-          <IconButton icon="list" label="Open tools menu" tooltip={false} onClick={() => setSidebarOpen(true)} />
-          <span className="tools-shell__bar-title">Tools</span>
-        </div>
-      }
-      sidebar={
-        <ToolsSidebar
-          activeSlug={activeSlug}
-          onSelectCatalog={() => selectSlug(null)}
-          onSelectTool={(slug) => selectSlug(slug)}
-        />
-      }
-    >
+    <div className="tools-shell">
       <section className="tools-main" aria-label="Tool workspace">
         {activeSlug && activeTool ? (
           <div className="tools-stage" key={activeSlug}>
@@ -185,6 +159,6 @@ export default function ToolsShell({ initialSlug = null }: Props) {
           <ToolCatalog onOpenTool={(slug) => selectSlug(slug)} />
         )}
       </section>
-    </AppShell>
+    </div>
   );
 }

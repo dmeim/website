@@ -7,7 +7,6 @@
   display: grid;
   gap: var(--ui-space-md);
   max-width: 36rem;
-  margin-bottom: var(--ui-space-lg);
 }
 
 .home-intro__lead {
@@ -19,69 +18,105 @@
   letter-spacing: var(--ui-tracking-tight);
 }
 
-.home-intro__more,
-.home-muted {
+.home-intro__more {
   margin: 0;
   max-width: 34rem;
   color: var(--ui-text-muted);
 }
 
-.home-lede {
-  max-width: 34rem;
-  margin: 0 0 var(--ui-space-lg);
+.home-explore {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ui-space-xs);
+  margin-top: var(--ui-space-lg);
 }
 
-.home-section .home-muted:has(+ .ui-list) {
-  margin-bottom: var(--ui-space-lg);
+.home-explore__glyph {
+  margin-inline-start: 0.3em;
+  font-size: var(--ui-fs-md);
+  line-height: 1;
 }
 
-.home-sub {
-  margin: 0 0 var(--ui-space-xs);
-  font-size: var(--ui-fs-sm);
+/* Experience and Education: dates in the list rows' label column, hairlines between entries. */
+.home-entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-entry {
+  display: grid;
+  grid-template-columns: var(--ui-label-col) minmax(0, 1fr);
+  column-gap: var(--ui-space-md);
+  padding-block: var(--ui-space-md);
+  border-top: var(--ui-border-width) solid var(--ui-line);
+}
+
+.home-entry:last-child {
+  border-bottom: var(--ui-border-width) solid var(--ui-line);
+}
+
+.home-entry__when {
+  margin: 0;
+  padding-top: 0.15em;
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-entry__title {
+  margin: 0;
+  color: var(--ui-text);
+  font-size: var(--ui-fs-md);
   font-weight: var(--ui-fw-medium);
 }
 
-.ui-list + .home-sub,
-.home-after + .home-sub {
-  margin-top: var(--ui-space-xl);
-}
-
-.home-after {
-  margin: var(--ui-space-md) 0 0;
+.home-entry__where {
+  margin: var(--ui-space-3xs) 0 0;
+  color: var(--ui-text-muted);
   font-size: var(--ui-fs-sm);
 }
 
-.home-quote {
-  max-width: 34rem;
-  margin-top: var(--ui-space-xl);
-}
-
-.home-quote .ui-quote__text {
-  font-style: italic;
+.home-entry__points {
+  display: grid;
+  gap: var(--ui-space-2xs);
+  margin: var(--ui-space-sm) 0 0;
+  padding-left: 1.1em;
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-sm);
   line-height: var(--ui-lh-normal);
 }
 
-.home-quote .ui-quote__text p {
-  margin: 0;
+.home-entry__points li::marker {
+  color: var(--ui-text-subtle);
 }
 
-/* Fingerprint copy controls stay visible, as in the approved concept. */
-#keys .ui-list-row__actions {
-  opacity: 1;
+.home-entry__facts {
+  display: grid;
+  gap: var(--ui-space-3xs);
+  margin: var(--ui-space-sm) 0 0;
+  font-size: var(--ui-fs-sm);
 }
 
-@media (min-width: 560px) {
-  .home-tools.ui-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: var(--ui-space-xl);
-  }
+.home-entry__facts dt {
+  color: var(--ui-text);
+  font-weight: var(--ui-fw-medium);
+}
 
-  .home-tools > .ui-list-row:nth-child(2) {
-    border-top: var(--ui-border-width) solid var(--ui-line);
-  }
+.home-entry__facts dd {
+  margin: 0 0 var(--ui-space-xs);
+  color: var(--ui-text-muted);
+  line-height: var(--ui-lh-normal);
+}
 
-  .home-tools > .ui-list-row:nth-last-child(2):nth-child(odd) {
-    border-bottom: var(--ui-border-width) solid var(--ui-line);
+.home-entry__facts dd:last-child {
+  margin-bottom: 0;
+}
+
+/* Phones: dates move above the role, like labelled list rows. */
+@media (max-width: 479px) {
+  .home-entry {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--ui-space-3xs);
   }
 }

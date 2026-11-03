@@ -2,9 +2,9 @@
 
 Personal website for dmeim.com — portfolios, public keys, verification tools, and more.
 
-**Stack:** Astro 7 · TypeScript · React islands · Framer Motion · plain CSS · Lucide · Cloudflare Workers Assets · Wrangler (`dmeim`) · Node ≥ 22
+**Stack:** Astro 7 · TypeScript · React islands · Framer Motion · plain CSS · Phosphor icons · Cloudflare Workers Assets · Wrangler (`dmeim`) · Node ≥ 22
 
-**Design:** Midnight Concert Hall (Syne / Instrument Serif / Manrope, champagne + steel accents) — adapted from the `pre-retro-pop` branch of [georgios-zerdalis](https://github.com/dmeim/georgios-zerdalis) (local clone under `reference/`, gitignored).
+**Design:** Profile: flat and quiet, Inter, a gold accent and hairlines, with a sticky identity rail. The UI library lives in `src/ui` (see `docs/13-Redesign-Profile.md`).
 
 ## Quick start
 
@@ -28,14 +28,14 @@ npm run deploy   # requires Wrangler auth
 | `/projects` | Project portfolio |
 | `/tools` | Tools (catalogue + tool pages) |
 | `/keys` | SSH / GPG keys |
-| `/connect` | Connect form + info |
+| `/gallery` | Albums of every image the site uses (photos, icons, project screenshots) |
 | `/game-of-life` | Conway's Game of Life (landing) |
 | `/game-of-life/simulation` | Full-page Game of Life simulator |
 | `/chat` | Private AI chat (Access-gated; OpenCode Go; Library + Archive panes) |
 
 ### Orthodox screensaver images
 
-Drop icons into `src/assets/orthodox/icons/<collection>/` and wall photos into `src/assets/orthodox/backgrounds/`. They are picked up at build time, with no per-file registration. Collections are currently month folders (`January/` … `December/`). Full-size originals are fine: the build resizes them to WebP with sharp (`imageService: "compile"` in `astro.config.ts`). The **Custom** layout lets you arrange cards by hand and lock each one to a specific icon (by file name) or a group (folder). Folder and file naming rules, and how the custom wall works, are in `src/assets/orthodox/README.md`.
+Drop icons into the gallery's Icons album, `src/assets/gallery/icons/<collection>/`, and wall photos into `src/assets/gallery/backgrounds/`. They are picked up at build time, with no per-file registration. Collections are currently month folders (`January/` … `December/`). Full-size originals are fine: the build resizes them to WebP with sharp (`imageService: "compile"` in `astro.config.ts`). The **Custom** layout lets you arrange cards by hand and lock each one to a specific icon (by file name) or a group (folder). Folder and file naming rules, and how the custom wall works, are in `src/assets/gallery/icons/README.md`.
 
 ### Private chat (local)
 

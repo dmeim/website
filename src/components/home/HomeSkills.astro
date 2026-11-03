@@ -1,0 +1,13 @@
+---
+/** Skills: one list, each row labelled with its category. */
+import Section from "@/ui/components/Section.astro";
+import List from "@/ui/components/List.astro";
+import ListRow from "@/ui/components/ListRow.astro";
+import { skills } from "@/content/resume";
+---
+
+<Section id="skills" title="Skills" spy class="home-section" data-reveal-group>
+  <List>
+    {skills.map((group) => <ListRow label={group.label} title={group.items.join(", ")} data-reveal />)}
+  </List>
+</Section>

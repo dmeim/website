@@ -12,12 +12,12 @@ import {
 } from "@/ui/components/groups/display";
 import Button from "@/ui/components/Button.astro";
 import IconButton from "@/ui/components/IconButton.astro";
+import figureSrc from "@/assets/gallery/cutouts/jackethold.png?url";
 import { DisplayShowcase } from "@/ui/react/showcase/DisplayShowcase";
 
 const tones = ["neutral", "accent", "success", "warning", "danger", "info"] as const;
 const variants = ["soft", "outline", "solid"] as const;
 const statuses = ["live", "wip", "archived", "idle", "busy", "success", "error"] as const;
-const figureSrc = "/gpt-photoshoot/gpt-jackethold-transparent.png";
 ---
 
 <section id="display" class="ui-showcase-section" aria-labelledby="display-title">

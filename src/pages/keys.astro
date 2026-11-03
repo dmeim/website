@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { CodeBlock, Container, KeyValue, Link, Notice, PageHeader, Section, Stack } from "@/ui/components";
-import { keys, connect } from "../content/site";
+import { keys, contact } from "../content/site";
 ---
 
 <BaseLayout
@@ -21,7 +21,7 @@ import { keys, connect } from "../content/site";
           <code>assets/keys/</code>.
         </p>
         <p>
-          Contact: <Link href={`mailto:${connect.email}`}>{connect.email}</Link>
+          Contact: <Link href={`mailto:${contact.email}`}>{contact.email}</Link>
         </p>
       </Notice>
     </Section>

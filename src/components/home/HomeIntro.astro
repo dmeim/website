@@ -1,23 +1,36 @@
 ---
-/** Now: the page's one statement (h1), a follow-up line, and the current chapter. */
+/** About: the page's one statement (h1), a follow-up line, and links into the site. */
 import Section from "@/ui/components/Section.astro";
-import List from "@/ui/components/List.astro";
-import ListRow from "@/ui/components/ListRow.astro";
-import { currentChapter, shortBio } from "@/content/site";
+import Button from "@/ui/components/Button.astro";
+import type { IconName } from "@/ui/icons";
+import { summary } from "@/content/resume";
+import { defaultNavItems } from "@/ui/lib/site-nav";
 
-const sentences = shortBio.split(/(?<=\.)\s+/);
-const lead = sentences.slice(0, 2).join(" ");
-const follow = sentences[2] ?? "";
-// Only the first sentence of the chapter body is current; the rest is stale.
-const nowLine = currentChapter.body.split(/(?<=\.)\s+/)[0];
+// Same pages and order as the site nav (minus Home); Orthodox keeps its cross glyph instead of an icon.
+const icons: Record<string, IconName> = {
+  "/projects": "code",
+  "/gallery": "images",
+  "/tools": "toolbox",
+  "/keys": "key",
+};
+const destinations = defaultNavItems
+  .filter(({ href }) => href !== "/")
+  .map(({ href, label, glyph }) => ({ href, label, glyph, icon: icons[href] }));
 ---
 
-<Section id="now" title="Now" spy class="home-section" data-reveal-group>
+<Section id="about" title="About" spy class="home-section" data-reveal-group>
   <div class="home-intro">
-    <h1 class="home-intro__lead" data-reveal>{lead}</h1>
-    {follow && <p class="home-intro__more" data-reveal>{follow}</p>}
+    <h1 class="home-intro__lead" data-reveal>{summary.lead}</h1>
+    <p class="home-intro__more" data-reveal>{summary.more}</p>
   </div>
-  <List>
-    <ListRow label="Current" title={currentChapter.title} description={nowLine} data-reveal />
-  </List>
+  <nav class="home-explore" aria-label="Explore the site" data-reveal>
+    {
+      destinations.map(({ href, label, icon, glyph }) => (
+        <Button href={href} variant="secondary" iconStart={icon} size="sm">
+          {label}
+          {glyph && <span class="home-explore__glyph" aria-hidden="true">{glyph}</span>}
+        </Button>
+      ))
+    }
+  </nav>
 </Section>

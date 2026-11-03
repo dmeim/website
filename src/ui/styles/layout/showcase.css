@@ -92,10 +92,6 @@
   text-transform: uppercase;
 }
 
-.ui-showcase-empty {
-  color: var(--ui-text-subtle);
-  font-size: var(--ui-fs-sm);
-}
 
 /* Token sheet */
 .ui-sheet-swatches {

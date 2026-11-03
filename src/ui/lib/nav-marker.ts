@@ -2,7 +2,7 @@
  * The gliding gold current marker. A container marked `[data-ui-nav-marker]`
  * holds one `.ui-nav-marker` and any number of `[data-ui-marker-target]`
  * links. The target is the one with `aria-current="location"` (scroll-spy),
- * else `aria-current="page"`. Vertical markers sit on the nearest
+ * else the last visible one with any `aria-current`. Vertical markers sit on the nearest
  * `[data-ui-marker-rail]` hairline; horizontal ones underline the target.
  */
 
@@ -14,7 +14,8 @@ function findTarget(container: HTMLElement): HTMLElement | null {
   for (const el of targets) {
     const current = el.getAttribute("aria-current");
     if (current === "location") return el;
-    if (current && !page) page = el;
+    // The deepest visible current wins, so a nested current tool beats its parent page link.
+    if (current && el.getClientRects().length > 0) page = el;
   }
   return page;
 }
@@ -57,7 +58,7 @@ export function bindNavMarker(container: HTMLElement): () => void {
   resize.observe(container);
   container.querySelectorAll("[data-ui-marker-rail]").forEach((el) => resize.observe(el));
   const mutations = new MutationObserver(place);
-  mutations.observe(container, { subtree: true, childList: true, attributes: true, attributeFilter: ["aria-current", "open"] });
+  mutations.observe(container, { subtree: true, childList: true, attributes: true, attributeFilter: ["aria-current", "open", "hidden"] });
   document.fonts?.ready.then(place).catch(() => {});
   place();
   const cleanup = () => {

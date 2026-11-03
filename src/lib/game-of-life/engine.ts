@@ -25,14 +25,6 @@ export function createEmptyGrid(cols: number, rows: number): Grid {
   return { cols: c, rows: r, cells: new Uint8Array(c * r) };
 }
 
-export function cloneGrid(grid: Grid): Grid {
-  return {
-    cols: grid.cols,
-    rows: grid.rows,
-    cells: new Uint8Array(grid.cells),
-  };
-}
-
 /** Copy overlapping cells from the old grid into a new empty grid (top-left aligned). */
 export function resizeGrid(grid: Grid, cols: number, rows: number): Grid {
   const next = createEmptyGrid(cols, rows);

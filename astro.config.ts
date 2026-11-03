@@ -1,5 +1,7 @@
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import type { AstroIntegration } from "astro";
 import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
@@ -10,7 +12,7 @@ const nodeTlsStub = path.resolve(rootDir, "src/shims/node-tls.ts");
 
 /**
  * Cloudflare workerd SSR uses a separate Vite environment. Mid-request dep
- * discovery (lucide, @lucide/astro, framer-motion, transitions) triggers a
+ * discovery (framer-motion, transitions) triggers a
  * program reload that desyncs React's hook dispatcher → Invalid hook call
  * inside MotionConfig. Pre-bundle island deps in ONE pass at startup.
  *
@@ -25,8 +27,6 @@ const CLOUDFLARE_SSR_OPTIMIZE_DEPS = [
   "react/jsx-runtime",
   "react/jsx-dev-runtime",
   "framer-motion",
-  "lucide",
-  "@lucide/astro",
   "@phosphor-icons/react/dist/ssr",
   // Keep in sync with the deep imports in src/ui/icons/token-icons.tsx.
   ...["BTC", "DOGE", "ETH", "SOL", "TRX", "USDC", "USDT", "XRP"].map(
@@ -60,6 +60,46 @@ function optimizeCloudflareSsrDeps(): Plugin {
   };
 }
 
+/** Workers Static Assets limits: https://developers.cloudflare.com/workers/platform/limits/#static-assets */
+const ASSET_MAX_BYTES = 25 * 1024 * 1024;
+const ASSET_FILES_FREE_PLAN = 20_000;
+
+function listFiles(dir: string): string[] {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+    return entry.isDirectory() ? listFiles(full) : [full];
+  });
+}
+
+/**
+ * Fail the build on any file Cloudflare would reject at deploy (over 25 MiB),
+ * so an oversized gallery video is caught here with its name, not as an
+ * upload error. Also warns when the file count nears the free-plan cap.
+ */
+function cloudflareAssetLimits(): AstroIntegration {
+  return {
+    name: "cloudflare-asset-limits",
+    hooks: {
+      "astro:build:done": ({ dir, logger }) => {
+        const root = fileURLToPath(dir);
+        const files = listFiles(root);
+        const tooBig = files
+          .map((file) => ({ file: path.relative(root, file), size: fs.statSync(file).size }))
+          .filter(({ size }) => size > ASSET_MAX_BYTES);
+        if (tooBig.length > 0) {
+          const list = tooBig.map(({ file, size }) => `  ${file} (${(size / 1024 / 1024).toFixed(1)} MiB)`).join("\n");
+          throw new Error(
+            `Cloudflare serves static files up to 25 MiB; these are larger:\n${list}\n` +
+              "Shrink them (re-encode video, use JPEG/WebP for photos) or host them in R2.",
+          );
+        }
+        const level = files.length > ASSET_FILES_FREE_PLAN * 0.9 ? "warn" : "info";
+        logger[level](`${files.length} static files (Workers Free allows ${ASSET_FILES_FREE_PLAN}, Paid 100,000).`);
+      },
+    },
+  };
+}
+
 // Preserve Cloudflare Workers adapter (current dmeim stack).
 // React islands + Framer Motion borrowed from Midnight Concert Hall reference.
 export default defineConfig({
@@ -67,7 +107,7 @@ export default defineConfig({
   // default runtime Cloudflare Images binding, which is metered per transform.
   adapter: cloudflare({ imageService: "compile" }),
   site: "https://dmeim.com",
-  integrations: [react()],
+  integrations: [react(), cloudflareAssetLimits()],
   vite: {
     plugins: [optimizeCloudflareSsrDeps()],
     server: {

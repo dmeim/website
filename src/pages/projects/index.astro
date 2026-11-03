@@ -1,0 +1,44 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Container, PageHeader, Section, StatusDot } from "@/ui/components";
+import FanStack from "@/components/gallery/FanStack.astro";
+import { statusLabel } from "@/lib/projects/catalog";
+import { loadProjects } from "@/lib/projects/projects";
+import "@/components/gallery/gallery.css";
+
+const projects = await loadProjects();
+---
+
+<BaseLayout
+  title="Projects"
+  description="Selected projects and experiments from Dimitri / dmeim."
+>
+  <Container width="wide">
+    <PageHeader
+      title="Projects"
+      lede="Selected builds, case studies, and experiments. Open one for the details and screenshots."
+    />
+    <Section>
+      <ul class="gallery-albums" role="list">
+        {
+          projects.map((project, index) => (
+            <li>
+              <FanStack
+                href={`/projects/${project.slug}`}
+                title={project.data.title}
+                description={project.data.summary}
+                cover={project.album?.cover}
+                items={project.album?.items}
+                placeholderIcon="code"
+                shape="landscape"
+                eager={index < 3}
+              >
+                <StatusDot slot="meta" status={project.data.status} label={statusLabel[project.data.status]} />
+              </FanStack>
+            </li>
+          ))
+        }
+      </ul>
+    </Section>
+  </Container>
+</BaseLayout>

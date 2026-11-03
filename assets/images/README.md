@@ -1,8 +1,7 @@
 # Images Folder
 
-Store general imagery here (photos, illustrations). Prefer optimized formats (WebP/AVIF) and include dimensions.
+Images the site shows live in the gallery, `src/assets/gallery/`, not here. See `src/content/gallery.ts`.
 
 ## `photoshoot/`
 
-Full portrait shoot: `gpt-*` are generated portraits (`-transparent` variants have the background removed); `reference-*` are the source photos they were generated from. These are originals only and are not deployed — copy a file into `public/` to use it on the site (the homepage hero uses `public/gpt-photoshoot/gpt-jackethold-transparent.png`).
-
+The `reference-*` source photos the generated portraits were made from. They are kept for reference only and are never deployed. The generated portraits themselves are in the gallery's Studio (`gpt-*.png`) and Cutouts (`gpt-*-transparent.png`) albums.

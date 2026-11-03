@@ -23,7 +23,7 @@ Read `docs/11-Redesign-Concepts.md` first for the visual direction. The quiet ru
    - `src/content/**` (text and data);
    - `src/pages/api/**` and anything server-side;
    - `src/lib/**` service logic, except where a package explicitly lists a file;
-   - `/home1`–`/home6`, `src/components/concepts/**` and `src/layouts/ConceptLayout.astro`. They stay as reference until the redesign is chosen.
+   - `/home1`–`/home6`, `src/components/concepts/**` and `src/layouts/ConceptLayout.astro`. They stay as reference until the redesign is chosen. (Since deleted on `full-site-redesign`.)
 5. **Theme mechanism is fixed.**
    - The `localStorage` key `theme` holds `"light" | "system" | "dark"`, defaulting to `"system"`.
    - The inline pre-paint script in `<head>` sets `data-theme-pref` (the preference) and `data-theme` (the resolved `light`/`dark`) on `<html>`.
@@ -646,7 +646,7 @@ Each package is sized so that one sub-agent can finish it while reading under ab
 ### Tools
 
 **S1 · Tools shell and kit adapters.**
-- Files: `ToolsShell.tsx` + `.css` (812), `ToolsSidebar.tsx`, `ToolCatalog.tsx`, `ToolMount.tsx`, `pages/tools/*`, `src/components/tools/ui/*` (about 450), `islands/toolIsland.css` (373).
+- Files: `ToolsShell.tsx` + `.css` (812), `ToolsSidebar.tsx` (since replaced by the rail's `SiteNavTools.astro`), `ToolCatalog.tsx`, `ToolMount.tsx`, `pages/tools/*`, `src/components/tools/ui/*` (about 450), `islands/toolIsland.css` (373).
 - **Key move:** re-implement the `tools/ui` kit exports as thin adapters over `@/ui/react`, so all 86 tools pick up the new design immediately. The kit's props stay the same:
   - `ToolButton` → Button
   - `ToolStatus` → Notice inline
@@ -828,7 +828,7 @@ The chat packages run sequentially. They share `ChatShell.css` (1924 lines) and 
 
 1. **`/colors`:** keep the hand-maintained palette (currently out of sync with `global.css`), or generate it from the design's `--ui-*` tokens? Recommendation: generate from tokens, since the page then documents the live design.
 2. **Ambient field and grain:** the quiet rulebook argues for removing or heavily dimming LifeField and the noise overlay. The mount stays either way; each team decides the opacity, and `0` is allowed.
-3. **Home motion:** HomeExperience uses parallax, magnetic buttons and photo tilt, which the quiet rulebook bans. Disabling them via props or CSS is in scope; deleting the motion components is not (that is a later cleanup).
+3. **Home motion:** HomeExperience uses parallax, magnetic buttons and photo tilt, which the quiet rulebook bans. Disabling them via props or CSS is in scope; deleting the motion components is not (that is a later cleanup). (Done on `full-site-redesign`: HomeExperience, PhotoLightbox and the unused motion components are deleted.)
 4. **Icon weight per design:** the convention fixes `regular` as the default. If Letter wants `light` to sit with Newsreader, that requires all three to agree (a per-design default weight would break API parity) and a one-line change to the `Icon` default.
 5. **Tabs, Toast and Breadcrumbs** are in the contract but unused today. They ship in the library and `/ui`; adopting them on pages is optional and must not change behaviour.
 6. **Lucide removal (Z1)** depends on whether the concept pages are deleted first.

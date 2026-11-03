@@ -37,6 +37,13 @@ export function trapTab(root: HTMLElement, event: KeyboardEvent): boolean {
 let locks = 0;
 let saved = "";
 
+// Document-level listeners install once per page lifetime. These live in the
+// module, not on <html>: ClientRouter replaces <html> attributes on every
+// navigation, so a DOM flag would vanish and a second listener would make one
+// click open and immediately close a drawer.
+let dialogOpenersBound = false;
+let drawerTogglesBound = false;
+
 export function lockScroll(): () => void {
   const root = document.documentElement;
   if (locks === 0) {
@@ -86,9 +93,8 @@ export function bindDialogs(): void {
       opener?.focus();
     });
   }
-  const root = document.documentElement;
-  if (root.dataset.uiDialogOpenBound === "1") return;
-  root.dataset.uiDialogOpenBound = "1";
+  if (dialogOpenersBound) return;
+  dialogOpenersBound = true;
   document.addEventListener("click", (event) => {
     const opener = (event.target as HTMLElement).closest<HTMLElement>("[data-ui-dialog-open]");
     if (!opener) return;
@@ -165,9 +171,8 @@ export function bindDrawers(): void {
       if (panel && isModal(drawer)) trapTab(panel, event);
     });
   }
-  const root = document.documentElement;
-  if (root.dataset.uiDrawerBound === "1") return;
-  root.dataset.uiDrawerBound = "1";
+  if (drawerTogglesBound) return;
+  drawerTogglesBound = true;
   document.addEventListener("click", (event) => {
     const toggle = (event.target as HTMLElement).closest<HTMLElement>("[data-ui-drawer-toggle]");
     if (!toggle) return;
