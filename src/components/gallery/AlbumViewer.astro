@@ -27,7 +27,7 @@ const items = album.items.map(({ id, kind, title, description, alt, still, media
   title,
   description,
   alt,
-  still: still && { src: still.src, width: still.width, height: still.height },
+  still: still && { src: still.src, thumb: still.thumb, width: still.width, height: still.height },
   media,
   original,
 }));
@@ -44,9 +44,17 @@ const cover = first.kind === "audio" ? first.still : undefined;
   data-gallery-viewer
   data-kind={first.kind}
   data-has-still={first.still ? "" : undefined}
+  data-preview={image ? "placeholder" : undefined}
 >
   <figure class="gallery-preview">
     <div class="gallery-preview__frame">
+      <img
+        class="gallery-preview__placeholder"
+        src={image?.thumb}
+        alt=""
+        aria-hidden="true"
+        data-gallery-placeholder
+      />
       <img
         class="gallery-preview__img"
         src={image?.src}
@@ -157,7 +165,7 @@ const cover = first.kind === "audio" ? first.still : undefined;
 <script>
   import type { GalleryKind } from "@/lib/gallery/types";
 
-  type Still = { src: string; width: number; height: number };
+  type Still = { src: string; thumb: string; width: number; height: number };
   type Item = {
     id: string;
     kind: GalleryKind;
@@ -177,12 +185,10 @@ const cover = first.kind === "audio" ? first.still : undefined;
     return el;
   }
 
-  /** Decode off-screen first so a swap never shows a half-loaded frame. */
-  async function decoded(still: Still, id: string) {
-    const loader = new Image();
-    loader.src = still.src;
+  /** Resolves once the full-size image can paint; a failed decode still reveals it. */
+  async function decoded(img: HTMLImageElement, id: string) {
     try {
-      await loader.decode();
+      await img.decode();
     } catch (error) {
       console.warn("[gallery] preview decode failed", { id, error });
     }
@@ -224,6 +230,7 @@ const cover = first.kind === "audio" ? first.still : undefined;
     const video = required<HTMLVideoElement>(root, "[data-gallery-video]");
     const audio = required<HTMLAudioElement>(root, "[data-gallery-audio]");
     const cover = required<HTMLImageElement>(root, "[data-gallery-cover]");
+    const placeholder = required<HTMLImageElement>(root, "[data-gallery-placeholder]");
     const title = required<HTMLElement>(root, "[data-gallery-title]");
     const description = required<HTMLElement>(root, "[data-gallery-description]");
     const count = required<HTMLElement>(root, "[data-gallery-count]");
@@ -255,10 +262,12 @@ const cover = first.kind === "audio" ? first.still : undefined;
       if (download) download.href = item.original;
       history.replaceState(history.state, "", `#${item.id}`);
 
+      // Images show their already-loaded thumbnail at once; the original fades in over it.
       if (item.kind === "image" && item.still) {
-        root.dataset.loading = "true";
-        await decoded(item.still, item.id);
-        if (ticket !== request) return;
+        root.dataset.preview = "placeholder";
+        placeholder.src = item.still.thumb;
+      } else {
+        delete root.dataset.preview;
       }
 
       root.dataset.kind = item.kind;
@@ -269,7 +278,11 @@ const cover = first.kind === "audio" ? first.still : undefined;
       video.poster = item.kind === "video" ? (item.still?.src ?? "") : "";
       setMedia(video, item.kind === "video" ? item : undefined);
       setMedia(audio, item.kind === "audio" ? item : undefined);
-      delete root.dataset.loading;
+
+      if (item.kind === "image") {
+        await decoded(img, item.id);
+        if (ticket === request) delete root.dataset.preview;
+      }
     }
 
     thumbs.forEach((thumb, index) => {
@@ -303,7 +316,13 @@ const cover = first.kind === "audio" ? first.still : undefined;
     );
 
     const linked = items.findIndex((item) => `#${item.id}` === decodeURIComponent(location.hash));
-    if (linked > 0) void show(linked);
+    if (linked > 0) {
+      void show(linked);
+    } else if (root.dataset.preview) {
+      void decoded(img, items[0].id).then(() => {
+        if (request === 0) delete root.dataset.preview;
+      });
+    }
   }
 
   initViewer();
