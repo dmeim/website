@@ -1,10 +1,7 @@
 ---
-/** Profile type: Inter only. Code uses the system mono stack (no webfont). */
+/** Profile type: Inter only, self-hosted. Code uses the system mono stack (no webfont). */
+import "./inter.css";
+import interLatin from "./inter/inter-normal-latin.woff2?url";
 ---
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..600;1,14..32,400&display=swap"
-/>
+<link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
