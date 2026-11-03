@@ -113,6 +113,7 @@ const cover = first.kind === "audio" ? first.still : undefined;
               href={first.original}
               download
               data-gallery-download
+              data-astro-prefetch="false"
             />
           )
         }

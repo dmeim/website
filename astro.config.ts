@@ -107,6 +107,10 @@ export default defineConfig({
   // /about builds about.html, so pages are served at their link path with no
   // trailing-slash redirect, and canonical URLs match the nav links.
   build: { format: "file" },
+  // Start loading a page as soon as its link is hovered, focused, or touched,
+  // so most navigations find it already downloaded. Links opt out with
+  // data-astro-prefetch="false" (the gallery's full-size download does).
+  prefetch: { prefetchAll: true, defaultStrategy: "hover" },
   integrations: [
     react(),
     sitemap({ filter: (page) => !/\/(ui|colors)$/.test(page) }),
