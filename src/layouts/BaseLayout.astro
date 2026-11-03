@@ -12,6 +12,7 @@ import Toaster from "@/ui/components/Toaster.astro";
 import { fullName } from "@/ui/lib/identity";
 import { shellMode } from "@/ui/lib/site-nav";
 import { THEME_COLORS } from "@/ui/lib/theme";
+import { analytics } from "@/content/site";
 
 interface Props {
   title?: string;
@@ -63,6 +64,16 @@ const pageTransition = { forwards: pageStep, backwards: pageStep };
     {!isNotFound && <link rel="canonical" href={canonical} />}
     <link rel="sitemap" href="/sitemap-index.xml" />
     <slot name="head" />
+    {
+      import.meta.env.PROD && analytics.cloudflareToken && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: analytics.cloudflareToken, spa: true })}
+        />
+      )
+    }
     <title>{pageTitle}</title>
     <!-- FOUC-safe theme: apply before paint -->
     <script is:inline>

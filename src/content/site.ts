@@ -33,6 +33,15 @@ export const meta: SiteMeta = {
     "Dimitrios Meimaridis (dmeim) is an IT manager, administrator, and computer teacher with over eight years of experience running school technology. Projects, tools, and public keys.",
 };
 
+/**
+ * Cloudflare Web Analytics (cookieless). The token is public: it ships in every
+ * page. Get it from Cloudflare dashboard > Analytics & Logs > Web Analytics >
+ * dmeim.com > Manage site. Empty turns the beacon off.
+ */
+export const analytics = {
+  cloudflareToken: "",
+};
+
 export const hero: HeroContent = {
   role: "definitely, semi, kinda, sorta, maybe, know what im doing",
 };
