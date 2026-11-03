@@ -43,8 +43,8 @@ const isNotFound = canonicalPath === "/404";
 
 // Rail and identity hold still; only the page content fades and rises (ui-page-* in base.css).
 const pageStep = {
-  old: { name: "ui-page-out", duration: "120ms", easing: "ease-in", fillMode: "both" },
-  new: { name: "ui-page-in", duration: "240ms", delay: "60ms", easing: "cubic-bezier(0.2, 0.7, 0.2, 1)", fillMode: "both" },
+  old: { name: "ui-page-out", duration: "80ms", easing: "ease-in", fillMode: "both" },
+  new: { name: "ui-page-in", duration: "180ms", easing: "cubic-bezier(0.2, 0.7, 0.2, 1)", fillMode: "both" },
 };
 const pageTransition = { forwards: pageStep, backwards: pageStep };
 ---
