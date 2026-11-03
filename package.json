@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.1.4",
+    "@astrojs/sitemap": "^3.7.4",
     "@phosphor-icons/react": "^2.1.10",
     "@regexper/render": "^1.0.0",
     "@scure/bip39": "^2.2.0",

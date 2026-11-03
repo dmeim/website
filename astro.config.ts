@@ -5,6 +5,7 @@ import type { AstroIntegration } from "astro";
 import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
+import sitemap from "@astrojs/sitemap";
 import type { Plugin } from "vite";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
@@ -103,7 +104,14 @@ export default defineConfig({
   // default runtime Cloudflare Images binding, which is metered per transform.
   adapter: cloudflare({ imageService: "compile" }),
   site: "https://dmeim.com",
-  integrations: [react(), cloudflareAssetLimits()],
+  // /about builds about.html, so pages are served at their link path with no
+  // trailing-slash redirect, and canonical URLs match the nav links.
+  build: { format: "file" },
+  integrations: [
+    react(),
+    sitemap({ filter: (page) => !/\/(ui|colors)$/.test(page) }),
+    cloudflareAssetLimits(),
+  ],
   vite: {
     plugins: [optimizeCloudflareSsrDeps()],
     server: {

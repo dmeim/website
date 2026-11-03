@@ -31,6 +31,9 @@ const pageTitle = title === "dmeim.com" ? title : `${title} · dmeim.com`;
 
 const pathname = Astro.url.pathname;
 const mode = shellMode(immersive);
+const canonicalPath = pathname.replace(/(\.html|\/)$/, "").replace(/\/index$/, "") || "/";
+const canonical = new URL(canonicalPath, Astro.site).href;
+const isNotFound = canonicalPath === "/404";
 ---
 
 <!doctype html>
@@ -44,6 +47,8 @@ const mode = shellMode(immersive);
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <Fonts />
     {noindex ? <meta name="robots" content="noindex" /> : null}
+    {!isNotFound && <link rel="canonical" href={canonical} />}
+    <link rel="sitemap" href="/sitemap-index.xml" />
     <title>{pageTitle}</title>
     <!-- FOUC-safe theme: apply before paint -->
     <script is:inline>
