@@ -25,7 +25,7 @@ Custom domain `dmeim.com` is pinned in `wrangler.jsonc` (`routes` + `custom_doma
 
 ## Headers, redirects, and caching
 
-- `public/_headers` sets the security headers on every response (HSTS, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, a `Permissions-Policy` that allows only camera, microphone, fullscreen, and wake lock for this origin, and a CSP limited to `frame-ancestors`, `base-uri`, `object-src`, and `upgrade-insecure-requests`). Hashed `/_astro/*` files are cached for a year; PNGs and the manifest for a day.
+- `public/_headers` sets the security headers on every response (HSTS, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, a `Permissions-Policy` that allows only camera, microphone, fullscreen, and wake lock for this origin, and a CSP limited to `frame-ancestors`, `base-uri`, `object-src`, and `upgrade-insecure-requests`). Pages and other files are cached for 60 seconds (`stale-while-revalidate` 10 minutes), which lets a page prefetched on hover be reused on click; hashed `/_astro/*` files are cached for a year; PNGs and the manifest for a day. Asset rules use `! Cache-Control` to replace the page default rather than add to it.
 - `public/_redirects` holds permanent redirects for retired pages (`/connect` goes home).
 - Pages build as `about.html` (`build.format: "file"`), so `/about` is served directly with no trailing-slash redirect. Canonical URLs and the sitemap use the slash-free form.
 

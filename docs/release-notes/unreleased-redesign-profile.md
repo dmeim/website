@@ -36,6 +36,7 @@ The whole site moves onto a new UI library (`src/ui`) in the Profile design. The
 - Pages are served at slash-free URLs (`/tools`, not `/tools/`), saving a redirect on every navigation.
 - Inter is served from the site instead of Google Fonts.
 - `/connect` now redirects home.
+- Faster page changes: pages prefetch on hover, React pages ship about 70 KB less JavaScript (only the icons and icon weights they use, and Framer Motion's lighter build), page transitions are quicker, and gallery previews show the thumbnail at once while the full-size original loads.
 
 ## Fixed
 - ASCII text drawer: fonts failed to load because of a double slash in the font path.
