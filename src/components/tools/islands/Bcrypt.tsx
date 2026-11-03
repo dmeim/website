@@ -106,7 +106,7 @@ export default function Bcrypt() {
           ? "Invalid hash"
           : compareState === "pending"
             ? "Checking…"
-            : "—";
+            : "–";
 
   const compareTone =
     compareState === "yes" ? "success" : compareState === "no" || compareState === "invalid" ? "danger" : "default";

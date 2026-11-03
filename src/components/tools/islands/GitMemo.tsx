@@ -30,7 +30,7 @@ export default function GitMemo() {
           query={search}
           onQueryChange={setSearch}
           count={matchCount}
-          empty={{ icon: "magnifying-glass", title: "No Git commands match this search.", size: "sm" }}
+          empty={{ icon: "magnifying-glass", title: "No Git commands match this search", size: "sm" }}
         >
           {sections.map((section) => {
             const sectionSlug = slugifyGitMemoTitle(section.title);

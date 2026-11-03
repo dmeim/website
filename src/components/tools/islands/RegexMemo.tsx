@@ -50,7 +50,7 @@ export default function RegexMemo() {
           query={search}
           onQueryChange={setSearch}
           count={matchCount}
-          empty={{ icon: "magnifying-glass", title: "No regex patterns match this search.", size: "sm" }}
+          empty={{ icon: "magnifying-glass", title: "No regex patterns match this search", size: "sm" }}
         >
           {sections.map((section, sectionIndex) => {
             const sectionSlug = slugifyRegexMemoTitle(

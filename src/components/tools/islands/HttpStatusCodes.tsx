@@ -32,7 +32,7 @@ export default function HttpStatusCodes() {
           query={search}
           onQueryChange={setSearch}
           count={matchCount}
-          empty={{ icon: "magnifying-glass", title: "No status codes match this search.", size: "sm" }}
+          empty={{ icon: "magnifying-glass", title: "No status codes match this search", size: "sm" }}
         >
           <div className="hsc-categories">
             {categories.map((group) => {

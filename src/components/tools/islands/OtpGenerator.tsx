@@ -44,7 +44,7 @@ export default function OtpGenerator() {
 
   const tokens = useMemo(() => {
     if (!secretValid) {
-      return { previous: "———", current: "———", next: "———" };
+      return { previous: "–––", current: "–––", next: "–––" };
     }
     return generateTokenWindow({ key: secret, now });
   }, [secret, secretValid, now]);
@@ -96,7 +96,7 @@ export default function OtpGenerator() {
     setSecret(generateSecret());
   }, []);
 
-  const copyable = (value: string) => (value && value !== "———" ? value : false);
+  const copyable = (value: string) => (value && value !== "–––" ? value : false);
 
   return (
     <ToolFrame layout="split" stagger>

@@ -132,7 +132,7 @@ function Specimens({ theme }: { theme: string }) {
       />
       <SegmentedControl
         name={`r-colour-${theme}`}
-        label="Border colour"
+        label="Border color"
         defaultValue="gold"
         options={[
           { value: "gold", label: "Gold", swatch: "#b8862f" },

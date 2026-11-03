@@ -107,7 +107,7 @@ export default function BaseConverter() {
           aria-live="polite"
           items={fixedValues.map((row) => ({
             label: row.label,
-            value: row.value || "—",
+            value: row.value || "–",
             mono: true,
             copy: row.value ? row.value : false,
             tone: row.value ? "default" : "muted",

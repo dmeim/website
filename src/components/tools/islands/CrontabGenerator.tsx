@@ -114,8 +114,8 @@ export default function CrontabGenerator() {
                   <code>{row.symbol}</code>
                 </td>
                 <td>{row.meaning}</td>
-                <td>{row.example ? <code>{row.example}</code> : "—"}</td>
-                <td>{row.equivalent ? <code>{row.equivalent}</code> : "—"}</td>
+                <td>{row.example ? <code>{row.example}</code> : "–"}</td>
+                <td>{row.equivalent ? <code>{row.equivalent}</code> : "–"}</td>
               </tr>
             ))}
           </tbody>

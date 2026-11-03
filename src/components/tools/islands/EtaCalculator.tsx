@@ -136,13 +136,13 @@ export default function EtaCalculator() {
         <StatGrid columns={2}>
           <Stat
             label="Total duration"
-            value={durationLabel || "—"}
+            value={durationLabel || "–"}
             live
             data-testid="eta-duration"
           />
           <Stat
             label="It will end"
-            value={endLabel || "—"}
+            value={endLabel || "–"}
             live
             data-testid="eta-end"
           />

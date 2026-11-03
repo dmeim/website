@@ -55,7 +55,7 @@ export default function UrlParser() {
           aria-live="polite"
           items={properties.map((property) => ({
             label: property.title,
-            value: property.value || "—",
+            value: property.value || "–",
             mono: true,
             tone: property.value ? "default" : "muted",
             copy: property.value ? property.value : false,
@@ -69,7 +69,7 @@ export default function UrlParser() {
               aria-label="Query parameters"
               items={parsed.searchParams.map((param) => ({
                 label: param.key,
-                value: param.value || "—",
+                value: param.value || "–",
                 mono: true,
                 tone: param.value ? "default" : "muted",
                 copy: param.value ? param.value : false,

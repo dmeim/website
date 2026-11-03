@@ -103,7 +103,7 @@ export const albumMeta: Record<string, GalleryAlbumMeta> = {
     items: {
       framed: {
         title: "Framed",
-        description: "The chest-up frame on its own. Works at any size on any colour.",
+        description: "The chest-up frame on its own. Works at any size on any color.",
         alt: "Chest-up cutout portrait in a black suit and tie on a transparent background",
       },
       crossarmed: {

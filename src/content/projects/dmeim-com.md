@@ -3,7 +3,7 @@ title: dmeim.com
 summary: Personal platform for projects, keys, and everyday tools, built static-first on Cloudflare.
 status: wip
 order: 1
-year: 2025–present
+year: 2025–Present
 role: Design and development
 tags: [Astro, TypeScript, Cloudflare Workers, Plain CSS]
 links:
@@ -13,8 +13,8 @@ cover: home
 media:
   home:
     title: Home
-    description: The identity block and the Now section. Flat, quiet, and laid out like a CV.
-    alt: dmeim.com homepage with a portrait, name, contact icons, and a Now section
+    description: The identity block and the resume. Flat, quiet, and laid out like a CV.
+    alt: dmeim.com homepage with a portrait, name, contact icons, and the About section
   gallery:
     title: Gallery
     description: Albums as fanned stacks; each opens its own page with a preview box.

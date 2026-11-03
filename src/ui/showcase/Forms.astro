@@ -121,7 +121,7 @@ const pct = (n: number) => `${n}%`;
             <h4 class="ui-showcase-sub">SegmentedControl</h4>
             <SegmentedControl name={`a-density-${theme}`} label="Density" options={density} defaultValue="default" />
             <SegmentedControl name={`a-theme-${theme}`} label="Theme" labelHidden options={theme3} defaultValue="system" size="sm" />
-            <SegmentedControl name={`a-colour-${theme}`} label="Border colour" options={swatches} defaultValue="gold" />
+            <SegmentedControl name={`a-colour-${theme}`} label="Border color" options={swatches} defaultValue="gold" />
             <SegmentedControl name={`a-uneven-${theme}`} label="Measured (equal=false)" equal={false} options={uneven} defaultValue="medium" />
             <SegmentedControl name={`a-fill-${theme}`} label="Fill indicator" indicator="fill" options={density} defaultValue="compact" size="lg" />
             <SegmentedControl name={`a-none-${theme}`} label="No selection, one disabled" options={[...density.slice(0, 2), { value: "x", label: "Off", disabled: true }]} />

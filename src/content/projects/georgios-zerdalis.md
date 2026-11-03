@@ -39,7 +39,7 @@ walking into a hall before a concert.
 
 The "Midnight Concert Hall" system: a near-black ground, champagne and steel
 accents, and three typefaces (Syne, Instrument Serif, and Manrope) used like a
-programme booklet. The home page is a single scroll, with React islands and
+program booklet. The home page is a single scroll, with React islands and
 Framer Motion choreographing each section as it enters.
 
 ## The build

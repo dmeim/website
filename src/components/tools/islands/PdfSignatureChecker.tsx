@@ -36,7 +36,7 @@ function KeyValueList({
       items={
         rows.length > 0
           ? rows.map((row) => ({ label: row.label, value: row.value }))
-          : [{ label, value: "—", tone: "muted" }]
+          : [{ label, value: "–", tone: "muted" }]
       }
     />
   );

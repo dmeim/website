@@ -26,13 +26,13 @@ const themes = ["light", "dark"] as const;
 
 <BaseLayout
   title="Colors"
-  description="The dmeim.com colour tokens: every --ui-* colour with its light and dark value."
+  description="The dmeim.com color tokens: every --ui-* color with its light and dark value."
   noindex
 >
   <Container>
     <PageHeader
       title="Colors"
-      lede="Every colour token in the live design, shown in the light and dark theme. Values are read from the stylesheet, so this page always matches the site."
+      lede="Every color token in the live design, shown in the light and dark themes. Values are read from the stylesheet, so this page always matches the site."
     />
     {
       sections.map((section) => (
@@ -47,7 +47,7 @@ const themes = ["light", "dark"] as const;
                       <Swatch
                         color={`var(${token})`}
                         label={theme === "light" ? "Light" : "Dark"}
-                        value="—"
+                        value="–"
                         data-color-token={token}
                       />
                     </div>
@@ -68,7 +68,7 @@ const themes = ["light", "dark"] as const;
       const token = swatch.dataset.colorToken;
       const out = swatch.querySelector(".ui-swatch__value");
       if (!token || !out) return;
-      out.textContent = getComputedStyle(swatch).getPropertyValue(token).trim() || "—";
+      out.textContent = getComputedStyle(swatch).getPropertyValue(token).trim() || "–";
     });
   }
   resolveSwatches();

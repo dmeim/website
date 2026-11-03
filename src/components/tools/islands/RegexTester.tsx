@@ -202,7 +202,7 @@ export default function RegexTester() {
       </Panel>
 
       <Panel title="Sample matching text" titleId="rt-sample-heading">
-        <CodeBlock code={sample || "—"} copy={Boolean(sample)} wrap aria-live="polite" />
+        <CodeBlock code={sample || "–"} copy={Boolean(sample)} wrap aria-live="polite" />
       </Panel>
 
       <Panel title="Regex diagram" titleId="rt-diagram-heading">

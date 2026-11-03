@@ -695,7 +695,7 @@ export default function CameraRecorder() {
             ))}
           </div>
         ) : (
-          <EmptyState icon="images" size="sm" title="No captures yet." />
+          <EmptyState icon="images" size="sm" title="No captures yet" />
         )}
       </Panel>
     </ToolFrame>

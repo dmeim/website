@@ -71,7 +71,7 @@ export default function RomanNumeralConverter() {
           items={[
             {
               label: "Roman",
-              value: outputRoman || "—",
+              value: outputRoman || "–",
               mono: true,
               copy: romanCopyable ? outputRoman : false,
             },
@@ -107,7 +107,7 @@ export default function RomanNumeralConverter() {
           items={[
             {
               label: "Arabic",
-              value: outputNumeralText || "—",
+              value: outputNumeralText || "–",
               mono: true,
               copy: outputNumeralText ? outputNumeralText : false,
             },

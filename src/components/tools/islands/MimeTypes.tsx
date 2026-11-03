@@ -107,7 +107,7 @@ export default function MimeTypes() {
           query={tableFilter}
           onQueryChange={setTableFilter}
           count={filteredInfos.length}
-          empty={{ icon: "magnifying-glass", title: "No MIME types match this filter.", size: "sm" }}
+          empty={{ icon: "magnifying-glass", title: "No MIME types match this filter", size: "sm" }}
         >
           <Table caption="MIME types and their extensions" captionHidden density="compact" stickyHeader>
             <thead>
