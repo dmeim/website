@@ -1,0 +1,20 @@
+# dmeim.com
+
+> Personal site of Dimitrios Meimaridis (dmeim), an IT manager, administrator, and computer teacher with over eight years of experience running technology in PreK-8 schools, as well as corporate and higher-education environments.
+
+The site is static. Every page is plain HTML, and nothing behind it needs a login.
+
+## Pages
+
+- [Home](https://dmeim.com/): About, experience, skills, and education.
+- [Projects](https://dmeim.com/projects): Write-ups and screenshots of things Dimitri has built.
+- [Gallery](https://dmeim.com/gallery): Albums of the photos, icons, and screenshots the site uses.
+- [Tools](https://dmeim.com/tools): Small in-browser utilities for encoding, conversion, networking, and more. Nothing typed into them leaves the browser.
+- [Keys](https://dmeim.com/keys): Public SSH and GPG keys.
+- [Orthodox](https://dmeim.com/orthodox): Orthodox Christian icons and a full-screen icon-wall screensaver.
+- [Game of Life](https://dmeim.com/game-of-life): Conway's Game of Life, with a full-page simulator.
+
+## Optional
+
+- [Sitemap](https://dmeim.com/sitemap-index.xml)
+- [Source code](https://github.com/dmeim)

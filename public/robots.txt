@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /ui
+
+Sitemap: https://dmeim.com/sitemap-index.xml
