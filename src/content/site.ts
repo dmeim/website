@@ -39,7 +39,7 @@ export const meta: SiteMeta = {
  * dmeim.com > Manage site. Empty turns the beacon off.
  */
 export const analytics = {
-  cloudflareToken: "",
+  cloudflareToken: "5f9f4b3b6b6a4c9a95cb078118f01b3b",
 };
 
 export const hero: HeroContent = {
