@@ -21,6 +21,8 @@ interface Props {
   immersive?: boolean;
   /** Adds robots noindex (e.g. the /ui showcase). */
   noindex?: boolean;
+  /** Link-preview image (absolute path or URL); none until the share images exist. */
+  image?: { src: string; alt: string };
 }
 
 const {
@@ -28,6 +30,7 @@ const {
   description = "Personal site of Dimitrios Meimaridis: projects, tools, and public keys.",
   immersive = false,
   noindex = false,
+  image,
 } = Astro.props;
 
 const pageTitle = title === "dmeim.com" || title.startsWith(fullName) ? title : `${title} · dmeim.com`;
@@ -62,6 +65,15 @@ const pageTransition = { forwards: pageStep, backwards: pageStep };
     <Fonts />
     {noindex ? <meta name="robots" content="noindex" /> : null}
     {!isNotFound && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="dmeim.com" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    {!isNotFound && <meta property="og:url" content={canonical} />}
+    {image && <meta property="og:image" content={new URL(image.src, Astro.site).href} />}
+    {image && <meta property="og:image:alt" content={image.alt} />}
+    <meta name="twitter:card" content={image ? "summary_large_image" : "summary"} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <slot name="head" />
     {
