@@ -11,6 +11,7 @@ import SkipLink from "@/ui/components/SkipLink.astro";
 import Toaster from "@/ui/components/Toaster.astro";
 import { fullName } from "@/ui/lib/identity";
 import { shellMode } from "@/ui/lib/site-nav";
+import { THEME_COLORS } from "@/ui/lib/theme";
 
 interface Props {
   title?: string;
@@ -46,6 +47,10 @@ const isNotFound = canonicalPath === "/404";
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content={THEME_COLORS.light} media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content={THEME_COLORS.dark} media="(prefers-color-scheme: dark)" />
+    <meta name="apple-mobile-web-app-title" content="dmeim" />
     <Fonts />
     {noindex ? <meta name="robots" content="noindex" /> : null}
     {!isNotFound && <link rel="canonical" href={canonical} />}
@@ -72,6 +77,10 @@ const isNotFound = canonicalPath === "/404";
                 : "light";
           document.documentElement.setAttribute("data-theme-pref", pref);
           document.documentElement.setAttribute("data-theme", theme);
+          var color = theme === "dark" ? "#111110" : "#f6f4ef";
+          document.querySelectorAll("meta[name='theme-color']").forEach(function (meta) {
+            meta.setAttribute("content", color);
+          });
         } catch (_) {
           document.documentElement.setAttribute("data-theme-pref", "system");
           document.documentElement.setAttribute("data-theme", "dark");

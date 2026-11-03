@@ -17,6 +17,16 @@ export const themePreferences: readonly ThemePreference[] = ["light", "system", 
 
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 
+/** `--ui-bg` per theme; the browser bar takes this colour. Keep in sync with tokens.css. */
+export const THEME_COLORS: Record<ResolvedTheme, string> = { light: "#f6f4ef", dark: "#111110" };
+
+/** Both media-scoped theme-color metas take the resolved theme's colour, so an explicit choice beats the system one. */
+export function syncThemeColor(theme: ResolvedTheme): void {
+  document.querySelectorAll("meta[name='theme-color']").forEach((meta) => {
+    meta.setAttribute("content", THEME_COLORS[theme]);
+  });
+}
+
 export function isThemePreference(value: unknown): value is ThemePreference {
   return value === "light" || value === "system" || value === "dark";
 }
@@ -41,6 +51,7 @@ function applyTheme(preference: ThemePreference): void {
   const theme = resolveTheme(preference);
   root.setAttribute("data-theme-pref", preference);
   root.setAttribute("data-theme", theme);
+  syncThemeColor(theme);
   syncControls(preference);
   document.dispatchEvent(
     new CustomEvent<ThemeEventDetail>(THEME_EVENT, { detail: { preference, theme } }),
@@ -70,6 +81,8 @@ function watchSystemTheme(): void {
   window.matchMedia(DARK_QUERY).addEventListener("change", () => {
     if (getThemePreference() === "system") applyTheme("system");
   });
+  // Client navigation brings in the new page's default metas.
+  document.addEventListener("astro:after-swap", () => syncThemeColor(resolveTheme(getThemePreference())));
 }
 
 /** Read a preference from a control: radio value or data-ui-theme-value. */
