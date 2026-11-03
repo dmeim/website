@@ -27,7 +27,7 @@ export default function TextStatistics() {
           label="Text"
           rows={5}
           value={text}
-          placeholder="Your text..."
+          placeholder="Your text…"
           onChange={(event) => setText(event.target.value)}
           autoFocus
           spellCheck={false}

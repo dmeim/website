@@ -477,7 +477,7 @@ export default function CameraRecorder() {
   return (
     <ToolFrame className="camera-island">
       <div className="camera-workspace">
-        <Panel title="Camera Controls" titleId="camera-settings-heading">
+        <Panel title="Camera controls" titleId="camera-settings-heading">
           <Notice tone={statusTone}>{statusMessage}</Notice>
 
           {permissionError ? (
@@ -580,7 +580,7 @@ export default function CameraRecorder() {
         </Panel>
 
         <Panel
-          title="Live Preview"
+          title="Live preview"
           titleId="camera-preview-heading"
           description="Use the controls below the preview to capture photos or videos."
         >
@@ -654,7 +654,7 @@ export default function CameraRecorder() {
       </div>
 
       <Panel
-        title="Local Capture Gallery"
+        title="Local capture gallery"
         titleId="camera-gallery-heading"
         description={galleryHint}
         actions={

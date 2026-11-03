@@ -47,7 +47,7 @@ export default function Chronometer() {
       <Panel
         title="Chronometer"
         titleId="chrono-heading"
-        description="Monitor the duration of a thing — start, stop, and reset a simple stopwatch."
+        description="Monitor the duration of a thing: start, stop, and reset a simple stopwatch."
       >
         <Stat
           label="Elapsed"

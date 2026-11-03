@@ -253,7 +253,7 @@ export default function QRCodeGenerator() {
           />
 
           {content.type !== "text" && (
-            <Fieldset legend="Preset Options">
+            <Fieldset legend="Preset options">
               {content.type === "website" && (
                 <FormGrid columns={2}>
                   <Input
@@ -682,7 +682,7 @@ export default function QRCodeGenerator() {
             </FormGrid>
           </Disclosure>
 
-          <Disclosure summary="Export Options" level="inline">
+          <Disclosure summary="Export options" level="inline">
             <FormGrid columns={2}>
               <Select
                 id="qr-error-correction"
@@ -691,7 +691,7 @@ export default function QRCodeGenerator() {
                 value={errorCorrectionLevel}
                 options={QR_ERROR_CORRECTION_LEVELS.map((level) => ({
                   value: level.value,
-                  label: `${level.label} — ${level.description}`,
+                  label: `${level.label} (${level.description})`,
                 }))}
                 onChange={(event) =>
                   setErrorCorrectionLevel(

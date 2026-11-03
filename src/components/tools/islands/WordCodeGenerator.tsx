@@ -252,9 +252,9 @@ export default function WordCodeGenerator() {
         );
         setLoadStatusType("error");
         setOutputMessage(
-          "Could Not Load Word Categories. Make Sure The Category JSON Files Are Present In The WordCode Source Folder.",
+          "Could not load word categories. Make sure the category JSON files are present in the WordCode source folder.",
         );
-        setOutputMetaText("Category Loading Failed.");
+        setOutputMetaText("Category loading failed.");
       }
     }
 
@@ -615,7 +615,7 @@ export default function WordCodeGenerator() {
       >
         <RadioGroup
           name="wc-out-format"
-          legend="Output Format"
+          legend="Output format"
           orientation="horizontal"
           value={outputFormat}
           options={[

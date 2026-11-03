@@ -94,7 +94,7 @@ export default function CrontabGenerator() {
       <Panel
         title="Cron format"
         titleId="cg-ref-heading"
-        description="Field order and common symbols. Shortcuts like @daily are shown for reference — expand them to a five-field expression to validate here."
+        description="Field order and common symbols. Shortcuts like @daily are shown for reference only. Expand them to a five-field expression to validate here."
       >
         <CodeBlock code={CRON_FORMAT_DIAGRAM} label="Cron field diagram" copy={false} aria-label="Cron field diagram" />
 

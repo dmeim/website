@@ -68,7 +68,7 @@ export const keys: KeyBlock[] = [
     fingerprint: "AAAA BBBB CCCC DDDD EEEE  FFFF 0000 1111 2222 3333",
     usage: "gpg --import · gpg --verify",
     body: `-----BEGIN PGP PUBLIC KEY BLOCK-----
-Comment: Placeholder — replace with real key material
+Comment: Placeholder. Replace with real key material
 
 mDMEAAAAABYJKwYBBAHaRw8BAQdALoremIpsumPlaceholderGpgBlockOnly
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

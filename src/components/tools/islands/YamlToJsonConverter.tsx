@@ -21,7 +21,7 @@ export default function YamlToJsonConverter() {
             label: "Your YAML",
             value: input,
             onChange: setInput,
-            placeholder: "Paste your yaml here...",
+            placeholder: "Paste your YAML here…",
             mono: true,
             rows: 10,
           }}

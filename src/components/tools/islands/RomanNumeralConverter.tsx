@@ -40,7 +40,7 @@ export default function RomanNumeralConverter() {
   return (
     <ToolFrame layout="split" stagger>
       <Panel
-        title="Arabic to roman"
+        title="Arabic to Roman"
         titleId="rnc-arabic-heading"
         description={`Enter a number between ${MIN_ARABIC_TO_ROMAN.toLocaleString()} and ${MAX_ARABIC_TO_ROMAN.toLocaleString()} to convert it to a Roman numeral.`}
       >
@@ -80,7 +80,7 @@ export default function RomanNumeralConverter() {
       </Panel>
 
       <Panel
-        title="Roman to arabic"
+        title="Roman to Arabic"
         titleId="rnc-roman-heading"
         description="Enter a classic uppercase Roman numeral to convert it to Arabic."
       >
@@ -98,7 +98,7 @@ export default function RomanNumeralConverter() {
 
         {romanInvalid ? (
           <Notice tone="danger" live="polite">
-            The input you entered is not a valid roman number
+            The input you entered is not a valid Roman number
           </Notice>
         ) : null}
 

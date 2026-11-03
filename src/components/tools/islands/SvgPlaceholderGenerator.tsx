@@ -74,7 +74,7 @@ export default function SvgPlaceholderGenerator() {
     <ToolFrame>
       <ToolFrame layout="split">
         <Panel
-          title="Placeholder Settings"
+          title="Placeholder settings"
           titleId="sp-settings-heading"
           description="Text is escaped before it is inserted into the generated SVG."
         >
@@ -106,13 +106,13 @@ export default function SvgPlaceholderGenerator() {
               onChange={setBackgroundColor}
             />
             <ColorInput
-              label="Text Color"
+              label="Text color"
               id="sp-text-color"
               value={textColor}
               onChange={setTextColor}
             />
             <Input
-              label="Font Size"
+              label="Font size"
               id="sp-font-size"
               type="number"
               min={1}
@@ -123,12 +123,12 @@ export default function SvgPlaceholderGenerator() {
             />
             <Checkbox
               id="sp-exact-size"
-              label="Add Exact Width/Height"
+              label="Add exact width/height"
               checked={useExactSize}
               onChange={(event) => setUseExactSize(event.target.checked)}
             />
             <Input
-              label="Custom Text"
+              label="Custom text"
               id="sp-custom-text"
               span="full"
               type="text"
@@ -140,7 +140,7 @@ export default function SvgPlaceholderGenerator() {
 
           <ButtonGroup>
             <CopyButton variant="primary" value={svg} label="Copy SVG" />
-            <CopyButton value={dataUri} label="Copy Data URI" />
+            <CopyButton value={dataUri} label="Copy data URI" />
             <Button iconStart="download-simple" onClick={downloadSvg}>
               Download SVG
             </Button>
@@ -164,18 +164,18 @@ export default function SvgPlaceholderGenerator() {
       </ToolFrame>
 
       <Panel
-        title="Generated Output"
+        title="Generated output"
         titleId="sp-output-heading"
         description="Both outputs are local strings generated from the current settings."
       >
         <OutputField
-          label="SVG Markup"
+          label="SVG markup"
           id="sp-svg-output"
           multiline
           value={svg}
         />
         <OutputField
-          label="SVG Data URI"
+          label="SVG data URI"
           id="sp-data-uri-output"
           multiline
           value={dataUri}

@@ -76,7 +76,7 @@ export default function Ipv4RangeExpander() {
               setStartIp(event.target.value);
               setActionStatus("");
             }}
-            error={!startValid ? "Invalid start ipv4 address" : undefined}
+            error={!startValid ? "Invalid start IPv4 address" : undefined}
           />
           <Input
             id="ipv4re-end"
@@ -89,7 +89,7 @@ export default function Ipv4RangeExpander() {
               setEndIp(event.target.value);
               setActionStatus("");
             }}
-            error={!endValid ? "Invalid end ipv4 address" : undefined}
+            error={!endValid ? "Invalid end IPv4 address" : undefined}
           />
         </FormGrid>
 
@@ -125,7 +125,7 @@ export default function Ipv4RangeExpander() {
               </Button>
             }
           >
-            Invalid combination of start and end IPv4 address. The end address is lower than the start address — switch
+            Invalid combination of start and end IPv4 address. The end address is lower than the start address. Switch
             them to calculate a result.
           </Notice>
         ) : null}

@@ -1,6 +1,6 @@
 # dmeim.com
 
-> Personal site of Dimitrios Meimaridis (dmeim), an IT manager, administrator, and computer teacher with over eight years of experience running technology in PreK-8 schools, as well as corporate and higher-education environments.
+> Personal site of Dimitrios Meimaridis (dmeim), an IT manager, administrator, and computer teacher with over eight years of experience running technology in PreK–8 schools, as well as corporate and higher-education environments.
 
 The site is static. Every page is plain HTML, and nothing behind it needs a login.
 

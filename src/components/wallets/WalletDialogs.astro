@@ -25,14 +25,14 @@ const wallets = await Promise.all(
       <div class="wallet-dialog__qr" role="img" aria-label={`QR code for the ${name} address`} set:html={qr} />
       <div class="wallet-dialog__address">
         <code>{address}</code>
-        <CopyButton value={address} size="sm" label="Copy Address" />
+        <CopyButton value={address} size="sm" label="Copy address" />
       </div>
       {
         alsoAccepts && (
           <p class="wallet-dialog__also">
             {alsoAccepts.map((token, i) => (
               <>
-                {i > 0 && " and "}
+                {i > 0 && (i < alsoAccepts.length - 1 ? ", " : alsoAccepts.length > 2 ? ", and " : " and ")}
                 <span class="wallet-dialog__token">
                   <Icon name={token.icon} />
                   {token.ticker} ({name})

@@ -135,7 +135,7 @@ export default function ListConverter() {
             label: "Your input data",
             value: input,
             onChange: setInput,
-            placeholder: "Paste your input data here...",
+            placeholder: "Paste your input data here…",
             mono: true,
             rows: 8,
           }}

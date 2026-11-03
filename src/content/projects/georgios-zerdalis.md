@@ -1,6 +1,6 @@
 ---
 title: Georgios Zerdalis
-summary: Portfolio for a timpanist, percussionist and educator, with a motion-led one-scroll home.
+summary: Portfolio for a timpanist, percussionist, and educator, with a motion-led one-scroll home.
 status: live
 order: 2
 year: "2026"
@@ -31,14 +31,14 @@ media:
 ## The brief
 
 George is a DMA candidate at the University of Miami Frost School of Music:
-a timpanist, percussionist and educator. He needed one place for
-performances, teaching and a way to get in touch, and it had to feel like
+a timpanist, percussionist, and educator. He needed one place for
+performances, teaching, and a way to get in touch, and it had to feel like
 walking into a hall before a concert.
 
 ## The design
 
 The "Midnight Concert Hall" system: a near-black ground, champagne and steel
-accents, and three typefaces (Syne, Instrument Serif and Manrope) used like a
+accents, and three typefaces (Syne, Instrument Serif, and Manrope) used like a
 programme booklet. The home page is a single scroll, with React islands and
 Framer Motion choreographing each section as it enters.
 

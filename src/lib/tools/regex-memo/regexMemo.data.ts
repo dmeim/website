@@ -58,7 +58,7 @@ export const regexMemoSections: RegexMemoSection[] = [
       },
       {
         expression: "\\w or [A-Za-z0-9_]",
-        description: "alphabet, digit or underscore",
+        description: "alphabet, digit, or underscore",
       },
       {
         expression: "\\W or [^A-Za-z0-9_]",
@@ -91,7 +91,7 @@ export const regexMemoSections: RegexMemoSection[] = [
       },
       {
         expression: "\\s",
-        description: "space, tab, newline or carriage return",
+        description: "space, tab, newline, or carriage return",
       },
     ],
   },
@@ -100,7 +100,7 @@ export const regexMemoSections: RegexMemoSection[] = [
     entries: [
       {
         expression: "[xyz]",
-        description: "either x, y or z",
+        description: "either x, y, or z",
       },
       {
         expression: "[^xyz]",
@@ -108,7 +108,7 @@ export const regexMemoSections: RegexMemoSection[] = [
       },
       {
         expression: "[1-3]",
-        description: "either 1, 2 or 3",
+        description: "either 1, 2, or 3",
       },
       {
         expression: "[^1-3]",

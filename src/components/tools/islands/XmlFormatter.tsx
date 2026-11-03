@@ -35,7 +35,7 @@ export default function XmlFormatter() {
             label: "Your XML",
             value: rawXml,
             onChange: setRawXml,
-            placeholder: "Paste your XML here...",
+            placeholder: "Paste your XML here…",
             mono: true,
             rows: 12,
           }}

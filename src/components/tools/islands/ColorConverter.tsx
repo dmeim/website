@@ -38,7 +38,7 @@ export default function ColorConverter() {
       <Panel
         title="Color converter"
         titleId="clc-heading"
-        description="Convert between hex, rgb, hsl, hwb, lch, cmyk, and CSS name — edit any field to update the rest live."
+        description="Convert between hex, rgb, hsl, hwb, lch, cmyk, and CSS name. Edit any field to update the rest live."
         actions={<Swatch color={preview} size="sm" aria-hidden="true" />}
       >
         <FormGrid columns={2} role="group" aria-label="Color formats">

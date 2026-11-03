@@ -21,18 +21,18 @@ export default function Ipv4AddressConverter() {
           label="The IPv4 address"
           mono
           value={ip}
-          placeholder="The ipv4 address…"
+          placeholder="The IPv4 address…"
           spellCheck={false}
           autoFocus
           onChange={(event) => setIp(event.target.value)}
-          error={!valid ? "Invalid ipv4 address" : undefined}
+          error={!valid ? "Invalid IPv4 address" : undefined}
         />
 
         <KeyValue
           aria-label="Converted values"
           items={sections.map((section) => ({
             label: section.label,
-            value: <span data-testid={section.key}>{section.value || "Set a correct ipv4 address"}</span>,
+            value: <span data-testid={section.key}>{section.value || "Set a correct IPv4 address"}</span>,
             mono: Boolean(section.value),
             tone: section.value ? "default" : "muted",
             copy: section.value ? section.value : false,

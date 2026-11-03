@@ -160,7 +160,7 @@ export default function LoremIpsumGenerator() {
           multiline
           rows={8}
           value={loremIpsumText}
-          placeholder="Your lorem ipsum..."
+          placeholder="Your lorem ipsum…"
           copy={false}
           mono={false}
         />

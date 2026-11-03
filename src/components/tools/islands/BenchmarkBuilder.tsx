@@ -94,7 +94,7 @@ function SuiteMeasures({
             inputMode="decimal"
             step="any"
             value={measureToInputValue(value)}
-            placeholder="Set your measure..."
+            placeholder="Set your measure…"
             onChange={(event) => updateAt(index, event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
@@ -181,7 +181,7 @@ export default function BenchmarkBuilder() {
       <Panel
         title="Benchmark builder"
         titleId="bb-heading"
-        description="Compare execution time (or any numeric samples) across suites — ranked by mean with variance and deltas vs the best."
+        description="Compare execution time (or any numeric samples) across suites, ranked by mean with variance and deltas vs the best."
       >
         <div className="bb-suites" aria-label="Benchmark suites">
           {suites.map((suite, index) => (
@@ -197,7 +197,7 @@ export default function BenchmarkBuilder() {
                 id={`bb-suite-${index}-name`}
                 label="Suite name"
                 value={suite.title}
-                placeholder="Suite name..."
+                placeholder="Suite name…"
                 onChange={(event) =>
                   updateSuite(index, { title: event.target.value })
                 }

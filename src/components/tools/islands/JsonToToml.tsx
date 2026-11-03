@@ -21,7 +21,7 @@ export default function JsonToToml() {
             label: "Your JSON",
             value: input,
             onChange: setInput,
-            placeholder: "Paste your JSON here...",
+            placeholder: "Paste your JSON here…",
             mono: true,
             rows: 10,
           }}

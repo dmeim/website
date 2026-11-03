@@ -32,7 +32,7 @@ export default function DeviceInformation() {
       <Panel
         title="Device information"
         titleId="devinfo-heading"
-        description="Live screen and browser details from this device — size, pixel ratio, orientation, languages, and user agent."
+        description="Live screen and browser details from this device: size, pixel ratio, orientation, languages, and user agent."
       >
         {sections == null ? <p aria-busy="true">Reading device environment…</p> : null}
       </Panel>

@@ -34,7 +34,7 @@ export const albumMeta: Record<string, GalleryAlbumMeta> = {
         title: "Headshot",
         description:
           "The one that became the site portrait. Black on black, slate behind, the light falling from the left.",
-        alt: "Head-and-shoulders portrait in a black suit, shirt and tie against a slate grey backdrop",
+        alt: "Head-and-shoulders portrait in a black suit, shirt, and tie against a slate grey backdrop",
       },
       "headshot-navy": {
         title: "Headshot, navy",

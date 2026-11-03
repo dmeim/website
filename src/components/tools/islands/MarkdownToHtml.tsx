@@ -37,7 +37,7 @@ export default function MarkdownToHtml() {
             label: "Your Markdown to convert",
             value: input,
             onChange: setInput,
-            placeholder: "Your Markdown content...",
+            placeholder: "Your Markdown content…",
             mono: true,
             rows: 10,
           }}

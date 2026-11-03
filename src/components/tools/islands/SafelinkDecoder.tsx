@@ -24,7 +24,7 @@ export default function SafelinkDecoder() {
         <Input
           label="Your Outlook SafeLink URL"
           value={input}
-          placeholder="Your input Outlook SafeLink Url…"
+          placeholder="Your input Outlook SafeLink URL…"
           spellCheck={false}
           autoFocus
           onChange={(event) => setInput(event.target.value)}

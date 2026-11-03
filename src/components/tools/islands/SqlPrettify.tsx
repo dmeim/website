@@ -46,7 +46,7 @@ export default function SqlPrettify() {
             label: "Your SQL query",
             value: rawSql,
             onChange: setRawSql,
-            placeholder: "Put your SQL query here...",
+            placeholder: "Put your SQL query here…",
             mono: true,
             rows: 12,
           }}

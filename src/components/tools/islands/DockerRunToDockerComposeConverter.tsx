@@ -60,7 +60,7 @@ export default function DockerRunToDockerComposeConverter() {
           mono
           rows={4}
           value={dockerRun}
-          placeholder="Your docker run command to convert..."
+          placeholder="Your docker run command to convert…"
           onChange={(event) => setDockerRun(event.target.value)}
           autoFocus
         />

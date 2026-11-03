@@ -12,7 +12,7 @@ export default function CaseConverter() {
     <ToolFrame>
       <Panel
         title="Case converter"
-        description="Type a string to see camel, snake, kebab, Pascal, constant, and other formats update live — then copy any result."
+        description="Type a string to see camel, snake, kebab, Pascal, constant, and other formats update live, then copy any result."
       >
         <Input
           label="Your string"

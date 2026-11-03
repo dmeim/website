@@ -49,7 +49,7 @@ export default function RsaKeyPairGenerator() {
   const slowHint =
     bitsValid && bitsInput >= 4096
       ? bitsInput >= 8192
-        ? "≥8192-bit keys can take a long time in the browser — generation may appear frozen."
+        ? "≥8192-bit keys can take a long time in the browser, and generation may appear frozen."
         : "≥4096-bit keys are slower; wait for generation to finish before refreshing again."
       : null;
 
@@ -158,7 +158,7 @@ export default function RsaKeyPairGenerator() {
       <Panel
         title="RSA key pair"
         titleId="rsa-heading"
-        description="Choose a modulus length and generate a fresh RSA-OAEP key pair as PEM. Keys ≥4096 bits (especially ≥8192) are slow in the browser — use Refresh for those sizes."
+        description="Choose a modulus length and generate a fresh RSA-OAEP key pair as PEM. Keys ≥4096 bits (especially ≥8192) are slow in the browser, so use Refresh for those sizes."
         actions={
           <Button
             variant="primary"
@@ -167,7 +167,7 @@ export default function RsaKeyPairGenerator() {
             disabled={pending || !bitsValid}
             data-testid="refresh"
           >
-            {pending ? "Generating…" : "Refresh key-pair"}
+            {pending ? "Generating…" : "Refresh key pair"}
           </Button>
         }
       >
@@ -191,7 +191,7 @@ export default function RsaKeyPairGenerator() {
 
         {bitsValid && bitsInput > RSA_BITS_AUTO_REGEN_MAX && !pending ? (
           <Notice tone="info">
-            Auto-refresh is off above {RSA_BITS_AUTO_REGEN_MAX} bits — press Refresh key-pair to generate (
+            Auto-refresh is off above {RSA_BITS_AUTO_REGEN_MAX} bits. Press Refresh key pair to generate (
             {normalizeRsaBits(bitsInput)}-bit).
           </Notice>
         ) : null}

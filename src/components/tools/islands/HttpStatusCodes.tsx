@@ -28,7 +28,7 @@ export default function HttpStatusCodes() {
         description={`The list of all HTTP status codes, their name, and their meaning (${total} codes).`}
       >
         <ReferenceList
-          searchLabel="Search http status…"
+          searchLabel="Search HTTP status…"
           query={search}
           onQueryChange={setSearch}
           count={matchCount}

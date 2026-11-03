@@ -26,7 +26,7 @@ export default function GitMemo() {
         description={`Quick access to the most common Git commands (${total} recipes).`}
       >
         <ReferenceList
-          searchLabel="Search git commands…"
+          searchLabel="Search Git commands…"
           query={search}
           onQueryChange={setSearch}
           count={matchCount}

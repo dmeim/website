@@ -12,7 +12,7 @@ export default function SlugifyString() {
     <ToolFrame>
       <Panel
         title="Slugify string"
-        description="Make a string URL, filename, and id safe — lowercase, hyphenated, with Unicode transliteration."
+        description="Make a string URL, filename, and id safe: lowercased, hyphenated, and transliterated from Unicode."
       >
         <TransformPanel
           input={{

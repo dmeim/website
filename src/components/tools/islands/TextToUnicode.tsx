@@ -25,7 +25,7 @@ export default function TextToUnicode() {
       >
         <TransformPanel
           input={{
-            label: "Enter text to convert to unicode",
+            label: "Enter text to convert to Unicode",
             value: inputText,
             onChange: setInputText,
             placeholder: "e.g. Hello Avengers",
@@ -36,12 +36,12 @@ export default function TextToUnicode() {
       </Panel>
 
       <Panel
-        title="Unicode to Text"
+        title="Unicode to text"
         description={<>Paste <Code>&amp;#N;</Code> entities to decode them back into readable text.</>}
       >
         <TransformPanel
           input={{
-            label: "Enter unicode to convert to text",
+            label: "Enter Unicode to convert to text",
             value: inputUnicode,
             onChange: setInputUnicode,
             placeholder: "e.g. &#72;&#101;&#108;&#108;&#111;",

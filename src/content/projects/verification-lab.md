@@ -19,4 +19,4 @@ on [/keys](/keys), without installing anything.
 - **SSH:** verify `ssh-keygen -Y sign` signatures made with an Ed25519 key.
 - **CLI snippets** for doing the same with `gpg` and `ssh-keygen`.
 
-Nothing leaves the page: keys, messages and signatures stay in the browser.
+Nothing leaves the page: keys, messages, and signatures stay in the browser.

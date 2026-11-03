@@ -40,7 +40,7 @@ export default function Ipv4SubnetCalculator() {
           label="An IPv4 address with or without mask"
           mono
           value={ip}
-          placeholder="The ipv4 address…"
+          placeholder="The IPv4 address…"
           spellCheck={false}
           autoFocus
           onChange={(event) => {

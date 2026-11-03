@@ -23,7 +23,7 @@ export default function EmailNormalizer() {
             label: "Raw emails to normalize",
             value: rawEmails,
             onChange: setRawEmails,
-            placeholder: "Put your emails here (one per line)...",
+            placeholder: "Put your emails here (one per line)…",
             mono: true,
             rows: 6,
           }}

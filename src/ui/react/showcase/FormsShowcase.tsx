@@ -164,7 +164,7 @@ function Specimens({ theme }: { theme: string }) {
       <Slider label="Words" min={1} max={50} value={words} onChange={setWords} showValue />
       <Slider label="Disabled" min={0} max={10} defaultValue={3} disabled showValue />
 
-      <h4 className="ui-showcase-sub">Field, FormGrid and Fieldset</h4>
+      <h4 className="ui-showcase-sub">Field, FormGrid, and Fieldset</h4>
       <Fieldset legend="Export" description="Settings applied to the downloaded file.">
         <FormGrid columns="auto" gap="sm">
           <Input label="Width" suffix="px" defaultValue="1200" />

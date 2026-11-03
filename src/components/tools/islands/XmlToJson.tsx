@@ -21,7 +21,7 @@ export default function XmlToJson() {
             label: "Your XML content",
             value: input,
             onChange: setInput,
-            placeholder: "Paste your XML content here...",
+            placeholder: "Paste your XML content here…",
             mono: true,
             rows: 10,
           }}

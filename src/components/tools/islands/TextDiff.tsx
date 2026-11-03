@@ -45,7 +45,7 @@ export default function TextDiff() {
       <Panel
         title="Text diff"
         titleId="text-diff-heading"
-        description="Compare two texts side by side. Edit either pane — differences update live with line and character highlighting."
+        description="Compare two texts side by side. Edit either pane and the differences update live, with line and character highlighting."
       >
         <FormGrid columns={2}>
           <Textarea

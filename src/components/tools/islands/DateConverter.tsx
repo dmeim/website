@@ -56,14 +56,14 @@ export default function DateConverter() {
       <Panel
         title="Date-time converter"
         titleId="dc-heading"
-        description="Paste a date string (or leave blank for now) to see ISO, RFC, Unix, Mongo, Excel, and other formats update live — then copy any result."
+        description="Paste a date string (or leave blank for now) to see ISO, RFC, Unix, Mongo, Excel, and other formats update live, then copy any result."
       >
         <FormGrid columns={2}>
           <Input
             id="dc-input"
             label="Date string"
             value={input}
-            placeholder="Put your date string here..."
+            placeholder="Put your date string here…"
             spellCheck={false}
             autoFocus
             onChange={(event) => onInputChange(event.target.value)}
@@ -92,7 +92,7 @@ export default function DateConverter() {
           aria-live="polite"
           items={formats.map((format) => ({
             label: format.name,
-            value: format.value || "Invalid date...",
+            value: format.value || "Invalid date…",
             mono: true,
             copy: format.value ? format.value : false,
             tone: format.value ? "default" : "muted",

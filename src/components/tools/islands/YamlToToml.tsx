@@ -21,7 +21,7 @@ export default function YamlToToml() {
             label: "Your YAML",
             value: input,
             onChange: setInput,
-            placeholder: "Paste your YAML here...",
+            placeholder: "Paste your YAML here…",
             mono: true,
             rows: 10,
           }}

@@ -67,7 +67,7 @@ export default function JsonDiff() {
             mono
             rows={16}
             value={rawLeft}
-            placeholder="Paste your first JSON here..."
+            placeholder="Paste your first JSON here…"
             onChange={(event) => setRawLeft(event.target.value)}
             autoFocus
             spellCheck={false}
@@ -79,7 +79,7 @@ export default function JsonDiff() {
             mono
             rows={16}
             value={rawRight}
-            placeholder="Paste your JSON to compare here..."
+            placeholder="Paste your JSON to compare here…"
             onChange={(event) => setRawRight(event.target.value)}
             spellCheck={false}
             error={rightInvalid ? "Invalid JSON format" : undefined}

@@ -30,7 +30,7 @@ export default function MathEvaluator() {
           rows={3}
           autoFocus
           spellCheck={false}
-          placeholder="Your math expression (ex: 2*sqrt(6) )..."
+          placeholder="Your math expression (ex: 2*sqrt(6) )…"
           value={expression}
           onChange={(event) => setExpression(event.target.value)}
           data-testid="math-eval-expression"

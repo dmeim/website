@@ -34,7 +34,7 @@ export default function Base64StringConverter() {
   return (
     <ToolFrame layout="split" stagger>
       <Panel
-        title="String to base64"
+        title="String to Base64"
         description={
           <>
             Encode a string into its Base64 representation. Toggle URL-safe for the{" "}
@@ -47,7 +47,7 @@ export default function Base64StringConverter() {
             label: "String to encode",
             value: textInput,
             onChange: setTextInput,
-            placeholder: "Put your string here...",
+            placeholder: "Put your string here…",
             rows: 5,
           }}
           options={
@@ -75,7 +75,7 @@ export default function Base64StringConverter() {
             label: "Base64 string to decode",
             value: base64Input,
             onChange: setBase64Input,
-            placeholder: "Your base64 string...",
+            placeholder: "Your Base64 string…",
             mono: true,
             rows: 5,
           }}
@@ -86,7 +86,7 @@ export default function Base64StringConverter() {
               onChange={(event) => setDecodeUrlSafe(event.target.checked)}
             />
           }
-          error={base64InputInvalid ? "Invalid base64 string" : undefined}
+          error={base64InputInvalid ? "Invalid Base64 string" : undefined}
           output={{ label: "Decoded string", value: textOutput, rows: 5 }}
         />
       </Panel>

@@ -143,14 +143,14 @@ export default function Base64FileConverter() {
           rows={5}
           spellCheck={false}
           value={base64Input}
-          placeholder="Put your base64 file string here..."
+          placeholder="Put your Base64 file string here…"
           onChange={(event) => setBase64Input(event.target.value)}
           aria-invalid={base64InputInvalid || undefined}
         />
 
         {base64InputInvalid ? (
           <Notice tone="danger" live="polite">
-            Invalid base 64 string
+            Invalid Base64 string
           </Notice>
         ) : null}
 
@@ -193,7 +193,7 @@ export default function Base64FileConverter() {
       </Panel>
 
       <Panel
-        title="File to base64"
+        title="File to Base64"
         titleId="b64f-encode-heading"
         description="Upload any file to encode it as a Base64 data URL in your browser."
       >
@@ -206,11 +206,11 @@ export default function Base64FileConverter() {
 
         <OutputField
           id="b64f-file-base64"
-          label="File in base64"
+          label="File in Base64"
           multiline
           rows={5}
           value={fileBase64}
-          placeholder="File in base64 will be here"
+          placeholder="File in Base64 will be here"
         />
 
         {uploadStatus ? (

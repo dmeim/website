@@ -21,7 +21,7 @@ export default function JsonToXml() {
             label: "Your JSON content",
             value: input,
             onChange: setInput,
-            placeholder: "Paste your JSON content here...",
+            placeholder: "Paste your JSON content here…",
             mono: true,
             rows: 10,
           }}

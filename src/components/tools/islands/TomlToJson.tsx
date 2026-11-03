@@ -21,7 +21,7 @@ export default function TomlToJson() {
             label: "Your TOML",
             value: input,
             onChange: setInput,
-            placeholder: "Paste your TOML here...",
+            placeholder: "Paste your TOML here…",
             mono: true,
             rows: 10,
           }}

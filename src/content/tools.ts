@@ -40,7 +40,7 @@ export const toolsCatalogue: ToolsCatalogue = {
       tools: [
         {
           id: "word-code-generator",
-          title: "WordCode Generator",
+          title: "WordCode generator",
           description: "Generate friendly word and number codes from a selection of word categories.",
           status: "available",
           route: "/tools/word-code-generator",
@@ -56,7 +56,7 @@ export const toolsCatalogue: ToolsCatalogue = {
       tools: [
         {
           id: "qrcode-generator",
-          title: "QR Code generator",
+          title: "QR code generator",
           description: "Generate and download QR codes from presets for text, websites, social profiles, contacts, WiFi networks, messages, and locations.",
           status: "available",
           route: "/tools/qrcode-generator",
@@ -95,7 +95,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "token-generator",
           title: "Token generator",
-          description: "Generate random string with the chars you want, uppercase or lowercase letters, numbers and/or symbols.",
+          description: "Generate random string with the chars you want, uppercase or lowercase letters, numbers, and/or symbols.",
           status: "available",
           route: "/tools/token-generator",
           tags: ["token", "password", "random", "string"],
@@ -105,7 +105,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "hash-text",
           title: "Hash text",
-          description: "Hash a text string using the function you need : MD5, SHA1, SHA256, SHA224, SHA512, SHA384, SHA3 or RIPEMD160",
+          description: "Hash a text string using the function you need: MD5, SHA1, SHA256, SHA224, SHA512, SHA384, SHA3, or RIPEMD160.",
           status: "available",
           route: "/tools/hash-text",
           tags: ["hash", "digest", "MD5", "SHA", "crypto"],
@@ -145,7 +145,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "encryption",
           title: "Encrypt / decrypt text",
-          description: "Encrypt clear text and decrypt ciphertext using crypto algorithms like AES, TripleDES, Rabbit or RC4.",
+          description: "Encrypt clear text and decrypt ciphertext using crypto algorithms like AES, TripleDES, Rabbit, or RC4.",
           status: "available",
           route: "/tools/encryption",
           tags: ["encrypt", "decrypt", "AES", "TripleDES", "Rabbit", "RC4", "cypher", "secret"],
@@ -213,7 +213,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "date-converter",
           title: "Date-time converter",
-          description: "Convert date and time into the various different formats",
+          description: "Convert date and time into the various different formats.",
           status: "available",
           route: "/tools/date-converter",
           tags: ["date", "time", "converter", "iso", "utc", "timezone", "year", "month", "day", "minute", "second"],
@@ -223,7 +223,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "base-converter",
           title: "Integer base converter",
-          description: "Convert a number between different bases (decimal, hexadecimal, binary, octal, base64, ...)",
+          description: "Convert a number between different bases (decimal, hexadecimal, binary, octal, base64, ...).",
           status: "available",
           route: "/tools/base-converter",
           tags: ["integer", "number", "base", "conversion", "decimal", "hexadecimal", "binary", "octal", "base64"],
@@ -263,7 +263,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "color-converter",
           title: "Color converter",
-          description: "Convert color between the different formats (hex, rgb, hsl and css name)",
+          description: "Convert color between the different formats (hex, rgb, hsl, and css name).",
           status: "available",
           route: "/tools/color-converter",
           tags: ["color", "converter", "hex", "rgb", "hsl", "hwb", "lch", "cmyk", "name", "picker"],
@@ -273,7 +273,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "case-converter",
           title: "Case converter",
-          description: "Transform the case of a string and choose between different formats",
+          description: "Transform the case of a string and choose between different formats.",
           status: "available",
           route: "/tools/case-converter",
           tags: [
@@ -317,7 +317,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "text-to-unicode",
           title: "Text to Unicode",
-          description: "Parse and convert text to unicode and vice-versa",
+          description: "Parse and convert text to unicode and vice-versa.",
           status: "available",
           route: "/tools/text-to-unicode",
           tags: ["text", "unicode", "entities", "html", "string", "convert"],
@@ -394,7 +394,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "xml-to-json",
           title: "XML to JSON",
-          description: "Convert XML to JSON",
+          description: "Convert XML to JSON.",
           status: "available",
           route: "/tools/xml-to-json",
           sourcePath: "/xml-to-json",
@@ -403,7 +403,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "json-to-xml",
           title: "JSON to XML",
-          description: "Convert JSON to XML",
+          description: "Convert JSON to XML.",
           status: "available",
           route: "/tools/json-to-xml",
           sourcePath: "/json-to-xml",
@@ -413,7 +413,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "markdown-to-html",
           title: "Markdown to HTML",
-          description: "Convert Markdown to Html and allow to print (as PDF)",
+          description: "Convert Markdown to HTML and allow to print (as PDF).",
           status: "available",
           route: "/tools/markdown-to-html",
           sourcePath: "/markdown-to-html",
@@ -439,7 +439,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "html-entities",
           title: "HTML entities",
-          description: "Escape or unescape HTML entities (replace characters like <,>, &, \" and ' with their HTML version)",
+          description: "Escape or unescape HTML entities (replace characters like <, >, &, \", and ' with their HTML version).",
           status: "available",
           route: "/tools/html-entities",
           sourcePath: "/html-entities",
@@ -448,7 +448,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "url-parser",
           title: "URL parser",
-          description: "Parse a URL into its separate constituent parts (protocol, origin, params, port, username-password, ...)",
+          description: "Parse a URL into its separate constituent parts (protocol, origin, params, port, username-password, ...).",
           status: "available",
           route: "/tools/url-parser",
           sourcePath: "/url-parser",
@@ -457,7 +457,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "device-information",
           title: "Device information",
-          description: "Get information about your current device (screen size, pixel-ratio, user agent, ...)",
+          description: "Get information about your current device (screen size, pixel-ratio, user agent, ...).",
           status: "available",
           route: "/tools/device-information",
           sourcePath: "/device-information",
@@ -511,7 +511,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "keycode-info",
           title: "Keycode info",
-          description: "Find the javascript keycode, code, location and modifiers of any pressed key.",
+          description: "Find the JavaScript keycode, code, location, and modifiers of any pressed key.",
           status: "available",
           route: "/tools/keycode-info",
           sourcePath: "/keycode-info",
@@ -520,7 +520,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "slugify-string",
           title: "Slugify string",
-          description: "Make a string url, filename and id safe.",
+          description: "Make a string url, filename, and id safe.",
           status: "available",
           route: "/tools/slugify-string",
           sourcePath: "/slugify-string",
@@ -538,7 +538,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "user-agent-parser",
           title: "User-agent parser",
-          description: "Detect and parse Browser, Engine, OS, CPU, and Device type/model from an user-agent string.",
+          description: "Detect and parse Browser, Engine, OS, CPU, and Device type/model from a user-agent string.",
           status: "available",
           route: "/tools/user-agent-parser",
           sourcePath: "/user-agent-parser",
@@ -565,7 +565,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "safelink-decoder",
           title: "Outlook Safelink decoder",
-          description: "Decode Outlook SafeLink links",
+          description: "Decode Outlook SafeLink links.",
           status: "available",
           route: "/tools/safelink-decoder",
           sourcePath: "/safelink-decoder",
@@ -699,7 +699,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "regex-memo",
           title: "Regex cheatsheet",
-          description: "Javascript Regex/Regular Expression cheatsheet",
+          description: "JavaScript Regex/Regular Expression cheatsheet.",
           status: "available",
           route: "/tools/regex-memo",
           sourcePath: "/regex-memo",
@@ -752,7 +752,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "mac-address-generator",
           title: "MAC address generator",
-          description: "Enter the quantity and prefix. MAC addresses will be generated in your chosen case (uppercase or lowercase)",
+          description: "Enter the quantity and prefix. MAC addresses will be generated in your chosen case (uppercase or lowercase).",
           status: "available",
           route: "/tools/mac-address-generator",
           sourcePath: "/mac-address-generator",
@@ -848,7 +848,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         {
           id: "lorem-ipsum-generator",
           title: "Lorem ipsum generator",
-          description: "Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content",
+          description: "Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content.",
           status: "available",
           route: "/tools/lorem-ipsum-generator",
           sourcePath: "/lorem-ipsum-generator",
@@ -901,7 +901,7 @@ export const toolsCatalogue: ToolsCatalogue = {
         },
         {
           id: "ascii-text-drawer",
-          title: "ASCII Art Text Generator",
+          title: "ASCII art text generator",
           description: "Create ASCII art text with many fonts and styles.",
           status: "available",
           route: "/tools/ascii-text-drawer",
@@ -918,8 +918,8 @@ export const toolsCatalogue: ToolsCatalogue = {
       tools: [
         {
           id: "phone-parser-and-formatter",
-          title: "Phone Parser",
-          description: "Parse, validate and format phone numbers. Get information about the phone number, like the country code, type, etc.",
+          title: "Phone parser",
+          description: "Parse, validate, and format phone numbers. Get information about the phone number, like the country code, type, etc.",
           status: "available",
           route: "/tools/phone-parser-and-formatter",
           sourcePath: "/phone-parser-and-formatter",
@@ -927,8 +927,8 @@ export const toolsCatalogue: ToolsCatalogue = {
         },
         {
           id: "iban-validator-and-parser",
-          title: "IBAN Validator",
-          description: "Validate and parse IBAN numbers. Check if an IBAN is valid and get the country, BBAN, if it is a QR-IBAN and the IBAN friendly format.",
+          title: "IBAN validator",
+          description: "Validate and parse IBAN numbers. Check if an IBAN is valid and get the country, BBAN, whether it is a QR-IBAN, and the IBAN friendly format.",
           status: "available",
           route: "/tools/iban-validator-and-parser",
           sourcePath: "/iban-validator-and-parser",

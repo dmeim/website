@@ -43,7 +43,7 @@ export default function MimeTypes() {
     <ToolFrame layout="stack">
       <ToolFrame layout="split" stagger>
         <Panel
-          title="Mime type to extension"
+          title="MIME type to extension"
           titleId="mime-to-ext-heading"
           description="Know which file extensions are associated with a MIME type."
         >
@@ -70,7 +70,7 @@ export default function MimeTypes() {
         </Panel>
 
         <Panel
-          title="File extension to mime type"
+          title="File extension to MIME type"
           titleId="ext-to-mime-heading"
           description="Know which MIME type is associated with a file extension."
         >

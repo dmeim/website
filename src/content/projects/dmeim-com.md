@@ -1,6 +1,6 @@
 ---
 title: dmeim.com
-summary: Personal platform for projects, keys and everyday tools, built static-first on Cloudflare.
+summary: Personal platform for projects, keys, and everyday tools, built static-first on Cloudflare.
 status: wip
 order: 1
 year: 2025–present
@@ -13,8 +13,8 @@ cover: home
 media:
   home:
     title: Home
-    description: The identity block and the Now section. Flat, quiet and laid out like a CV.
-    alt: dmeim.com homepage with a portrait, name, contact icons and a Now section
+    description: The identity block and the Now section. Flat, quiet, and laid out like a CV.
+    alt: dmeim.com homepage with a portrait, name, contact icons, and a Now section
   gallery:
     title: Gallery
     description: Albums as fanned stacks; each opens its own page with a preview box.
@@ -30,7 +30,7 @@ media:
   ui:
     title: UI library
     description: The /ui showcase renders every component in both themes, Astro and React side by side.
-    alt: UI library showcase page with buttons, inputs and badges
+    alt: UI library showcase page with buttons, inputs, and badges
   home-phone:
     title: Home on a phone
     description: Menu on the left opens a drawer; the identity block stays at the top.
@@ -41,8 +41,8 @@ media:
 
 The home base for everything I make and publish: projects, public keys, a
 gallery, and a growing set of tools that run entirely in the browser. It is
-deliberately quiet. Colour, spacing and hairlines carry the hierarchy, and
-gold is saved for links, focus and the marker that glides to the current page.
+deliberately quiet. Colour, spacing, and hairlines carry the hierarchy, and
+gold is saved for links, focus, and the marker that glides to the current page.
 
 ## How it's built
 
@@ -57,8 +57,8 @@ gold is saved for links, focus and the marker that glides to the current page.
 
 ## What's in it
 
-- **Tools:** converters, generators, parsers and viewers that never send your
+- **Tools:** converters, generators, parsers, and viewers that never send your
   data anywhere.
-- **Gallery:** wallpapers, photos, GIFs, video and audio in albums.
+- **Gallery:** wallpapers, photos, GIFs, video, and audio in albums.
 - **Keys:** published SSH and GPG fingerprints, with verification planned.
 - **Orthodox:** a slow, full-screen wall of icons for a spare screen.

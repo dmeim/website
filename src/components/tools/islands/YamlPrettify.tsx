@@ -35,7 +35,7 @@ export default function YamlPrettify() {
             label: "Your raw YAML",
             value: rawYaml,
             onChange: setRawYaml,
-            placeholder: "Paste your raw YAML here...",
+            placeholder: "Paste your raw YAML here…",
             mono: true,
             rows: 12,
           }}

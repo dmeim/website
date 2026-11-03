@@ -21,7 +21,7 @@ export default function JsonMinify() {
             label: "Your raw JSON",
             value: rawJson,
             onChange: setRawJson,
-            placeholder: "Paste your raw JSON here...",
+            placeholder: "Paste your raw JSON here…",
             mono: true,
             rows: 12,
           }}
