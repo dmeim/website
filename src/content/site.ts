@@ -28,9 +28,9 @@ export type KeyBlock = {
 };
 
 export const meta: SiteMeta = {
-  title: "dmeim.com | Dimitri",
+  title: "Dimitrios Meimaridis · IT manager and computer teacher",
   description:
-    "Personal site for Dimitri (dmeim) — projects, tools, public keys, and ways to connect.",
+    "Dimitrios Meimaridis (dmeim) is an IT manager, administrator, and computer teacher with over eight years of experience running school technology. Projects, tools, and public keys.",
 };
 
 export const hero: HeroContent = {

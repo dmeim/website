@@ -19,7 +19,7 @@ const { tool } = Astro.props;
 const resolved = getToolById(tool.id) ?? tool;
 ---
 
-<BaseLayout title={resolved.title} description={resolved.description}>
+<BaseLayout title={`${resolved.title} · Tools`} description={resolved.description}>
   <ToolsShell client:only="react" initialSlug={resolved.id}>
     <div slot="fallback" class="tools-shell-fallback" aria-busy="true">
       <span class="ui-skeleton" style="--ui-skeleton-w: 40%; --ui-skeleton-h: 2.25rem" aria-hidden="true"></span>

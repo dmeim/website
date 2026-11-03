@@ -14,7 +14,7 @@ import { contactLinks } from "@/ui/lib/identity";
           href={href}
           aria-label={external ? `${label} (opens in a new tab)` : label}
           title={label}
-          {...(external && { target: "_blank", rel: "noopener noreferrer" })}
+          {...(external && { target: "_blank", rel: "me noopener noreferrer" })}
         >
           <Icon name={icon} />
         </a>

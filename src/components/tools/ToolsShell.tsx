@@ -41,7 +41,7 @@ function titleForSlug(slug: string | null): string {
 }
 
 function pageTitle(slug: string | null): string {
-  return `${titleForSlug(slug)} · dmeim.com`;
+  return slug ? `${titleForSlug(slug)} · Tools · dmeim.com` : "Tools · dmeim.com";
 }
 
 /**

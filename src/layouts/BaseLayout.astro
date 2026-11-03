@@ -9,6 +9,7 @@ import SiteIdentity from "@/ui/components/SiteIdentity.astro";
 import { Container } from "@/ui/components";
 import SkipLink from "@/ui/components/SkipLink.astro";
 import Toaster from "@/ui/components/Toaster.astro";
+import { fullName } from "@/ui/lib/identity";
 import { shellMode } from "@/ui/lib/site-nav";
 
 interface Props {
@@ -22,12 +23,12 @@ interface Props {
 
 const {
   title = "dmeim.com",
-  description = "Personal site for Dimitri — projects, keys, and tools.",
+  description = "Personal site of Dimitrios Meimaridis: projects, tools, and public keys.",
   immersive = false,
   noindex = false,
 } = Astro.props;
 
-const pageTitle = title === "dmeim.com" ? title : `${title} · dmeim.com`;
+const pageTitle = title === "dmeim.com" || title.startsWith(fullName) ? title : `${title} · dmeim.com`;
 
 const pathname = Astro.url.pathname;
 const mode = shellMode(immersive);
@@ -49,6 +50,7 @@ const isNotFound = canonicalPath === "/404";
     {noindex ? <meta name="robots" content="noindex" /> : null}
     {!isNotFound && <link rel="canonical" href={canonical} />}
     <link rel="sitemap" href="/sitemap-index.xml" />
+    <slot name="head" />
     <title>{pageTitle}</title>
     <!-- FOUC-safe theme: apply before paint -->
     <script is:inline>

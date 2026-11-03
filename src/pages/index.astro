@@ -4,12 +4,29 @@ import HomeIntro from "@/components/home/HomeIntro.astro";
 import HomeExperience from "@/components/home/HomeExperience.astro";
 import HomeSkills from "@/components/home/HomeSkills.astro";
 import HomeEducation from "@/components/home/HomeEducation.astro";
-import { meta } from "@/content/site";
+import { getImage } from "astro:assets";
+import portrait from "@/assets/gallery/studio/headshot.png";
+import { contact, meta } from "@/content/site";
+import { fullName } from "@/ui/lib/identity";
 import { Container } from "@/ui/components";
 import "@/components/home/home.css";
+
+const site = Astro.site?.href ?? "https://dmeim.com/";
+const portraitImage = await getImage({ src: portrait, width: 512, format: "jpg" });
+const person = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: fullName,
+  alternateName: "dmeim",
+  url: site,
+  image: new URL(portraitImage.src, site).href,
+  jobTitle: "IT Manager and Computer Teacher",
+  sameAs: [contact.socialUrl, contact.forgejoUrl],
+};
 ---
 
-<BaseLayout title="dmeim.com" description={meta.description}>
+<BaseLayout title={meta.title} description={meta.description}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(person)} />
   <Container width="narrow">
     <HomeIntro />
     <HomeExperience />
