@@ -1,11 +1,11 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import GameOfLifeSimulation from "../../components/game-of-life/GameOfLifeSimulation";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { GameOfLifeSimulation } from "@/components/game-of-life/GameOfLifeSimulation";
 ---
 
 <BaseLayout
   title="Game of Life simulator"
-  description="A full-page Conway's Game of Life simulator: draw cells, then start, step, or clear the board."
+  description="A full-screen Conway's Game of Life simulator: draw cells or start from a random board, then run, step, or clear it."
   immersive
 >
   <GameOfLifeSimulation client:load />

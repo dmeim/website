@@ -1,5 +1,5 @@
 /**
- * Conway's Game of Life — pure B3/S23 engine with toroidal wrapping.
+ * Conway's Game of Life: pure B3/S23 engine with toroidal wrapping.
  * Reusable by the interactive page and a future ambient field.
  */
 
@@ -109,4 +109,16 @@ export function countPopulation(grid: Grid): number {
 /** Clear all cells in place. */
 export function clearGrid(grid: Grid): void {
   grid.cells.fill(0);
+}
+
+/** Fill in place with a random soup; `density` is the live share (0 to 1). */
+export function randomizeGrid(
+  grid: Grid,
+  density = 0.2,
+  random: () => number = Math.random,
+): void {
+  const share = Math.min(1, Math.max(0, density));
+  for (let i = 0; i < grid.cells.length; i++) {
+    grid.cells[i] = random() < share ? 1 : 0;
+  }
 }

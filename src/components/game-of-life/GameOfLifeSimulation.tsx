@@ -10,6 +10,7 @@ import {
   clearGrid,
   countPopulation,
   createEmptyGrid,
+  randomizeGrid,
   resizeGrid,
   setCell,
   step,
@@ -17,12 +18,10 @@ import {
 } from "@/lib/game-of-life/engine";
 
 import { Button } from "@/ui/react/Button";
+import { IconButton } from "@/ui/react/IconButton";
 import { ImmersiveStage } from "@/ui/react/ImmersiveStage";
-import { Link } from "@/ui/react/Link";
 import { Slider } from "@/ui/react/Slider";
-import { Stat, StatGrid } from "@/ui/react/Stat";
 import { Toolbar } from "@/ui/react/Toolbar";
-import { Icon } from "@/ui/icons";
 
 import "./GameOfLifeSimulation.css";
 
@@ -31,6 +30,12 @@ const DPR_CAP = 2;
 const MIN_FPS = 1;
 const MAX_FPS = 60;
 const DEFAULT_FPS = 8;
+const SEED_DENSITY = 0.14;
+
+const formatCount = new Intl.NumberFormat("en-US");
+
+/** Keys on these targets keep their native meaning (activate, type, slide). */
+const NATIVE_KEY_TARGETS = "input, select, textarea, button, a[href], [role='toolbar']";
 
 function readCssColor(name: string, fallback: string): string {
   if (typeof document === "undefined") return fallback;
@@ -65,11 +70,12 @@ function cellFromPointer(
   return { x, y };
 }
 
-export default function GameOfLifeSimulation() {
+export function GameOfLifeSimulation() {
   const shellRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gridRef = useRef<Grid>(createEmptyGrid(1, 1));
   const bufferRef = useRef<Grid>(createEmptyGrid(1, 1));
+  const seededRef = useRef(false);
   const runningRef = useRef(false);
   const fpsRef = useRef(DEFAULT_FPS);
   const lastTickRef = useRef(0);
@@ -96,24 +102,25 @@ export default function GameOfLifeSimulation() {
     const cssH = shell.clientHeight;
     if (cssW <= 0 || cssH <= 0) return;
 
-    canvas.width = Math.floor(cssW * dpr);
-    canvas.height = Math.floor(cssH * dpr);
-    canvas.style.width = `${cssW}px`;
-    canvas.style.height = `${cssH}px`;
+    // Reassigning the backing size clears and reallocates the bitmap, so only
+    // do it when the stage actually changed size.
+    const pxW = Math.floor(cssW * dpr);
+    const pxH = Math.floor(cssH * dpr);
+    if (canvas.width !== pxW || canvas.height !== pxH) {
+      canvas.width = pxW;
+      canvas.height = pxH;
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
+    }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const elevated = readCssColor("--ui-canvas-bg", "#0e1014");
-    const accent = readCssColor("--ui-canvas-cell", "#d4bc8a");
-    const border = readCssColor("--ui-canvas-grid", "#0e1014");
-
-    ctx.fillStyle = elevated;
+    ctx.fillStyle = readCssColor("--ui-canvas-bg", "#f6f4ef");
     ctx.fillRect(0, 0, cssW, cssH);
 
     const cellW = cssW / grid.cols;
     const cellH = cssH / grid.rows;
 
-    ctx.strokeStyle = border;
-    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = readCssColor("--ui-canvas-grid", "rgb(23 22 20 / 6%)");
     ctx.lineWidth = 1;
     ctx.beginPath();
     for (let x = 0; x <= grid.cols; x++) {
@@ -127,19 +134,16 @@ export default function GameOfLifeSimulation() {
       ctx.lineTo(cssW, py);
     }
     ctx.stroke();
-    ctx.globalAlpha = 1;
 
-    ctx.fillStyle = accent;
+    ctx.fillStyle = readCssColor("--ui-canvas-cell", "#171614");
     for (let y = 0; y < grid.rows; y++) {
       for (let x = 0; x < grid.cols; x++) {
         if (grid.cells[y * grid.cols + x] !== 1) continue;
-        const px = x * cellW;
-        const py = y * cellH;
         ctx.fillRect(
-          Math.floor(px) + 1,
-          Math.floor(py) + 1,
-          Math.max(1, Math.ceil(cellW) - 2),
-          Math.max(1, Math.ceil(cellH) - 2),
+          Math.round(x * cellW) + 1,
+          Math.round(y * cellH) + 1,
+          Math.max(1, Math.round(cellW) - 2),
+          Math.max(1, Math.round(cellH) - 2),
         );
       }
     }
@@ -151,17 +155,64 @@ export default function GameOfLifeSimulation() {
 
   const resizeToShell = useCallback(() => {
     const shell = shellRef.current;
-    if (!shell) return;
+    if (!shell || shell.clientWidth <= 0 || shell.clientHeight <= 0) return;
     const next = gridFromSize(
       shell.clientWidth,
       shell.clientHeight,
       gridRef.current,
     );
+    // Open on a random soup so the board reads as a board, not a blank page.
+    if (!seededRef.current) {
+      randomizeGrid(next, SEED_DENSITY);
+      seededRef.current = true;
+    }
     gridRef.current = next;
     bufferRef.current = createEmptyGrid(next.cols, next.rows);
     syncStats();
     draw();
   }, [draw, syncStats]);
+
+  /** Advance one generation in place, swapping the double buffer. */
+  const advance = useCallback(() => {
+    const current = gridRef.current;
+    if (
+      bufferRef.current.cols !== current.cols ||
+      bufferRef.current.rows !== current.rows
+    ) {
+      bufferRef.current = createEmptyGrid(current.cols, current.rows);
+    }
+    step(current, bufferRef.current);
+    gridRef.current = bufferRef.current;
+    bufferRef.current = current;
+    setGeneration((g) => g + 1);
+    syncStats();
+    draw();
+  }, [draw, syncStats]);
+
+  const toggleRun = useCallback(() => {
+    if (!runningRef.current) lastTickRef.current = performance.now();
+    setRunning((value) => !value);
+  }, []);
+
+  const stepOnce = useCallback(() => {
+    setRunning(false);
+    advance();
+  }, [advance]);
+
+  const handleRandom = () => {
+    randomizeGrid(gridRef.current, SEED_DENSITY);
+    setGeneration(0);
+    syncStats();
+    draw();
+  };
+
+  const handleClear = () => {
+    setRunning(false);
+    clearGrid(gridRef.current);
+    setGeneration(0);
+    syncStats();
+    draw();
+  };
 
   useEffect(() => {
     runningRef.current = running;
@@ -200,24 +251,10 @@ export default function GameOfLifeSimulation() {
     const tick = (now: number) => {
       if (runningRef.current) {
         const interval =
-          1000 /
-          Math.min(MAX_FPS, Math.max(MIN_FPS, fpsRef.current));
+          1000 / Math.min(MAX_FPS, Math.max(MIN_FPS, fpsRef.current));
         if (now - lastTickRef.current >= interval) {
           lastTickRef.current = now;
-          const current = gridRef.current;
-          const buffer = bufferRef.current;
-          if (
-            buffer.cols !== current.cols ||
-            buffer.rows !== current.rows
-          ) {
-            bufferRef.current = createEmptyGrid(current.cols, current.rows);
-          }
-          step(current, bufferRef.current);
-          gridRef.current = bufferRef.current;
-          bufferRef.current = current;
-          setGeneration((g) => g + 1);
-          setPopulation(countPopulation(gridRef.current));
-          draw();
+          advance();
         }
       }
       rafRef.current = requestAnimationFrame(tick);
@@ -227,7 +264,26 @@ export default function GameOfLifeSimulation() {
     return () => {
       cancelAnimationFrame(rafRef.current);
     };
-  }, [draw]);
+  }, [advance]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+      const target = event.target as HTMLElement | null;
+      if (target?.closest(NATIVE_KEY_TARGETS)) return;
+      if (event.key === " ") {
+        event.preventDefault();
+        toggleRun();
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        stepOnce();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [toggleRun, stepOnce]);
 
   const paintAt = useCallback(
     (clientX: number, clientY: number, mode: "live" | "dead") => {
@@ -283,80 +339,82 @@ export default function GameOfLifeSimulation() {
     }
   };
 
-  const handleToggleRun = () => {
-    if (running) {
-      setRunning(false);
-      return;
-    }
-    lastTickRef.current = performance.now();
-    setRunning(true);
-  };
-
-  const handleStep = () => {
-    setRunning(false);
-    const current = gridRef.current;
-    if (
-      bufferRef.current.cols !== current.cols ||
-      bufferRef.current.rows !== current.rows
-    ) {
-      bufferRef.current = createEmptyGrid(current.cols, current.rows);
-    }
-    step(current, bufferRef.current);
-    gridRef.current = bufferRef.current;
-    bufferRef.current = current;
-    setGeneration((g) => g + 1);
-    syncStats();
-    draw();
-  };
-
-  const handleClear = () => {
-    setRunning(false);
-    clearGrid(gridRef.current);
-    setGeneration(0);
-    syncStats();
-    draw();
-  };
-
-  const toolbar = (
-    <Toolbar label="Simulation controls" placement="floating-top" className="gol-sim__bar">
-      <Link href="/game-of-life" tone="quiet" className="gol-sim__exit">
-        <Icon name="arrow-left" />
-        Exit
-      </Link>
-      <div className="gol-sim__actions">
+  // The slider sits outside the toolbar so its arrow keys move the value
+  // instead of the toolbar's roving focus.
+  const dock = (
+    <div className="gol-sim__dock">
+      <Toolbar label="Simulation controls" className="gol-sim__toolbar">
+        <IconButton
+          icon="arrow-left"
+          label="Back to Game of Life"
+          href="/game-of-life"
+          size="sm"
+        />
+        <span className="gol-sim__divider" aria-hidden="true" />
         <Button
           size="sm"
-          variant={running ? "secondary" : "primary"}
+          variant="primary"
           iconStart={running ? "pause" : "play"}
-          pressed={running}
-          onClick={handleToggleRun}
+          aria-keyshortcuts="Space"
+          className="gol-sim__run"
+          onClick={toggleRun}
         >
           {running ? "Pause" : "Start"}
         </Button>
-        <Button size="sm" variant="ghost" iconStart="skip-forward" onClick={handleStep}>
+        <Button
+          size="sm"
+          variant="ghost"
+          iconStart="skip-forward"
+          aria-keyshortcuts="ArrowRight"
+          className="gol-sim__action"
+          onClick={stepOnce}
+        >
           Step
         </Button>
-        <Button size="sm" variant="ghost" iconStart="eraser" onClick={handleClear}>
+        <Button
+          size="sm"
+          variant="ghost"
+          iconStart="shuffle"
+          className="gol-sim__action"
+          onClick={handleRandom}
+        >
+          Random
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          iconStart="eraser"
+          className="gol-sim__action"
+          onClick={handleClear}
+        >
           Clear
         </Button>
+      </Toolbar>
+      <div className="gol-sim__readout">
+        <dl className="gol-sim__stats">
+          <div className="gol-sim__stat">
+            <dt>Generation</dt>
+            <dd>{formatCount.format(generation)}</dd>
+          </div>
+          <div className="gol-sim__stat">
+            <dt>Population</dt>
+            <dd>{formatCount.format(population)}</dd>
+          </div>
+        </dl>
+        <Slider
+          id="gol-sim-fps"
+          className="gol-sim__speed"
+          label="Speed"
+          min={MIN_FPS}
+          max={MAX_FPS}
+          step={1}
+          value={fps}
+          onChange={(value) => setFps(Array.isArray(value) ? value[1] : value)}
+          showValue
+          formatValue={(value) => `${value} fps`}
+        />
       </div>
-      <StatGrid columns={2} className="gol-sim__stats">
-        <Stat label="Generation" value={generation} mono />
-        <Stat label="Population" value={population} mono />
-      </StatGrid>
-      <Slider
-        id="gol-sim-fps"
-        className="gol-sim__speed"
-        label="Speed"
-        min={MIN_FPS}
-        max={MAX_FPS}
-        step={1}
-        value={fps}
-        onChange={(value) => setFps(Array.isArray(value) ? value[1] : value)}
-        showValue
-        formatValue={(value) => `${value} FPS`}
-      />
-    </Toolbar>
+    </div>
   );
 
   return (
@@ -364,18 +422,14 @@ export default function GameOfLifeSimulation() {
       label="Game of Life simulation"
       className="gol-sim"
       data-running={running ? "true" : "false"}
-      toolbar={toolbar}
+      toolbar={dock}
     >
-      <div
-        ref={shellRef}
-        className="gol-sim__stage"
-        aria-label="Game of Life board. Left-click to place cells, right-click to erase."
-      >
+      <div ref={shellRef} className="gol-sim__stage">
         <canvas
           ref={canvasRef}
           className="gol-sim__canvas"
           role="img"
-          aria-label="Game of Life grid"
+          aria-label="Game of Life board. Click or drag to draw cells, right-click to erase."
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={endPaint}

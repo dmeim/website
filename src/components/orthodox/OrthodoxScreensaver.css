@@ -86,11 +86,15 @@ body:has(.ow-stage) .mobile-nav {
 
 /* ——— Chrome: trigger, hint, empty state ——— */
 
-.ow-trigger {
+/* An overlay chip so it reads on any wall photo. */
+.ow-trigger.ui-button {
+  --_fill: var(--ui-popover);
+  --_fill-hover: var(--ui-surface);
   position: absolute;
   z-index: 3;
   right: var(--ui-space-md);
-  bottom: var(--ui-space-md);
+  bottom: calc(var(--ui-space-md) + env(safe-area-inset-bottom, 0px));
+  border: var(--ui-border-width) solid var(--ui-line-strong);
 }
 
 .ow-hint {
@@ -163,6 +167,25 @@ body:has(.ow-stage) .mobile-nav {
   min-height: 0;
 }
 
+/* Groups are hairline-ruled sections; the drawer header already draws the
+   first rule. */
+.ow-group {
+  padding-top: var(--ui-space-md);
+}
+
+.ow-group:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.ow-group > .ui-fieldset__legend {
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-xs);
+  font-weight: var(--ui-fw-medium);
+  letter-spacing: var(--ui-tracking-wide);
+  text-transform: uppercase;
+}
+
 .ow-field {
   display: grid;
   gap: var(--ui-space-xs);
@@ -185,6 +208,17 @@ body:has(.ow-stage) .mobile-nav {
   color: var(--ui-text-muted);
 }
 
+.ow-field--row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ui-space-sm);
+}
+
+.ow-field--row > .ui-button {
+  flex: none;
+}
+
 .ow-segments .ui-segmented-control__track {
   display: flex;
   width: 100%;
@@ -192,6 +226,20 @@ body:has(.ow-stage) .mobile-nav {
 
 .ow-segments .ui-segmented-control__option {
   flex: 1 1 auto;
+}
+
+/* Border names are long; two even columns keep them whole. */
+.ow-segments--grid .ui-segmented-control__track {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ui-seg-pad);
+  height: auto;
+}
+
+.ow-segments--grid .ui-segmented-control__option {
+  min-height: calc(var(--ui-seg-height) - 2 * var(--ui-seg-pad));
+  justify-content: flex-start;
 }
 
 /* Phones: let long options wrap onto extra rows; the sliding thumb can't follow rows, so fill the checked option. */
@@ -379,35 +427,6 @@ body:has(.ow-stage) .mobile-nav {
   flex-direction: column;
   gap: var(--ui-space-xs);
   min-height: 14rem;
-}
-
-.ow-picker__search {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-space-xs);
-  height: var(--ui-control-sm);
-  padding: 0 var(--ui-space-sm);
-  border: var(--ui-border-width) solid var(--ui-line-field);
-  border-radius: var(--ui-radius-control);
-  color: var(--ui-text-muted);
-}
-
-.ow-picker__search:focus-within {
-  border-color: transparent;
-  outline: var(--ui-focus-width) solid var(--ui-focus-ring);
-  outline-offset: var(--ui-focus-offset);
-}
-
-.ow-picker__search input {
-  flex: 1;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  outline: none;
-  background: transparent;
-  color: var(--ui-text);
-  font: inherit;
-  font-size: var(--ui-fs-sm);
 }
 
 .ow-picker__list {

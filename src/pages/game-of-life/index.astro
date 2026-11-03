@@ -17,7 +17,11 @@ import Stack from "@/ui/components/Stack.astro";
     <PageHeader
       title="Game of Life"
       lede="A zero-player cellular automaton. Set the stage, then watch the rules unfold."
-    />
+    >
+      <Button slot="actions" variant="primary" href="/game-of-life/simulation" iconEnd="arrow-right">
+        Open the simulation
+      </Button>
+    </PageHeader>
 
     <Section title="About" spy>
       <Prose as="article">
@@ -29,31 +33,31 @@ import Stack from "@/ui/components/Stack.astro";
         </p>
         <p>
           Each cell on the grid is either live or dead. Every generation applies
-          the classic B3/S23 rules to every cell at once (birth on three neighbors;
+          the classic B3/S23 rules to every cell at once (birth on three neighbors,
           survival on two or three):
         </p>
         <ol>
           <li>
-            <strong>Underpopulation</strong> — A live cell with fewer than two live
+            <strong>Underpopulation.</strong> A live cell with fewer than two live
             neighbors dies.
           </li>
           <li>
-            <strong>Survival</strong> — A live cell with two or three live neighbors
+            <strong>Survival.</strong> A live cell with two or three live neighbors
             lives on.
           </li>
           <li>
-            <strong>Overpopulation</strong> — A live cell with more than three live
+            <strong>Overpopulation.</strong> A live cell with more than three live
             neighbors dies.
           </li>
           <li>
-            <strong>Reproduction</strong> — A dead cell with exactly three live
+            <strong>Reproduction.</strong> A dead cell with exactly three live
             neighbors becomes live.
           </li>
         </ol>
       </Prose>
       <Prose size="sm">
         <p>
-          Overview adapted from
+          Overview adapted from{" "}
           <Link href="https://en.wikipedia.org/wiki/Conway's_Game_of_Life" external>
             Conway's Game of Life on Wikipedia
           </Link>.
@@ -65,9 +69,15 @@ import Stack from "@/ui/components/Stack.astro";
       <Stack gap="md" align="start">
         <Prose>
           <p>
-            Paint cells, run the automaton, and watch patterns emerge under B3/S23
-            with toroidal edges.
+            The board fills the screen and wraps at the edges, so patterns that
+            leave one side return on the other. It opens with a random soup of
+            cells, paused.
           </p>
+          <ul>
+            <li>Click or drag to draw cells, and right-click to erase them.</li>
+            <li>Press Space to start or pause, and the right arrow to step once.</li>
+            <li>Use Random for a fresh soup, Clear for an empty board, and Speed to set the pace.</li>
+          </ul>
         </Prose>
         <Button variant="primary" href="/game-of-life/simulation" iconEnd="arrow-right">
           Enter simulation

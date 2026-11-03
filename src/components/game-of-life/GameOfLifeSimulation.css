@@ -14,48 +14,138 @@
   cursor: crosshair;
 }
 
-.gol-sim__bar {
+/* Dock: one floating overlay for the controls, readout, and speed. */
+
+.gol-sim__dock {
+  position: absolute;
+  inset-inline-start: 50%;
+  top: calc(var(--ui-space-md) + env(safe-area-inset-top, 0px));
+  z-index: var(--ui-z-sticky);
+  display: flex;
   align-items: center;
   gap: var(--ui-space-md);
-  padding-inline: var(--ui-space-sm);
+  max-width: calc(100% - 2 * var(--ui-space-md));
+  padding: var(--ui-space-2xs) var(--ui-space-md) var(--ui-space-2xs) var(--ui-space-2xs);
+  border: var(--ui-border-width) solid var(--ui-line-strong);
+  border-radius: var(--ui-radius-dialog);
+  background: var(--ui-popover);
+  color: var(--ui-text);
+  translate: -50% 0;
 }
 
-.gol-sim__exit {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ui-space-3xs);
-  flex-shrink: 0;
-  font-size: var(--ui-fs-sm);
+.gol-sim__toolbar {
+  flex: none;
+  flex-wrap: nowrap;
 }
 
-.gol-sim__actions {
+.gol-sim__divider {
+  align-self: stretch;
+  width: var(--ui-border-width);
+  margin: var(--ui-space-2xs);
+  background: var(--ui-line);
+}
+
+.gol-sim__run {
+  min-width: 5.5rem;
+}
+
+.gol-sim__readout {
   display: flex;
-  gap: var(--ui-space-3xs);
+  align-items: center;
+  gap: var(--ui-space-lg);
+  min-width: 0;
+  padding-inline-start: var(--ui-space-md);
+  border-inline-start: var(--ui-border-width) solid var(--ui-line);
 }
 
 .gol-sim__stats {
-  gap: var(--ui-space-md);
-  flex-shrink: 0;
+  display: flex;
+  gap: var(--ui-space-lg);
+  margin: 0;
 }
 
+.gol-sim__stat {
+  display: grid;
+  gap: var(--ui-space-3xs);
+}
+
+.gol-sim__stat dt,
+.gol-sim__speed .ui-slider__label,
+.gol-sim__speed .ui-slider__value {
+  color: var(--ui-text-muted);
+  font-size: var(--ui-fs-2xs);
+  font-weight: var(--ui-fw-regular);
+  line-height: var(--ui-lh-tight);
+}
+
+.gol-sim__stat dd {
+  min-width: 6ch;
+  margin: 0;
+  color: var(--ui-text);
+  font-family: var(--ui-font-mono);
+  font-size: var(--ui-fs-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--ui-lh-tight);
+}
+
+/* A shorter track keeps the slider level with the stats; the thumb offset
+   follows the same token. */
 .gol-sim__speed {
-  width: 10rem;
-  flex-shrink: 0;
+  --ui-control-sm: 1.25rem;
+  width: 9rem;
+  gap: 0;
 }
 
-@media (max-width: 1100px) {
-  .gol-sim__bar.ui-toolbar {
+/* Phones and narrow windows: controls on top, readout and speed below. */
+@media (max-width: 860px) {
+  .gol-sim__dock {
     flex-wrap: wrap;
-    width: min(32rem, calc(100% - 2 * var(--ui-space-sm)));
-    top: var(--ui-space-sm);
-    gap: var(--ui-space-sm);
+    gap: var(--ui-space-2xs);
+    width: calc(100% - 2 * var(--ui-space-sm));
+    max-width: 34rem;
+    top: calc(var(--ui-space-sm) + env(safe-area-inset-top, 0px));
+    padding: var(--ui-space-2xs);
   }
 
-  .gol-sim__stats {
+  .gol-sim__toolbar {
     flex: 1 1 100%;
   }
 
+  .gol-sim__readout {
+    flex: 1 1 100%;
+    justify-content: space-between;
+    padding: var(--ui-space-xs) var(--ui-space-sm) var(--ui-space-2xs);
+    border-inline-start: 0;
+    border-top: var(--ui-border-width) solid var(--ui-line);
+  }
+
   .gol-sim__speed {
-    width: 100%;
+    flex: 0 1 9rem;
+  }
+}
+
+/* Small phones: secondary actions go icon-only; the label stays as the name. */
+@media (max-width: 479px) {
+  .gol-sim__run {
+    margin-inline-end: auto;
+  }
+
+  .gol-sim__toolbar .gol-sim__action[data-size] {
+    width: var(--ui-control-sm);
+    padding: 0;
+  }
+
+  .gol-sim__action .ui-button__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .gol-sim__readout,
+  .gol-sim__stats {
+    gap: var(--ui-space-md);
   }
 }

@@ -1,4 +1,4 @@
-import { LAYOUTS, LAYOUT_LABELS } from "@/lib/orthodox/layout";
+import { LAYOUTS, LAYOUT_LABELS, type WallLayout } from "@/lib/orthodox/layout";
 import { ALL_COLLECTIONS } from "@/lib/orthodox/selection";
 import {
   BORDERS,
@@ -11,10 +11,17 @@ import {
   type ScreensaverSettings as Settings,
 } from "@/lib/orthodox/settings";
 import type { OrthodoxCollection, WallBackground } from "@/lib/orthodox/types";
-import { Button, Progress, Select, Slider, Swatch } from "@/ui/react";
+import {
+  Button,
+  Fieldset,
+  Progress,
+  SegmentedControl,
+  Select,
+  Slider,
+  Swatch,
+} from "@/ui/react";
 
 import { OrthodoxSheet } from "./OrthodoxSheet";
-import { SegmentedChoice } from "./SegmentedChoice";
 
 type ScreensaverSettingsProps = {
   settings: Settings;
@@ -96,85 +103,100 @@ export function ScreensaverSettings({
       />
 
       <div className="ow-panel__fields">
-        <Select
-          label="Collection"
-          size="sm"
-          options={collectionOptions}
-          value={settings.collection}
-          onChange={(e) => onChange({ collection: e.target.value })}
-        />
+        <Fieldset legend="Icons" className="ow-group">
+          <Select
+            label="Collection"
+            size="sm"
+            options={collectionOptions}
+            value={settings.collection}
+            onChange={(e) => onChange({ collection: e.target.value })}
+          />
 
-        {custom ? null : (
-          <div className="ow-field">
-            <Slider
-              label="Icons"
-              min={MIN_COUNT}
-              max={MAX_COUNT}
-              showValue
-              value={settings.count}
-              onChange={(count) => onChange({ count: count as number })}
-            />
-            {poolSize < settings.count ? (
-              <p className="ow-field__note">
-                Only {poolSize} in this collection.
-              </p>
-            ) : null}
-          </div>
-        )}
-
-        <SegmentedChoice
-          legend="Layout"
-          name="ow-layout"
-          options={LAYOUT_OPTIONS}
-          value={settings.layout}
-          onChange={(layout) => onChange({ layout })}
-        />
-
-        {custom ? (
-          <div className="ow-field">
-            <Button size="sm" iconStart="pencil-simple" onClick={onArrange}>
-              Arrange wall
-            </Button>
-            <p className="ow-field__note">
-              {settings.customCards.length} cards. Unlocked cards draw from the
-              collection above.
-            </p>
-          </div>
-        ) : null}
-
-        <SegmentedChoice
-          legend="Border"
-          name="ow-border"
-          options={BORDER_OPTIONS}
-          value={settings.border}
-          onChange={(border) => onChange({ border })}
-        />
-
-        <SegmentedChoice
-          legend="Rotate every"
-          name="ow-rotation"
-          options={ROTATION_CHOICES}
-          value={String(settings.rotationSeconds)}
-          onChange={(v) => onChange({ rotationSeconds: Number(v) })}
-        />
-
-        <fieldset className="ow-field">
-          <legend className="ow-field__label">Background</legend>
-          <div className="ow-backgrounds">
-            {backgrounds.map((bg) => (
-              <Swatch
-                key={bg.id}
-                as="button"
-                size="sm"
-                className="ow-background"
-                color={bg.css}
-                label={bg.label}
-                selected={bg.id === settings.background}
-                onClick={() => onChange({ background: bg.id })}
+          {custom ? null : (
+            <div className="ow-field">
+              <Slider
+                label="How many"
+                min={MIN_COUNT}
+                max={MAX_COUNT}
+                showValue
+                value={settings.count}
+                onChange={(count) => onChange({ count: count as number })}
               />
-            ))}
-          </div>
-        </fieldset>
+              {poolSize < settings.count ? (
+                <p className="ow-field__note">
+                  Only {poolSize} in this collection.
+                </p>
+              ) : null}
+            </div>
+          )}
+
+          <SegmentedControl
+            className="ow-segments"
+            name="ow-layout"
+            label="Layout"
+            size="sm"
+            equal={false}
+            options={LAYOUT_OPTIONS}
+            value={settings.layout}
+            onChange={(layout) => onChange({ layout: layout as WallLayout })}
+          />
+
+          {custom ? (
+            <div className="ow-field ow-field--row">
+              <p className="ow-field__note">
+                {settings.customCards.length} cards. Unlocked cards draw from
+                the collection above.
+              </p>
+              <Button size="sm" iconStart="pencil-simple" onClick={onArrange}>
+                Arrange wall
+              </Button>
+            </div>
+          ) : null}
+        </Fieldset>
+
+        <Fieldset legend="Frame" className="ow-group">
+          <SegmentedControl
+            className="ow-segments ow-segments--grid"
+            name="ow-border"
+            label="Border"
+            size="sm"
+            indicator="fill"
+            options={BORDER_OPTIONS}
+            value={settings.border}
+            onChange={(border) => onChange({ border: border as BoardBorder })}
+          />
+
+          <fieldset className="ow-field">
+            <legend className="ow-field__label">Background</legend>
+            <div className="ow-backgrounds">
+              {backgrounds.map((bg) => (
+                <Swatch
+                  key={bg.id}
+                  as="button"
+                  size="sm"
+                  className="ow-background"
+                  color={bg.css}
+                  label={bg.label}
+                  selected={bg.id === settings.background}
+                  onClick={() => onChange({ background: bg.id })}
+                />
+              ))}
+            </div>
+          </fieldset>
+        </Fieldset>
+
+        <Fieldset legend="Timing" className="ow-group">
+          <SegmentedControl
+            className="ow-segments"
+            name="ow-rotation"
+            label="Change icons every"
+            size="sm"
+            equal={false}
+            options={ROTATION_CHOICES}
+            value={String(settings.rotationSeconds)}
+            onChange={(v) => onChange({ rotationSeconds: Number(v) })}
+          />
+        </Fieldset>
       </div>
 
       <div className="ow-panel__actions">

@@ -419,8 +419,8 @@ These are not library components. They are app-local markup that the relevant pa
    - **main:** pane header (IconButton menu on mobile, editable title Input, Toolbar of IconButtons), thread (scroll container `.chat-thread`), composer.
    - **Keep:** the `data-sidebar-open` drawer and every keyboard shortcut listed in package C1.
 5. **Immersive app pages:** `/game-of-life/simulation` and `/orthodox/screensaver` use `BaseLayout immersive` plus `ImmersiveStage`:
-   - Game of Life: a floating Toolbar (Exit Link, play/pause `Button pressed`, Step, Clear, speed `Slider`, `StatGrid` for generation and population).
-   - Orthodox: the trigger Button, settings `Drawer side="end"` (non-modal sheet) with Panels, SegmentedControls, Select, Slider, Swatch buttons and Progress (countdown), plus the floating edit Toolbar.
+   - Game of Life: a floating dock overlay with a Toolbar (back IconButton, Start/Pause, Step, Random, and Clear Buttons), a compact generation and population readout, and the speed `Slider`. The Slider sits outside the Toolbar so its arrow keys are not taken by the Toolbar's roving focus. Space starts or pauses and the right arrow steps when focus is on the board.
+   - Orthodox: the trigger Button, settings `Drawer side="end"` (non-modal sheet) with Fieldset groups (Icons, Frame, and Timing), SegmentedControls, Select, Slider, Swatch buttons, and Progress (countdown), plus the floating edit Toolbar. The card lock sheet uses SegmentedControl and a search `Input`.
 
 ---
 

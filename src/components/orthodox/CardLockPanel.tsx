@@ -3,11 +3,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { CardLock } from "@/lib/orthodox/custom";
 import type { OrthodoxCollection, OrthodoxImage } from "@/lib/orthodox/types";
 
-import { Icon } from "@/ui/icons";
-import { Button, Select } from "@/ui/react";
+import { Button, Input, SegmentedControl, Select } from "@/ui/react";
 
 import { OrthodoxSheet } from "./OrthodoxSheet";
-import { SegmentedChoice } from "./SegmentedChoice";
 
 type CardLockPanelProps = {
   lock: CardLock;
@@ -23,7 +21,7 @@ const KIND_OPTIONS = [
   { value: "any", label: "Any icon" },
   { value: "collection", label: "A group" },
   { value: "icon", label: "One icon" },
-] as const;
+];
 
 export function CardLockPanel({
   lock,
@@ -80,12 +78,14 @@ export function CardLockPanel({
       onClick={(event) => event.stopPropagation()}
     >
       <div className="ow-panel__fields">
-        <SegmentedChoice
-          legend="Shows"
+        <SegmentedControl
+          className="ow-segments"
           name="ow-lock-kind"
+          label="Shows"
+          size="sm"
           options={KIND_OPTIONS}
           value={lock.kind}
-          onChange={setKind}
+          onChange={(kind) => setKind(kind as CardLock["kind"])}
         />
 
         {lock.kind === "any" ? (
@@ -112,16 +112,16 @@ export function CardLockPanel({
 
         {lock.kind === "icon" ? (
           <div className="ow-picker">
-            <label className="ow-picker__search">
-              <Icon name="magnifying-glass" />
-              <input
-                type="search"
-                placeholder="Search by name"
-                aria-label="Search icons by name"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </label>
+            <Input
+              type="search"
+              size="sm"
+              label="Search icons by name"
+              labelHidden
+              iconStart="magnifying-glass"
+              placeholder="Search by name"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
             <div ref={listRef} className="ow-picker__list">
               {groups.map(({ collection, items }) => (
                 <section key={collection.id} className="ow-picker__group">
