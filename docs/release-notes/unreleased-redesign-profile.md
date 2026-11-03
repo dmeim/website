@@ -24,7 +24,7 @@ The whole site moves onto a new UI library (`src/ui`) in the Profile design. The
 - Inter replaces the previous font stack. Code and output use the system monospace.
 - Phosphor icons replace Lucide everywhere.
 - `/tools` now uses the identity rail like the content pages, replacing the tools sidebar. The landing page is slimmed to an intro and one search across every tool.
-- The tools workspace, all 86 tools, the chat app, the orthodox screensaver and Game of Life are restyled. Their behaviour is unchanged.
+- The tools workspace, all 86 tools, the orthodox screensaver, and Game of Life are restyled. Their behaviour is unchanged.
 - The ambient Life field and grain are off by default.
 
 ## Fixed
@@ -35,6 +35,7 @@ The whole site moves onto a new UI library (`src/ui`) in the Profile design. The
 - The always-on `SiteEffects` island (ambient field off), so content pages no longer load React (about 63 KB gzip less per page). Unused barrels, dead exports and stale selectors are gone, and `/ui`'s showcase styles load only on `/ui`.
 - The rounded corners on the favicon and the iOS home-screen icon (same crop; the browser and iOS shape them), and the unused placeholder `favicon.svg`.
 - The `/connect` page and its form (including the optional `PUBLIC_N8N_WEBHOOK_URL`), and the homepage Contact section. The icon rows at the top and bottom of each page are the ways to get in touch.
+- The private `/chat` app and everything behind it: the `/api/chat*`, `/api/chats*` and `/api/library*` routes, the D1 (`DB`) and R2 (`CHAT_LIBRARY`) bindings and their migrations, the OpenCode, Exa and Context7 secrets, the AI SDK packages, `highlight.js` and `unpdf`, and the `app` header mode only chat used. Nothing on the site runs server-side now.
 - The `/home1`–`/home6` redesign concept pages, their components and `ConceptLayout`.
 - Lucide (`lucide`, `@lucide/astro`), the old `projects` and `endorsement` content, and an orphaned project placeholder image.
 - Duplicate portrait files in `assets/images/photoshoot/` and `public/gpt-photoshoot/`; the site uses the gallery copies.

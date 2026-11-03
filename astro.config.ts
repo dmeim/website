@@ -32,10 +32,6 @@ const CLOUDFLARE_SSR_OPTIMIZE_DEPS = [
   ...["BTC", "DOGE", "ETH", "SOL", "TRX", "USDC", "USDT", "XRP"].map(
     (ticker) => `@web3icons/react/icons/tokens/Token${ticker}`,
   ),
-  "ai",
-  "@ai-sdk/react",
-  "@ai-sdk/openai-compatible",
-  "@ai-sdk/anthropic",
   "markdown-it",
   // ClientRouter pulls these; mid-request discovery reloads workerd and
   // desyncs React (Invalid hook call in MotionConfig).

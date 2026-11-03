@@ -47,9 +47,9 @@ gold is saved for links, focus and the marker that glides to the current page.
 ## How it's built
 
 - **Static first.** Astro 7 renders every page at build time and Cloudflare
-  Workers Static Assets serves them. Only the private chat runs server-side.
+  Workers Static Assets serves them. Nothing runs server-side.
 - **One UI library.** About 70 components share a single token contract, in
-  both Astro and React, so tools, chat and content pages look like one site.
+  both Astro and React, so tools and content pages look like one site.
 - **Images at build time.** Photos are resized to WebP once during the build,
   so there are no per-request image transforms to pay for.
 - **No framework CSS.** Plain CSS with custom properties, light and dark

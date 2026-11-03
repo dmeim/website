@@ -15,10 +15,6 @@
   background: var(--ui-site-tile);
 }
 
-.ui-site-header__portrait[data-size="sm"] {
-  width: 32px;
-}
-
 .ui-site-header__portrait img {
   width: 100%;
   height: 100%;
@@ -123,39 +119,12 @@ a.ui-site-header__name:hover {
   background: var(--ui-bg);
 }
 
-.ui-site-header__brand {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ui-space-xs);
-  color: var(--ui-text);
-  font-weight: var(--ui-fw-semibold);
-  letter-spacing: var(--ui-tracking-tight);
-  text-decoration: none;
-}
-
-.ui-site-header__brand-name {
-  white-space: nowrap;
-}
-
-/* Phones: the menu button and theme control leave no room for the full name. */
-@media (max-width: 29.99rem) {
-  .ui-site-header__brand-name {
-    display: none;
-  }
-}
-
-.ui-site-header__bar-nav {
-  display: none;
-  align-self: stretch;
-}
-
 .ui-site-header__actions {
   display: flex;
   align-items: center;
   gap: var(--ui-space-xs);
   margin-left: auto;
 }
-
 
 .ui-site-header__drawer .ui-drawer__body {
   display: flex;
@@ -166,10 +135,6 @@ a.ui-site-header__name:hover {
 @media (min-width: 960px) {
   .ui-site-header__toggle {
     display: none;
-  }
-
-  .ui-site-header[data-shell="app"] .ui-site-header__bar-nav {
-    display: block;
   }
 
   .ui-site-header[data-shell="rail"] {

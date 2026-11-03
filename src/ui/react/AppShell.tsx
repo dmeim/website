@@ -28,7 +28,7 @@ function useNarrow(breakpoint: number): boolean | undefined {
 
 /**
  * Sidebar + main app frame. The main area scrolls; pass `data-main-scroll="false"`
- * when the app owns its own scroller (chat keeps `.chat-thread`).
+ * when the app owns its own scroller.
  */
 export function AppShell({
   sidebar,

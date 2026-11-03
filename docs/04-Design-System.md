@@ -50,7 +50,6 @@ The live, complete list is at `/colors`, which is generated from the tokens.
 - **Gutter:** `--ui-gutter`, at least 16px.
 - **Widths:** `--ui-content-narrow` (40rem), `--ui-content` (46rem) and `--ui-content-wide` (64rem).
 - **Content pages:** a sticky 320px identity rail sits beside the content column at ≥960px. Below that, a top bar opens a drawer.
-- **App pages** (`/tools`, `/chat`): a 56px top bar (`--ui-header-height`) with `AppShell` filling the rest of the viewport.
 - **Corners:** 8px for controls and tiles, 12px for overlays, pills for badges. No shadows or gradients.
 
 ## Motion

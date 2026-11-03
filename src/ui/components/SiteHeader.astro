@@ -1,9 +1,6 @@
 ---
 import type { HTMLAttributes } from "astro/types";
-import { Image } from "astro:assets";
-import portrait from "@/assets/gallery/studio/headshot.png";
 import { cx } from "@/ui/lib/cx";
-import { fullName } from "@/ui/lib/identity";
 import { defaultNavItems, shellMode, type NavItem } from "@/ui/lib/site-nav";
 import Drawer from "./Drawer.astro";
 import IconButton from "./IconButton.astro";
@@ -11,9 +8,9 @@ import SiteNav from "./SiteNav.astro";
 import ThemeControl from "./ThemeControl.astro";
 
 /**
- * Site chrome. Mode comes from `currentPath`: `app` for /chat
- * (slim top bar), otherwise `rail` (sticky theme + nav column at >=960px, top
- * bar below; the identity lives in SiteIdentity at the top of main). `immersive` renders nothing. `menuId` exists only so the /ui
+ * Site chrome: a sticky theme + nav rail at >=960px and a top bar with the
+ * menu below that; the identity lives in SiteIdentity at the top of main.
+ * `immersive` renders nothing. `menuId` exists only so the /ui
  * showcase can render several headers; the site keeps `mobile-nav`.
  */
 interface Props extends Omit<HTMLAttributes<"header">, "class"> {
@@ -32,19 +29,17 @@ const {
   class: className,
   ...rest
 } = Astro.props;
-const mode = shellMode(currentPath, immersive);
+const mode = shellMode(immersive);
 const toggleId = menuId === "mobile-nav" ? "nav-toggle" : `${menuId}-toggle`;
 ---
 
 {
   mode !== "immersive" && (
     <header {...rest} class={cx("ui-site-header", className)} data-shell={mode} data-ui-site-header>
-      {mode === "rail" && (
-        <div class="ui-site-header__rail">
-          <ThemeControl size="sm" class="ui-site-header__rail-theme" />
-          <SiteNav items={items} currentPath={currentPath} orientation="vertical" class="ui-site-header__nav" data-ui-site-spy />
-        </div>
-      )}
+      <div class="ui-site-header__rail">
+        <ThemeControl size="sm" class="ui-site-header__rail-theme" />
+        <SiteNav items={items} currentPath={currentPath} orientation="vertical" class="ui-site-header__nav" data-ui-site-spy />
+      </div>
 
       <div class="ui-site-header__bar">
         <IconButton
@@ -57,17 +52,6 @@ const toggleId = menuId === "mobile-nav" ? "nav-toggle" : `${menuId}-toggle`;
           aria-expanded="false"
           data-ui-drawer-toggle={menuId}
         />
-        {
-          mode === "app" && (
-            <a class="ui-site-header__brand" href="/">
-              <span class="ui-site-header__portrait" data-size="sm">
-                <Image src={portrait} alt="" widths={[96]} sizes="32px" loading="eager" />
-              </span>
-              <span class="ui-site-header__brand-name">{fullName}</span>
-            </a>
-          )
-        }
-        {mode === "app" && <SiteNav items={items} currentPath={currentPath} class="ui-site-header__bar-nav" />}
         <div class="ui-site-header__actions">
           <ThemeControl size="sm" class="ui-site-header__bar-theme" />
         </div>

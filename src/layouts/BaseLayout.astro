@@ -14,7 +14,7 @@ import { shellMode } from "@/ui/lib/site-nav";
 interface Props {
   title?: string;
   description?: string;
-  /** Full-bleed main, no footer. Outside /tools and /chat it also drops the site header. */
+  /** Full-bleed main with no site header or footer. */
   immersive?: boolean;
   /** Adds robots noindex (e.g. the /ui showcase). */
   noindex?: boolean;
@@ -30,8 +30,7 @@ const {
 const pageTitle = title === "dmeim.com" ? title : `${title} · dmeim.com`;
 
 const pathname = Astro.url.pathname;
-// Tools and chat keep the app bar even though their main is full-bleed.
-const mode = shellMode(pathname, immersive && shellMode(pathname) !== "app");
+const mode = shellMode(immersive);
 ---
 
 <!doctype html>

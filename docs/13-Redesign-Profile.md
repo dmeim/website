@@ -12,7 +12,6 @@ npm run dev -- --port 4342
 - Library showcase: `http://localhost:4342/ui` (noindex). Every component appears in both themes, Astro and React side by side.
 - Live token sheet: `http://localhost:4342/colors`.
 - Checks: `npx astro build && npm test`.
-- Chat needs the local D1 tables. On a fresh checkout `/chat` shows "no such table: chats" until you run `npm run chat:reset-local`.
 
 ## Design language
 
@@ -28,19 +27,17 @@ The site reads like a refined online CV. It is flat and quiet, and colour, spaci
 - **Panels.** Panels, the tool work areas, are boxless: a hairline top rule, a title row, then content. Cards are flat surface tiles.
 - **Signature interaction.** A 2px gold marker glides (320ms) along a hairline to the current item:
   - the rail nav, including in-page section sub-links driven by scroll-spy;
-  - the app-bar nav, horizontally;
-  - the tool groups under Tools in the rail (current tool, or its collapsed group) and the chat list (current chat);
+  - the tool groups under Tools in the rail (current tool, or its collapsed group);
   - Tabs.
 - **Other motion.** Hover colour and fill shifts take 160ms. The reveal fade-up is 6px over 360ms and is gated on `html.js`. Copy changes to "Copied". Under `prefers-reduced-motion` every `--ui-dur-*` collapses to 0.01ms. There is no parallax, tilt, magnetic effect or marquee.
 
 ## Site shell
 
-`SiteHeader` derives its mode from `currentPath`, so `BaseLayout` gained no new props apart from `noindex`, which `/ui` needs.
+`SiteHeader` has two modes, set by the page's `immersive` prop; `BaseLayout` gained no new props apart from `noindex`, which `/ui` needs.
 
 | Mode | Routes | Desktop (≥960px) | Phone |
 | --- | --- | --- | --- |
 | **rail** | `/`, `/projects*`, `/gallery*`, `/tools*`, `/keys`, `/colors`, `/orthodox`, `/game-of-life`, `/404`, `/ui` | Sticky 320px identity rail, described below. Content sits in the column beside it. | Sticky top bar (portrait, name, menu) with a `#mobile-nav` Drawer. |
-| **app** | `/chat*` | 56px top bar with brand, horizontal nav (gold underline marker) and ThemeControl. `AppShell` fills the rest. | Same bar, with the Drawer. |
 | **immersive** | `/game-of-life/simulation`, `/orthodox/screensaver` | No chrome; `ImmersiveStage` with a floating `Toolbar`. | Same. |
 
 The rail holds the segmented ThemeControl above the vertical SiteNav, where the current page expands into its spy Sections (and Tools into its groups). The identity sits at the top of main on every rail page (`SiteIdentity`): the portrait and the name "Dimitrios Meimaridis", both linking home (not the h1), the handle and tagline, then the contact and crypto icon rows (`IdentityLinks`). Those rows are the site's ways to reach Dimitri, so there is no Connect page; the addresses live in `contact` in `src/content/site.ts`.
@@ -125,8 +122,6 @@ All 70 catalogue entries exist with the spec'd APIs, in `src/ui/components` (Ast
 
 **Composites.** ToolFrame, TransformPanel, OutputField and ReferenceList are composites. `TransformPanel` is a plain block, so consumers place it inside their own `Panel`.
 
-**AppShell.** Chat passes `data-main-scroll="false"` on the AppShell root so that `.chat-thread` stays the scroll container. No extra prop was added.
-
 **Deviations, kept small:**
 - `SiteHeader` has an extra optional `menuId` prop (default `mobile-nav`), so the showcase can render several headers.
 - Astro `ListRow` takes `badge` as an object, since Astro can't pass a node.
@@ -155,14 +150,11 @@ Behaviour was kept frozen; the presentational side effects are listed here.
   - **Tools:** some element ids changed where no code or test used them. Inputs no longer `autoFocus` inside `TransformPanel`. In ListConverter the options now sit between the input and the output.
   - **Panel titles:** "Docker run → Compose" became "Docker run to Compose".
   - **OTP generator:** the refresh button is now a small icon in the Secret field's label row, so it is easy to miss.
-- **Chat Escape listener:** the composer's capture-phase Escape listener now calls only `preventDefault`, not `stopImmediatePropagation`. This lets library popovers dismiss and restore focus. `ChatShell` already ignores an Escape that was prevented.
-- **Chat code blocks:** the markup string in `src/lib/chat/markdown.ts` follows the `.ui-code-block` contract (`data-chat-copy` plus `data-copy`), and its test was updated. This is a markup-only change.
 - **AsciiTextDrawer fix:** this is a real bug fix in `src/lib/tools/ascii-text-drawer/asciiTextDrawer.service.ts`, made in its own `fix:` commit. The font path ended in `/`, so figlet requested `fonts//Standard.flf` and got a 404. It had been broken since the tool was added.
 - **WordCode scroll guard:** tools now scroll with the page, so the guard checks the heading against the window instead of a `tools-stage__body` container.
 
 ## Known issues / not verified
 
-- Chat was checked only up to the UI. The local D1 had no tables, so the chat list rows, the per-chat StatusDot, the thread with real messages and streaming were not seen live. The markdown, thinking and metrics components were render-checked in a throwaway test.
 - These camera paths could not be tested in the browser pane: recording, photo capture and device switching. The permission-denied state was checked.
 - Fullscreen and wake lock on `/orthodox/screensaver` are blocked in the test pane and were not exercised.
 - Arrow-key movement on native radio SegmentedControls was not driven by synthetic events, so it relies on native behaviour.

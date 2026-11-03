@@ -7,7 +7,7 @@ export interface NavItem {
   ariaLabel?: string;
 }
 
-export type ShellMode = "rail" | "app" | "immersive";
+export type ShellMode = "rail" | "immersive";
 
 // U+FE0E keeps the cross as a text glyph instead of an emoji on iOS.
 export const defaultNavItems: NavItem[] = [
@@ -24,7 +24,6 @@ export function isCurrentPath(href: string, currentPath: string): boolean {
   return currentPath === href || currentPath.startsWith(`${href}/`);
 }
 
-export function shellMode(currentPath: string, immersive = false): ShellMode {
-  if (immersive) return "immersive";
-  return /^\/chat(\/|$)/.test(currentPath) ? "app" : "rail";
+export function shellMode(immersive = false): ShellMode {
+  return immersive ? "immersive" : "rail";
 }

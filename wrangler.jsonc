@@ -13,20 +13,4 @@
   "routes": [
     { "pattern": "dmeim.com", "custom_domain": true },
   ],
-  // Code expects bindings DB + CHAT_LIBRARY (see src/lib/chat/db.ts).
-  // Local `astro dev` uses Miniflare; do not set remote:true here or local hits prod data.
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "dmeim-chat",
-      "database_id": "0954c59b-82df-46df-8dbd-ca0b43445fc8",
-      "migrations_dir": "migrations",
-    },
-  ],
-  "r2_buckets": [
-    {
-      "binding": "CHAT_LIBRARY",
-      "bucket_name": "dmeim-chat-library",
-    },
-  ],
 }
