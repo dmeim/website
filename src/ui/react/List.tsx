@@ -1,5 +1,5 @@
 import { createContext, useContext, type HTMLAttributes, type MouseEvent, type ReactNode, type Ref } from "react";
-import { Icon, type IconName } from "@/ui/icons";
+import { Icon, type IslandIconName as IconName } from "@/ui/icons";
 import { cx } from "@/ui/lib/cx";
 import { Badge, type BadgeProps } from "./Badge";
 import { StatusDot, type StatusDotProps } from "./StatusDot";

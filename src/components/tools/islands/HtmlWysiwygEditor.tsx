@@ -2,7 +2,7 @@ import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useMemo, useState } from "react";
 
-import type { IconName } from "@/ui/icons";
+import type { IslandIconName as IconName } from "@/ui/icons";
 import { CopyButton, IconButton, OutputField, Panel, ToolFrame, Toolbar } from "@/ui/react";
 import {
   DEFAULT_HTML,

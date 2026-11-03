@@ -1,5 +1,5 @@
 import type { ComponentPropsWithRef } from "react";
-import { Icon, type IconName } from "@/ui/icons";
+import { Icon, type IslandIconName as IconName } from "@/ui/icons";
 import { cx } from "@/ui/lib/cx";
 
 export type BadgeProps = ComponentPropsWithRef<"span"> & {

@@ -28,7 +28,6 @@ const CLOUDFLARE_SSR_OPTIMIZE_DEPS = [
   "react/jsx-runtime",
   "react/jsx-dev-runtime",
   "framer-motion",
-  "@phosphor-icons/react/dist/ssr",
   // Keep in sync with the deep imports in src/ui/icons/token-icons.tsx.
   ...["BTC", "DOGE", "ETH", "SOL", "TRX", "USDC", "USDT", "XRP"].map(
     (ticker) => `@web3icons/react/icons/tokens/Token${ticker}`,

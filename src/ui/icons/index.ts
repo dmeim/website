@@ -1,2 +1,9 @@
 export { Icon, type IconProps } from "./Icon";
-export { icons, iconNames, type IconName, type IconWeight } from "./registry";
+export {
+  iconNames,
+  iconWeights,
+  islandIconNames,
+  type IconName,
+  type IconWeight,
+  type IslandIconName,
+} from "./registry";

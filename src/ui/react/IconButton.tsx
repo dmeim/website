@@ -1,5 +1,5 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, Ref } from "react";
-import { Icon, type IconName, type IconWeight } from "@/ui/icons";
+import { Icon, type IslandIconName as IconName, type IconWeight } from "@/ui/icons";
 import { cx } from "@/ui/lib/cx";
 import { Tooltip } from "./Tooltip";
 

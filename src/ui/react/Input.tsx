@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent, type InputHTMLAttributes, type ReactNode, type Ref } from "react";
-import { Icon, type IconName } from "@/ui/icons";
+import { Icon, type IslandIconName as IconName } from "@/ui/icons";
 import { cx } from "@/ui/lib/cx";
 import { describedBy, type ControlSize } from "@/ui/lib/field";
 import { useStableId } from "@/ui/lib/ids";

@@ -10,7 +10,7 @@ import {
   type ReactElement,
   type Ref,
 } from "react";
-import { Icon, type IconName } from "@/ui/icons";
+import { Icon, type IslandIconName as IconName } from "@/ui/icons";
 import { cx } from "@/ui/lib/cx";
 import { useDismiss } from "@/ui/lib/dismiss";
 import { useStableId } from "@/ui/lib/ids";

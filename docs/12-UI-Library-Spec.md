@@ -428,14 +428,14 @@ These are not library components. They are app-local markup that the relevant pa
 
 ### Package choice
 
-The package is **`@phosphor-icons/react@^2.1.10`**, Phosphor's official React package. It is the only Phosphor dependency.
+Icons come from **`@phosphor-icons/react`**, used only at development time (a dev dependency). `npm run icons` (`scripts/build-icons.mjs`) renders each listed icon in the four weights the site uses (regular, bold, fill, light) and writes the inner SVG markup to `src/ui/icons/glyphs-island.ts` and `glyphs-page.ts`. Nothing from Phosphor ships to the browser.
 
-- **React islands** import from `@/ui/icons` (the `Icon` component), never from Phosphor directly. This keeps one closed, typed icon set.
-- **Astro** uses `src/ui/icons/Icon.astro`. It renders the same React component **on the server with no client directive**. The output is inline `<svg>` with zero client JS, which was verified in a build. One registry serves both frameworks, and it supports all six weights.
+- **React islands** import `Icon` from `@/ui/icons`. It only accepts `IslandIconName`, so the browser bundle carries just those glyphs (77 icons, about 31 KB gzipped, down from about 87 KB for the full Phosphor components in six weights).
+- **Astro** uses `src/ui/icons/Icon.astro`, which renders inline `<svg>` at build from both glyph files plus the web3icons token marks. It accepts every `IconName` and ships zero JS.
 - **Rejected:**
   - `@phosphor-icons/core` raw SVGs: a 9,000-file glob or per-weight `?raw` imports, with no type safety.
   - `@phosphor-icons/web`: an icon font or CSS loaded at runtime.
-- The registry imports from the `@phosphor-icons/react/dist/ssr` entry (context-free components, safe on server and client). The package is `sideEffects: false`, so client bundles tree-shake to the icons actually used. The entry is pre-bundled for the Cloudflare SSR dev environment in `astro.config.ts`.
+  - Importing Phosphor's React components directly: lookup by name defeats tree-shaking, so every island shipped every icon in all six weights.
 
 ### API
 
@@ -458,7 +458,7 @@ import { Icon } from "@/ui/icons";
 
 ### Adding icons
 
-`src/ui/icons/registry.ts` is a **closed set** keyed by Phosphor's kebab-case name. To use a new icon, add the import and the entry, in alphabetical order. This is the one shared file all three teams may append to. Expect trivial merge conflicts, and resolve them by keeping both entries.
+`src/ui/icons/registry.ts` is a **closed set** keyed by Phosphor's kebab-case name. To use a new icon, add its name to `islandIconNames` (React) or `pageIconNames` (Astro only), in alphabetical order, then run `npm run icons`. This is the one shared file all three teams may append to. Expect trivial merge conflicts, and resolve them by keeping both entries.
 
 **Exception: crypto token marks.** Every cryptocurrency mark comes from [web3icons](https://github.com/0xa3k5/web3icons) (`@web3icons/react`, MIT), never Phosphor, so the set never mixes packs. `src/ui/icons/token-icons.tsx` imports each mark by its deep path (`@web3icons/react/icons/tokens/TokenBTC`) so only used icons ship, forces the `mono` variant so it inherits `currentColor`, and wraps it in Phosphor's props. Registry keys are `token-<ticker>` (`token-btc`, `token-eth`, `token-sol`, `token-xrp`, `token-doge`). To add another token, wrap it there, add the key, and add its ticker to the web3icons list in `CLOUDFLARE_SSR_OPTIMIZE_DEPS` (`astro.config.ts`); otherwise the dev server discovers it mid-request and throws "Invalid hook call". Everything that is not a crypto mark stays Phosphor.
 

@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState, type HTMLAttributes, type KeyboardEvent, type ReactNode, type Ref } from "react";
-import { Icon, type IconName } from "@/ui/icons";
+import { Icon, type IslandIconName as IconName } from "@/ui/icons";
 import { cx } from "@/ui/lib/cx";
 import { useStableId } from "@/ui/lib/ids";
 import { placeIndicator, tabForKey } from "@/ui/lib/tabs";

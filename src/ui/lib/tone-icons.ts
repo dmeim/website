@@ -1,10 +1,10 @@
-import type { IconName } from "@/ui/icons";
+import type { IslandIconName } from "@/ui/icons";
 import type { ToastTone } from "./toast";
 
 export type Tone = ToastTone;
 
 /** Default Notice/Toast icon per tone. */
-export const TONE_ICONS: Record<Tone, IconName> = {
+export const TONE_ICONS: Record<Tone, IslandIconName> = {
   neutral: "info",
   info: "info",
   success: "check-circle",

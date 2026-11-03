@@ -1,5 +1,5 @@
 import type { AriaRole, HTMLAttributes, ReactNode, Ref } from "react";
-import { Icon, type IconName } from "@/ui/icons";
+import { Icon, type IslandIconName as IconName } from "@/ui/icons";
 import { cx } from "@/ui/lib/cx";
 import { TONE_ICONS, type Tone } from "@/ui/lib/tone-icons";
 

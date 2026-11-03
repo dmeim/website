@@ -1,10 +1,12 @@
 ---
 /**
- * Static Phosphor icon for .astro files. Renders the shared React icon on the
- * server with no client directive, so it ships inline SVG and zero JS.
+ * Icon for .astro files: inline SVG rendered at build, zero JS. Takes every
+ * IconName, including page-only icons and the crypto token marks.
  */
-import { Icon as IconSvg } from "./Icon";
-import type { IconName, IconWeight } from "./registry";
+import { islandGlyphs } from "./glyphs-island";
+import { pageGlyphs } from "./glyphs-page";
+import { isTokenIcon, type IconName, type IconWeight } from "./registry";
+import { tokenIcons } from "./token-icons";
 
 interface Props {
   name: IconName;
@@ -16,14 +18,29 @@ interface Props {
   class?: string;
 }
 
-const { name, size, weight, mirrored, label, class: className } = Astro.props;
+const { name, size = "1em", weight = "regular", mirrored = false, label, class: className } = Astro.props;
+const classes = className ? `ui-icon ${className}` : "ui-icon";
+const a11y = label ? { role: "img", "aria-label": label } : { "aria-hidden": "true" };
+const Token = isTokenIcon(name) ? tokenIcons[name] : undefined;
+const glyph = isTokenIcon(name) ? "" : (name in islandGlyphs ? islandGlyphs : pageGlyphs)[name as keyof typeof islandGlyphs & keyof typeof pageGlyphs]?.[weight];
 ---
 
-<IconSvg
-  name={name}
-  size={size}
-  weight={weight}
-  mirrored={mirrored}
-  label={label}
-  className={className}
-/>
+{
+  Token ? (
+    <Token size={size} className={classes} focusable="false" data-icon={name} {...a11y} />
+  ) : (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      fill="currentColor"
+      viewBox="0 0 256 256"
+      transform={mirrored ? "scale(-1, 1)" : undefined}
+      class={classes}
+      focusable="false"
+      data-icon={name}
+      {...a11y}
+      set:html={glyph}
+    />
+  )
+}
