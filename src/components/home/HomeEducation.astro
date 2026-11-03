@@ -1,23 +1,26 @@
 ---
-/** Education: one entry in the same shape as Experience. */
+/**
+ * Education: one entry in the same shape as Experience. Its parts reveal one by
+ * one, since a single entry would otherwise fade in as one block.
+ */
 import Section from "@/ui/components/Section.astro";
 import { education } from "@/content/resume";
 ---
 
 <Section id="education" title="Education" spy class="home-section" data-reveal-group>
   <ol class="home-entries">
-    <li class="home-entry" data-reveal>
-      <p class="home-entry__when">{education.dates}</p>
+    <li class="home-entry">
+      <p class="home-entry__when" data-reveal>{education.dates}</p>
       <div class="home-entry__body">
-        <h3 class="home-entry__title">{education.degree}</h3>
-        <p class="home-entry__where">
+        <h3 class="home-entry__title" data-reveal>{education.degree}</h3>
+        <p class="home-entry__where" data-reveal>
           {education.school} · {education.place} · {education.note}
         </p>
         <dl class="home-entry__facts">
-          <dt>Scholarships &amp; grants</dt>
-          <dd>{education.honors.join(", ")}</dd>
-          <dt>Coursework</dt>
-          <dd>{education.coursework.join(", ")}</dd>
+          <dt data-reveal>Scholarships &amp; grants</dt>
+          <dd data-reveal>{education.honors.join(", ")}</dd>
+          <dt data-reveal>Coursework</dt>
+          <dd data-reveal>{education.coursework.join(", ")}</dd>
         </dl>
       </div>
     </li>
