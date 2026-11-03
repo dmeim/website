@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import {
   useCallback,
   useEffect,
@@ -7,7 +7,7 @@ import {
   type MouseEvent,
 } from "react";
 
-import { MotionConfigProvider } from "@/components/motion";
+import { MotionRoot } from "@/ui/react/MotionRoot";
 import type { OrthodoxCatalog } from "@/lib/orthodox/assets";
 import { addCard, describeLock, type CustomCard } from "@/lib/orthodox/custom";
 import type { ScreensaverSettings as Settings } from "@/lib/orthodox/settings";
@@ -137,7 +137,7 @@ export function OrthodoxScreensaver({
   }
 
   return (
-    <MotionConfigProvider>
+    <MotionRoot>
       <ImmersiveStage
         label="Icon wall"
         className="ow-stage"
@@ -160,7 +160,7 @@ export function OrthodoxScreensaver({
 
             <AnimatePresence>
               {hintVisible && !panelOpen && !arranging ? (
-                <motion.p
+                <m.p
                   className="ow-hint"
                   role="status"
                   initial={{ opacity: 0 }}
@@ -169,7 +169,7 @@ export function OrthodoxScreensaver({
                   transition={{ duration: 0.8 }}
                 >
                   Tap the wall to change the display
-                </motion.p>
+                </m.p>
               ) : null}
             </AnimatePresence>
           </>
@@ -264,7 +264,7 @@ export function OrthodoxScreensaver({
           ) : null}
         </AnimatePresence>
       </ImmersiveStage>
-    </MotionConfigProvider>
+    </MotionRoot>
   );
 }
 

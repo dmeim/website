@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import type { ComponentProps } from "react";
 
 import { cx } from "@/ui/lib/cx";
@@ -12,7 +12,7 @@ type OrthodoxSheetProps = Omit<
 /** Non-modal end drawer; the wrapper keeps the AnimatePresence enter/exit. */
 export function OrthodoxSheet({ className, ...rest }: OrthodoxSheetProps) {
   return (
-    <motion.div
+    <m.div
       className="ow-sheet"
       initial={{ opacity: 0, x: 24 }}
       animate={{ opacity: 1, x: 0 }}
@@ -27,6 +27,6 @@ export function OrthodoxSheet({ className, ...rest }: OrthodoxSheetProps) {
         width="24rem"
         className={cx("ow-panel", className)}
       />
-    </motion.div>
+    </m.div>
   );
 }

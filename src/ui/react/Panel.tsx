@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
+import { MotionRoot } from "./MotionRoot";
 import type { HTMLAttributes, ReactNode, Ref } from "react";
 import { cx } from "@/ui/lib/cx";
 import { useStableId } from "@/ui/lib/ids";
@@ -48,8 +49,10 @@ export function Panel({
   const props = { ...rest, className: cx("ui-panel", className), "aria-labelledby": headingId };
   if (!animate || reduced) return <section {...props}>{content}</section>;
   return (
-    <motion.section {...(props as object)} initial="hidden" animate="visible" variants={fadeUp}>
-      {content}
-    </motion.section>
+    <MotionRoot>
+      <m.section {...(props as object)} initial="hidden" animate="visible" variants={fadeUp}>
+        {content}
+      </m.section>
+    </MotionRoot>
   );
 }

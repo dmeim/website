@@ -30,7 +30,7 @@ Read `docs/11-Redesign-Concepts.md` first for the visual direction. The quiet ru
    - Canvas code watches `data-theme` with a `MutationObserver`. Keep that attribute as the single source of truth.
 6. **Reduced motion is respected everywhere.**
    - CSS uses `@media (prefers-reduced-motion: reduce)`.
-   - React motion code goes through the existing `MotionConfigProvider` and `usePrefersReducedMotion`.
+   - React motion code uses `m` components inside `MotionRoot` (`src/ui/react/MotionRoot.tsx`), which loads Framer Motion's lighter `domAnimation` features and respects reduced motion.
    - Reveals must render their final state when motion is reduced or JS is unavailable.
 7. **Astro ClientRouter is on.** Every inline or init script must stay idempotent on `astro:page-load`. Use the existing `dataset.bound` guard pattern.
 8. **Accessibility is a baseline, not the priority.** Use semantic elements, keep visible `:focus-visible`, make every interactive element keyboard-reachable, give icon-only controls an accessible name, and keep ARIA attributes that JS reads (see the risks in each package).
@@ -610,7 +610,6 @@ Each package is sized so that one sub-agent can finish it while reading under ab
 - `src/scripts/theme-toggle.ts` and `site-nav-thumb.ts` become `src/ui/lib/theme.ts` plus the SiteNav marker.
 - `src/components/react/{SiteEffects,LifeField,GlyphField}.tsx`: switch to `--ui-ambient`.
 - `src/components/react/PageIntro.*` becomes a thin wrapper over PageHeader (or callers move to PageHeader).
-- `src/components/motion/*`: tokens only.
 - Risks:
   - The mobile nav script ids, attributes, focus trap and resize auto-close.
   - ClientRouter re-binding.

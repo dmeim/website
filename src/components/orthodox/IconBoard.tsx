@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import type {
   CSSProperties,
   KeyboardEventHandler,
@@ -61,7 +61,7 @@ export function IconBoard({
   const tilt = edit?.phase === 1 ? -JIGGLE_DEG : JIGGLE_DEG;
 
   return (
-    <motion.figure
+    <m.figure
       className="ow-board"
       data-border={border}
       data-editing={edit ? true : undefined}
@@ -88,7 +88,7 @@ export function IconBoard({
       <div className="ow-board__ark">
         <AnimatePresence initial={false}>
           {image ? (
-            <motion.img
+            <m.img
               key={image.id}
               className="ow-board__img"
               src={image.src}
@@ -103,6 +103,6 @@ export function IconBoard({
         </AnimatePresence>
       </div>
       {children}
-    </motion.figure>
+    </m.figure>
   );
 }

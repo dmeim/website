@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 import { MAX_CARDS } from "@/lib/orthodox/custom";
 import { Button, Toolbar } from "@/ui/react";
@@ -12,7 +12,7 @@ type EditToolbarProps = {
 export function EditToolbar({ count, onAdd, onDone }: EditToolbarProps) {
   // Opacity only: a transform on this wrapper would re-anchor the floating toolbar.
   return (
-    <motion.div
+    <m.div
       className="ow-toolbar-fade"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -41,6 +41,6 @@ export function EditToolbar({ count, onAdd, onDone }: EditToolbarProps) {
           Done
         </Button>
       </Toolbar>
-    </motion.div>
+    </m.div>
   );
 }

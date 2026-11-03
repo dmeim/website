@@ -56,7 +56,7 @@ The live, complete list is at `/colors`, which is generated from the tokens.
 
 - Durations are `--ui-dur-instant` / `fast` / `base` / `slow` (80 / 160 / 240 / 360ms), plus `--ui-dur-glide` (320ms) for the signature gold marker that glides to the current nav item.
 - Reveals fade up 6px and are gated on `html.js`. React motion code uses `src/ui/lib/motion.ts`.
-- Reduced motion: `base.css` collapses every duration, and islands use `MotionConfigProvider` / `usePrefersReducedMotion`.
+- Reduced motion: `base.css` collapses every duration, and islands animate through `MotionRoot` (`src/ui/react/MotionRoot.tsx`: Framer Motion's lighter `LazyMotion` + `domAnimation` with `reducedMotion="user"`), using `m` components rather than `motion`.
 - The ambient Life field is mounted but off (`AMBIENT_ENABLED` in `SiteEffects.tsx`).
 
 ## Styling Approach
