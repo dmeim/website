@@ -36,12 +36,16 @@ export function useFullscreen() {
     const doc = document as FullscreenDocument;
     setSupported(Boolean(doc.fullscreenEnabled || doc.webkitFullscreenEnabled));
     const sync = () => setActive(fullscreenElement() !== null);
+    // Leaving the page should drop out of fullscreen with it.
+    const onBeforeSwap = () => void exitFullscreen();
     sync();
     document.addEventListener("fullscreenchange", sync);
     document.addEventListener("webkitfullscreenchange", sync);
+    document.addEventListener("astro:before-swap", onBeforeSwap);
     return () => {
       document.removeEventListener("fullscreenchange", sync);
       document.removeEventListener("webkitfullscreenchange", sync);
+      document.removeEventListener("astro:before-swap", onBeforeSwap);
     };
   }, []);
 
@@ -50,7 +54,7 @@ export function useFullscreen() {
       if (fullscreenElement()) await exitFullscreen();
       else await enterFullscreen();
     } catch (error) {
-      console.warn("[orthodox] fullscreen toggle failed", error);
+      console.warn("[fullscreen] toggle failed", error);
     }
   }, []);
 

@@ -20,10 +20,10 @@ import { IconBoard } from "./IconBoard";
 import { ScreensaverSettings } from "./ScreensaverSettings";
 import { useAutoClose } from "./useAutoClose";
 import { useElementSize } from "./useElementSize";
-import { exitFullscreen, useFullscreen } from "./useFullscreen";
+import { useFullscreen } from "@/ui/react/use-fullscreen";
 import { useIdle } from "./useIdle";
 import { useScreensaverSettings } from "./useScreensaverSettings";
-import { useWakeLock } from "./useWakeLock";
+import { useWakeLock } from "@/ui/react/use-wake-lock";
 import { useWallBoards } from "./useWallBoards";
 import "./OrthodoxScreensaver.css";
 
@@ -88,16 +88,6 @@ export function OrthodoxScreensaver({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pickingId, editing, stopEditing]);
-
-  useEffect(() => {
-    // Leaving the page should drop out of fullscreen with it.
-    function onBeforeSwap() {
-      void exitFullscreen();
-    }
-    document.addEventListener("astro:before-swap", onBeforeSwap);
-    return () =>
-      document.removeEventListener("astro:before-swap", onBeforeSwap);
-  }, []);
 
   /** The first switch to Custom starts from the wall as it hangs now. */
   function changeSettings(patch: Partial<Settings>) {

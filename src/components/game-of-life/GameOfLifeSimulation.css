@@ -14,6 +14,11 @@
   cursor: crosshair;
 }
 
+/* After a few still seconds the dock fades out; the cursor goes with it. */
+.gol-sim[data-idle="true"] .gol-sim__canvas {
+  cursor: none;
+}
+
 /* Dock: one floating overlay for the controls, readout, and speed. */
 
 .gol-sim__dock {
@@ -31,6 +36,13 @@
   background: var(--ui-popover);
   color: var(--ui-text);
   translate: -50% 0;
+}
+
+/* Depleting line: time left before the dock hides itself. Inset by the
+   corner radius so it sits on the straight part of the bottom edge. */
+.gol-sim__timer {
+  position: absolute;
+  inset: auto var(--ui-radius-dialog) 0;
 }
 
 .gol-sim__toolbar {

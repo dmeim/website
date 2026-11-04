@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-/** Keep the display awake while the screensaver is showing. */
+/** Keep the display awake while `enabled` (screensavers, simulations). */
 export function useWakeLock(enabled: boolean): void {
   useEffect(() => {
     if (!enabled || !("wakeLock" in navigator)) return;
@@ -13,7 +13,7 @@ export function useWakeLock(enabled: boolean): void {
         sentinel = await navigator.wakeLock.request("screen");
         if (cancelled) await sentinel.release();
       } catch (error) {
-        console.warn("[orthodox] screen wake lock unavailable", error);
+        console.warn("[wake-lock] screen wake lock unavailable", error);
       }
     }
 

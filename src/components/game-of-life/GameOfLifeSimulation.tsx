@@ -20,9 +20,13 @@ import {
 import { Button } from "@/ui/react/Button";
 import { IconButton } from "@/ui/react/IconButton";
 import { ImmersiveStage } from "@/ui/react/ImmersiveStage";
+import { Progress } from "@/ui/react/Progress";
 import { Slider } from "@/ui/react/Slider";
 import { Toolbar } from "@/ui/react/Toolbar";
+import { useFullscreen } from "@/ui/react/use-fullscreen";
+import { useWakeLock } from "@/ui/react/use-wake-lock";
 
+import { useAutoHide } from "./use-auto-hide";
 import "./GameOfLifeSimulation.css";
 
 const CELL_SIZE = 12;
@@ -31,6 +35,7 @@ const MIN_FPS = 1;
 const MAX_FPS = 60;
 const DEFAULT_FPS = 8;
 const SEED_DENSITY = 0.14;
+const DOCK_HIDE_MS = 6_000;
 
 const formatCount = new Intl.NumberFormat("en-US");
 
@@ -87,6 +92,10 @@ export function GameOfLifeSimulation() {
   const [fps, setFps] = useState(DEFAULT_FPS);
   const [generation, setGeneration] = useState(0);
   const [population, setPopulation] = useState(0);
+
+  const dockTimer = useAutoHide(DOCK_HIDE_MS);
+  const fullscreen = useFullscreen();
+  useWakeLock(running);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -266,6 +275,8 @@ export function GameOfLifeSimulation() {
     };
   }, [advance]);
 
+  const toggleFullscreen = fullscreen.toggle;
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) {
@@ -279,11 +290,14 @@ export function GameOfLifeSimulation() {
       } else if (event.key === "ArrowRight") {
         event.preventDefault();
         stepOnce();
+      } else if (event.key === "f" || event.key === "F") {
+        event.preventDefault();
+        void toggleFullscreen();
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [toggleRun, stepOnce]);
+  }, [toggleRun, stepOnce, toggleFullscreen]);
 
   const paintAt = useCallback(
     (clientX: number, clientY: number, mode: "live" | "dead") => {
@@ -312,6 +326,8 @@ export function GameOfLifeSimulation() {
     event.preventDefault();
     const canvas = canvasRef.current;
     if (!canvas) return;
+    // A tap that only brings the dock back shouldn't also paint a cell.
+    if (dockTimer.hidden) return;
 
     if (event.button === 0) {
       paintModeRef.current = "live";
@@ -340,9 +356,13 @@ export function GameOfLifeSimulation() {
   };
 
   // The slider sits outside the toolbar so its arrow keys move the value
-  // instead of the toolbar's roving focus.
+  // instead of the toolbar's roving focus. A press drops focus so the dock can
+  // still hide and the board's shortcuts keep working; keyboard focus stays.
   const dock = (
-    <div className="gol-sim__dock">
+    <div
+      className="gol-sim__dock"
+      onPointerUp={() => (document.activeElement as HTMLElement | null)?.blur()}
+    >
       <Toolbar label="Simulation controls" className="gol-sim__toolbar">
         <IconButton
           icon="arrow-left"
@@ -389,6 +409,18 @@ export function GameOfLifeSimulation() {
         >
           Clear
         </Button>
+        {fullscreen.supported ? (
+          <>
+            <span className="gol-sim__divider" aria-hidden="true" />
+            <IconButton
+              icon={fullscreen.active ? "corners-in" : "corners-out"}
+              label={fullscreen.active ? "Exit fullscreen" : "Fullscreen"}
+              aria-keyshortcuts="F"
+              size="sm"
+              onClick={() => void toggleFullscreen()}
+            />
+          </>
+        ) : null}
       </Toolbar>
       <div className="gol-sim__readout">
         <dl className="gol-sim__stats">
@@ -414,6 +446,14 @@ export function GameOfLifeSimulation() {
           formatValue={(value) => `${value} fps`}
         />
       </div>
+      <Progress
+        key={dockTimer.cycle}
+        className="gol-sim__timer"
+        size="sm"
+        label="Controls hide automatically"
+        labelHidden
+        duration={DOCK_HIDE_MS}
+      />
     </div>
   );
 
@@ -422,6 +462,7 @@ export function GameOfLifeSimulation() {
       label="Game of Life simulation"
       className="gol-sim"
       data-running={running ? "true" : "false"}
+      idle={dockTimer.hidden}
       toolbar={dock}
     >
       <div ref={shellRef} className="gol-sim__stage">

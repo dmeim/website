@@ -419,7 +419,7 @@ These are not library components. They are app-local markup that the relevant pa
    - **main:** pane header (IconButton menu on mobile, editable title Input, Toolbar of IconButtons), thread (scroll container `.chat-thread`), composer.
    - **Keep:** the `data-sidebar-open` drawer and every keyboard shortcut listed in package C1.
 5. **Immersive app pages:** `/game-of-life/simulation` and `/orthodox/screensaver` use `BaseLayout immersive` plus `ImmersiveStage`:
-   - Game of Life: a floating dock overlay with a Toolbar (back IconButton, Start/Pause, Step, Random, and Clear Buttons), a compact generation and population readout, and the speed `Slider`. The Slider sits outside the Toolbar so its arrow keys are not taken by the Toolbar's roving focus. Space starts or pauses and the right arrow steps when focus is on the board.
+   - Game of Life: a floating dock overlay with a Toolbar (back IconButton, Start/Pause, Step, Random, and Clear Buttons, and a Fullscreen IconButton where the browser supports it), a compact generation and population readout, and the speed `Slider`. The Slider sits outside the Toolbar so its arrow keys are not taken by the Toolbar's roving focus. Space starts or pauses, the right arrow steps, and F toggles fullscreen when focus is on the board. After 6 seconds without pointer or keyboard activity the dock and cursor hide (`use-auto-hide.ts`, ImmersiveStage `idle`); a countdown `Progress` line along the dock's bottom edge shows the time left. The screen stays awake while the simulation runs.
    - Orthodox: the trigger Button, settings `Drawer side="end"` (non-modal sheet) with Fieldset groups (Icons, Frame, and Timing), SegmentedControls, Select, Slider, Swatch buttons, and Progress (countdown), plus the floating edit Toolbar. The card lock sheet uses SegmentedControl and a search `Input`.
 
 ---
@@ -764,7 +764,7 @@ The chat packages run sequentially. They share `ChatShell.css` (1924 lines) and 
 
 **O1 · Orthodox wall, boards and edit mode.**
 - Files: `OrthodoxScreensaver.tsx` (markup), `IconBoard.tsx`, `EditToolbar.tsx`, `EditableCard.tsx`, and the stage/wall/board/card/toolbar/trigger/hint sections of `OrthodoxScreensaver.css`. Use ImmersiveStage and the Toolbar `floating`.
-- Do not edit the hooks (`useFullscreen`, `useWakeLock`, `useIdle`, `useAutoClose`, `useCardGesture`, `useWallBoards`, `useScreensaverSettings`, `useElementSize`).
+- Do not edit the hooks (`useFullscreen` and `useWakeLock`, now shared in `src/ui/react/use-fullscreen.ts` and `use-wake-lock.ts`, `useIdle`, `useAutoClose`, `useCardGesture`, `useWallBoards`, `useScreensaverSettings`, `useElementSize`).
 - Risks:
   - Fullscreen (webkit fallbacks, exit on `astro:before-swap`), wake lock and idle auto-hide.
   - `useCardGesture` ignores pointerdown on `button` (`closest("button")`) and resizes via `closest("[data-resize]")`. Cards must keep those elements and attributes, and the arrow-key moves.
