@@ -20,6 +20,7 @@ None.
 ## Notes
 - Convert: `new MarkdownIt().render(input)` (matches it-tools defaults)
 - Empty input yields empty HTML
+- Raw HTML in the input is escaped and `javascript:`-style links are not linked (markdown-it defaults), which is what makes the live preview safe
 - Print opens a new window, writes the HTML body, then calls `window.print()`
 - Dep: `markdown-it` ^14 (same major as it-tools)
 

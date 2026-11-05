@@ -14,6 +14,7 @@ import {
   MIN_BASE,
   clampBase,
   convertBaseSafe,
+  getBaseError,
   getConvertBaseError,
 } from "@/lib/tools/base-converter";
 
@@ -32,33 +33,37 @@ export default function BaseConverter() {
 
   const safeInputBase = clampBase(inputBase, 10);
   const safeOutputBase = clampBase(outputBase, 42);
+  const isEmpty = input.trim() === "";
+  const inputBaseError = getBaseError("Input base", inputBase);
+  const outputBaseError = getBaseError("Custom base", outputBase);
 
   const convertArgs = useMemo(
     () => ({ value: input, fromBase: safeInputBase }),
     [input, safeInputBase],
   );
 
-  const error = useMemo(
-    () =>
-      getConvertBaseError({
-        ...convertArgs,
-        toBase: safeOutputBase,
-      }),
-    [convertArgs, safeOutputBase],
+  const digitError = useMemo(
+    () => (isEmpty ? null : getConvertBaseError({ ...convertArgs, toBase: 10 })),
+    [convertArgs, isEmpty],
   );
+
+  const canConvert = !isEmpty && !digitError && !inputBaseError;
 
   const fixedValues = useMemo(
     () =>
       FIXED_OUTPUTS.map((row) => ({
         ...row,
-        value: convertBaseSafe({ ...convertArgs, toBase: row.base }),
+        value: canConvert ? convertBaseSafe({ ...convertArgs, toBase: row.base }) : "",
       })),
-    [convertArgs],
+    [convertArgs, canConvert],
   );
 
   const customValue = useMemo(
-    () => convertBaseSafe({ ...convertArgs, toBase: safeOutputBase }),
-    [convertArgs, safeOutputBase],
+    () =>
+      canConvert && !outputBaseError
+        ? convertBaseSafe({ ...convertArgs, toBase: safeOutputBase })
+        : "",
+    [convertArgs, canConvert, outputBaseError, safeOutputBase],
   );
 
   return (
@@ -78,7 +83,7 @@ export default function BaseConverter() {
             spellCheck={false}
             autoFocus
             onChange={(event) => setInput(event.target.value)}
-            aria-invalid={error ? true : undefined}
+            aria-invalid={digitError ? true : undefined}
           />
           <Input
             id="bc-input-base"
@@ -89,6 +94,7 @@ export default function BaseConverter() {
             step={1}
             value={Number.isFinite(inputBase) ? inputBase : ""}
             placeholder="Put your input base here (ex: 10)"
+            error={inputBaseError ?? undefined}
             onChange={(event) => {
               const next = event.target.valueAsNumber;
               setInputBase(Number.isNaN(next) ? Number.NaN : next);
@@ -96,9 +102,9 @@ export default function BaseConverter() {
           />
         </FormGrid>
 
-        {error ? (
+        {digitError && !inputBaseError ? (
           <Notice tone="danger" live="polite">
-            {error}
+            {digitError}
           </Notice>
         ) : null}
 
@@ -123,6 +129,7 @@ export default function BaseConverter() {
             max={MAX_BASE}
             step={1}
             value={Number.isFinite(outputBase) ? outputBase : ""}
+            error={outputBaseError ?? undefined}
             onChange={(event) => {
               const next = event.target.valueAsNumber;
               setOutputBase(Number.isNaN(next) ? Number.NaN : next);
@@ -130,9 +137,9 @@ export default function BaseConverter() {
           />
           <OutputField
             id="bc-out-custom"
-            label={`Base ${safeOutputBase}`}
+            label={outputBaseError ? "Custom output" : `Base ${safeOutputBase}`}
             value={customValue}
-            placeholder={`Base ${safeOutputBase} will be here…`}
+            placeholder={outputBaseError ? "–" : `Base ${safeOutputBase} will be here…`}
           />
         </FormGrid>
       </Panel>

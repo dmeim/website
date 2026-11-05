@@ -15,25 +15,77 @@ export type ConvertBaseArgs = {
   toBase: number;
 };
 
-export function convertBase({ value, fromBase, toBase }: ConvertBaseArgs): string {
-  const fromRange = DIGIT_RANGE.slice(0, fromBase);
-  const toRange = DIGIT_RANGE.slice(0, toBase);
-  let decValue = value
-    .split("")
-    .reverse()
-    .reduce((carry: bigint, digit: string, index: number) => {
-      if (!fromRange.includes(digit)) {
-        throw new Error(`Invalid digit "${digit}" for base ${fromBase}.`);
-      }
-      return (carry +=
-        BigInt(fromRange.indexOf(digit)) * BigInt(fromBase) ** BigInt(index));
-    }, 0n);
-  let newValue = "";
-  while (decValue > 0) {
-    newValue = toRange[Number(decValue % BigInt(toBase))]! + newValue;
-    decValue = (decValue - (decValue % BigInt(toBase))) / BigInt(toBase);
+/** BigInt work grows with the square of the digit count, so this keeps a stray paste from freezing the tab. */
+export const MAX_INPUT_DIGITS = 100_000;
+
+/** How many digits fit in a safe integer, so long numbers take one BigInt step per group and not per digit. */
+function groupSize(base: number): number {
+  return Math.floor(Math.log(Number.MAX_SAFE_INTEGER) / Math.log(base));
+}
+
+/** Bases up to 36 have one case of letters, so "FF" can only mean "ff". */
+function normalizeDigits(value: string, fromBase: number): string {
+  const trimmed = value.trim();
+  return fromBase <= 36 ? trimmed.toLowerCase() : trimmed;
+}
+
+function parseDigits(value: string, fromBase: number): bigint {
+  const digits = normalizeDigits(value, fromBase);
+  if (digits.length > MAX_INPUT_DIGITS) {
+    throw new Error(`That number is too long. The limit is ${MAX_INPUT_DIGITS.toLocaleString("en-US")} digits.`);
   }
-  return newValue || "0";
+
+  const size = groupSize(fromBase);
+  const scale = BigInt(fromBase) ** BigInt(size);
+  let result = 0n;
+  let group = 0;
+  let count = 0;
+  for (const digit of digits) {
+    const index = DIGIT_RANGE.indexOf(digit);
+    if (index === -1 || index >= fromBase) {
+      throw new Error(`Invalid digit "${digit}" for base ${fromBase}.`);
+    }
+    group = group * fromBase + index;
+    count += 1;
+    if (count === size) {
+      result = result * scale + BigInt(group);
+      group = 0;
+      count = 0;
+    }
+  }
+  return result * BigInt(fromBase) ** BigInt(count) + BigInt(group);
+}
+
+let lastParse: { value: string; fromBase: number; result: bigint } | undefined;
+
+/** The island converts one input to six bases per keystroke, so reuse the costly parse. */
+function parseOnce(value: string, fromBase: number): bigint {
+  if (lastParse?.value === value && lastParse.fromBase === fromBase) return lastParse.result;
+  const result = parseDigits(value, fromBase);
+  lastParse = { value, fromBase, result };
+  return result;
+}
+
+export function convertBase({ value, fromBase, toBase }: ConvertBaseArgs): string {
+  let decValue = parseOnce(value, fromBase);
+  if (toBase <= 36) {
+    return decValue.toString(toBase);
+  }
+
+  const size = groupSize(toBase);
+  const scale = BigInt(toBase) ** BigInt(size);
+  const groups: string[] = [];
+  while (decValue > 0n) {
+    let group = Number(decValue % scale);
+    decValue /= scale;
+    let digits = "";
+    for (let i = 0; i < size && (group > 0 || decValue > 0n); i += 1) {
+      digits = DIGIT_RANGE[group % toBase]! + digits;
+      group = Math.floor(group / toBase);
+    }
+    groups.push(digits);
+  }
+  return groups.reverse().join("") || "0";
 }
 
 /** Convert without throwing; returns empty string on invalid input. */
@@ -53,6 +105,12 @@ export function getConvertBaseError(args: ConvertBaseArgs): string | null {
   } catch (err) {
     return err instanceof Error ? err.message : String(err);
   }
+}
+
+/** A message when a base is blank or outside 2 to 64; otherwise null. */
+export function getBaseError(label: string, base: number): string | null {
+  if (Number.isInteger(base) && base >= MIN_BASE && base <= MAX_BASE) return null;
+  return `${label} must be a whole number from ${MIN_BASE} to ${MAX_BASE}.`;
 }
 
 /** Clamp a base to the supported 2–64 range; non-finite values fall back to `fallback`. */

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { Code, Panel, Switch, ToolFrame, TransformPanel } from "@/ui/react";
 import {
   base64ToTextSafe,
@@ -10,8 +11,8 @@ import {
 export default function Base64StringConverter() {
   const [textInput, setTextInput] = useState("");
   const [base64Input, setBase64Input] = useState("");
-  const [encodeUrlSafe, setEncodeUrlSafe] = useState(false);
-  const [decodeUrlSafe, setDecodeUrlSafe] = useState(false);
+  const [encodeUrlSafe, setEncodeUrlSafe] = useStoredState("base64-string-converter--encode-url-safe", false);
+  const [decodeUrlSafe, setDecodeUrlSafe] = useStoredState("base64-string-converter--decode-url-safe", false);
 
   const base64Output = useMemo(
     () => textToBase64(textInput, { makeUrlSafe: encodeUrlSafe }),

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import {
   Fieldset,
   FormGrid,
@@ -13,25 +14,30 @@ import {
 import {
   DEFAULT_CONVERT_OPTIONS,
   convertList,
+  isConvertOptions,
   type ConvertOptions,
   type SortOrder,
 } from "@/lib/tools/list-converter";
 
 const SORT_OPTIONS = [
-  { value: "", label: "Sort alphabetically" },
+  { value: "", label: "No sorting" },
   { value: "asc", label: "Sort ascending" },
   { value: "desc", label: "Sort descending" },
 ];
 
 export default function ListConverter() {
   const [input, setInput] = useState("");
-  const [options, setOptions] = useState<ConvertOptions>(DEFAULT_CONVERT_OPTIONS);
+  const [options, setOptions] = useStoredState<ConvertOptions>(
+    "list-converter:conversionConfig",
+    DEFAULT_CONVERT_OPTIONS,
+    isConvertOptions,
+  );
 
   const output = useMemo(() => convertList(input, options), [input, options]);
 
   const patchOptions = useCallback((patch: Partial<ConvertOptions>) => {
     setOptions((prev) => ({ ...prev, ...patch }));
-  }, []);
+  }, [setOptions]);
 
   const optionsUi = (
     <FormGrid columns={1}>

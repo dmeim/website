@@ -20,6 +20,7 @@ None.
 - Letters map case-insensitively (`a`/`A` → Alpha)
 - Non-letters (digits, punctuation, spaces, etc.) pass through unchanged
 - Characters are joined with a single space, so an input space becomes three spaces in the output (letter-space, passthrough space, letter-space)
+- An emoji stays whole rather than being split into two broken halves
 - Empty input yields an empty output
 
 ## Source

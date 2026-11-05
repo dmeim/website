@@ -15,21 +15,21 @@ export default function RomanNumeralConverter() {
   const [inputNumeral, setInputNumeral] = useState(42);
   const [inputRoman, setInputRoman] = useState("XLII");
 
+  // NaN means the field is blank, which is an empty state and not a mistake.
   const arabicOutOfRange =
-    !Number.isFinite(inputNumeral) ||
-    inputNumeral < MIN_ARABIC_TO_ROMAN ||
-    inputNumeral > MAX_ARABIC_TO_ROMAN;
+    inputNumeral < MIN_ARABIC_TO_ROMAN || inputNumeral > MAX_ARABIC_TO_ROMAN;
 
   const outputRoman = useMemo(
     () => (Number.isFinite(inputNumeral) ? arabicToRoman(inputNumeral) : ""),
     [inputNumeral],
   );
 
-  const romanInvalid = !isValidRomanNumber(inputRoman);
+  const trimmedRoman = inputRoman.trim();
+  const romanInvalid = !isValidRomanNumber(trimmedRoman);
 
   const outputNumeral = useMemo(
-    () => (romanInvalid ? null : romanToArabic(inputRoman)),
-    [inputRoman, romanInvalid],
+    () => (romanInvalid || trimmedRoman === "" ? null : romanToArabic(trimmedRoman)),
+    [trimmedRoman, romanInvalid],
   );
 
   const outputNumeralText =
@@ -98,7 +98,7 @@ export default function RomanNumeralConverter() {
 
         {romanInvalid ? (
           <Notice tone="danger" live="polite">
-            The input you entered is not a valid Roman number
+            That is not a valid Roman numeral. Use uppercase letters, like XLII.
           </Notice>
         ) : null}
 

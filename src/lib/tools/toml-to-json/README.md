@@ -18,7 +18,8 @@ None.
 - Validation error when the TOML is invalid
 
 ## Notes
-- Empty input yields an empty output string (matches it-tools short-circuit)
+- Empty or whitespace-only input yields an empty output string
+- Integers above 2^53 stay exact, where it-tools shows nothing
 - Invalid TOML clears the JSON output and shows “Provided TOML is not valid.”
 - Cluster deps (`yaml`, `iarna-toml-esm`, `json5`) are shared with sibling yaml/toml converters
 

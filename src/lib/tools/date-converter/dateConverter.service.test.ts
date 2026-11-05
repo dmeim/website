@@ -21,6 +21,7 @@ import {
   isTimestamp,
   isUTCDateString,
   isUnixTimestamp,
+  parseISO,
   resolveDate,
 } from "./dateConverter.service";
 
@@ -237,7 +238,60 @@ describe("date-converter", () => {
     });
   });
 
+  describe("parseISO (date-fns parity, vectors checked against date-fns@2.29.3)", () => {
+    it("parses zoned instants, including basic and week forms new Date rejects", () => {
+      expect(parseISO("2023-04-12T23:10:24+02:00").toISOString()).toBe("2023-04-12T21:10:24.000Z");
+      expect(parseISO("20230412T145600+0100").toISOString()).toBe("2023-04-12T13:56:00.000Z");
+      expect(parseISO("20230412T145600Z").toISOString()).toBe("2023-04-12T14:56:00.000Z");
+      expect(parseISO("2022-01-01 12:00:00-05:00").toISOString()).toBe("2022-01-01T17:00:00.000Z");
+      expect(parseISO("2022-01-01T12:30:15,5Z").toISOString()).toBe("2022-01-01T12:30:15.500Z");
+    });
+
+    it("reads a date or time with no zone as local wall time", () => {
+      expect(parseISO("2016-02-01").getTime()).toBe(new Date(2016, 1, 1).getTime());
+      expect(parseISO("2022-01-01 12:00:00").getTime()).toBe(new Date(2022, 0, 1, 12).getTime());
+      expect(parseISO("2023-W01-1").getTime()).toBe(new Date(2023, 0, 2).getTime());
+      expect(parseISO("2023-032").getTime()).toBe(new Date(2023, 1, 1).getTime());
+    });
+
+    it("rejects impossible dates instead of rolling them over", () => {
+      for (const value of ["2023-02-29", "2016-02-31", "2023-13-01", "2023-366", "2023-W54", "2022-01-01T25:00", "2022-01-01T12:30:15+05:99", "qsd", ""]) {
+        expect(Number.isNaN(parseISO(value).getTime()), value).toBe(true);
+      }
+      expect(parseISO("2024-02-29").getDate()).toBe(29);
+    });
+  });
+
+  describe("full-width years and Mongo IDs", () => {
+    it("pads short years and keeps the sign of BCE years", () => {
+      const year999 = new Date("0999-06-15T12:00:00.000Z");
+      expect(formatRFC7231(year999)).toBe("Sun, 15 Jun 0999 12:00:00 GMT".replace("Sun", formatRFC7231(year999).slice(0, 3)));
+      expect(formatRFC3339(year999).slice(0, 5)).toBe("0999-");
+      expect(formatISO(new Date("-000005-06-15T12:00:00.000Z")).slice(0, 6)).toBe("-0005-");
+    });
+
+    it("pads early Mongo IDs to 24 characters and blanks dates with no ID", () => {
+      const rows = (date: Date) => formatAll(date, true).find((row) => row.id === "mongo")!.value;
+      expect(rows(new Date(0))).toBe("000000000000000000000000");
+      expect(rows(new Date("2023-04-12T21:10:24Z"))).toBe("64371e400000000000000000");
+      expect(rows(new Date("1960-01-01T00:00:00Z"))).toBe("");
+      expect(rows(new Date("2200-01-01T00:00:00Z"))).toBe("");
+    });
+  });
+
   describe("detect / resolve / validate", () => {
+    it("matches the it-tools e2e vector, whatever the local zone", () => {
+      const date = resolveDate("2023-04-12T23:10:24+02:00", 1, new Date())!;
+      const row = (id: string) => formatAll(date, true).find((item) => item.id === id)!.value;
+      expect(row("unix")).toBe("1681333824");
+      expect(row("rfc-7231")).toBe("Wed, 12 Apr 2023 21:10:24 GMT");
+      expect(row("timestamp")).toBe("1681333824000");
+      expect(row("utc")).toBe("Wed, 12 Apr 2023 21:10:24 GMT");
+      expect(row("mongo")).toBe("64371e400000000000000000");
+      expect(row("excel")).toBe("45028.88222222222");
+    });
+
+
     it("defaults to Timestamp format index", () => {
       expect(DEFAULT_FORMAT_INDEX).toBe(6);
       expect(DATE_FORMATS[DEFAULT_FORMAT_INDEX].id).toBe("timestamp");

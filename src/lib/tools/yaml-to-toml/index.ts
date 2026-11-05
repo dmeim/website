@@ -1,1 +1,1 @@
-export { isValidYaml, yamlToToml } from "./yamlToToml.service";
+export { getYamlToTomlError, isValidYaml, yamlToToml } from "./yamlToToml.service";

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isValidYaml, yamlToToml } from "./yamlToToml.service";
+import { getYamlToTomlError } from "./yamlToToml.service";
 
 describe("yaml-to-toml", () => {
   describe("yamlToToml", () => {
@@ -26,6 +27,19 @@ name = "item"
   number = 1
         `.trim(),
       );
+    });
+
+    it("expands merge keys, like the YAML to JSON tool", () => {
+      expect(yamlToToml("base: &b\n  k: 1\nuse:\n  <<: *b\n")).toBe("[base]\nk = 1\n\n[use]\nk = 1");
+    });
+
+    it("explains what stopped the conversion", () => {
+      expect(getYamlToTomlError("")).toBeNull();
+      expect(getYamlToTomlError("# only a comment")).toBeNull();
+      expect(getYamlToTomlError("a: 1")).toBeNull();
+      expect(getYamlToTomlError("a: b: c")).toBe("Provided YAML is not valid.");
+      expect(getYamlToTomlError("- a\n- b")).toContain("top level");
+      expect(getYamlToTomlError("42")).toContain("top level");
     });
 
     it("returns empty string for empty or whitespace input", () => {

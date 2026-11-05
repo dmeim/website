@@ -24,10 +24,11 @@ Live (as you type), each with copy:
 - Custom base (chosen output base)
 
 ## Notes
-- Invalid digits for the input base clear all outputs and show an error message
-- Empty input converts as `0`
-- Large integers are supported via BigInt (parity with it-tools)
-- Alphabet is case-sensitive for bases above 36 (`a` ≠ `A`)
+- Invalid digits for the input base clear all outputs and show an error message, and so does a base outside 2 to 64
+- Empty input leaves the outputs blank (the service still converts `""` as `0`)
+- Large integers keep full precision via BigInt (parity with it-tools), up to 100,000 digits so a stray paste cannot freeze the tab
+- Surrounding whitespace is ignored
+- Alphabet is case-sensitive for bases above 36 (`a` ≠ `A`); at 36 and below, `FF` and `ff` are the same number
 
 ## Source
 Port of [it-tools Integer base converter](https://it-tools.tech/base-converter). Local reference: handy-dandy `it-tools` (`/integer-base-converter`; catalogue path `/base-converter`). Catalogue id: `base-converter`.

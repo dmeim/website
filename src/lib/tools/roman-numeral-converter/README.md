@@ -21,7 +21,7 @@ None.
 ## Notes
 - Arabic → Roman accepts floats in range and floors via the subtractive lookup (parity with it-tools)
 - Values outside 1–3999 yield an empty Roman output and a validation hint
-- Roman validation is case-sensitive and uses the classic form regex (empty string is valid and yields `0`)
+- Roman validation is case-sensitive and uses the classic form regex. Surrounding whitespace is ignored, and a blank field shows no error and no result
 - Invalid Roman input yields a null conversion (empty output) and a validation hint
 
 ## Source

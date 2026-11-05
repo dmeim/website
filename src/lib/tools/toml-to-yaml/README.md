@@ -19,6 +19,7 @@ None.
 
 ## Notes
 - Empty or whitespace-only input yields an empty output string (matches it-tools trim short-circuit)
+- Integers above 2^53 stay exact
 - Invalid TOML clears the YAML output and shows “Provided TOML is not valid.”
 - Cluster deps (`yaml`, `iarna-toml-esm`, `json5`) are shared with sibling yaml/toml converters
 

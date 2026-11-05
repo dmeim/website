@@ -1,16 +1,16 @@
 import { useMemo, useState } from "react";
 
 import { Panel, ToolFrame, TransformPanel } from "@/ui/react";
-import { isValidYaml, yamlToToml } from "@/lib/tools/yaml-to-toml";
+import { getYamlToTomlError, yamlToToml } from "@/lib/tools/yaml-to-toml";
 
 export default function YamlToToml() {
   const [input, setInput] = useState("");
 
-  const inputInvalid = input !== "" && !isValidYaml(input);
+  const error = useMemo(() => getYamlToTomlError(input), [input]);
 
   const output = useMemo(
-    () => (inputInvalid ? "" : yamlToToml(input)),
-    [input, inputInvalid],
+    () => (error ? "" : yamlToToml(input)),
+    [input, error],
   );
 
   return (
@@ -26,7 +26,7 @@ export default function YamlToToml() {
             rows: 10,
           }}
           output={{ label: "TOML from your YAML", value: output, mono: true, rows: 12 }}
-          error={inputInvalid ? "Provided YAML is not valid." : undefined}
+          error={error ?? undefined}
         />
       </Panel>
     </ToolFrame>

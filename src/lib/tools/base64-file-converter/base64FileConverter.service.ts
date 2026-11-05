@@ -4,6 +4,7 @@
  */
 
 import { isValidBase64, removePotentialDataAndMimePrefix } from "@/lib/tools/base64-string-converter";
+import { getExtensionsForMime, getMimeForExtension } from "@/lib/tools/mime-types";
 
 export { isValidBase64, removePotentialDataAndMimePrefix };
 
@@ -57,12 +58,13 @@ export function getMimeTypeFromBase64(base64String: string): {
 }
 
 export function getExtensionFromMimeType(mimeType: string): string | undefined {
-  return MIME_TO_EXTENSION[mimeType.toLowerCase()];
+  const clean = mimeType.split(";")[0]!.trim().toLowerCase();
+  return MIME_TO_EXTENSION[clean] ?? getExtensionsForMime(clean)[0];
 }
 
 export function getMimeTypeFromExtension(extension: string): string | undefined {
   const clean = extension.replace(/^\./, "").toLowerCase();
-  return EXTENSION_TO_MIME[clean];
+  return EXTENSION_TO_MIME[clean] ?? getMimeForExtension(clean);
 }
 
 export type DownloadFromBase64Options = {
@@ -94,9 +96,12 @@ export function buildDownloadFromBase64({
   const defaultExtension = extension ?? "txt";
   const { mimeType } = getMimeTypeFromBase64(sourceValue);
 
+  // Anything without a data: prefix must be wrapped, including a sniffed signature: a bare string
+  // would download the site's response for that path instead of the decoded bytes.
   let dataUrl = sourceValue;
-  if (!mimeType) {
+  if (!/^data:/i.test(sourceValue)) {
     const targetMimeType =
+      mimeType ??
       fileMimeType ??
       getMimeTypeFromExtension(defaultExtension) ??
       "application/octet-stream";
@@ -118,7 +123,8 @@ export function buildDownloadFromBase64({
 
 /**
  * Resolve preview `src` for an `<img>`.
- * If the string already has a data URI, use it; otherwise wrap as image when sniffable.
+ * If the string already has a data URI, use it; otherwise wrap it as an image.
+ * A bare string would load as a relative URL, sending the payload to the server.
  */
 export function resolvePreviewImageSrc(base64String: string): string {
   if (base64String === "") {
@@ -130,12 +136,9 @@ export function resolvePreviewImageSrc(base64String: string): string {
   }
 
   const { mimeType } = getMimeTypeFromBase64(base64String);
-  if (mimeType?.startsWith("image/")) {
-    return `data:${mimeType};base64,${base64String}`;
-  }
-
-  // Match it-tools: assign raw string (browser may still fail to paint non-URI).
-  return base64String;
+  // Browsers sniff the real format from the bytes for any image/* type.
+  const imageType = mimeType?.startsWith("image/") ? mimeType : "image/png";
+  return `data:${imageType};base64,${base64String}`;
 }
 
 /** Encode a File/Blob to a data URL via FileReader (parity with VueUse useBase64). */

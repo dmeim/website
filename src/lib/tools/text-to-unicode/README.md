@@ -19,8 +19,8 @@ None.
 - Copy to clipboard on each panel
 
 ## Notes
-- Encoding uses `charCodeAt(0)` per UTF-16 code unit (BMP-oriented; matches it-tools)
-- Decoding uses `/&#(\d+);/g` and `String.fromCharCode`
+- Encoding emits one entity per code point, so `😀` is `&#128512;`, which HTML decodes correctly. it-tools emits two surrogate entities, which HTML reads as U+FFFD. BMP text is unchanged
+- Decoding accepts decimal and hex entities and still combines surrogate pairs written as two entities. Numbers beyond U+10FFFF are left as they are
 - Empty / whitespace-only input yields an empty output on that panel
 - Non-entity text in the Unicode→Text panel is left unchanged
 

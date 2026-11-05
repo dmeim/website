@@ -24,6 +24,8 @@ Convert between files and Base64. Paste Base64 (optionally with a `data:*;base64
 - Validation uses the same Base64 rules as `base64-string-converter` (empty is valid; invalid shows a hint)
 - MIME sniffing covers data-URI prefixes plus PNG / GIF / JPG / PDF magic signatures (it-tools parity)
 - Upload encoding uses `FileReader.readAsDataURL` (parity with VueUse `useBase64`)
+- Extension suggestions and data URI types use the full mime-db list, through `mime-types`
+- Preview loads the image off screen first, so non-image Base64 gets a message instead of a broken image, and a bare string is wrapped as a data URI so it is never fetched as a URL
 - Download wraps bare Base64 in a data URI when MIME cannot be sniffed, using the extension (default `txt`)
 
 ## Source

@@ -21,7 +21,7 @@ None.
 - Parse: `JSON5.parse` (matches it-tools)
 - Serialize: `yaml.stringify` (default options)
 - Invalid JSON clears the YAML output and shows “Provided JSON is not valid.”
-- Empty input is treated as valid and yields empty output
+- Empty or whitespace-only input is treated as valid and yields empty output
 - Cluster deps (`yaml`, `iarna-toml-esm`, `json5`) are shared with sibling yaml/toml converters
 
 ## Source

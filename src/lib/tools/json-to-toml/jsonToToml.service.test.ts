@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isValidJson, jsonToToml } from "./jsonToToml.service";
+import { getJsonToTomlError } from "./jsonToToml.service";
 
 describe("json-to-toml", () => {
   describe("jsonToToml", () => {
@@ -68,6 +69,15 @@ key = 1
       expect(isValidJson('{"a":1}')).toBe(true);
       expect(isValidJson("{a: 1}")).toBe(true);
       expect(isValidJson("[1, 2, 3]")).toBe(true);
+    });
+
+    it("explains what stopped the conversion", () => {
+      expect(getJsonToTomlError("  ")).toBeNull();
+      expect(getJsonToTomlError("{a: 1}")).toBeNull();
+      expect(getJsonToTomlError("{nope")).toBe("Provided JSON is not valid.");
+      for (const value of ["[1, 2]", "42", '"text"', "null", "false"]) {
+        expect(getJsonToTomlError(value), value).toContain("top level");
+      }
     });
 
     it("rejects invalid json", () => {

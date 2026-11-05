@@ -22,7 +22,7 @@ None.
 - Serialize: `iarna-toml-esm` `stringify`, flattened and trimmed (matches it-tools)
 - Empty / whitespace-only input yields an empty output string
 - Invalid JSON clears the TOML output and shows “Provided JSON is not valid.”
-- Top-level arrays are valid JSON but not valid TOML documents — conversion yields empty output
+- A top-level list or value is valid JSON but not a TOML document, so it shows an error explaining that
 - Cluster deps (`yaml`, `iarna-toml-esm`, `json5`) are shared with sibling yaml/toml converters
 
 ## Source

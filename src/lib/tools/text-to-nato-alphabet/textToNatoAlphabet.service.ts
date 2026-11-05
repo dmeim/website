@@ -39,8 +39,7 @@ function letterIndex(character: string): number {
  * Letters map case-insensitively to Alpha…Zulu; all other characters pass through.
  */
 export function textToNatoAlphabet(text: string): string {
-  return text
-    .split("")
+  return Array.from(text)
     .map((character) => {
       const index = letterIndex(character);
       return NATO_ALPHABET[index] ?? character;

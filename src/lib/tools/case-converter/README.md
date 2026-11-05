@@ -21,6 +21,7 @@ Lowercase, Uppercase, Camelcase, Capitalcase, Constantcase, Dotcase, Headercase,
 - Separator stripping uses it-tools’ custom regexp: keep `A–Z a–z` and Latin accented letters (`À–Ö Ø–ö ø–ÿ`); everything else becomes a word break
 - Lowercase / Uppercase use `toLocaleLowerCase` / `toLocaleUpperCase` (parity with it-tools)
 - Mockingcase alternates character case by index (`index % 2`) and does not strip punctuation
+- Empty results show an en dash and have no copy control
 - Catalogue id: `case-converter`
 
 ## Source

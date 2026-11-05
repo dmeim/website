@@ -19,8 +19,9 @@ None. Octet separator defaults to a single space (parity with it-tools).
 - Copy to clipboard on each panel
 
 ## Notes
-- Encoding uses `charCodeAt(0)` per UTF-16 code unit, zero-padded to 8 bits (BMP-oriented; matches it-tools)
-- Decoding strips non-`01` characters, then requires a multiple of 8 bits
+- ASCII encodes exactly as in it-tools. Beyond ASCII this uses UTF-8 bytes, so `é` is `11000011 10101001` where it-tools gives `11101001`, and every octet stays 8 bits so emoji round-trip
+- Decoding strips non-`01` characters, then requires a multiple of 8 bits. Octets that are not valid UTF-8 read as Latin-1, so older `11101001` output still decodes
+- Text with no `0` or `1` at all shows the validation hint
 - Incomplete octets throw in the service; the island soft-fails to an empty output and shows a validation hint
 - Empty input yields an empty output on that panel
 

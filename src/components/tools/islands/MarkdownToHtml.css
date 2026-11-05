@@ -1,0 +1,5 @@
+/* Rendered Markdown can hold long unbroken words, which would otherwise widen the whole page. */
+.mdh-preview {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

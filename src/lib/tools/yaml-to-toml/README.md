@@ -18,11 +18,11 @@ None.
 - Validation error when the YAML is invalid
 
 ## Notes
-- Parse: `yaml` `parse` (matches it-tools; no merge-key option)
+- Parse: `yaml` `parse` with `{ merge: true }`, like the YAML to JSON tool
 - Serialize: `iarna-toml-esm` `stringify`, flattened and trimmed (matches it-tools)
 - Empty / whitespace-only input yields an empty output string
 - Invalid YAML clears the TOML output and shows “Provided YAML is not valid.”
-- Top-level arrays are valid YAML but not valid TOML documents — conversion yields empty output
+- A top-level list or value is valid YAML but not a TOML document, so it shows an error explaining that
 - Cluster deps (`yaml`, `iarna-toml-esm`, `json5`) are shared with sibling yaml/toml converters
 
 ## Source

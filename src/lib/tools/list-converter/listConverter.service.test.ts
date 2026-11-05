@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_CONVERT_OPTIONS,
   convertList,
+  isConvertOptions,
   type ConvertOptions,
 } from "./listConverter.service";
 
@@ -88,13 +89,50 @@ describe("list-converter", () => {
       );
     });
 
-    it("dedupes before trim (it-tools order)", () => {
+    it("dedupes after trim, so spacing cannot hide a duplicate", () => {
       const options: ConvertOptions = {
         ...DEFAULT_CONVERT_OPTIONS,
         removeDuplicates: true,
         trimItems: true,
       };
-      expect(convertList("1 \n1\n1 ", options)).toEqual("1, 1");
+      expect(convertList("1 \n1\n1 ", options)).toEqual("1");
+    });
+
+    it("sorts on the trimmed text, so indentation cannot reorder items", () => {
+      expect(convertList("  z\na", { ...DEFAULT_CONVERT_OPTIONS, sortList: "asc" })).toEqual("a, z");
+    });
+
+    it("handles Windows line endings with trimming off", () => {
+      expect(convertList("a\r\nb", { ...DEFAULT_CONVERT_OPTIONS, trimItems: false })).toEqual("a, b");
+    });
+
+    it("keeps inner spacing when trimming is off", () => {
+      expect(convertList("  a\n a", { ...DEFAULT_CONVERT_OPTIONS, trimItems: false })).toEqual("  a,  a");
+    });
+
+    it("stays empty with no items, even with line breaks and wrappers on", () => {
+      const options = { ...DEFAULT_CONVERT_OPTIONS, keepLineBreaks: true, listPrefix: "<ul>", listSuffix: "</ul>" };
+      expect(convertList("", options)).toEqual("");
+      expect(convertList("  \n ", options)).toEqual("");
+    });
+
+    it("adds no stray blank lines when line breaks are on and there is no wrapper", () => {
+      expect(convertList("a\nb", { ...DEFAULT_CONVERT_OPTIONS, keepLineBreaks: true, separator: "," })).toEqual("a,\nb");
+    });
+
+    it("matches the it-tools e2e vectors", () => {
+      expect(convertList("1\n    2\n    3\n    4\n    5", DEFAULT_CONVERT_OPTIONS)).toEqual("1, 2, 3, 4, 5");
+      expect(
+        convertList("1\n    2\n    2\n    4\n    4\n    3\n    5", { ...DEFAULT_CONVERT_OPTIONS, itemPrefix: "'", itemSuffix: "'" }),
+      ).toEqual("'1', '2', '4', '3', '5'");
+    });
+
+    it("accepts remembered settings only in the current shape", () => {
+      expect(isConvertOptions(DEFAULT_CONVERT_OPTIONS)).toBe(true);
+      expect(isConvertOptions({ ...DEFAULT_CONVERT_OPTIONS, sortList: "asc" })).toBe(true);
+      expect(isConvertOptions({ ...DEFAULT_CONVERT_OPTIONS, sortList: "up" as never })).toBe(false);
+      expect(isConvertOptions({ ...DEFAULT_CONVERT_OPTIONS, separator: 1 as never })).toBe(false);
+      expect(isConvertOptions({ lowerCase: true } as never)).toBe(false);
     });
 
     it("lowercases the whole text before splitting", () => {

@@ -14,15 +14,28 @@ export function isValidToml(value: string): boolean {
   }
 }
 
+// From the private use area, so it cannot clash with a real TOML string in practice.
+const BIG_INT_MARKER = "\uE000bigint:";
+const BIG_INT_TOKEN = new RegExp(`"${BIG_INT_MARKER}(-?\\d+)"`, "g");
+
+/** The TOML parser returns BigInt above 2^53, which JSON.stringify refuses, so write those digits by hand. */
+function stringifyWithBigInts(value: unknown): string {
+  return JSON.stringify(
+    value,
+    (_key, item: unknown) => (typeof item === "bigint" ? `${BIG_INT_MARKER}${item}` : item),
+    3,
+  ).replace(BIG_INT_TOKEN, "$1");
+}
+
 /**
  * Convert TOML text to JSON with 3-space indent.
- * Returns "" on empty input or parse/stringify failure
+ * Returns "" on blank input or parse/stringify failure
  * (matches it-tools `withDefaultOnError` + empty short-circuit).
  */
 export function tomlToJson(value: string): string {
-  if (value === "") return "";
+  if (value.trim() === "") return "";
   try {
-    return JSON.stringify(parseToml(value), null, 3);
+    return stringifyWithBigInts(parseToml(value));
   } catch {
     return "";
   }

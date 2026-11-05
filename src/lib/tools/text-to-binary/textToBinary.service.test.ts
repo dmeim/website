@@ -69,6 +69,33 @@ describe("text-to-binary", () => {
   });
 
   describe("round-trip", () => {
+    it("encodes non-ASCII as UTF-8 octets (vectors from python3 str.encode)", () => {
+      expect(convertTextToAsciiBinary("é")).toBe("11000011 10101001");
+      expect(convertTextToAsciiBinary("😀")).toBe("11110000 10011111 10011000 10000000");
+      expect(convertAsciiBinaryToText("11000011 10101001")).toBe("é");
+      expect(convertAsciiBinaryToText("11110000 10011111 10011000 10000000")).toBe("😀");
+    });
+
+    it("round-trips any Unicode text", () => {
+      for (const text of ["😀", "日本語 👩‍💻 𝒳 é", "\uFEFFbom", "\u0000"]) {
+        expect(convertAsciiBinaryToText(convertTextToAsciiBinary(text))).toBe(text);
+      }
+    });
+
+    it("still reads Latin-1 octets that are not valid UTF-8", () => {
+      expect(convertAsciiBinaryToText("11101001")).toBe("é");
+    });
+
+    it("handles a long Latin-1 string without overflowing the call stack", () => {
+      expect(convertAsciiBinaryToText("11101001".repeat(200_000))).toBe("é".repeat(200_000));
+    });
+
+    it("rejects text with no binary digits instead of showing nothing", () => {
+      expect(isValidAsciiBinary("hello")).toBe(false);
+      expect(isValidAsciiBinary("   ")).toBe(true);
+      expect(isValidAsciiBinary("")).toBe(true);
+    });
+
     it("round-trips ASCII text through binary", () => {
       const sample = "it-tools";
       expect(

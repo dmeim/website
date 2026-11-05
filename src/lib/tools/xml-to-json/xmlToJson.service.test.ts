@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isValidXml, xmlToJson } from "./xmlToJson.service";
+import { DEFAULT_XML } from "./xmlToJson.service";
 
 describe("xml-to-json", () => {
   describe("xmlToJson", () => {
@@ -31,9 +32,33 @@ describe("xml-to-json", () => {
       );
     });
 
-    it("returns empty object json for empty / whitespace input", () => {
-      expect(xmlToJson("")).toBe("{}");
-      expect(xmlToJson("   ")).toBe("{}");
+    it("returns nothing for empty / whitespace input", () => {
+      expect(xmlToJson("")).toBe("");
+      expect(xmlToJson("   ")).toBe("");
+    });
+
+    it("matches the it-tools default sample", () => {
+      expect(xmlToJson(DEFAULT_XML)).toBe(
+        JSON.stringify({ a: { _attributes: { x: "1.234", y: "It's" } } }, null, 2),
+      );
+    });
+
+    it("decodes entities and keeps emoji", () => {
+      expect(JSON.parse(xmlToJson('<a x="1&amp;2">a &amp; b &#x1F600; é</a>'))).toEqual({
+        a: { _attributes: { x: "1&2" }, _text: "a & b 😀 é" },
+      });
+    });
+
+    it("tolerates whitespace before a declaration", () => {
+      expect(isValidXml('  <?xml version="1.0"?><a/>')).toBe(true);
+      expect(JSON.parse(xmlToJson('  <?xml version="1.0"?><a/>'))).toEqual({
+        _declaration: { _attributes: { version: "1.0" } },
+        a: {},
+      });
+    });
+
+    it("rejects a second root, like it-tools", () => {
+      expect(isValidXml("<a/><b/>")).toBe(false);
     });
 
     it("returns empty string for invalid xml", () => {

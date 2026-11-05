@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { Button, Notice, Panel, Prose, ToolFrame, TransformPanel } from "@/ui/react";
 import { markdownToHtml } from "@/lib/tools/markdown-to-html";
+import "./MarkdownToHtml.css";
 
 export default function MarkdownToHtml() {
   const [input, setInput] = useState("");
@@ -36,7 +37,10 @@ export default function MarkdownToHtml() {
           input={{
             label: "Your Markdown to convert",
             value: input,
-            onChange: setInput,
+            onChange: (value) => {
+              setInput(value);
+              setActionStatus("");
+            },
             placeholder: "Your Markdown content…",
             mono: true,
             rows: 10,
@@ -57,7 +61,7 @@ export default function MarkdownToHtml() {
       </Panel>
       {htmlOutput ? (
         <Panel title="Preview">
-          <Prose html={htmlOutput} />
+          <Prose className="mdh-preview" html={htmlOutput} />
         </Panel>
       ) : null}
     </ToolFrame>

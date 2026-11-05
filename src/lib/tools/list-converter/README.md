@@ -25,11 +25,13 @@ Live transformed list (as you type), with copy.
 
 ## Notes
 - Empty lines are dropped after optional trim
-- Dedupe runs before trim (parity with it-tools / lodash `uniq` then `trim`)
+- Trim runs before dedupe and sort, so `a` and ` a` are one item and indentation cannot reorder a sort. it-tools trims last
+- A list with no items yields empty output, even with line breaks or list wrappers on
+- Line breaks add no blank line for an empty wrapper
 - Lowercase is applied to the whole input before splitting on newlines
 - Sort uses `localeCompare` (asc / desc)
 - Catalogue description mentions “truncate”; it-tools UI/model has no truncate option — not implemented
-- Settings are in-memory for the session (it-tools persisted via `useStorage`; we do not persist)
+- Settings are remembered in this browser, under the same key it-tools uses (`list-converter:conversionConfig`). The pasted list is not
 
 ## Source
 Port of [it-tools List converter](https://it-tools.tech/list-converter). Local reference: handy-dandy `it-tools` (`/list-converter`). Catalogue id: `list-converter`.

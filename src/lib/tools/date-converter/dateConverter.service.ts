@@ -88,6 +88,11 @@ function pad(value: number, length = 2): string {
   return String(Math.trunc(Math.abs(value))).padStart(length, "0");
 }
 
+/** date-fns addLeadingZeros for years, so BCE dates keep their sign. */
+function padYear(year: number): string {
+  return `${year < 0 ? "-" : ""}${pad(year, 4)}`;
+}
+
 function isValidDate(value: unknown): value is Date {
   return (
     Object.prototype.toString.call(value) === "[object Date]" &&
@@ -97,7 +102,7 @@ function isValidDate(value: unknown): value is Date {
 
 /** date-fns formatISO (extended, complete) — local wall time + offset. */
 export function formatISO(date: Date): string {
-  const year = pad(date.getFullYear(), 4);
+  const year = padYear(date.getFullYear());
   const month = pad(date.getMonth() + 1);
   const day = pad(date.getDate());
   const hour = pad(date.getHours());
@@ -121,7 +126,7 @@ export function formatISO(date: Date): string {
 
 /** date-fns formatISO9075 (extended, complete) — local wall time, space separator. */
 export function formatISO9075(date: Date): string {
-  const year = pad(date.getFullYear(), 4);
+  const year = padYear(date.getFullYear());
   const month = pad(date.getMonth() + 1);
   const day = pad(date.getDate());
   const hour = pad(date.getHours());
@@ -132,7 +137,7 @@ export function formatISO9075(date: Date): string {
 
 /** date-fns formatRFC3339 (fractionDigits = 0). */
 export function formatRFC3339(date: Date): string {
-  const year = String(date.getFullYear());
+  const year = padYear(date.getFullYear());
   const month = pad(date.getMonth() + 1);
   const day = pad(date.getDate());
   const hour = pad(date.getHours());
@@ -159,19 +164,128 @@ export function formatRFC7231(date: Date): string {
   const dayName = DAYS[date.getUTCDay()];
   const dayOfMonth = pad(date.getUTCDate());
   const monthName = MONTHS[date.getUTCMonth()];
-  const year = date.getUTCFullYear();
+  const year = padYear(date.getUTCFullYear());
   const hour = pad(date.getUTCHours());
   const minute = pad(date.getUTCMinutes());
   const second = pad(date.getUTCSeconds());
   return `${dayName}, ${dayOfMonth} ${monthName} ${year} ${hour}:${minute}:${second} GMT`;
 }
 
-/** Parse ISO-like strings (allows space as date/time delimiter, like date-fns parseISO). */
+const ISO_DATE_REGEX = /^-?(?:(\d{3})|(\d{2})(?:-?(\d{2}))?|W(\d{2})(?:-?(\d{1}))?|)$/;
+const ISO_TIME_REGEX = /^(\d{2}(?:[.,]\d*)?)(?::?(\d{2}(?:[.,]\d*)?))?(?::?(\d{2}(?:[.,]\d*)?))?$/;
+const ISO_TIMEZONE_REGEX = /^([+-])(\d{2})(?::?(\d{2}))?$/;
+const ISO_YEAR_REGEX = /^(?:(\d{4}|[+-]\d{6})|(\d{2}|[+-]\d{4})$)/;
+const MS_IN_HOUR = 3_600_000;
+const MS_IN_MINUTE = 60_000;
+const DAYS_IN_MONTH = [31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+function isLeapYear(year: number): boolean {
+  return year % 400 === 0 || (year % 4 === 0 && year % 100 !== 0);
+}
+
+function splitIsoString(value: string): { date?: string; time?: string; timezone?: string } {
+  const parts = value.split(/[T ]/);
+  if (parts.length > 2) return {};
+
+  let date: string | undefined;
+  let timeString: string | undefined;
+  if (parts[0]!.includes(":")) {
+    timeString = parts[0];
+  } else {
+    date = parts[0]!;
+    timeString = parts[1];
+    if (/[Z ]/i.test(date)) {
+      date = value.split(/[Z ]/i)[0]!;
+      timeString = value.slice(date.length);
+    }
+  }
+  if (!timeString) return { date };
+
+  const timezone = /([Z+-].*)$/.exec(timeString)?.[1];
+  return {
+    date,
+    time: timezone ? timeString.replace(timezone, "") : timeString,
+    timezone,
+  };
+}
+
+/** The UTC midnight of an ISO date, or NaN. A missing year or unit counts as invalid or 1, like date-fns. */
+function parseIsoDate(value: string): number {
+  const yearMatch = ISO_YEAR_REGEX.exec(value);
+  if (!yearMatch) return Number.NaN;
+  const year = yearMatch[1] ? Number.parseInt(yearMatch[1]) : Number.parseInt(yearMatch[2]!) * 100;
+  const captures = ISO_DATE_REGEX.exec(value.slice((yearMatch[1] ?? yearMatch[2]!).length));
+  if (!captures) return Number.NaN;
+
+  const unit = (raw?: string) => (raw ? Number.parseInt(raw) : 1);
+  const date = new Date(0);
+
+  if (captures[4]) {
+    const week = unit(captures[4]);
+    const dayOfWeek = unit(captures[5]) - 1;
+    if (week < 1 || week > 53 || dayOfWeek < 0 || dayOfWeek > 6) return Number.NaN;
+    date.setUTCFullYear(year, 0, 4);
+    date.setUTCDate(date.getUTCDate() + (week - 1) * 7 + dayOfWeek + 1 - (date.getUTCDay() || 7));
+    return date.getTime();
+  }
+
+  const dayOfYear = unit(captures[1]);
+  const month = unit(captures[2]) - 1;
+  const day = unit(captures[3]);
+  const lastDay = DAYS_IN_MONTH[month] || (isLeapYear(year) ? 29 : 28);
+  if (month < 0 || month > 11 || day < 1 || day > lastDay) return Number.NaN;
+  if (dayOfYear < 1 || dayOfYear > (isLeapYear(year) ? 366 : 365)) return Number.NaN;
+  date.setUTCFullYear(year, month, Math.max(dayOfYear, day));
+  return date.getTime();
+}
+
+function parseIsoTime(value: string): number {
+  const captures = ISO_TIME_REGEX.exec(value);
+  if (!captures) return Number.NaN;
+  const unit = (raw?: string) => (raw ? Number.parseFloat(raw.replace(",", ".")) || 0 : 0);
+  const hours = unit(captures[1]);
+  const minutes = unit(captures[2]);
+  const seconds = unit(captures[3]);
+  const valid =
+    hours === 24
+      ? minutes === 0 && seconds === 0
+      : seconds < 60 && minutes < 60 && hours < 25;
+  return valid ? hours * MS_IN_HOUR + minutes * MS_IN_MINUTE + seconds * 1000 : Number.NaN;
+}
+
+function parseIsoTimezone(value: string): number {
+  if (value === "Z") return 0;
+  const captures = ISO_TIMEZONE_REGEX.exec(value);
+  if (!captures) return 0;
+  const hours = Number.parseInt(captures[2]!);
+  const minutes = captures[3] ? Number.parseInt(captures[3]) : 0;
+  if (minutes > 59) return Number.NaN;
+  return (captures[1] === "+" ? -1 : 1) * (hours * MS_IN_HOUR + minutes * MS_IN_MINUTE);
+}
+
+/**
+ * date-fns parseISO. `new Date` is not a substitute: it rejects basic and week forms, rolls
+ * 2023-02-31 over to March, and reads a date with no time as UTC instead of local.
+ */
 export function parseISO(value: string): Date {
-  const normalized = value.includes("T")
-    ? value
-    : value.replace(/^(\d{4}-\d{2}-\d{2}) /, "$1T");
-  return new Date(normalized);
+  const { date, time, timezone } = splitIsoString(value);
+  const day = date ? parseIsoDate(date) : Number.NaN;
+  if (Number.isNaN(day)) return new Date(Number.NaN);
+
+  const clock = time ? parseIsoTime(time) : 0;
+  if (Number.isNaN(clock)) return new Date(Number.NaN);
+
+  if (timezone) {
+    const offset = parseIsoTimezone(timezone);
+    return new Date(day + clock + offset);
+  }
+
+  // No zone means local wall time, so rebuild the UTC fields in the local zone.
+  const utc = new Date(day + clock);
+  const local = new Date(0);
+  local.setFullYear(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
+  local.setHours(utc.getUTCHours(), utc.getUTCMinutes(), utc.getUTCSeconds(), utc.getUTCMilliseconds());
+  return local;
 }
 
 export function dateToExcelFormat(date: Date): string {
@@ -180,6 +294,15 @@ export function dateToExcelFormat(date: Date): string {
 
 export function excelFormatToDate(excelFormat: string | number): Date {
   return new Date((Number(excelFormat) - 25569) * 86400 * 1000);
+}
+
+/** An ObjectID holds 32 unsigned bits of seconds, so anything outside 1970 to 2106 has no ID. */
+export function dateToMongoObjectId(date: Date): string {
+  const seconds = Math.floor(date.getTime() / 1000);
+  if (seconds < 0 || seconds > 0xffffffff) {
+    throw new RangeError("Date is outside the Mongo ObjectID range");
+  }
+  return `${seconds.toString(16).padStart(8, "0")}0000000000000000`;
 }
 
 const toDateFromString = (value: string) => new Date(value);
@@ -244,8 +367,7 @@ export const DATE_FORMATS: DateFormatDef[] = [
   {
     id: "mongo",
     name: "Mongo ObjectID",
-    fromDate: (date) =>
-      `${Math.floor(date.getTime() / 1000).toString(16)}0000000000000000`,
+    fromDate: dateToMongoObjectId,
     toDate: (objectId) =>
       new Date(Number.parseInt(objectId.substring(0, 8), 16) * 1000),
     formatMatcher: (date) => isMongoObjectId(date),

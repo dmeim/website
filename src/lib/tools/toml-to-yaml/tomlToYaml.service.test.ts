@@ -32,6 +32,10 @@ list:
       expect(tomlToYaml("   \n\t  ")).toBe("");
     });
 
+    it("keeps integers above 2^53 exact", () => {
+      expect(tomlToYaml("a = 9007199254740993")).toBe("a: 9007199254740993\n");
+    });
+
     it("returns empty string for invalid toml", () => {
       expect(tomlToYaml("foo = [unterminated")).toBe("");
       expect(tomlToYaml("[section\nkey = 1")).toBe("");

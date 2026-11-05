@@ -47,6 +47,10 @@ describe("json-to-yaml-converter", () => {
       expect(isValidJson("[1, 2, 3]")).toBe(true);
     });
 
+    it("treats whitespace as empty, not as a mistake", () => {
+      expect(isValidJson("  \n ")).toBe(true);
+    });
+
     it("rejects invalid json", () => {
       expect(isValidJson("{unterminated")).toBe(false);
       expect(isValidJson("[1, 2")).toBe(false);

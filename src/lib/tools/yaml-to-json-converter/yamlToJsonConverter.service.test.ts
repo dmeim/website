@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isValidYaml, yamlToJson } from "./yamlToJsonConverter.service";
+import { getYamlToJsonError } from "./yamlToJsonConverter.service";
 
 describe("yaml-to-json-converter", () => {
   describe("yamlToJson", () => {
@@ -77,9 +78,18 @@ describe("yaml-to-json-converter", () => {
       expect(yamlToJson("{a: b, c")).toBe("");
     });
 
-    it("returns empty string for falsy scalar values (it-tools parity)", () => {
-      expect(yamlToJson("false")).toBe("");
-      expect(yamlToJson("0")).toBe("");
+    it("converts falsy scalars rather than showing nothing", () => {
+      expect(yamlToJson("false")).toBe("false");
+      expect(yamlToJson("0")).toBe("0");
+      expect(yamlToJson('""')).toBe('""');
+    });
+
+    it("explains what stopped the conversion", () => {
+      expect(getYamlToJsonError("")).toBeNull();
+      expect(getYamlToJsonError("   ")).toBeNull();
+      expect(getYamlToJsonError("a: 1")).toBeNull();
+      expect(getYamlToJsonError("a: b: c")).toBe("Provided YAML is not valid.");
+      expect(getYamlToJsonError("a: &a\n  b: *a")).toContain("refers to itself");
     });
 
     it("stringifies truthy scalars", () => {

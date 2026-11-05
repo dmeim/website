@@ -7,7 +7,9 @@ Color converter (`color-converter`)
 Convert a color between hex, rgb, hsl, hwb, lch, cmyk, and CSS color name (with closest-name fallback). Includes a native color picker. Conversion runs in the browser via `colord` (same library as it-tools) for format parity.
 
 ## Toggles and Settings
-None — every field is an editable live input. Changing any valid format updates the others.
+- **alpha** slider (0% to 100%), beside the color picker
+
+Every other field is an editable live input. Changing any valid format updates the others.
 
 ## Inputs
 - Color picker (`#rrggbb`)
@@ -28,7 +30,8 @@ Live (as you type), each with copy:
 - Empty input is allowed and does not clear sibling fields
 - Invalid non-empty input shows a field error and leaves siblings unchanged
 - Name output uses colord `toName({ closest: true })` (falls back to `Unknown`)
-- Native color picker is opaque `#rrggbb` only (alpha is dropped for the picker field)
+- Native color picker is opaque `#rrggbb` only, so the alpha slider stands in for the alpha control of the it-tools picker, and picking a color keeps the current alpha
+- The hex field accepts a value with no leading `#`
 - Uses `colord` + cmyk/hwb/lch/names plugins for parity with it-tools
 
 ## Source

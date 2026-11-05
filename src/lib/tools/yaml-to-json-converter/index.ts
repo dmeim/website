@@ -1,1 +1,1 @@
-export { isValidYaml, yamlToJson } from "./yamlToJsonConverter.service";
+export { getYamlToJsonError, isValidYaml, yamlToJson } from "./yamlToJsonConverter.service";

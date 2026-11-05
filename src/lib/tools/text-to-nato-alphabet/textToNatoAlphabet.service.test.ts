@@ -34,6 +34,10 @@ describe("text-to-nato-alphabet", () => {
       expect(textToNatoAlphabet("OK!")).toBe("Oscar Kilo !");
     });
 
+    it("keeps an emoji whole instead of splitting its surrogate pair", () => {
+      expect(textToNatoAlphabet("a😀b")).toBe("Alpha 😀 Bravo");
+    });
+
     it("maps the full alphabet in order", () => {
       const input = "abcdefghijklmnopqrstuvwxyz";
       expect(textToNatoAlphabet(input)).toBe(NATO_ALPHABET.join(" "));

@@ -20,7 +20,10 @@ None.
 ## Notes
 - Parse: `JSON5.parse` (matches it-tools — unquoted keys, trailing commas)
 - Convert options: `{ compact: true }` (matches it-tools)
-- Empty input is treated as valid and yields empty output
+- Opens with the it-tools sample, `{"a":{"_attributes":{"x":"1.234","y":"It's"}}}`
+- Empty or whitespace-only input is treated as valid and yields empty output
+- `<`, `&`, and `>` in attribute values are escaped, which `xml-js` leaves undone
+- Output is checked by parsing it back, so a top-level list or value, or a key that is not an XML name (such as `a b`), shows an error instead of broken XML
 - Invalid JSON clears the XML output and shows “Provided JSON is not valid.”
 - Cluster dep: `xml-js` (shared with sibling `xml-to-json`); also uses existing `json5`
 

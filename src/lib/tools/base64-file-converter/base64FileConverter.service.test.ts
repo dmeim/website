@@ -61,11 +61,20 @@ describe("base64-file-converter", () => {
       expect(getExtensionFromMimeType("application/x-unknown")).toBeUndefined();
     });
 
+    it("knows the full mime-db list, and ignores mime parameters", () => {
+      expect(getExtensionFromMimeType("application/zip")).toBe("zip");
+      expect(getExtensionFromMimeType("text/plain;charset=utf-8")).toBe("txt");
+      expect(getExtensionFromMimeType("image/webp")).toBe("webp");
+      expect(getExtensionFromMimeType("application/x-not-a-real-type")).toBeUndefined();
+      expect(getMimeTypeFromExtension("zip")).toBe("application/zip");
+      expect(getMimeTypeFromExtension("nope")).toBeUndefined();
+    });
+
     it("maps common extensions back to mime types", () => {
       expect(getMimeTypeFromExtension("png")).toBe("image/png");
       expect(getMimeTypeFromExtension(".txt")).toBe("text/plain");
       expect(getMimeTypeFromExtension("pdf")).toBe("application/pdf");
-      expect(getMimeTypeFromExtension("xyz")).toBeUndefined();
+      expect(getMimeTypeFromExtension("not-an-extension")).toBeUndefined();
     });
   });
 
@@ -95,6 +104,12 @@ describe("base64-file-converter", () => {
       expect(result.filename).toBe("file.png");
     });
 
+    it("wraps a sniffed signature too, so it is never treated as a URL", () => {
+      const { dataUrl, filename } = buildDownloadFromBase64({ sourceValue: "iVBORw0KGgo=", filename: "pic", extension: "png" });
+      expect(dataUrl).toBe("data:image/png;base64,iVBORw0KGgo=");
+      expect(filename).toBe("pic.png");
+    });
+
     it("wraps bare base64 using extension mime when no sniff", () => {
       const result = buildDownloadFromBase64({
         sourceValue: "YQ==",
@@ -112,7 +127,7 @@ describe("base64-file-converter", () => {
         extension: "png",
       });
       expect(result.filename).toBe("shot.png");
-      expect(result.dataUrl).toBe("iVBORw0KGgo=");
+      expect(result.dataUrl).toBe("data:image/png;base64,iVBORw0KGgo=");
     });
 
     it("does not double-append matching extension", () => {
@@ -130,6 +145,10 @@ describe("base64-file-converter", () => {
       expect(() => resolvePreviewImageSrc("")).toThrow(
         "Base64 string is empty",
       );
+    });
+
+    it("wraps unrecognized strings so the browser never fetches them as a URL", () => {
+      expect(resolvePreviewImageSrc("SGVsbG8=")).toBe("data:image/png;base64,SGVsbG8=");
     });
 
     it("passes through data URIs", () => {

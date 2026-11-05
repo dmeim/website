@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  COLOR_FORMATS,
+  alphaOf,
   applyColorInput,
   formatAll,
   initialColorValues,
   invalidMessageFor,
   isColorInputValid,
   parseColor,
+  previewColor,
   removeAlphaChannelWhenOpaque,
+  withAlpha,
 } from "./colorConverter.service";
 
 describe("color-converter", () => {
@@ -91,6 +95,53 @@ describe("color-converter", () => {
       expect(valid).toBe(true);
       expect(values.rgb).toBe("");
       expect(values.hex).toBe(current.hex);
+    });
+  });
+
+  describe("alpha and lenient input", () => {
+    it("every text placeholder example is a color the tool accepts", () => {
+      for (const format of COLOR_FORMATS.filter((item) => item.type === "text")) {
+        const example = format.placeholder.replace(/^e\.g\. /, "");
+        expect(parseColor(example), format.id).toBeDefined();
+      }
+    });
+
+    it("carries alpha through every format that has one", () => {
+      const { values } = applyColorInput(initialColorValues(), "hex", "#ff000080");
+      expect(values.rgb).toBe("rgba(255, 0, 0, 0.5)");
+      expect(values.hsl).toBe("hsla(0, 100%, 50%, 0.5)");
+      expect(values.hwb).toBe("hwb(0 0% 0% / 0.5)");
+      expect(values.picker).toBe("#ff0000");
+      expect(alphaOf(values)).toBe(0.5);
+    });
+
+    it("accepts a hex without its hash, in the hex field only", () => {
+      expect(applyColorInput(initialColorValues(), "hex", "ff0000").values.rgb).toBe("rgb(255, 0, 0)");
+      expect(applyColorInput(initialColorValues(), "name", "ff0000").valid).toBe(false);
+      expect(isColorInputValid("ff0000", "hex")).toBe(true);
+      expect(isColorInputValid("zzz", "hex")).toBe(false);
+    });
+
+    it("the picker stays opaque when an alpha is applied to it", () => {
+      const hex = withAlpha("#ff0000", 0.5);
+      expect(hex).toBe("#ff000080");
+      const { values } = applyColorInput(initialColorValues(), "picker", hex);
+      expect(values.picker).toBe("#ff0000");
+      expect(values.hex).toBe("#ff000080");
+    });
+
+    it("round-trips transparent", () => {
+      const { values } = applyColorInput(initialColorValues(), "name", "transparent");
+      expect(values.hex).toBe("#00000000");
+      expect(values.rgb).toBe("rgba(0, 0, 0, 0)");
+    });
+
+    it("previews the hex field when it parses and the last good color when not", () => {
+      const seeded = applyColorInput(initialColorValues(), "hex", "#ff000080").values;
+      expect(previewColor(seeded)).toBe("#ff000080");
+      expect(previewColor({ ...seeded, hex: "ff0000" })).toBe("#ff0000");
+      expect(previewColor({ ...seeded, hex: "zzz" })).toBe("#ff000080");
+      expect(previewColor({ ...seeded, hex: "" })).toBe("#ff000080");
     });
   });
 

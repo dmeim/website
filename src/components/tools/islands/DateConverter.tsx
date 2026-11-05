@@ -66,6 +66,7 @@ export default function DateConverter() {
             placeholder="Put your date string here…"
             spellCheck={false}
             autoFocus
+            clearable
             onChange={(event) => onInputChange(event.target.value)}
             aria-invalid={valid ? undefined : true}
           />

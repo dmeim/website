@@ -10,6 +10,8 @@ Encode and decode strings to/from Base64 (UTF-8). Optional URL-safe alphabet (`-
 - **Encode URL safe** — when encoding, strip `=` padding and map `+`/`/` → `-`/`_`
 - **Decode URL safe** — when decoding, accept URL-safe alphabet and missing padding
 
+- Both switches are remembered in this browser, under the same keys it-tools uses
+
 ## Inputs
 - Cleartext string to encode (multiline)
 - Base64 string to decode (multiline; optional `data:*;base64,` prefix; trimmed in the UI)
@@ -24,6 +26,7 @@ Encode and decode strings to/from Base64 (UTF-8). Optional URL-safe alphabet (`-
 - Invalid decode input soft-fails to an empty output and shows a validation hint
 - Data-URI prefixes matching `data:…;base64,` are stripped before decode/validation
 - Empty input yields an empty output on that panel
+- A leading byte order mark survives decoding, so text round-trips exactly
 
 ## Source
 Port of [it-tools Base64 string converter](https://it-tools.tech/base64-string-converter). Local reference: handy-dandy `it-tools` (`/base64-string-converter`). Catalogue id: `base64-string-converter`.

@@ -19,7 +19,8 @@ None.
 
 ## Notes
 - Parse options: `{ merge: true }` (enables YAML merge keys)
-- Empty / null / falsy parsed values yield an empty output string (matches it-tools)
+- Empty and null documents yield an empty output string. `0` and `false` convert, where it-tools shows nothing
+- An alias that refers to itself gets its own error, since JSON cannot write a cycle
 - Invalid YAML clears the JSON output and shows “Provided YAML is not valid.”
 - Cluster deps (`yaml`, `iarna-toml-esm`, `json5`) are shared with sibling yaml/toml converters
 

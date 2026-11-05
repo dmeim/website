@@ -20,9 +20,10 @@ None.
 ## Notes
 - Convert options: `{ compact: true }` (matches it-tools)
 - Indent: 2 spaces (matches it-tools)
-- Empty / whitespace-only input is treated as valid and yields `{}`
+- Opens with the it-tools sample, `<a x="1.234" y="It's"/>`
+- Empty / whitespace-only input is treated as valid and yields empty output
 - Invalid XML clears the JSON output and shows “Provided XML is not valid.”
-- Validation uses `xml-js` (not `xml-formatter`) so `json-to-xml` can share one dep
+- Validation uses `xml-formatter`, as it-tools does, which rejects a second root, plus `xml-js`, which rejects the unclosed tags `xml-formatter` closes on its own
 - Cluster dep: `xml-js` (shared with sibling `json-to-xml`)
 
 ## Source

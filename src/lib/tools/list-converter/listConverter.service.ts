@@ -33,6 +33,15 @@ export const DEFAULT_CONVERT_OPTIONS: ConvertOptions = {
   separator: ", ",
 };
 
+/** Guards remembered settings, which may be corrupt or from an older shape. */
+export function isConvertOptions(value: ConvertOptions): boolean {
+  return (Object.keys(DEFAULT_CONVERT_OPTIONS) as (keyof ConvertOptions)[]).every((key) =>
+    key === "sortList"
+      ? value.sortList === null || value.sortList === "asc" || value.sortList === "desc"
+      : typeof value[key] === typeof DEFAULT_CONVERT_OPTIONS[key],
+  );
+}
+
 function whenever<T>(condition: boolean, fn: (value: T) => T) {
   return (value: T) => (condition ? fn(value) : value);
 }
@@ -53,13 +62,20 @@ function uniquePreserveOrder(parts: string[]): string[] {
   return out;
 }
 
-/** Convert a newline-separated list using the given options. */
+/**
+ * Convert a newline-separated list using the given options.
+ * Unlike it-tools, this trims before it dedupes and sorts, so `a` and ` a` count as one item and
+ * indentation cannot change the sort order. A list with no items stays empty even when wrapped.
+ */
 export function convertList(list: string, options: ConvertOptions): string {
   const lineBreak = options.keepLineBreaks ? "\n" : "";
 
   let parts = whenever(options.lowerCase, (text: string) =>
     text.toLowerCase(),
-  )(list).split("\n");
+  )(list)
+    .split(/\r?\n/)
+    .map(whenever(options.trimItems, (item: string) => item.trim()))
+    .filter((item) => item !== "");
 
   parts = whenever(options.removeDuplicates, uniquePreserveOrder)(parts);
   parts = whenever(options.reverseList, (items: string[]) =>
@@ -70,11 +86,13 @@ export function convertList(list: string, options: ConvertOptions): string {
     parts = [...parts].sort(byOrder(options.sortList));
   }
 
-  parts = parts
-    .map(whenever(options.trimItems, (item: string) => item.trim()))
-    .filter((item) => item !== "")
-    .map((item) => options.itemPrefix + item + options.itemSuffix);
+  if (parts.length === 0) return "";
 
-  const joined = parts.join(options.separator + lineBreak);
-  return [options.listPrefix, joined, options.listSuffix].join(lineBreak);
+  const joined = parts
+    .map((item) => options.itemPrefix + item + options.itemSuffix)
+    .join(options.separator + lineBreak);
+
+  return [options.listPrefix, joined, options.listSuffix]
+    .filter((part) => part !== "")
+    .join(lineBreak);
 }

@@ -1,1 +1,1 @@
-export { isValidJson, jsonToXml } from "./jsonToXml.service";
+export { DEFAULT_JSON, getJsonToXmlError, isValidJson, jsonToXml } from "./jsonToXml.service";

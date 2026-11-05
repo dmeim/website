@@ -1,16 +1,16 @@
 import { useMemo, useState } from "react";
 
 import { Panel, ToolFrame, TransformPanel } from "@/ui/react";
-import { isValidYaml, yamlToJson } from "@/lib/tools/yaml-to-json-converter";
+import { getYamlToJsonError, yamlToJson } from "@/lib/tools/yaml-to-json-converter";
 
 export default function YamlToJsonConverter() {
   const [input, setInput] = useState("");
 
-  const inputInvalid = input !== "" && !isValidYaml(input);
+  const error = useMemo(() => getYamlToJsonError(input), [input]);
 
   const output = useMemo(
-    () => (inputInvalid ? "" : yamlToJson(input)),
-    [input, inputInvalid],
+    () => (error ? "" : yamlToJson(input)),
+    [input, error],
   );
 
   return (
@@ -26,7 +26,7 @@ export default function YamlToJsonConverter() {
             rows: 10,
           }}
           output={{ label: "JSON from your YAML", value: output, mono: true, rows: 12 }}
-          error={inputInvalid ? "Provided YAML is not valid." : undefined}
+          error={error ?? undefined}
         />
       </Panel>
     </ToolFrame>

@@ -1,16 +1,15 @@
 /**
- * Convert text to ASCII binary (8-bit octets via charCodeAt) and back.
- * BMP-oriented (matches it-tools): surrogate pairs are encoded per code unit.
+ * Convert text to binary octets and back. ASCII matches it-tools exactly. Anything beyond
+ * ASCII is UTF-8, because 16-bit code units cannot split into octets and survive the trip back.
  */
 
 export function convertTextToAsciiBinary(
   text: string,
   { separator = " " }: { separator?: string } = {},
 ): string {
-  return text
-    .split("")
-    .map((char) => char.charCodeAt(0).toString(2).padStart(8, "0"))
-    .join(separator);
+  return Array.from(new TextEncoder().encode(text), (byte) =>
+    byte.toString(2).padStart(8, "0"),
+  ).join(separator);
 }
 
 export function convertAsciiBinaryToText(binary: string): string {
@@ -20,15 +19,21 @@ export function convertAsciiBinaryToText(binary: string): string {
     throw new Error("Invalid binary string");
   }
 
-  return cleanBinary
-    .split(/(\d{8})/)
-    .filter(Boolean)
-    .map((octet) => String.fromCharCode(Number.parseInt(octet, 2)))
-    .join("");
+  const bytes = Uint8Array.from(cleanBinary.match(/.{8}/g) ?? [], (octet) =>
+    Number.parseInt(octet, 2),
+  );
+
+  try {
+    return new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes);
+  } catch {
+    // Not UTF-8, so read each octet as Latin-1, as it-tools does for every input.
+    return Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+  }
 }
 
-/** True when the string cleans to complete 8-bit octets (or empty). */
+/** True when the string cleans to complete 8-bit octets, or is blank. Text with no bits at all is not binary. */
 export function isValidAsciiBinary(binary: string): boolean {
+  if (binary.trim() !== "" && !/[01]/.test(binary)) return false;
   try {
     convertAsciiBinaryToText(binary);
     return true;

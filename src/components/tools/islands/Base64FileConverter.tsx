@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   Button,
@@ -32,6 +32,7 @@ export default function Base64FileConverter() {
   const [fileBase64, setFileBase64] = useState("");
   const [uploadName, setUploadName] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
+  const latestUpload = useRef(0);
 
   const trimmedBase64Input = base64Input.trim();
   const base64InputInvalid =
@@ -51,12 +52,22 @@ export default function Base64FileConverter() {
       return;
     }
 
+    const previewError = "This Base64 is not an image your browser can display.";
     try {
-      setPreviewSrc(resolvePreviewImageSrc(trimmedBase64Input));
-      setDecodeStatus("");
+      const src = resolvePreviewImageSrc(trimmedBase64Input);
+      const probe = new Image();
+      probe.onload = () => {
+        setPreviewSrc(src);
+        setDecodeStatus("");
+      };
+      probe.onerror = () => {
+        setPreviewSrc("");
+        setDecodeStatus(previewError);
+      };
+      probe.src = src;
     } catch {
       setPreviewSrc("");
-      setDecodeStatus("Could not preview this Base64 as an image.");
+      setDecodeStatus(previewError);
     }
   }, [canUseBase64, trimmedBase64Input]);
 
@@ -81,15 +92,19 @@ export default function Base64FileConverter() {
   }, [canUseBase64, trimmedBase64Input, fileName, fileExtension]);
 
   const onUpload = useCallback(async (file: File) => {
+    latestUpload.current += 1;
+    const upload = latestUpload.current;
     setUploadName(file.name);
     setUploadStatus("Reading file…");
     setFileBase64("");
 
     try {
       const encoded = await fileToBase64DataUrl(file);
+      if (upload !== latestUpload.current) return;
       setFileBase64(encoded);
       setUploadStatus("");
     } catch {
+      if (upload !== latestUpload.current) return;
       setFileBase64("");
       setUploadStatus("Could not read that file as Base64.");
     }

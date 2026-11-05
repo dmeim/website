@@ -37,6 +37,26 @@ describe("text-to-unicode", () => {
   });
 
   describe("round-trip", () => {
+    it("encodes an emoji as one entity (U+1F600 = 128512)", () => {
+      expect(convertTextToUnicode("😀")).toBe("&#128512;");
+      expect(convertUnicodeToText("&#128512;")).toBe("😀");
+    });
+
+    it("decodes hex entities and code-unit surrogate pairs", () => {
+      expect(convertUnicodeToText("&#x1F600;&#X41;")).toBe("😀A");
+      expect(convertUnicodeToText("&#55357;&#56832;")).toBe("😀");
+    });
+
+    it("leaves numbers beyond Unicode unchanged instead of wrapping them", () => {
+      expect(convertUnicodeToText("&#99999999;")).toBe("&#99999999;");
+    });
+
+    it("round-trips any Unicode text", () => {
+      for (const text of ["😀", "日本語 👩‍💻 𝒳 é", "\uFEFFbom"]) {
+        expect(convertUnicodeToText(convertTextToUnicode(text))).toBe(text);
+      }
+    });
+
     it("round-trips ASCII text through entities", () => {
       const sample = "Hello Avengers!";
       expect(convertUnicodeToText(convertTextToUnicode(sample))).toBe(sample);

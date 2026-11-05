@@ -31,7 +31,7 @@ export function base64ToText(
   }
 
   try {
-    return new TextDecoder().decode(base64ToBytes(cleanStr));
+    return new TextDecoder("utf-8", { ignoreBOM: true }).decode(base64ToBytes(cleanStr));
   } catch {
     throw new Error("Incorrect base64 string");
   }

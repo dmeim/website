@@ -87,21 +87,21 @@ export const COLOR_FORMATS: readonly ColorFormatDef[] = [
   {
     id: "hwb",
     label: "hwb",
-    placeholder: "e.g. hwb(0, 0%, 0%)",
+    placeholder: "e.g. hwb(0 0% 0%)",
     type: "text",
     format: (v) => v.toHwbString(),
   },
   {
     id: "lch",
     label: "lch",
-    placeholder: "e.g. lch(53.24, 104.55, 40.85)",
+    placeholder: "e.g. lch(53.24% 104.55 40.85)",
     type: "text",
     format: (v) => v.toLchString(),
   },
   {
     id: "cmyk",
     label: "cmyk",
-    placeholder: "e.g. cmyk(0, 100%, 100%, 0)",
+    placeholder: "e.g. device-cmyk(0% 100% 100% 0%)",
     type: "text",
     format: (v) => v.toCmykString(),
   },
@@ -120,17 +120,39 @@ const FORMAT_BY_ID = Object.fromEntries(
 
 export function parseColor(value: string): Colord | undefined {
   return withDefaultOnError(() => {
-    const parsed = colord(value);
+    const parsed = colord(value.trim());
     return parsed.isValid() ? parsed : undefined;
   }, undefined);
 }
 
+/** The hex field also takes a pasted `ff0000`. Elsewhere that could be a name, so `#` stays required. */
+function parseColorField(id: ColorFormatId, raw: string): Colord | undefined {
+  const value = raw.trim();
+  const needsHash = id === "hex" && /^[0-9a-f]{3,8}$/i.test(value);
+  return parseColor(needsHash ? `#${value}` : value);
+}
+
 /** Empty input is treated as valid (matches it-tools validation). */
-export function isColorInputValid(value: string): boolean {
+export function isColorInputValid(value: string, id?: ColorFormatId): boolean {
   if (value === "") {
     return true;
   }
-  return parseColor(value) !== undefined;
+  return (id ? parseColorField(id, value) : parseColor(value)) !== undefined;
+}
+
+/** The opacity of what the fields describe, from 0 to 1. Prefers rgb, since hex may be mid-edit. */
+export function alphaOf(values: ColorValues): number {
+  return (parseColor(values.rgb) ?? parseColor(values.hex))?.alpha() ?? 1;
+}
+
+/** An opaque picker hex plus an alpha, as an `#rrggbbaa` hex. */
+export function withAlpha(hex: string, alpha: number): string {
+  return parseColor(hex)?.alpha(alpha).toHex() ?? hex;
+}
+
+/** What the swatch shows: the hex field if it parses, or else the last good color. */
+export function previewColor(values: ColorValues): string {
+  return parseColorField("hex", values.hex)?.toHex() ?? withAlpha(values.picker, alphaOf(values));
 }
 
 export function formatAll(color: Colord): ColorValues {
@@ -161,7 +183,7 @@ export function applyColorInput(
   raw: string,
 ): { values: ColorValues; valid: boolean } {
   const next: ColorValues = { ...current, [sourceId]: raw };
-  const parsed = parseColor(raw);
+  const parsed = parseColorField(sourceId, raw);
 
   if (!parsed) {
     return { values: next, valid: raw === "" };
@@ -172,6 +194,8 @@ export function applyColorInput(
       next[format.id] = format.format(parsed);
     }
   }
+  // The native picker only holds opaque hex, even when an alpha came along with the edit.
+  next.picker = toPickerHex(parsed);
 
   return { values: next, valid: true };
 }

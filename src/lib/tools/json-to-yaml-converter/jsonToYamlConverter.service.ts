@@ -7,7 +7,7 @@ import { stringify as stringifyYaml } from "yaml";
 
 /** Returns true when parse + stringify does not throw (matches it-tools validation). */
 export function isValidJson(value: string): boolean {
-  if (value === "") return true;
+  if (value.trim() === "") return true;
   try {
     stringifyYaml(JSON5.parse(value));
     return true;

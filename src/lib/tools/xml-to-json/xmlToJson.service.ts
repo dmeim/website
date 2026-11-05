@@ -3,6 +3,10 @@
  * Parity with it-tools: `xml-js` xml2js with `{ compact: true }`, indent 2.
  */
 import convert from "xml-js";
+import xmlFormat from "xml-formatter";
+
+/** The sample it-tools opens with. */
+export const DEFAULT_XML = `<a x="1.234" y="It's"/>`;
 
 function cleanRawXml(rawXml: string): string {
   return rawXml.trim();
@@ -11,14 +15,15 @@ function cleanRawXml(rawXml: string): string {
 /**
  * Validate XML for conversion.
  * Empty / whitespace-only input is valid (matches it-tools xml-formatter rule).
- * Uses xml-js + JSON.stringify so circular/unclosed trees that cannot be
- * serialized are treated as invalid (same outcome as it-tools withDefaultOnError).
+ * xml-formatter is the it-tools check and rejects a second root, but it closes open tags on its
+ * own, so xml-js + JSON.stringify must also pass: those unclosed trees come back circular.
  */
 export function isValidXml(value: string): boolean {
   const cleaned = cleanRawXml(value);
   if (cleaned === "") return true;
 
   try {
+    xmlFormat(cleaned);
     JSON.stringify(convert.xml2js(cleaned, { compact: true }));
     return true;
   } catch {
@@ -28,12 +33,14 @@ export function isValidXml(value: string): boolean {
 
 /**
  * Convert XML text to JSON with 2-space indent.
- * Returns "" on parse/stringify failure (matches it-tools `withDefaultOnError`).
+ * Returns "" on blank input or parse/stringify failure (matches it-tools `withDefaultOnError`).
  */
 export function xmlToJson(value: string): string {
+  const cleaned = cleanRawXml(value);
+  if (cleaned === "") return "";
   try {
     return JSON.stringify(
-      convert.xml2js(value, { compact: true }),
+      convert.xml2js(cleaned, { compact: true }),
       null,
       2,
     );

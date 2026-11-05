@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 
 import { Panel, ToolFrame, TransformPanel } from "@/ui/react";
-import { isValidXml, xmlToJson } from "@/lib/tools/xml-to-json";
+import { DEFAULT_XML, isValidXml, xmlToJson } from "@/lib/tools/xml-to-json";
 
 export default function XmlToJson() {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(DEFAULT_XML);
 
-  const inputInvalid = input !== "" && !isValidXml(input);
+  const inputInvalid = !isValidXml(input);
 
   const output = useMemo(
     () => (inputInvalid ? "" : xmlToJson(input)),

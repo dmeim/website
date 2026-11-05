@@ -127,6 +127,22 @@ describe("base64-string-converter", () => {
       expect(base64ToTextSafe("YQ==")).toBe("a");
     });
 
+    it("round-trips emoji, astral characters, and a leading BOM", () => {
+      // Expected values from: printf '%s' '<text>' | base64
+      expect(textToBase64("😀")).toBe("8J+YgA==");
+      expect(textToBase64("😀", { makeUrlSafe: true })).toBe("8J-YgA");
+      expect(base64ToText("8J+YgA==")).toBe("😀");
+      expect(base64ToText("8J-YgA", { makeUrlSafe: true })).toBe("😀");
+      for (const text of ["日本語 👩‍💻 𝒳 é", "\uFEFFbom", "line\nbreak\ttab", "\u0000nul"]) {
+        expect(base64ToText(textToBase64(text))).toBe(text);
+        expect(base64ToText(textToBase64(text, { makeUrlSafe: true }), { makeUrlSafe: true })).toBe(text);
+      }
+    });
+
+    it("decodes base64 wrapped across lines", () => {
+      expect(base64ToText("bG9yZW0g\naXBzdW0=")).toBe("lorem ipsum");
+    });
+
     it("round-trips text through base64", () => {
       const sample = "it-tools ← UTF-8";
       expect(base64ToText(textToBase64(sample))).toBe(sample);

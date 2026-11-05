@@ -33,6 +33,26 @@ foo = "bar"
       expect(tomlToJson("")).toBe("");
     });
 
+    it("keeps integers above 2^53 exact", () => {
+      expect(tomlToJson("a = 9007199254740993\nb = [-9007199254740993]")).toBe(
+        '{\n   "a": 9007199254740993,\n   "b": [\n      -9007199254740993\n   ]\n}',
+      );
+    });
+
+    it("converts every TOML date flavor to a string", () => {
+      const parsed = JSON.parse(
+        tomlToJson("offset = 1979-05-27T07:32:00Z\nlocal = 1979-05-27T07:32:00\nday = 1979-05-27\ntime = 07:32:00"),
+      ) as Record<string, string>;
+      expect(parsed.offset).toBe("1979-05-27T07:32:00.000Z");
+      expect(parsed.local).toBe("1979-05-27T07:32:00.000");
+      expect(parsed.day).toBe("1979-05-27");
+      expect(parsed.time).toBe("07:32:00.000");
+    });
+
+    it("treats whitespace as empty", () => {
+      expect(tomlToJson(" \n ")).toBe("");
+    });
+
     it("returns empty string for invalid toml", () => {
       expect(tomlToJson("foo = [unterminated")).toBe("");
       expect(tomlToJson("[section\nkey = 1")).toBe("");

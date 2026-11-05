@@ -26,9 +26,10 @@ export default function CaseConverter() {
           aria-live="polite"
           items={formats.map((format) => ({
             label: format.label,
-            value: format.value,
+            value: format.value || "–",
             mono: true,
             copy: format.value ? format.value : false,
+            tone: format.value ? "default" : "muted",
           }))}
         />
       </Panel>

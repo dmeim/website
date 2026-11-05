@@ -1,16 +1,16 @@
 import { useMemo, useState } from "react";
 
 import { Panel, ToolFrame, TransformPanel } from "@/ui/react";
-import { isValidJson, jsonToToml } from "@/lib/tools/json-to-toml";
+import { getJsonToTomlError, jsonToToml } from "@/lib/tools/json-to-toml";
 
 export default function JsonToToml() {
   const [input, setInput] = useState("");
 
-  const inputInvalid = input !== "" && !isValidJson(input);
+  const error = useMemo(() => getJsonToTomlError(input), [input]);
 
   const output = useMemo(
-    () => (inputInvalid ? "" : jsonToToml(input)),
-    [input, inputInvalid],
+    () => (error ? "" : jsonToToml(input)),
+    [input, error],
   );
 
   return (
@@ -26,7 +26,7 @@ export default function JsonToToml() {
             rows: 10,
           }}
           output={{ label: "TOML from your JSON", value: output, mono: true, rows: 12 }}
-          error={inputInvalid ? "Provided JSON is not valid." : undefined}
+          error={error ?? undefined}
         />
       </Panel>
     </ToolFrame>

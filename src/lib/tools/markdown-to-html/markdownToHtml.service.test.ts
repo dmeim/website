@@ -43,6 +43,20 @@ describe("markdown-to-html", () => {
       expect(html).toContain("<li>two</li>");
     });
 
+    it("escapes raw HTML, so the preview cannot run markup from the input", () => {
+      expect(markdownToHtml("<script>alert(1)</script>")).toBe(
+        "<p>&lt;script&gt;alert(1)&lt;/script&gt;</p>\n",
+      );
+      expect(markdownToHtml('<img src=x onerror="alert(1)">')).not.toContain("<img");
+    });
+
+    it("does not link dangerous URL schemes", () => {
+      for (const url of ["javascript:alert(1)", "vbscript:msgbox(1)", "data:text/html;base64,PHNjcmlwdD4="]) {
+        expect(markdownToHtml(`[click](${url})`), url).not.toContain("<a ");
+        expect(markdownToHtml(`![pic](${url})`), url).not.toContain("<img");
+      }
+    });
+
     it("renders inline code", () => {
       expect(markdownToHtml("Use `code` here")).toBe(
         "<p>Use <code>code</code> here</p>\n",
