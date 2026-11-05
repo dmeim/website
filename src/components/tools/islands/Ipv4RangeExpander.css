@@ -1,7 +1,7 @@
 .ipv4re-value {
   display: inline-flex;
   align-items: center;
-  gap: var(--ui-space-2);
+  gap: var(--ui-space-xs);
 }
 
 .ipv4re-value__text {
