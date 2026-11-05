@@ -1,1 +1,1 @@
-export { evaluateExpression } from "./mathEvaluator.service";
+export { evaluateExpression, evaluateMath, type MathEvaluation } from "./mathEvaluator.service";

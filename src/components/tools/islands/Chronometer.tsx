@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button, ButtonGroup, Panel, Stat, ToolFrame } from "@/ui/react";
-import { formatMs } from "@/lib/tools/chronometer";
+import { computeElapsedMs, formatMs } from "@/lib/tools/chronometer";
 
 export default function Chronometer() {
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
-  const previousRafDate = useRef(Date.now());
+  const accumulatedMs = useRef(0);
+  const startedAt = useRef<number | null>(null);
   const rafId = useRef<number | null>(null);
 
   const stopRaf = useCallback(() => {
@@ -17,15 +18,12 @@ export default function Chronometer() {
   }, []);
 
   const tick = useCallback(() => {
-    const now = Date.now();
-    const deltaMs = now - previousRafDate.current;
-    previousRafDate.current = now;
-    setElapsedMs((prev) => prev + deltaMs);
+    setElapsedMs(computeElapsedMs(accumulatedMs.current, startedAt.current, Date.now()));
     rafId.current = requestAnimationFrame(tick);
   }, []);
 
   const resume = useCallback(() => {
-    previousRafDate.current = Date.now();
+    startedAt.current = Date.now();
     setIsRunning(true);
     stopRaf();
     rafId.current = requestAnimationFrame(tick);
@@ -33,10 +31,17 @@ export default function Chronometer() {
 
   const pause = useCallback(() => {
     stopRaf();
+    accumulatedMs.current = computeElapsedMs(accumulatedMs.current, startedAt.current, Date.now());
+    startedAt.current = null;
+    setElapsedMs(accumulatedMs.current);
     setIsRunning(false);
   }, [stopRaf]);
 
   const reset = useCallback(() => {
+    accumulatedMs.current = 0;
+    if (startedAt.current !== null) {
+      startedAt.current = Date.now();
+    }
     setElapsedMs(0);
   }, []);
 

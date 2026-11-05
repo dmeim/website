@@ -87,7 +87,7 @@ export async function generateIpv6Ula({
     return null;
   }
 
-  const digest = await sha1(String(timestamp) + macAddress);
+  const digest = await sha1(String(timestamp) + macAddress.trim());
   const hex40bit = digest.substring(30);
 
   return buildUlaFromHex40(hex40bit);

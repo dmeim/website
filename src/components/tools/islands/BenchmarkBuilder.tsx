@@ -198,6 +198,7 @@ export default function BenchmarkBuilder() {
                 label="Suite name"
                 value={suite.title}
                 placeholder="Suite name…"
+                clearable
                 onChange={(event) =>
                   updateSuite(index, { title: event.target.value })
                 }

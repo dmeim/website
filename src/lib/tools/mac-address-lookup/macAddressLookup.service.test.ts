@@ -28,7 +28,10 @@ describe("mac-address-lookup", () => {
       expect(isValidMacAddress("")).toBe(false);
       expect(isValidMacAddress("gg:hh:ii:jj:kk:ll")).toBe(false);
       expect(isValidMacAddress("20:37")).toBe(false);
-      expect(isValidMacAddress("20.37.06.12.34.56")).toBe(false);
+      expect(isValidMacAddress("20:37:06:12:34:5")).toBe(false);
+      expect(isValidMacAddress("2037061234")).toBe(true);
+      expect(isValidMacAddress("20370")).toBe(false);
+      expect(isValidMacAddress("20370612345678")).toBe(false);
       expect(isValidMacAddress("not-a-mac")).toBe(false);
     });
   });
@@ -84,6 +87,17 @@ describe("mac-address-lookup", () => {
     it("returns an empty list when vendor is missing", () => {
       expect(getVendorLines(undefined)).toEqual([]);
       expect(getVendorLines("")).toEqual([]);
+    });
+  });
+
+  describe("generator output formats", () => {
+    it("accepts dot, bare, and Cisco forms and finds the same vendor", () => {
+      const colon = lookupMacVendor("20:37:06:12:34:56");
+      expect(colon).toBeTruthy();
+      for (const form of ["20.37.06.12.34.56", "203706123456", "2037.0612.3456", "20-37-06-12-34-56", "20:37:06"]) {
+        expect(isValidMacAddress(form)).toBe(true);
+        expect(lookupMacVendor(form)).toBe(colon);
+      }
     });
   });
 });

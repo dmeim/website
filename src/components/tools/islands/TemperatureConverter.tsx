@@ -1,16 +1,25 @@
 import { useCallback, useState } from "react";
 
-import { FormGrid, Input, Panel, ToolFrame } from "@/ui/react";
+import { FormGrid, Input, Notice, Panel, ToolFrame } from "@/ui/react";
 import {
   TEMPERATURE_SCALES,
   convertFromScale,
   initialTemperatures,
+  isBelowAbsoluteZero,
   parseTemperatureInput,
   type TemperatureScale,
 } from "@/lib/tools/temperature-converter";
 
 function formatScaleValue(value: number): string {
-  return String(value);
+  return Number.isFinite(value) ? String(value) : "";
+}
+
+function blankValues(): Record<TemperatureScale, string> {
+  const next = {} as Record<TemperatureScale, string>;
+  for (const { id } of TEMPERATURE_SCALES) {
+    next[id] = "";
+  }
+  return next;
 }
 
 function valuesToStrings(
@@ -28,15 +37,15 @@ export default function TemperatureConverter() {
     valuesToStrings(initialTemperatures()),
   );
 
-  const onScaleChange = useCallback((scale: TemperatureScale, raw: string) => {
-    setValues((prev) => {
-      const parsed = parseTemperatureInput(raw);
-      if (parsed === undefined) {
-        return { ...prev, [scale]: raw };
-      }
+  const [belowAbsoluteZero, setBelowAbsoluteZero] = useState(false);
 
-      // Keep the typed source string; floor only the other scales (it-tools omit).
-      return { ...valuesToStrings(convertFromScale(scale, parsed)), [scale]: raw };
+  const onScaleChange = useCallback((scale: TemperatureScale, raw: string) => {
+    const parsed = parseTemperatureInput(raw);
+    setBelowAbsoluteZero(parsed !== undefined && isBelowAbsoluteZero(scale, parsed));
+    // Keep the typed source string; only the other scales are rounded, and they clear with an empty source.
+    setValues({
+      ...(parsed === undefined ? blankValues() : valuesToStrings(convertFromScale(scale, parsed))),
+      [scale]: raw,
     });
   }, []);
 
@@ -65,6 +74,12 @@ export default function TemperatureConverter() {
             />
           ))}
         </FormGrid>
+
+        {belowAbsoluteZero ? (
+          <Notice tone="warning" live="polite">
+            This is below absolute zero (0 K), so it is not a physically possible temperature.
+          </Notice>
+        ) : null}
       </Panel>
     </ToolFrame>
   );

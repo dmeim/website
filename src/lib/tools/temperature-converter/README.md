@@ -13,13 +13,14 @@ None.
 Eight linked number fields, one per scale. Changing any field recalculates the rest.
 
 ## Outputs
-All eight scale values stay in sync. The edited field keeps the typed value; other scales are truncated toward −∞ to two decimal places (`Math.floor(n * 100) / 100`), matching it-tools.
+All eight scale values stay in sync. The edited field keeps the typed value; other scales are rounded to two decimal places.
 
 ## Notes
 - Hub scale is Kelvin
-- Empty / non-finite input does not update the other fields
-- Initial state is 0 K (and the floored equivalents on every other scale)
-- Flooring uses `Math.floor`, so IEEE float noise can show e.g. `273.14` instead of `273.15` when converting from Celsius 0 (same as it-tools)
+- Clearing a field clears the other scales
+- Initial state is 0 K (and the rounded equivalents on every other scale)
+- A value colder than 0 K still converts, with a warning that it is not physically possible
+- it-tools floors instead of rounding, so float noise makes 0 °C read as 31.99 °F there. This port rounds, so it reads 32 °F
 - No external libraries
 
 ## Source

@@ -30,7 +30,8 @@ function pluralUnit(count: number, unit: string): string {
 /**
  * Total duration in ms for consuming `unitCount` units when
  * `unitPerTimeSpan` units are consumed every `timeSpan * timeSpanUnitMultiplier` ms.
- * Same formula as it-tools: `unitCount / (unitPerTimeSpan / timeSpanMs)`.
+ * Multiplies before dividing: it-tools' `unitCount / (unitPerTimeSpan / timeSpanMs)` divides by an inexact
+ * reciprocal, which can land just under a whole number of milliseconds.
  */
 export function computeDurationMs(
   unitCount: number,
@@ -39,23 +40,27 @@ export function computeDurationMs(
   timeSpanUnitMultiplier: number,
 ): number {
   const timeSpanMs = timeSpan * timeSpanUnitMultiplier;
-  return unitCount / (unitPerTimeSpan / timeSpanMs);
+  return (unitCount * timeSpanMs) / unitPerTimeSpan;
 }
 
 /**
  * Format a millisecond duration like date-fns `formatDuration` (en) plus optional ms.
- * Zero units are omitted; only-ms durations keep the leading space from it-tools
- * (` formatDuration(...) + (ms > 0 ? \` \${ms} ms\` : '')`).
+ * Zero units are omitted. Rounds to the millisecond so float noise cannot show as `59 seconds 999 ms`.
  */
 export function formatMsDuration(duration: number): string {
   if (!Number.isFinite(duration)) {
     return "";
   }
 
-  const ms = Math.floor(duration % 1000);
-  const secs = Math.floor(((duration - ms) / 1000) % 60);
-  const mins = Math.floor((((duration - ms) / 1000 - secs) / 60) % 60);
-  const hrs = Math.floor((((duration - ms) / 1000 - secs) / 60 - mins) / 60);
+  const total = Math.round(duration);
+  if (total === 0 && duration > 0) {
+    return "less than 1 ms";
+  }
+
+  const ms = total % 1000;
+  const secs = ((total - ms) / 1000) % 60;
+  const mins = (((total - ms) / 1000 - secs) / 60) % 60;
+  const hrs = ((total - ms) / 1000 - secs - mins * 60) / 3600;
 
   const parts: string[] = [];
   if (hrs !== 0) {
@@ -68,8 +73,11 @@ export function formatMsDuration(duration: number): string {
     parts.push(pluralUnit(secs, "second"));
   }
 
-  const base = parts.join(" ");
-  return base + (ms > 0 ? ` ${ms} ms` : "");
+  if (ms > 0) {
+    parts.push(`${ms} ms`);
+  }
+
+  return parts.join(" ");
 }
 
 function formatTimeEnGB(date: Date): string {
@@ -97,6 +105,10 @@ export function formatEtaRelative(endAtMs: number, nowMs: number = Date.now()): 
   }
 
   const date = new Date(endAtMs);
+  if (Number.isNaN(date.getTime())) {
+    return "too far in the future to show";
+  }
+
   const base = new Date(nowMs);
   const diff = differenceInCalendarDays(date, base);
   const time = formatTimeEnGB(date);
@@ -123,10 +135,10 @@ export function formatEtaRelative(endAtMs: number, nowMs: number = Date.now()): 
   return formatDateEnGB(date);
 }
 
-/** Local wall time for `<input type="datetime-local">` (minute precision). */
+/** Local wall time for `<input type="datetime-local">` (second precision, like the it-tools picker). */
 export function toDatetimeLocalValue(ms: number): string {
   const date = new Date(ms);
-  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}T${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
 }
 
 /** Parse a datetime-local string to epoch ms; invalid → `undefined`. */
@@ -138,11 +150,11 @@ export function parseDatetimeLocalValue(value: string): number | undefined {
   return Number.isFinite(ms) ? ms : undefined;
 }
 
-/** Parse a positive number field; empty / invalid → `undefined`. */
+/** Parse a positive number field; empty, invalid, zero, or negative → `undefined`. */
 export function parsePositiveNumber(raw: string): number | undefined {
   if (raw.trim() === "") {
     return undefined;
   }
   const value = Number(raw);
-  return Number.isFinite(value) ? value : undefined;
+  return Number.isFinite(value) && value > 0 ? value : undefined;
 }

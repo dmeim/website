@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { Button, ButtonGroup, CopyButton, Input, Notice, OutputField, Panel, SegmentedControl, ToolFrame } from "@/ui/react";
 import {
   DEFAULT_MAC_CASE,
@@ -32,10 +33,11 @@ const SEPARATOR_LABELS: Record<MacSeparator, string> = {
 };
 
 export default function MacAddressGenerator() {
-  const [quantity, setQuantity] = useState(MAC_QUANTITY_DEFAULT);
-  const [prefix, setPrefix] = useState(DEFAULT_MAC_PREFIX);
+  const [quantity, setQuantity] = useStoredState("mac-address-generator-amount", MAC_QUANTITY_DEFAULT);
+  const [quantityDraft, setQuantityDraft] = useState<string | null>(null);
+  const [prefix, setPrefix] = useStoredState("mac-address-generator-prefix", DEFAULT_MAC_PREFIX);
   const [caseStyle, setCaseStyle] = useState<MacCase>(DEFAULT_MAC_CASE);
-  const [separator, setSeparator] = useState<MacSeparator>(DEFAULT_MAC_SEPARATOR);
+  const [separator, setSeparator] = useStoredState<MacSeparator>("mac-address-generator-separator", DEFAULT_MAC_SEPARATOR);
   const [refreshKey, setRefreshKey] = useState(0);
   const [actionStatus, setActionStatus] = useState("");
 
@@ -75,11 +77,13 @@ export default function MacAddressGenerator() {
           min={MAC_QUANTITY_MIN}
           max={MAC_QUANTITY_MAX}
           step={1}
-          value={safeQuantity}
+          value={quantityDraft ?? safeQuantity}
           onChange={(event) => {
+            setQuantityDraft(event.target.value);
             setQuantity(clampMacQuantity(event.target.value));
             setActionStatus("");
           }}
+          onBlur={() => setQuantityDraft(null)}
         />
 
         <Input
@@ -89,11 +93,12 @@ export default function MacAddressGenerator() {
           value={prefix}
           placeholder="Set a prefix, e.g. 64:16:7F"
           spellCheck={false}
+          clearable
           onChange={(event) => {
             setPrefix(event.target.value);
             setActionStatus("");
           }}
-          error={!prefixValid ? "Invalid partial MAC address" : undefined}
+          error={!prefixValid ? "Invalid partial MAC address. Use up to six hex pairs, like 64:16:7F." : undefined}
         />
 
         <SegmentedControl

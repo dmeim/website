@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  cleanFloatNoise,
   parseOptionalNumber,
   percentOf,
   percentageIncreaseDecrease,
@@ -80,6 +81,42 @@ describe("percentage-calculator", () => {
     it("handles decrease and no change", () => {
       expect(percentageIncreaseDecrease(100, 50)).toBe("-50");
       expect(percentageIncreaseDecrease(40, 40)).toBe("0");
+    });
+  });
+
+  describe("float noise", () => {
+    it("drops binary noise from exact answers", () => {
+      expect(percentOf(7, 100)).toBe("7");
+      expect(percentOf(0.1, 3)).toBe("0.003");
+      expect(percentOf(110, 1.1)).toBe("1.21");
+      expect(xIsWhatPercentOfY(0.07, 1)).toBe("7");
+      expect(xIsWhatPercentOfY(1.1, 100)).toBe("1.1");
+      expect(percentageIncreaseDecrease(3, 3.3)).toBe("10");
+      expect(percentageIncreaseDecrease(0.1, 0.3)).toBe("200");
+    });
+
+    it("keeps genuinely long results intact", () => {
+      expect(xIsWhatPercentOfY(1, 3)).toBe("33.333333333333336");
+      expect(cleanFloatNoise(26.973684210526315)).toBe(26.973684210526315);
+      expect(cleanFloatNoise(1234567890.12345)).toBe(1234567890.12345);
+      expect(cleanFloatNoise(1e21)).toBe(1e21);
+      expect(cleanFloatNoise(0)).toBe(0);
+    });
+  });
+
+  describe("edges", () => {
+    it("reports negative starts with the right direction", () => {
+      expect(percentageIncreaseDecrease(-100, -50)).toBe("50");
+      expect(percentageIncreaseDecrease(-100, -150)).toBe("-50");
+    });
+
+    it("returns empty when the result overflows", () => {
+      expect(percentOf(1e308, 1e308)).toBe("");
+    });
+
+    it("computes 0 and -100 percent changes", () => {
+      expect(percentageIncreaseDecrease(50, 0)).toBe("-100");
+      expect(xIsWhatPercentOfY(0, 5)).toBe("0");
     });
   });
 });

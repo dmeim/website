@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { Input, KeyValue, Panel, ToolFrame } from "@/ui/react";
 import { DEFAULT_IP, getConversionSections, isValidIpv4 } from "@/lib/tools/ipv4-address-converter";
 
 export default function Ipv4AddressConverter() {
-  const [ip, setIp] = useState(DEFAULT_IP);
+  const [ip, setIp] = useStoredState("ipv4-converter:ip", DEFAULT_IP);
 
   const valid = isValidIpv4({ ip });
   const sections = useMemo(() => getConversionSections(ip), [ip]);
@@ -25,7 +26,7 @@ export default function Ipv4AddressConverter() {
           spellCheck={false}
           autoFocus
           onChange={(event) => setIp(event.target.value)}
-          error={!valid ? "Invalid IPv4 address" : undefined}
+          error={!valid && ip.trim() !== "" ? "Invalid IPv4 address. Use four numbers from 0 to 255, like 192.168.1.1." : undefined}
         />
 
         <KeyValue

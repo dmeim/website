@@ -42,6 +42,12 @@ describe("eta-calculator", () => {
     it("scales with unit multiplier", () => {
       expect(computeDurationMs(10, 2, 1, 1_000)).toBe(5_000);
     });
+
+    it("stays on whole milliseconds for awkward fractions", () => {
+      expect(formatMsDuration(computeDurationMs(3, 0.3, 1, 1_000))).toBe("10 seconds");
+      expect(formatMsDuration(computeDurationMs(7, 0.7, 1, 60_000))).toBe("10 minutes");
+      expect(formatMsDuration(computeDurationMs(10, 3, 1, 3_600_000))).toBe("3 hours 20 minutes");
+    });
   });
 
   describe("formatMsDuration", () => {
@@ -56,8 +62,19 @@ describe("eta-calculator", () => {
       expect(formatMsDuration(0)).toBe("");
     });
 
-    it("keeps the leading space for ms-only durations (it-tools parity)", () => {
-      expect(formatMsDuration(999)).toBe(" 999 ms");
+    it("has no leading space for ms-only durations", () => {
+      expect(formatMsDuration(999)).toBe("999 ms");
+    });
+
+    it("rounds away float noise", () => {
+      expect(formatMsDuration(9_999.999999999998)).toBe("10 seconds");
+      expect(formatMsDuration(18_000_000.000000004)).toBe("5 hours");
+      expect(formatMsDuration(59_999.6)).toBe("1 minute");
+    });
+
+    it("keeps hours past a day and handles sub-millisecond durations", () => {
+      expect(formatMsDuration(90_000_000)).toBe("25 hours");
+      expect(formatMsDuration(0.3)).toBe("less than 1 ms");
     });
 
     it("returns empty for non-finite input", () => {
@@ -105,6 +122,10 @@ describe("eta-calculator", () => {
       );
     });
 
+    it("says so when the date is out of range rather than printing NaN", () => {
+      expect(formatEtaRelative(1e20, now)).toBe("too far in the future to show");
+    });
+
     it("returns empty for non-finite timestamps", () => {
       expect(formatEtaRelative(Number.NaN, now)).toBe("");
       expect(formatEtaRelative(now, Number.NaN)).toBe("");
@@ -120,10 +141,10 @@ describe("eta-calculator", () => {
   });
 
   describe("datetime-local helpers", () => {
-    it("round-trips minute precision", () => {
+    it("round-trips second precision", () => {
       const ms = new Date(2024, 5, 15, 17, 10, 0).getTime();
       const local = toDatetimeLocalValue(ms);
-      expect(local).toBe("2024-06-15T17:10");
+      expect(local).toBe("2024-06-15T17:10:00");
       expect(parseDatetimeLocalValue(local)).toBe(ms);
     });
 
@@ -139,6 +160,8 @@ describe("eta-calculator", () => {
       expect(parsePositiveNumber("3.5")).toBe(3.5);
       expect(parsePositiveNumber("")).toBeUndefined();
       expect(parsePositiveNumber("abc")).toBeUndefined();
+      expect(parsePositiveNumber("0")).toBeUndefined();
+      expect(parsePositiveNumber("-5")).toBeUndefined();
     });
   });
 });

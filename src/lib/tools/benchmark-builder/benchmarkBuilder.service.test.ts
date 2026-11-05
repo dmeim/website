@@ -87,6 +87,12 @@ describe("benchmark-builder", () => {
     });
   });
 
+  describe("arrayToMarkdownTable escaping", () => {
+    it("escapes pipes so a suite name cannot add a column", () => {
+      expect(arrayToMarkdownTable({ data: [{ title: "a|b" }] })).toBe("| title |\n| --- |\n| a\\|b |");
+    });
+  });
+
   describe("buildBenchmarkResults", () => {
     const suites: BenchmarkSuite[] = [
       { title: "Suite 1", data: [5, 10] },

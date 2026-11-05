@@ -17,7 +17,7 @@ Estimate how long a steady consumption task will take and when it will finish �
 5. **Time span unit** — see settings above (default minutes)
 
 ## Outputs
-1. **Total duration** — human-readable duration (`formatMsDuration`, date-fns en parity + optional `ms`)
+1. **Total duration** — human-readable duration (`formatMsDuration`, date-fns en parity + optional `ms`), rounded to the millisecond so float noise cannot show as `59 seconds 999 ms`
 2. **It will end** — relative end time (`formatEtaRelative`, date-fns `en-GB` `formatRelative` parity)
 
 Duration formula (matches it-tools): `unitCount / (unitPerTimeSpan / (timeSpan * unitMultiplier))`.

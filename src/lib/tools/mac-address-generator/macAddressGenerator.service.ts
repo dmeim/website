@@ -17,9 +17,9 @@ export const MAC_CASES = ["upper", "lower"] as const;
 export type MacCase = (typeof MAC_CASES)[number];
 export const DEFAULT_MAC_CASE: MacCase = "upper";
 
-/** Partial MAC prefix — up to 6 hex octets with optional : - . or space separators. */
+/** Partial MAC prefix: up to 6 hex octets separated by : - . or a space, or up to 12 bare hex digits. */
 const PARTIAL_MAC_PATTERN =
-  /^([0-9a-f]{2}[:\-. ]){0,5}([0-9a-f]{0,2})$/i;
+  /^(?:([0-9a-f]{2}[:\-. ]){0,5}([0-9a-f]{0,2})|[0-9a-f]{0,12})$/i;
 
 export function clampMacQuantity(
   value: unknown,
@@ -67,7 +67,8 @@ export function isValidPartialMacAddress(value: string): boolean {
  * Split a MAC prefix into hex octets.
  * Continuous hex is grouped by 2; otherwise splits on non-hex characters.
  */
-export function splitPrefix(prefix: string): string[] {
+export function splitPrefix(rawPrefix: string): string[] {
+  const prefix = rawPrefix.trim();
   const base =
     prefix.match(/[^0-9a-f]/i) === null
       ? (prefix.match(/.{1,2}/g) ?? [])

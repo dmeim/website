@@ -15,7 +15,7 @@ None.
 ## Outputs
 1. **Result** — stringified mathjs evaluation result (hidden while empty)
 
-Invalid or incomplete expressions yield an empty result (it-tools `withDefaultOnError` + `?? ''` parity). Empty input evaluates to `undefined` → empty result.
+Invalid or incomplete expressions show the reason in an error notice and no result. Empty input shows nothing. Complex numbers, matrices, and units print in their usual form, and functions and objects print through mathjs `format`.
 
 ## Notes
 - Uses `mathjs` `evaluate` for parity with it-tools

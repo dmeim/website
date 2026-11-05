@@ -76,7 +76,10 @@ export function arrayToMarkdownTable({
 
   const headerRow = `| ${headers.map((header) => headerMap[header] ?? header).join(" | ")} |`;
   const separatorRow = `| ${headers.map(() => "---").join(" | ")} |`;
-  const dataRows = rows.map((row) => `| ${row.join(" | ")} |`).join("\n");
+  // A pipe in a suite name would otherwise start a new column.
+  const dataRows = rows
+    .map((row) => `| ${row.map((cell) => String(cell).replace(/\|/g, "\\|")).join(" | ")} |`)
+    .join("\n");
 
   return `${headerRow}\n${separatorRow}\n${dataRows}`;
 }

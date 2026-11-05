@@ -20,7 +20,8 @@ None.
 - IPv6 (short) (`::ffff:xxxx:xxxx`)
 
 ## Notes
-- Invalid input shows a validation error; output fields are cleared with a placeholder
+- Invalid input shows a validation error; output fields are cleared with a placeholder. An empty field shows only the placeholder
+- The address is remembered in this browser (`tools:ipv4-converter:ip`)
 - Hex/binary use the shared `base-converter` `convertBase` helper (same as it-tools integer base converter)
 - IPv6 mapping does not use lodash; octet → hex → hextet pairing matches it-tools
 

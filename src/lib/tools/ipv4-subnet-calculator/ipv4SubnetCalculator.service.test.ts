@@ -45,6 +45,20 @@ describe("ipv4-subnet-calculator", () => {
       expect(isValidIpv4Cidr("not an ip")).toBe(false);
       expect(isValidIpv4Cidr("999.999.999.999")).toBe(false);
       expect(isValidIpv4Cidr("192.168.0.1/99")).toBe(false);
+      expect(isValidIpv4Cidr("192.168.0.1/33")).toBe(false);
+      expect(isValidIpv4Cidr("192.168.0.1/-1")).toBe(false);
+      expect(isValidIpv4Cidr("192.168.0.1/")).toBe(false);
+      expect(isValidIpv4Cidr("192.168.0.1/24/8")).toBe(false);
+      expect(isValidIpv4Cidr("192.168.0.1/255.0.255.0")).toBe(false);
+    });
+
+    it("rejects the shorthand forms netmask would otherwise accept", () => {
+      expect(isValidIpv4Cidr("192.168.1")).toBe(false);
+      expect(isValidIpv4Cidr("1")).toBe(false);
+      expect(isValidIpv4Cidr("010.0.0.1")).toBe(false);
+      expect(isValidIpv4Cidr("0x7f.0.0.1")).toBe(false);
+      expect(isValidIpv4Cidr("::1")).toBe(false);
+      expect(isValidIpv4Cidr("2001:db8::/32")).toBe(false);
     });
   });
 
@@ -108,11 +122,61 @@ describe("ipv4-subnet-calculator", () => {
     it("returns undefined for invalid input", () => {
       expect(switchBlock("bad", 1)).toBeUndefined();
     });
+
+    it("stops at the ends of the address space instead of wrapping", () => {
+      expect(switchBlock("255.255.255.0/24", 1)).toBeUndefined();
+      expect(switchBlock("255.255.255.0/24", -1)).toBe("255.255.254.0/24");
+      expect(switchBlock("0.0.0.0/24", -1)).toBeUndefined();
+      expect(switchBlock("0.0.0.0/24", 1)).toBe("0.0.1.0/24");
+      expect(switchBlock("255.255.255.255", 1)).toBeUndefined();
+      expect(switchBlock("255.255.255.254/32", 1)).toBe("255.255.255.255/32");
+      expect(switchBlock("0.0.0.0/0", 1)).toBeUndefined();
+      expect(switchBlock("0.0.0.0/0", -1)).toBeUndefined();
+      expect(switchBlock("128.0.0.0/1", 1)).toBeUndefined();
+      expect(switchBlock("128.0.0.0/1", -1)).toBe("0.0.0.0/1");
+    });
   });
 
   describe("getNetworkInfo", () => {
     it("throws on invalid addresses", () => {
       expect(() => getNetworkInfo("not-an-ip")).toThrow();
+    });
+  });
+
+  describe("edge masks (vectors from python ipaddress)", () => {
+    const vectors: [string, string, string, string, number, string, string, string | undefined][] = [
+      ["192.168.0.1/24", "192.168.0.0/24", "255.255.255.0", "0.0.0.255", 256, "192.168.0.1", "192.168.0.254", "192.168.0.255"],
+      ["0.0.0.0/0", "0.0.0.0/0", "0.0.0.0", "255.255.255.255", 4294967296, "0.0.0.1", "255.255.255.254", "255.255.255.255"],
+      ["10.0.0.0/31", "10.0.0.0/31", "255.255.255.254", "0.0.0.1", 2, "10.0.0.0", "10.0.0.1", undefined],
+      ["10.0.0.1/32", "10.0.0.1/32", "255.255.255.255", "0.0.0.0", 1, "10.0.0.1", "10.0.0.1", undefined],
+      ["255.255.255.255/32", "255.255.255.255/32", "255.255.255.255", "0.0.0.0", 1, "255.255.255.255", "255.255.255.255", undefined],
+      ["255.255.255.254/31", "255.255.255.254/31", "255.255.255.254", "0.0.0.1", 2, "255.255.255.254", "255.255.255.255", undefined],
+      ["172.16.5.9/20", "172.16.0.0/20", "255.255.240.0", "0.0.15.255", 4096, "172.16.0.1", "172.16.15.254", "172.16.15.255"],
+      ["8.8.8.8/1", "0.0.0.0/1", "128.0.0.0", "127.255.255.255", 2147483648, "0.0.0.1", "127.255.255.254", "127.255.255.255"],
+      ["128.0.0.1/255.128.0.0", "128.0.0.0/9", "255.128.0.0", "0.127.255.255", 8388608, "128.0.0.1", "128.127.255.254", "128.127.255.255"],
+      ["10.1.2.3/0.0.0.0", "0.0.0.0/0", "0.0.0.0", "255.255.255.255", 4294967296, "0.0.0.1", "255.255.255.254", "255.255.255.255"],
+    ];
+
+    it.each(vectors)("%s", (input, netmask, mask, wildcard, size, first, last, broadcast) => {
+      expect(parseSubnet(input)).toMatchObject({
+        netmask,
+        networkMask: mask,
+        wildcardMask: wildcard,
+        networkSize: String(size),
+        firstAddress: first,
+        lastAddress: last,
+        broadcastAddress: broadcast,
+      });
+    });
+
+    it("treats a bare address as /32", () => {
+      expect(parseSubnet("255.255.255.255")?.netmask).toBe("255.255.255.255/32");
+      expect(parseSubnet("0.0.0.0")?.cidr).toBe("/32");
+    });
+
+    it("prints the /0 and /32 binary masks", () => {
+      expect(parseSubnet("0.0.0.0/0")?.networkMaskBinary).toBe("00000000.00000000.00000000.00000000");
+      expect(parseSubnet("1.2.3.4/32")?.networkMaskBinary).toBe("11111111.11111111.11111111.11111111");
     });
   });
 });

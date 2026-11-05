@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { Button, CopyButton, FormGrid, Input, Notice, Panel, Table, ToolFrame } from "@/ui/react";
 import {
   DEFAULT_END_IP,
@@ -13,8 +14,8 @@ import {
 import "./Ipv4RangeExpander.css";
 
 export default function Ipv4RangeExpander() {
-  const [startIp, setStartIp] = useState(DEFAULT_START_IP);
-  const [endIp, setEndIp] = useState(DEFAULT_END_IP);
+  const [startIp, setStartIp] = useStoredState("ipv4-range-expander:startAddress", DEFAULT_START_IP);
+  const [endIp, setEndIp] = useStoredState("ipv4-range-expander:endAddress", DEFAULT_END_IP);
   const [actionStatus, setActionStatus] = useState("");
 
   const startValid = isValidIpv4({ ip: startIp });
@@ -40,7 +41,7 @@ export default function Ipv4RangeExpander() {
     setStartIp(endIp);
     setEndIp(startIp);
     setActionStatus("Switched start and end addresses.");
-  }, [startIp, endIp]);
+  }, [startIp, endIp, setStartIp, setEndIp]);
 
   const renderValue = (testId: string, value: string, label: string) =>
     value ? (
@@ -52,7 +53,7 @@ export default function Ipv4RangeExpander() {
       </span>
     ) : (
       <span className="ipv4re-empty" data-testid={testId}>
-        —
+        –
       </span>
     );
 
@@ -71,12 +72,13 @@ export default function Ipv4RangeExpander() {
             value={startIp}
             placeholder="Start IPv4 address…"
             spellCheck={false}
+            clearable
             autoFocus
             onChange={(event) => {
               setStartIp(event.target.value);
               setActionStatus("");
             }}
-            error={!startValid ? "Invalid start IPv4 address" : undefined}
+            error={!startValid && startIp.trim() !== "" ? "Invalid start IPv4 address. Use four numbers from 0 to 255." : undefined}
           />
           <Input
             id="ipv4re-end"
@@ -85,11 +87,12 @@ export default function Ipv4RangeExpander() {
             value={endIp}
             placeholder="End IPv4 address…"
             spellCheck={false}
+            clearable
             onChange={(event) => {
               setEndIp(event.target.value);
               setActionStatus("");
             }}
-            error={!endValid ? "Invalid end IPv4 address" : undefined}
+            error={!endValid && endIp.trim() !== "" ? "Invalid end IPv4 address. Use four numbers from 0 to 255." : undefined}
           />
         </FormGrid>
 

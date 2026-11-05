@@ -10,3 +10,11 @@ export function formatMs(msTotal: number) {
     .toString()
     .padStart(2, "0")}.${ms.toString().padStart(3, "0")}`;
 }
+
+/**
+ * Elapsed time from timestamps, so a hidden tab (where animation frames stop) never loses time.
+ * `startedAt` is null while stopped. A clock moved backward clamps to the accumulated time.
+ */
+export function computeElapsedMs(accumulatedMs: number, startedAt: number | null, now: number): number {
+  return startedAt === null ? accumulatedMs : accumulatedMs + Math.max(0, now - startedAt);
+}

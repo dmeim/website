@@ -18,7 +18,7 @@ None.
 Elapsed time formatted as `MM:SS.mmm`, or `HH:MM:SS.mmm` once one or more hours have elapsed. Updates on animation frames while running.
 
 ## Notes
-- Timing uses wall-clock deltas between animation frames (same approach as it-tools + VueUse `useRafFn`)
+- Elapsed time is computed from a start timestamp, not from counted frames, so a hidden tab keeps time and catches up as soon as it is visible again. Stop records the exact elapsed time
 - Reset while running zeros the counter without stopping the RAF loop
 - No lap splits or countdown mode
 - No external libraries

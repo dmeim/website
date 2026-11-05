@@ -99,6 +99,15 @@ describe("mac-address-generator", () => {
       expect(isValidPartialMacAddress("gg")).toBe(false);
       expect(isValidPartialMacAddress("64:16:7F:ZZ")).toBe(false);
       expect(isValidPartialMacAddress("not-a-mac")).toBe(false);
+      expect(isValidPartialMacAddress("a:b")).toBe(false);
+      expect(isValidPartialMacAddress("64:16:7F:AA:BB:CC:DD")).toBe(false);
+      expect(isValidPartialMacAddress("64:16:7F:AA:BB:CC:")).toBe(false);
+      expect(isValidPartialMacAddress("64167FAABBCCDD")).toBe(false);
+    });
+
+    it("accepts bare hex, since the generator can output it", () => {
+      expect(isValidPartialMacAddress("64167F")).toBe(true);
+      expect(isValidPartialMacAddress("64167FAABBCC")).toBe(true);
     });
   });
 
@@ -123,6 +132,22 @@ describe("mac-address-generator", () => {
           getRandomByte: createRandomByteGenerator(),
         }),
       ).toBe("ffee00010203");
+    });
+
+    it("applies each separator and keeps a full six-octet prefix as is", () => {
+      for (const [separator, expected] of [[":", "AA:BB:CC:00:01:02"], ["-", "AA-BB-CC-00-01-02"], [".", "AA.BB.CC.00.01.02"], ["", "AABBCC000102"]] as const) {
+        expect(generateMacAddresses({ prefix: "aa:bb:cc", separator, getRandomByte: createRandomByteGenerator() })).toBe(expected);
+      }
+      expect(generateMacAddresses({ prefix: "01:23:45:67:89:ab", caseStyle: "lower" })).toBe("01:23:45:67:89:ab");
+      expect(generateMacAddresses({ prefix: "  64167f  ", separator: "-", getRandomByte: createRandomByteGenerator() })).toBe("64-16-7F-00-01-02");
+    });
+
+    it("generates exactly the requested count of six-octet addresses", () => {
+      const lines = generateMacAddresses({ quantity: 100, prefix: "" }).split("\n");
+      expect(lines).toHaveLength(100);
+      for (const line of lines) {
+        expect(line).toMatch(/^[0-9A-F]{2}(:[0-9A-F]{2}){5}$/);
+      }
     });
 
     it("returns empty string for invalid prefix", () => {

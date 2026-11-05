@@ -25,10 +25,12 @@ None. Previous / next block buttons adjust the current CIDR by one block of the 
 - IP class (A–E, or “Unknown class type”)
 
 ## Notes
-- Invalid input shows a parse error and hides the results table
+- Invalid input shows a parse error and hides the results table; an empty field shows neither
+- Only dotted-quad addresses are accepted. `netmask` on its own reads `1.2` as `1.0.0.2`, reads `010.0.0.1` as octal, accepts `/-1`, and rejects the valid mask `0.0.0.0`, so the service validates first
+- The address is remembered in this browser (`tools:ipv4-subnet-calculator:ip`)
 - Class is derived from the network base address first octet (classic A–E)
 - `/31` and `/32` have no broadcast address (`netmask` returns undefined)
-- Block navigation uses `Netmask.next(±1)` and replaces the input with the adjacent block CIDR
+- Block navigation uses `Netmask.next(±1)` and replaces the input with the adjacent block CIDR. The buttons disable at the ends of the address space rather than wrapping around
 
 ## Source
 Port of [it-tools IPv4 subnet calculator](https://it-tools.tech/ipv4-subnet-calculator). Local reference: handy-dandy `it-tools` (`/ipv4-subnet-calculator`). Catalogue id: `ipv4-subnet-calculator`.

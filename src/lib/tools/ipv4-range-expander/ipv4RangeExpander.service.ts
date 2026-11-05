@@ -118,13 +118,13 @@ export function getResultRows(
     {
       key: "start-address",
       label: "Start address",
-      oldValue: startIp,
+      oldValue: startIp.trim(),
       newValue: result.newStart ?? "",
     },
     {
       key: "end-address",
       label: "End address",
-      oldValue: endIp,
+      oldValue: endIp.trim(),
       newValue: result.newEnd ?? "",
     },
     {

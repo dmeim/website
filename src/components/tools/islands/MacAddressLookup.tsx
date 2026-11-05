@@ -15,7 +15,8 @@ export default function MacAddressLookup() {
   const [macAddress, setMacAddress] = useState(DEFAULT_MAC_ADDRESS);
 
   const macValid = isValidMacAddress(macAddress);
-  const vendor = useMemo(() => lookupMacVendor(macAddress), [macAddress]);
+  const isEmpty = macAddress.trim() === "";
+  const vendor = useMemo(() => (macValid ? lookupMacVendor(macAddress) : undefined), [macAddress, macValid]);
   const vendorLines = useMemo(() => getVendorLines(vendor), [vendor]);
 
   return (
@@ -33,12 +34,13 @@ export default function MacAddressLookup() {
           value={macAddress}
           placeholder="Type a MAC address"
           spellCheck={false}
+          clearable
           autoFocus
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
           onChange={(event) => setMacAddress(event.target.value)}
-          error={!macValid ? "Invalid MAC address" : undefined}
+          error={!macValid && !isEmpty ? "Invalid MAC address. Use a format like 20:37:06:12:34:56." : undefined}
         />
 
         <div className="maclookup-vendor" role="region" aria-label="Vendor info" data-testid="vendor-info">
@@ -51,7 +53,7 @@ export default function MacAddressLookup() {
               ))}
             </Card>
           ) : (
-            <EmptyState size="sm" icon="question" title="Vendor info" description={UNKNOWN_VENDOR_MESSAGE} />
+            <EmptyState size="sm" icon="question" title="Vendor info" description={isEmpty ? "Enter a MAC address to see its vendor." : UNKNOWN_VENDOR_MESSAGE} />
           )}
         </div>
       </Panel>

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { Button, ButtonGroup, Input, KeyValue, Notice, Panel, ToolFrame } from "@/ui/react";
 import {
   DEFAULT_IP,
@@ -10,10 +11,12 @@ import {
 } from "@/lib/tools/ipv4-subnet-calculator";
 
 export default function Ipv4SubnetCalculator() {
-  const [ip, setIp] = useState(DEFAULT_IP);
+  const [ip, setIp] = useStoredState("ipv4-subnet-calculator:ip", DEFAULT_IP);
   const [actionStatus, setActionStatus] = useState("");
 
   const valid = isValidIpv4Cidr(ip);
+  const previousBlock = useMemo(() => switchBlock(ip, -1), [ip]);
+  const nextBlock = useMemo(() => switchBlock(ip, 1), [ip]);
   const info = useMemo(() => (valid ? parseSubnet(ip) : undefined), [ip, valid]);
   const sections = useMemo(() => (info ? getSubnetSections(info) : []), [info]);
 
@@ -25,7 +28,7 @@ export default function Ipv4SubnetCalculator() {
         setActionStatus(count < 0 ? "Moved to previous block." : "Moved to next block.");
       }
     },
-    [ip],
+    [ip, setIp],
   );
 
   return (
@@ -47,7 +50,7 @@ export default function Ipv4SubnetCalculator() {
             setIp(event.target.value);
             setActionStatus("");
           }}
-          error={!valid ? "We cannot parse this address, check the format" : undefined}
+          error={!valid && ip.trim() !== "" ? "We cannot parse this address. Try a format like 192.168.0.1/24 or 192.168.0.1/255.255.255.0." : undefined}
         />
 
         {info ? (
@@ -66,10 +69,10 @@ export default function Ipv4SubnetCalculator() {
             />
 
             <ButtonGroup>
-              <Button variant="ghost" iconStart="caret-left" onClick={() => goBlock(-1)}>
+              <Button variant="ghost" iconStart="caret-left" disabled={!previousBlock} onClick={() => goBlock(-1)}>
                 Previous block
               </Button>
-              <Button variant="secondary" iconEnd="caret-right" onClick={() => goBlock(1)}>
+              <Button variant="secondary" iconEnd="caret-right" disabled={!nextBlock} onClick={() => goBlock(1)}>
                 Next block
               </Button>
             </ButtonGroup>

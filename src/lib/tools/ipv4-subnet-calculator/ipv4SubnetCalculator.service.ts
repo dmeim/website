@@ -5,7 +5,11 @@
 
 import { Netmask } from "netmask";
 
+import { ipv4ToInt, isValidIpv4 } from "@/lib/tools/ipv4-address-converter";
+
 export const DEFAULT_IP = "192.168.0.1/24";
+
+const ADDRESS_SPACE_SIZE = 2 ** 32;
 
 export type IpClass = "A" | "B" | "C" | "D" | "E";
 
@@ -75,16 +79,43 @@ function bitmaskToBinary(bitmask: number): string {
   return ("1".repeat(bitmask) + "0".repeat(32 - bitmask)).match(/.{8}/g)?.join(".") ?? "";
 }
 
-/** Parse an IPv4 address with optional mask; throws on invalid input. */
+/** Prefix length for a `/24` or `/255.255.255.0` style mask; undefined when it is not a valid mask. */
+function parseMaskBits(mask: string): number | undefined {
+  if (/^\d{1,2}$/.test(mask)) {
+    const bits = Number(mask);
+    return bits <= 32 ? bits : undefined;
+  }
+  if (!isValidIpv4({ ip: mask })) {
+    return undefined;
+  }
+  const maskLong = ipv4ToInt({ ip: mask });
+  for (let bits = 0; bits <= 32; bits++) {
+    const candidate = bits === 0 ? 0 : (0xffffffff << (32 - bits)) >>> 0;
+    if (candidate === maskLong) {
+      return bits;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Parse an IPv4 address with optional mask; throws on invalid input.
+ * `netmask` alone reads `1.2` as `1.0.0.2`, `010.0.0.1` as octal, accepts `/-1`, treats IPv6 as valid,
+ * and rejects the valid mask `0.0.0.0`, so the shape is checked here and only a prefix length is passed on.
+ */
 export function getNetworkInfo(address: string): Netmask {
-  return new Netmask(address.trim());
+  const [ip = "", mask, ...rest] = address.trim().split("/");
+  const bits = mask === undefined ? 32 : parseMaskBits(mask.trim());
+  if (rest.length > 0 || !isValidIpv4({ ip }) || bits === undefined) {
+    throw new Error(`Invalid IPv4 address or mask: ${address}`);
+  }
+  return new Netmask(ip.trim(), String(bits));
 }
 
 /** True when `getNetworkInfo` succeeds. */
 export function isValidIpv4Cidr(value: string): boolean {
   try {
-    getNetworkInfo(value);
-    return true;
+    return getNetworkInfo(value).bitmask >= 0;
   } catch {
     return false;
   }
@@ -146,11 +177,16 @@ export function getSubnetSections(info: SubnetInfo): SubnetSection[] {
 /**
  * Adjacent same-size block as a CIDR string.
  * Returns undefined when out of address space or current address is invalid.
+ * `Netmask.next` wraps past the ends (255.255.255.0/24 becomes 0.0.0.0/24), so the range is checked first.
  */
 export function switchBlock(address: string, count = 1): string | undefined {
   try {
-    const next = getNetworkInfo(address).next(count);
-    return next?.toString();
+    const block = getNetworkInfo(address);
+    const nextStart = block.netLong + block.size * count;
+    if (nextStart < 0 || nextStart >= ADDRESS_SPACE_SIZE) {
+      return undefined;
+    }
+    return block.next(count).toString();
   } catch {
     return undefined;
   }

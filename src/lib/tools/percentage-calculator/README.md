@@ -17,14 +17,13 @@ None.
 ## Outputs
 1. `(X / 100) * Y` (copyable)
 2. `(100 * X) / Y` (copyable; empty when not finite, e.g. Y = 0)
-3. `((To - From) / From) * 100` (copyable; empty when not finite, e.g. From = 0)
+3. `((To - From) / |From|) * 100` (copyable; empty when not finite, e.g. From = 0)
 
-Results use JavaScript number `.toString()` formatting (matches it-tools). Incomplete pairs yield an empty result.
+Results use JavaScript number `.toString()` formatting, after dropping binary float noise (7% of 100 is `7`, not `7.000000000000001`). Genuinely long results keep every digit. Incomplete pairs yield an empty result, and a zero Y or From shows a message on that field.
 
 ## Notes
 - Empty inputs are treated as missing — both sides of a pair are required
 - Division by zero / non-finite results clear the second and third outputs
-- No rounding beyond native float stringification
 
 ## Source
 Port of [it-tools Percentage calculator](https://it-tools.tech/percentage-calculator). Local reference: handy-dandy `it-tools` (`/percentage-calculator`). Catalogue id: `percentage-calculator`.

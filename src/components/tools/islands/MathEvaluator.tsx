@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 
 import { Code, KeyValue, Notice, Panel, Textarea, ToolFrame } from "@/ui/react";
-import { evaluateExpression } from "@/lib/tools/math-evaluator";
+import { evaluateMath } from "@/lib/tools/math-evaluator";
 
 export default function MathEvaluator() {
   const [expression, setExpression] = useState("");
 
-  const result = useMemo(
-    () => evaluateExpression(expression),
+  const { result, error } = useMemo(
+    () => evaluateMath(expression),
     [expression],
   );
 
@@ -48,11 +48,13 @@ export default function MathEvaluator() {
               },
             ]}
           />
-        ) : (
-          <Notice live="polite">
-            Enter a valid math expression to see the result.
+        ) : null}
+
+        {error ? (
+          <Notice tone="danger" live="polite">
+            {error}
           </Notice>
-        )}
+        ) : null}
       </Panel>
     </ToolFrame>
   );

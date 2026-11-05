@@ -22,6 +22,7 @@ function NumberField({
   placeholder,
   onChange,
   autoFocus,
+  error,
 }: {
   id: string;
   label: string;
@@ -29,6 +30,7 @@ function NumberField({
   placeholder: string;
   onChange: (next: string) => void;
   autoFocus?: boolean;
+  error?: string;
 }) {
   return (
     <Input
@@ -40,6 +42,7 @@ function NumberField({
       value={value}
       placeholder={placeholder}
       autoFocus={autoFocus}
+      error={error}
       onChange={(event) => onChange(event.target.value)}
     />
   );
@@ -151,6 +154,7 @@ export default function PercentageCalculator() {
             value={numberY}
             placeholder="Y"
             onChange={setNumberY}
+            error={parseOptionalNumber(numberY) === 0 ? "Y cannot be zero." : undefined}
           />
         </Calculator>
 
@@ -166,6 +170,7 @@ export default function PercentageCalculator() {
             value={numberFrom}
             placeholder="From"
             onChange={setNumberFrom}
+            error={parseOptionalNumber(numberFrom) === 0 ? "From cannot be zero." : undefined}
           />
           <NumberField
             id="pct-number-to"

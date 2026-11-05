@@ -91,4 +91,31 @@ describe("ipv4-address-converter", () => {
       expect(sections.every((s) => s.value === "")).toBe(true);
     });
   });
+
+  describe("edges", () => {
+    it("converts 0.0.0.0 and 255.255.255.255", () => {
+      const zero = getConversionSections("0.0.0.0");
+      expect(zero.map((s) => s.value)).toEqual([
+        "0",
+        "0",
+        "0",
+        "0000:0000:0000:0000:0000:ffff:0000:0000",
+        "::ffff:0000:0000",
+      ]);
+      const top = getConversionSections("255.255.255.255");
+      expect(top.map((s) => s.value)).toEqual([
+        "4294967295",
+        "FFFFFFFF",
+        "1".repeat(32),
+        "0000:0000:0000:0000:0000:ffff:ffff:ffff",
+        "::ffff:ffff:ffff",
+      ]);
+    });
+
+    it("rejects leading zeros and trims whitespace", () => {
+      expect(isValidIpv4({ ip: "01.1.1.1" })).toBe(false);
+      expect(isValidIpv4({ ip: "1.1.1.1234" })).toBe(false);
+      expect(getConversionSections("  10.0.0.1 ")[0]?.value).toBe("167772161");
+    });
+  });
 });

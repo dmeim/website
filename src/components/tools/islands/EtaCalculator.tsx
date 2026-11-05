@@ -47,8 +47,7 @@ export default function EtaCalculator() {
     if (
       unitCount === undefined ||
       unitPerSpan === undefined ||
-      timeSpan === undefined ||
-      unitPerSpan === 0
+      timeSpan === undefined
     ) {
       return Number.NaN;
     }
@@ -90,6 +89,7 @@ export default function EtaCalculator() {
             id="eta-started-at"
             label="The consumption started at"
             type="datetime-local"
+            step={1}
             value={startedAtLocal}
             onChange={(event) => setStartedAtLocal(event.target.value)}
           />

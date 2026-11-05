@@ -18,7 +18,8 @@ None.
 - Copy puts the full vendor string on the clipboard (disabled when unknown)
 
 ## Notes
-- Validation matches it-tools (`:` / `-` separators only); lookup still strips `.` and spaces when extracting the OUI key
+- Validation accepts `:`, `-`, and `.` separators, bare hex, and Cisco style (`2037.0612.3456`), so every format the MAC address generator produces can be looked up. it-tools accepts only `:` and `-`
+- Vendor info only shows for a valid address, and an empty field shows a prompt instead of an error
 - OUI key = first 6 hex digits after removing separators, uppercased
 - Vendor database comes from the `oui-data` npm package (same as it-tools)
 

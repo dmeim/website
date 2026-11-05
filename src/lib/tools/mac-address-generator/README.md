@@ -22,7 +22,8 @@ Generate one or more random MAC addresses with an optional prefix, chosen case (
 ## Notes
 - Invalid prefix shows a validation error and clears output (same as it-tools)
 - Random bytes use Web Crypto (`crypto.getRandomValues`); no npm dependency
-- Prefix parsing matches it-tools: continuous hex grouped by two, otherwise split on non-hex
+- Prefix parsing matches it-tools: continuous hex grouped by two, otherwise split on non-hex. Bare hex prefixes like `64167F` are also accepted, since this tool can output them
+- Quantity, prefix, and separator are remembered in this browser (`tools:mac-address-generator-amount`, `-prefix`, `-separator`)
 
 ## Source
 Port of [it-tools MAC address generator](https://it-tools.tech/mac-address-generator). Local reference: handy-dandy `it-tools` (`/mac-address-generator`). Catalogue id: `mac-address-generator`.

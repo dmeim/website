@@ -16,6 +16,7 @@ export {
   convertReaumurToKelvin,
   convertRomerToKelvin,
   initialTemperatures,
+  isBelowAbsoluteZero,
   parseTemperatureInput,
   roundTemperature,
   type TemperatureScale,

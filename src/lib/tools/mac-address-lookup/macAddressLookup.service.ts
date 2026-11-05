@@ -9,14 +9,18 @@ export const DEFAULT_MAC_ADDRESS = "20:37:06:12:34:56";
 
 export const UNKNOWN_VENDOR_MESSAGE = "Unknown vendor for this address";
 
-/** Full MAC: 3–6 octets separated by `:` or `-` (same rule as it-tools). */
-const MAC_ADDRESS_PATTERN = /^([0-9A-Fa-f]{2}[:-]){2,5}([0-9A-Fa-f]{2})$/;
+/**
+ * 3 to 6 octets separated by `:`, `-`, or `.`; bare hex (`203706123456`); or Cisco style (`2037.0612.3456`).
+ * Wider than it-tools because the MAC address generator here can output the `.` and bare forms.
+ */
+const MAC_ADDRESS_PATTERN =
+  /^(?:([0-9A-Fa-f]{2}[:.-]){2,5}[0-9A-Fa-f]{2}|(?:[0-9A-Fa-f]{2}){3,6}|[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4}\.[0-9A-Fa-f]{4})$/;
 
 const defaultDb = ouiData as Record<string, string>;
 
 export type OuiVendorDb = Record<string, string>;
 
-/** True when `value` is a valid MAC address (trimmed), matching it-tools. */
+/** True when `value` is a valid MAC address (trimmed). */
 export function isValidMacAddress(value: string): boolean {
   return MAC_ADDRESS_PATTERN.test(value.trim());
 }

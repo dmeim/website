@@ -1,1 +1,1 @@
-export { formatMs } from "./chronometer.service";
+export { computeElapsedMs, formatMs } from "./chronometer.service";

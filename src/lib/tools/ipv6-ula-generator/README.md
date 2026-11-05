@@ -19,7 +19,7 @@ Generate a Unique Local Address (ULA) prefix for private IPv6 networks per RFC 4
 - Each row is copyable when the MAC is valid
 
 ## Notes
-- Invalid MAC shows a validation error and clears output values (same as it-tools)
+- Invalid MAC shows a validation error and clears output values (same as it-tools); an empty field shows no error
 - SHA-1 uses Web Crypto (`crypto.subtle.digest`); no extra npm dependency
 - Hash input is `String(timestamp) + macAddress` (milliseconds since epoch), matching it-tools
 

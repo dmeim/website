@@ -82,14 +82,23 @@ const fromKelvin: Record<TemperatureScale, (v: number) => number> = {
   romer: convertKelvinToRomer,
 };
 
-/** Truncate toward −∞ to two decimal places (matches it-tools `Math.floor(n * 100) / 100`). */
+/**
+ * Round to two decimal places, half up. it-tools floors here, which turns the float noise in
+ * 31.999999999999943 into 31.99 °F for 0 °C. The precision step removes that noise before rounding.
+ */
 export function roundTemperature(value: number): number {
-  return Math.floor(value * 100) / 100;
+  // Adding 0 turns -0 into 0.
+  return Math.round(Number((value * 100).toPrecision(15))) / 100 + 0;
+}
+
+/** True when `value` on `scale` is colder than 0 K. The tolerance absorbs float noise at exactly 0 K. */
+export function isBelowAbsoluteZero(scale: TemperatureScale, value: number): boolean {
+  return toKelvin[scale](value) < -1e-9;
 }
 
 /**
  * Convert a value on `source` into all scales.
- * The source scale keeps `value` unchanged; others are floored to 2 decimals.
+ * The source scale keeps `value` unchanged; others are rounded to 2 decimals.
  */
 export function convertFromScale(
   source: TemperatureScale,
@@ -114,7 +123,7 @@ export function parseTemperatureInput(raw: string): number | undefined {
   return Number.isFinite(value) ? value : undefined;
 }
 
-/** Default linked values: 0 K and the floored equivalents on every other scale. */
+/** Default linked values: 0 K and the rounded equivalents on every other scale. */
 export function initialTemperatures(): Record<TemperatureScale, number> {
   return convertFromScale("kelvin", 0);
 }

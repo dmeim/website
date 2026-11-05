@@ -20,7 +20,8 @@ None. When start > end, a “Switch start and end” action swaps the two inputs
 - CIDR — expanded subnet in `a.b.c.d/prefix` form
 
 ## Notes
-- Invalid addresses show a validation error; no result table until both are valid
+- Invalid addresses show a validation error; no result table until both are valid. Empty fields show no error
+- Both addresses are remembered in this browser (`tools:ipv4-range-expander:startAddress`, `:endAddress`)
 - When both are valid but end < start, show an error with a switch action (same as it-tools)
 - Reuses `ipv4ToInt` / `isValidIpv4` from `ipv4-address-converter` and `convertBase` from `base-converter`
 - No npm dependencies beyond the shared kit

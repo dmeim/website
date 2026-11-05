@@ -14,6 +14,7 @@ export default function Ipv6UlaGenerator() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [sections, setSections] = useState<Ipv6UlaSection[]>(emptyUlaSections);
   const [actionStatus, setActionStatus] = useState("");
+  const [generationFailed, setGenerationFailed] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const macValid = isValidMacAddress(macAddress);
@@ -35,11 +36,13 @@ export default function Ipv6UlaGenerator() {
         const result = await generateIpv6Ula({ macAddress });
         if (!cancelled) {
           setSections(result?.sections ?? emptyUlaSections());
+          setGenerationFailed(false);
         }
       } catch {
         if (!cancelled) {
           setSections(emptyUlaSections());
-          setActionStatus("Generation failed. Try again.");
+          setGenerationFailed(true);
+          setActionStatus("");
         }
       } finally {
         if (!cancelled) {
@@ -86,12 +89,13 @@ export default function Ipv6UlaGenerator() {
           value={macAddress}
           placeholder="Type a MAC address"
           spellCheck={false}
+          clearable
           autoFocus
           onChange={(event) => {
             setMacAddress(event.target.value);
             setActionStatus("");
           }}
-          error={!macValid ? "Invalid MAC address" : undefined}
+          error={!macValid && macAddress.trim() !== "" ? "Invalid MAC address. Use a format like 20:37:06:12:34:56." : undefined}
         />
 
         <KeyValue
@@ -107,6 +111,7 @@ export default function Ipv6UlaGenerator() {
         />
 
         {actionStatus ? <Notice tone="success">{actionStatus}</Notice> : null}
+        {generationFailed ? <Notice tone="danger">We could not generate a ULA. Try again.</Notice> : null}
       </Panel>
     </ToolFrame>
   );
