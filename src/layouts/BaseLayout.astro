@@ -122,7 +122,7 @@ const pageTransition = { forwards: pageStep, backwards: pageStep };
   <body class:list={[{ "is-immersive": immersive }]} data-shell={mode}>
     <SkipLink />
     <div class="ui-site-shell" data-shell={mode}>
-      <SiteHeader currentPath={pathname} immersive={mode === "immersive"} />
+      <SiteHeader currentPath={canonicalPath} immersive={mode === "immersive"} />
       <main
         class:list={["site-main", { "site-main--immersive": immersive }]}
         id="main"
