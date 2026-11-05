@@ -59,6 +59,7 @@ export default [
 - **`shell`:** the `/tools` landing page, search, navigation, and 404s.
 - **`crypto`, `converter`, `web`, `dev`, `netmath`, `textmedia`:** every tool in each group, checked against it-tools behavior.
 - **`case-converter`:** digits and non-Latin text survive in the page.
+- **`keys`:** the public key files and the `/keys` page agree, with no private key material.
 - **`crypto-web-independent`:** a second pass over the crypto and web tools, written without reading their code.
 
 ## Fixtures

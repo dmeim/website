@@ -3,6 +3,10 @@
  * Visual structure adapted from Midnight Concert Hall reference.
  */
 
+// Read from the files the site serves, so the page and the curl URLs can't disagree.
+import pgpPublicKey from "../../public/keys/pgp.asc?raw";
+import sshPublicKey from "../../public/keys/ssh_ed25519.pub?raw";
+
 export type SiteMeta = {
   title: string;
   description: string;
@@ -24,6 +28,8 @@ export type KeyBlock = {
   kind: "SSH" | "GPG" | "Other";
   fingerprint: string;
   usage: string;
+  commandLabel: string;
+  command: string;
   body: string;
 };
 
@@ -57,24 +63,22 @@ export const keys: KeyBlock[] = [
     id: "ssh-ed25519",
     title: "SSH · Ed25519",
     kind: "SSH",
-    fingerprint: "SHA256:loremIpsumPlaceholderFingerprintDoNotTrust",
-    usage: "ssh-keygen -Y verify · authorized_keys",
-    body: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILoremIpsumPlaceholderKeyMaterialOnlyXXXX hello@dmeim.com`,
+    fingerprint: "SHA256:nqaPo4ImFit8/kg+3RfF7UYf1GRHKVaV9+Vv87Z6lA4",
+    usage: "Server logins and SSH signatures",
+    commandLabel: "Add to a server",
+    command:
+      "mkdir -p ~/.ssh && chmod 700 ~/.ssh && curl -fsSL https://dmeim.com/keys/ssh_ed25519.pub >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys",
+    body: sshPublicKey.trim(),
   },
   {
     id: "gpg-primary",
     title: "GPG · Primary",
     kind: "GPG",
-    fingerprint: "AAAA BBBB CCCC DDDD EEEE  FFFF 0000 1111 2222 3333",
-    usage: "gpg --import · gpg --verify",
-    body: `-----BEGIN PGP PUBLIC KEY BLOCK-----
-Comment: Placeholder. Replace with real key material
-
-mDMEAAAAABYJKwYBBAHaRw8BAQdALoremIpsumPlaceholderGpgBlockOnly
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-=XXXX
------END PGP PUBLIC KEY BLOCK-----`,
+    fingerprint: "3A23 B8E5 D0B4 7019 44D5  8D2A 7E9D 73FE CE8F F326",
+    usage: "Signatures and encrypted messages. Expires November 4, 2028.",
+    commandLabel: "Import",
+    command: "curl -fsSL https://dmeim.com/keys/pgp.asc | gpg --import",
+    body: pgpPublicKey.trim(),
   },
 ];
 

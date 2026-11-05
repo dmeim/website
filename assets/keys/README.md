@@ -1,11 +1,5 @@
 # Keys Folder
 
-Place your public keys here. Recommended filenames:
+Public keys now live in `public/keys/`, so the site serves them at `/keys/ssh_ed25519.pub` and `/keys/pgp.asc`. The `/keys` page reads those same files, but its fingerprints are set by hand in `src/content/site.ts`, so update them whenever a key changes.
 
-- `ssh_ed25519.pub` — SSH public key
-- `authorized_keys` — optional convenience file for servers
-- `pgp.asc` — PGP public key (ASCII armored)
-- Optional: `minisign.pub`, `age.pub`
-
-These files will be copied to the site `public/keys/` folder during build.
-
+Never put private keys or revocation certificates in this repo.

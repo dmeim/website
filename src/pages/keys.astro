@@ -11,14 +11,13 @@ import { keys, contact } from "../content/site";
   <Container>
     <PageHeader
       title="Keys"
-      lede="Public SSH and GPG material for verifying identity and securing collaboration. The blocks below are placeholders, to be replaced with real keys before production."
+      lede="Public SSH and GPG keys for verifying identity and securing collaboration."
     />
     <Section>
-      <Notice tone="warning" variant="callout" title="Notice" live="off">
+      <Notice variant="callout" title="Before you trust a key" live="off">
         <p>
-          Fingerprints and key bodies on this page are placeholders. Do not trust
-          them for production verification until real material is published from
-          <code>assets/keys/</code>.
+          Check its fingerprint against a copy you already trust, not only this
+          page. Anyone who could change this site could change the keys too.
         </p>
         <p>
           Contact: <Link href={`mailto:${contact.email}`}>{contact.email}</Link>
@@ -31,6 +30,7 @@ import { keys, contact } from "../content/site";
           <Stack gap="md">
             <KeyValue items={[{ label: "Usage", value: key.usage }]} />
             <CodeBlock label="Fingerprint" code={key.fingerprint} wrap />
+            <CodeBlock label={key.commandLabel} code={key.command} wrap />
             <CodeBlock label="Public key" code={key.body} wrap />
           </Stack>
         </Section>

@@ -2,12 +2,12 @@
 
 ## Assets & Publishing
 
-- Canonical keys live under `assets/keys/`:
+- Public keys live in `public/keys/` and are served at `/keys/…`:
   - `ssh_ed25519.pub`
-  - `authorized_keys` (optional convenience bundle)
   - `pgp.asc`
-  - Optional later: `minisign.pub`, `age.pub`
-- During build, copy into `site/public/keys/` for hosting at `/keys/…`.
+  - Optional later: `authorized_keys`, `minisign.pub`, `age.pub`
+- The `/keys` page reads these same files. Its fingerprints are set by hand in `src/content/site.ts`, so update them when a key changes.
+- Private keys and revocation certificates never go in this repo.
 
 ## Fingerprints
 

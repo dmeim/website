@@ -17,5 +17,5 @@
 - Place logos in `assets/logos/`
 - Place images the site shows in the gallery, `src/assets/gallery/<album>/` (see `src/content/gallery.ts`); `assets/images/` only keeps unpublished reference photos
 - vCards in `assets/vcards/`
-- Keys in `assets/keys/`
+- Keys in `public/keys/`
 - Downloads in `assets/downloads/`

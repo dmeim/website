@@ -6,6 +6,7 @@ import converter from "./scenarios/converter.mjs";
 import crypto from "./scenarios/crypto.mjs";
 import cryptoWebIndependent from "./scenarios/crypto-web-independent.mjs";
 import dev from "./scenarios/dev.mjs";
+import keys from "./scenarios/keys.mjs";
 import netmath from "./scenarios/netmath.mjs";
 import shell from "./scenarios/shell.mjs";
 import textmedia from "./scenarios/textmedia.mjs";
@@ -21,6 +22,7 @@ const SUITES = {
   textmedia,
   "case-converter": caseConverter,
   "crypto-web-independent": cryptoWebIndependent,
+  keys,
 };
 
 /** The helpers every scenario receives as `t`. */
