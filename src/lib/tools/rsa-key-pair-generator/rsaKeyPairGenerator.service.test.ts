@@ -1,3 +1,5 @@
+import { constants, createPrivateKey, createPublicKey, privateDecrypt, publicEncrypt } from "node:crypto";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -125,6 +127,21 @@ describe("rsa-key-pair-generator", () => {
     it("defaults omitted bits to 2048 via normalize", () => {
       expect(normalizeRsaBits(undefined)).toBe(RSA_BITS_DEFAULT);
       expect(RSA_BITS_DEFAULT).toBe(2048);
+    });
+  });
+
+  describe("generated keys work outside this tool", () => {
+    it("parses in node:crypto with the requested size and round-trips OAEP", async () => {
+      const { publicKeyPem, privateKeyPem } = await generateRsaKeyPair({ bits: 1024 });
+      const publicKey = createPublicKey(publicKeyPem);
+      const privateKey = createPrivateKey(privateKeyPem);
+
+      expect(publicKey.asymmetricKeyDetails?.modulusLength).toBe(1024);
+      expect(publicKey.asymmetricKeyDetails?.publicExponent).toBe(65537n);
+
+      const oaep = { padding: constants.RSA_PKCS1_OAEP_PADDING, oaepHash: "sha256" };
+      const cipher = publicEncrypt({ key: publicKey, ...oaep }, Buffer.from("hello"));
+      expect(privateDecrypt({ key: privateKey, ...oaep }, cipher).toString()).toBe("hello");
     });
   });
 });

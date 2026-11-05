@@ -11,5 +11,6 @@ export {
   generateUlid,
   generateUlids,
   isValidUlid,
+  isUlidFormat,
   normalizeUlidFormat,
 } from "./ulidGenerator.service";

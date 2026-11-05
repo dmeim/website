@@ -6,6 +6,22 @@ import type {
 } from "./pdfSignatureChecker.types";
 
 export const NO_SIGNATURES_MESSAGE = "No signatures found in the provided file.";
+export const UNSUPPORTED_SIGNATURE_MESSAGE =
+  "This PDF uses a signature format this tool cannot read. Only adbe.pkcs7.detached and etsi.cades.detached signatures are supported.";
+export const UNREADABLE_SIGNATURE_MESSAGE =
+  "This PDF appears to be signed, but the signature could not be read. The file may be damaged.";
+
+export const CHECKER_UNAVAILABLE_MESSAGE =
+  "The signature checker could not load. Check your connection and reload the page.";
+
+/** Turns pdf-signature-reader's internal error text into a message a person can act on. */
+export function friendlyVerifyMessage(libraryMessage: unknown): string {
+  const message = typeof libraryMessage === "string" ? libraryMessage : "";
+  if (!message.trim() || /byterange|cannot find subfilter/i.test(message)) {
+    return NO_SIGNATURES_MESSAGE;
+  }
+  return /subfilter .* not supported/i.test(message) ? UNSUPPORTED_SIGNATURE_MESSAGE : UNREADABLE_SIGNATURE_MESSAGE;
+}
 
 export const CERT_PARTY_FIELDS: ReadonlyArray<{
   key: keyof CertificateParty;
@@ -27,11 +43,7 @@ export const CERT_PARTY_FIELDS: ReadonlyArray<{
 export function normalizeVerifyResult(result: VerifyPdfRawResult): SignatureInfo[] {
   const signatures = result.signatures;
   if (!Array.isArray(signatures) || signatures.length === 0) {
-    const message =
-      typeof result.message === "string" && result.message.trim()
-        ? result.message.trim()
-        : NO_SIGNATURES_MESSAGE;
-    throw new Error(message);
+    throw new Error(friendlyVerifyMessage(result.message));
   }
   return signatures;
 }
@@ -78,13 +90,11 @@ export function partyFieldRows(party: CertificateParty): PartyFieldRow[] {
   return rows;
 }
 
-type PdfSignatureReaderModule = {
-  default?: VerifyPdfFn;
-} & VerifyPdfFn;
+type PdfSignatureReaderModule = VerifyPdfFn | { default?: VerifyPdfFn };
 
 /** Dynamic client-only load of pdf-signature-reader (never call from SSR). */
 export async function loadVerifyPdf(): Promise<VerifyPdfFn> {
-  const mod = (await import("pdf-signature-reader")) as PdfSignatureReaderModule;
+  const mod = (await import("pdf-signature-reader")) as unknown as PdfSignatureReaderModule;
   const verify = typeof mod === "function" ? mod : mod.default;
   if (typeof verify !== "function") {
     throw new Error("pdf-signature-reader did not export a verify function.");
@@ -99,16 +109,18 @@ export async function loadVerifyPdf(): Promise<VerifyPdfFn> {
 export async function verifyPdfSignatures(
   pdf: ArrayBuffer | Uint8Array,
 ): Promise<SignatureInfo[]> {
-  const verifyPDF = await loadVerifyPdf();
+  let verifyPDF: VerifyPdfFn;
+  try {
+    verifyPDF = await loadVerifyPdf();
+  } catch (error) {
+    console.error("Failed to load pdf-signature-reader", error);
+    throw new Error(CHECKER_UNAVAILABLE_MESSAGE);
+  }
   let result: VerifyPdfRawResult;
   try {
     result = verifyPDF(pdf);
   } catch (error) {
-    const message =
-      error instanceof Error && error.message.trim()
-        ? error.message.trim()
-        : NO_SIGNATURES_MESSAGE;
-    throw new Error(message);
+    throw new Error(friendlyVerifyMessage(error instanceof Error ? error.message : undefined));
   }
   return normalizeVerifyResult(result);
 }

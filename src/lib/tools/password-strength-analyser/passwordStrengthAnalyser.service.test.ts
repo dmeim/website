@@ -78,4 +78,31 @@ describe("password-strength-analyser", () => {
       expect(Math.round(result.score * 100)).toBeGreaterThanOrEqual(0);
     });
   });
+
+  describe("crack duration wording", () => {
+    it("matches the it-tools e2e vector", () => {
+      expect(getPasswordCrackTimeEstimation({ password: "ABCabc123!@#" }).crackDurationFormatted).toBe(
+        "15,091 millennia, 3 centuries",
+      );
+    });
+
+    it("spells the singular unit correctly", () => {
+      const secondsIn1550Years = 31536000000 * 1.55;
+      const { crackDurationFormatted } = getPasswordCrackTimeEstimation({
+        password: "a",
+        guessesPerSecond: 26 / secondsIn1550Years,
+      });
+      expect(crackDurationFormatted).toBe("1 millennium, 5 centuries");
+    });
+
+    it("handles passwords too long for a double without printing Infinity or NaN", () => {
+      const estimation = getPasswordCrackTimeEstimation({ password: "a".repeat(300) });
+      expect(estimation.crackDurationFormatted).toBe("Effectively forever");
+      expect(estimation.score).toBe(1);
+    });
+
+    it("counts an emoji as one character", () => {
+      expect(getPasswordCrackTimeEstimation({ password: "😀😀" }).passwordLength).toBe(2);
+    });
+  });
 });

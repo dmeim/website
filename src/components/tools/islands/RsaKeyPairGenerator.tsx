@@ -62,10 +62,8 @@ export default function RsaKeyPairGenerator() {
     let cancelled = false;
     const delay = request.immediate ? 0 : BITS_DEBOUNCE_MS;
 
-    if (request.immediate) {
-      setPending(true);
-      setErrorStatus("");
-    }
+    setPending(true);
+    setErrorStatus("");
 
     const timer = window.setTimeout(() => {
       if (cancelled) {
@@ -93,11 +91,8 @@ export default function RsaKeyPairGenerator() {
 
           setPublicKeyPem(EMPTY_PAIR.publicKeyPem);
           setPrivateKeyPem(EMPTY_PAIR.privateKeyPem);
-          setErrorStatus(
-            error instanceof Error
-              ? error.message
-              : "Key generation failed. Try a smaller bit size.",
-          );
+          console.error("RSA key generation failed", { bits: request.bits, error });
+          setErrorStatus(`Your browser could not generate a ${request.bits}-bit key. Try a size between 2048 and 4096 bits.`);
           setActionStatus("");
         } finally {
           if (runId === runIdRef.current) {
@@ -151,6 +146,7 @@ export default function RsaKeyPairGenerator() {
     }));
   }, [bitsInput]);
 
+  const showKeys = !pending && !bitsError;
   const bitsFieldValue = Number.isFinite(bitsInput) ? bitsInput : "";
 
   return (
@@ -210,7 +206,7 @@ export default function RsaKeyPairGenerator() {
           </Notice>
         ) : null}
 
-        {!pending && actionStatus ? (
+        {!pending && !bitsError && actionStatus ? (
           <Notice tone="success" live="polite">
             {actionStatus}
           </Notice>
@@ -223,12 +219,12 @@ export default function RsaKeyPairGenerator() {
             multiline
             rows={8}
             copy={false}
-            value={publicKeyPem}
+            value={showKeys ? publicKeyPem : ""}
             placeholder={pending ? "Generating public key…" : "Public key PEM"}
           />
         </div>
         <div>
-          <CopyButton value={publicKeyPem} label="Copy public key" disabled={pending || !publicKeyPem} />
+          <CopyButton value={publicKeyPem} label="Copy public key" disabled={!showKeys || !publicKeyPem} />
         </div>
 
         <div aria-busy={pending || undefined}>
@@ -238,12 +234,12 @@ export default function RsaKeyPairGenerator() {
             multiline
             rows={12}
             copy={false}
-            value={privateKeyPem}
+            value={showKeys ? privateKeyPem : ""}
             placeholder={pending ? "Generating private key…" : "Private key PEM"}
           />
         </div>
         <div>
-          <CopyButton value={privateKeyPem} label="Copy private key" disabled={pending || !privateKeyPem} />
+          <CopyButton value={privateKeyPem} label="Copy private key" disabled={!showKeys || !privateKeyPem} />
         </div>
       </Panel>
     </ToolFrame>

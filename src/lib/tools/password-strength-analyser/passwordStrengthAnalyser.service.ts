@@ -23,13 +23,18 @@ function getHumanFriendlyDuration({ seconds }: { seconds: number }): string {
     return "Less than a second";
   }
 
+  // 2 ** entropy overflows past about 1024 bits; there is no meaningful number to show by then.
+  if (!Number.isFinite(seconds)) {
+    return "Effectively forever";
+  }
+
   const timeUnits: Array<{
     unit: string;
     secondsInUnit: number;
     plural: string;
     format?: (quantity: number) => string;
   }> = [
-    { unit: "millenium", secondsInUnit: 31536000000, format: prettifyExponentialNotation, plural: "millennia" },
+    { unit: "millennium", secondsInUnit: 31536000000, format: prettifyExponentialNotation, plural: "millennia" },
     { unit: "century", secondsInUnit: 3153600000, plural: "centuries" },
     { unit: "decade", secondsInUnit: 315360000, plural: "decades" },
     { unit: "year", secondsInUnit: 31536000, plural: "years" },
@@ -95,7 +100,8 @@ export function getPasswordCrackTimeEstimation({
   guessesPerSecond?: number;
 }): PasswordCrackTimeEstimation {
   const charsetLength = getCharsetLength({ password });
-  const passwordLength = password.length;
+  // Code points, so an emoji counts as one character rather than two UTF-16 units.
+  const passwordLength = Array.from(password).length;
 
   const entropy = password === "" ? 0 : Math.log2(charsetLength) * passwordLength;
 

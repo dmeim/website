@@ -15,6 +15,7 @@ import {
   HASH_ALGORITHMS,
   HASH_ENCODING_DEFAULT,
   convertHexToBin,
+  hmacSha3Digest,
   normalizeHashEncoding,
   type HashAlgorithm,
   type HashEncoding,
@@ -42,8 +43,9 @@ const ALGOS = {
   SHA224: HmacSHA224,
   SHA512: HmacSHA512,
   SHA384: HmacSHA384,
-  SHA3: HmacSHA3,
+  SHA3: hmacSha3Digest,
   RIPEMD160: HmacRIPEMD160,
+  Keccak512: HmacSHA3,
 } as const satisfies Record<
   HashAlgorithm,
   (message: string | lib.WordArray, key: string | lib.WordArray) => lib.WordArray

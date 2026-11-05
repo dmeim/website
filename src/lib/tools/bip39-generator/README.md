@@ -24,6 +24,9 @@ Generate BIP39 mnemonic passphrases from random or pasted entropy, or recover en
 - Accepts full BIP39 entropy lengths — unlike it-tools’ 16–32 hex-char cap, 15/18/21/24-word mnemonics work
 - Japanese spacing/NFKD normalization is handled by scure’s Japanese wordlist path
 - Empty fields are allowed in the UI; conversion and copy require valid input
+- Invalid entropy clears the mnemonic and an invalid mnemonic clears the entropy, so a stale value is never shown beside an error
+- Pasted mnemonics may contain extra spaces or line breaks
+- The strength select follows the length of pasted entropy or mnemonics
 
 ## Source
 Port of [it-tools BIP39 passphrase generator](https://it-tools.tech/bip39-generator). Local reference: handy-dandy `it-tools` (`/bip39-generator`). Catalogue id: `bip39-generator`. Strength select is a deliberate improvement over the source UI.

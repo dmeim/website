@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   LOWERCASE_ALPHABET,
+  SYMBOL_ALPHABET,
   TOKEN_LENGTH_MAX,
   TOKEN_LENGTH_MIN,
   UPPERCASE_ALPHABET,
@@ -142,6 +143,33 @@ describe("token-generator", () => {
 
       expect(token).toHaveLength(64);
       expect(token).toMatch(/^[ab]+$/);
+    });
+  });
+
+  describe("randomness", () => {
+    it("never touches Math.random", () => {
+      const spy = vi.spyOn(Math, "random");
+      createToken({ withSymbols: true, length: TOKEN_LENGTH_MAX });
+      expect(spy).not.toHaveBeenCalled();
+      spy.mockRestore();
+    });
+
+    it("fails loudly rather than generating a weak token without Web Crypto", () => {
+      vi.stubGlobal("crypto", undefined);
+      expect(() => createToken({ length: 8 })).toThrow();
+      vi.unstubAllGlobals();
+    });
+
+    it("includes every letter and has no duplicate symbols, so no character is favored", () => {
+      expect(UPPERCASE_ALPHABET).toContain("N");
+      expect(LOWERCASE_ALPHABET).toContain("n");
+      expect(new Set(SYMBOL_ALPHABET).size).toBe(SYMBOL_ALPHABET.length);
+    });
+
+    it("can repeat a character and covers the whole alphabet", () => {
+      expect(createToken({ alphabet: "a", length: 12 })).toBe("a".repeat(12));
+      const seen = new Set(createToken({ alphabet: "abcd", length: TOKEN_LENGTH_MAX }));
+      expect(seen.size).toBe(4);
     });
   });
 });

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   applyLengthFilter,
@@ -57,9 +57,31 @@ describe("wordCode.service", () => {
     expect(clampNumber(99, 1, 8, 2)).toBe(8);
     expect(
       getLengthLabel({ min: 2, max: 5, boundsMin: 1, boundsMax: 10 }),
-    ).not.toBe("No Limits");
+    ).not.toBe("no limits");
     expect(
       getLengthLabel({ min: 1, max: 10, boundsMin: 1, boundsMax: 10 }),
-    ).toBe("No Limits");
+    ).toBe("no limits");
+  });
+
+  it("uses Web Crypto only for random draws", () => {
+    const spy = vi.spyOn(Math, "random");
+    generateCodeItems({ words: ["a", "b"], digits: 4, requested: 50, randomize: true, allowRepeats: true });
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it("does not repeat words when repeats are off, and keeps list order when not randomizing", () => {
+    const words = ["alpha", "beta", "gamma"];
+    const shuffled = generateCodeItems({ words, digits: 2, requested: 3, randomize: true, allowRepeats: false });
+    expect(shuffled.map((item) => item.word).sort()).toEqual(words);
+    const ordered = generateCodeItems({ words, digits: 2, requested: 5, randomize: false, allowRepeats: true });
+    expect(ordered.map((item) => item.word)).toEqual(["alpha", "beta", "gamma", "alpha", "beta"]);
+  });
+
+  it("writes length labels that read correctly mid-sentence", () => {
+    expect(getLengthLabel({ min: 1, max: 1, boundsMin: 1, boundsMax: 10 })).toBe("up to 1 letter");
+    expect(getLengthLabel({ min: 3, max: 5, boundsMin: 1, boundsMax: 10 })).toBe("3–5 letters");
+    expect(getLengthLabel({ min: 3, max: 10, boundsMin: 1, boundsMax: 10 })).toBe("3+ letters");
+    expect(getLengthLabel({ min: 4, max: 4, boundsMin: 1, boundsMax: 10 })).toBe("4 letters");
   });
 });

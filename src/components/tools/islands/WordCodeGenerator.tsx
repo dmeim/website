@@ -74,7 +74,6 @@ export default function WordCodeGenerator() {
   const [addSpaces, setAddSpaces] = useState(false);
 
   const [lastCodes, setLastCodes] = useState<GeneratedCode[]>([]);
-  const [lastPosition, setLastPosition] = useState<DigitPosition>("end");
   const [lastOutputMeta, setLastOutputMeta] = useState(
     "Your generated codes will appear here.",
   );
@@ -203,7 +202,7 @@ export default function WordCodeGenerator() {
       separator,
       customSeparator,
       addSpaces,
-      position: lastPosition,
+      position,
       wordCase,
     });
   }, [
@@ -212,7 +211,7 @@ export default function WordCodeGenerator() {
     separator,
     customSeparator,
     addSpaces,
-    lastPosition,
+    position,
     wordCase,
   ]);
 
@@ -248,7 +247,7 @@ export default function WordCodeGenerator() {
         setSelectedCategoryIds([]);
         setIsLoading(false);
         setLoadStatusMessage(
-          `${error instanceof Error ? error.message : String(error)} Check The Bundled WordCode Category Data.`,
+          `${error instanceof Error ? error.message : String(error)} Check the bundled category data.`,
         );
         setLoadStatusType("error");
         setOutputMessage(
@@ -409,7 +408,6 @@ export default function WordCodeGenerator() {
     });
 
     const meta = `${codes.length} codes generated from ${selectedWords.length} available words.`;
-    setLastPosition(position);
     setLastCodes(codes);
     setLastOutputMeta(meta);
     setOutputMetaText(meta);
@@ -421,7 +419,6 @@ export default function WordCodeGenerator() {
     lengthLabel,
     allowRepeats,
     randomize,
-    position,
     showOutputMessage,
   ]);
 

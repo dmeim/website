@@ -21,7 +21,8 @@ Encrypt clear text and decrypt ciphertext with a secret key using AES, TripleDES
 - Defaults match it-tools: sample lorem plaintext, secret `my secret key`, AES; decrypt panel is seeded with a ciphertext that round-trips that sample
 - Each encrypt uses a random salt, so the same plaintext+secret yields different ciphertext strings
 - `tryDecrypt` maps throws (e.g. Malformed UTF-8) and empty failure modes to `DECRYPT_ERROR_MESSAGE`; it does not surface crypto-js messages in the UI
-- Encrypting an empty string produces non-empty ciphertext that decrypts to `""`; `tryDecrypt` treats that edge case as failure when ciphertext is non-empty
+- Encrypting an empty string produces non-empty ciphertext that decrypts back to `""` successfully. A wrong key that yields no text is still reported as a failure
+- Whitespace in pasted ciphertext is ignored, so line-wrapped `openssl enc -a` output decrypts. For OpenSSL interop use `-aes-256-cbc -md md5`
 
 ## Source
 Port of [it-tools Encrypt / decrypt text](https://it-tools.tech/encryption). Local reference: handy-dandy `it-tools` (`/encryption`). Catalogue id: `encryption`.

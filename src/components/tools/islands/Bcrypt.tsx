@@ -34,6 +34,7 @@ export default function Bcrypt() {
   useEffect(() => {
     let cancelled = false;
     setHashPending(true);
+    setActionStatus("");
 
     const timer = window.setTimeout(() => {
       void (async () => {
@@ -145,7 +146,11 @@ export default function Bcrypt() {
         />
 
         {safeRounds >= 14 ? (
-          <Notice tone="warning">High salt rounds can take a long time in the browser. Prefer 8–12 for interactive use.</Notice>
+          <Notice tone="warning">
+            {safeRounds >= 20
+              ? "Each extra round doubles the work, so this can take hours or longer, and it keeps running until you reload the page."
+              : "High salt rounds can take a long time in the browser. Prefer 8–12 for interactive use."}
+          </Notice>
         ) : null}
 
         <OutputField
@@ -154,7 +159,7 @@ export default function Bcrypt() {
           multiline
           rows={3}
           copy={false}
-          value={hashed}
+          value={hashPending ? "" : hashed}
           placeholder={hashPending ? "Hashing…" : "Hash appears here"}
         />
 

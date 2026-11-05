@@ -63,6 +63,7 @@ export function encryptText(
 
 /**
  * Decrypt OpenSSL Salted__ Base64 `ciphertext` with `secret` using `algo`.
+ * Whitespace is ignored because `openssl enc -a` wraps its output and pastes often carry a newline.
  * May throw (e.g. Malformed UTF-8) when the key/algo/ciphertext do not match.
  */
 export function decryptText(
@@ -71,14 +72,14 @@ export function decryptText(
   secret: string,
 ): string {
   return ALGOS[normalizeEncryptionAlgorithm(algo)]
-    .decrypt(ciphertext, secret)
+    .decrypt(ciphertext.replace(/\s+/g, ""), secret)
     .toString(enc.Utf8);
 }
 
 /**
  * Safe decrypt wrapper for UI. Maps throws and empty failure modes to a stable error.
- * Note: a successful decrypt of an empty plaintext also yields `""`; that edge case
- * is reported as failure when the ciphertext is non-empty.
+ * A wrong key usually leaves a negative byte count, which reads as `""`; only exactly
+ * zero bytes from a salted ciphertext is a genuine empty plaintext.
  */
 export function tryDecrypt(
   algo: EncryptionAlgorithm,
@@ -86,9 +87,13 @@ export function tryDecrypt(
   secret: string,
 ): DecryptResult {
   try {
-    const text = decryptText(algo, ciphertext, secret);
-    if (ciphertext.length > 0 && text.length === 0) {
-      return { ok: false, error: DECRYPT_ERROR_MESSAGE };
+    const compact = ciphertext.replace(/\s+/g, "");
+    const text = decryptText(algo, compact, secret);
+    if (compact.length > 0 && text.length === 0) {
+      const isEmptyPlaintext =
+        compact.startsWith(OPENSSL_SALTED_BASE64_PREFIX) &&
+        ALGOS[normalizeEncryptionAlgorithm(algo)].decrypt(compact, secret).sigBytes === 0;
+      return isEmptyPlaintext ? { ok: true, text } : { ok: false, error: DECRYPT_ERROR_MESSAGE };
     }
     return { ok: true, text };
   } catch {

@@ -10,7 +10,7 @@ Generate a random string from the character classes you enable: uppercase letter
 - **Uppercase** — include `A–Z` (default on)
 - **Lowercase** — include `a–z` (default on)
 - **Numbers** — include `0–9` (default on)
-- **Symbols** — include `.,;:!?./-"'#{([-|\@)]=}*+` (default off)
+- **Symbols** — include `.,;:!?/-"'#{([|\@)]=}*+` (default off)
 - **Length** — slider / value from 1 to 512 (default 64)
 
 ## Inputs
@@ -24,7 +24,9 @@ Generate a random string from the character classes you enable: uppercase letter
 ## Notes
 - When every character class is off (and no custom alphabet is set), the output is an empty string
 - Length is clamped to 1–512 in the service
-- Randomness prefers Web Crypto (`crypto.getRandomValues`) with a Fisher–Yates shuffle; falls back to `Math.random` only if Web Crypto is unavailable
+- Every character is drawn independently and uniformly with `crypto.getRandomValues`. There is no `Math.random` fallback: without Web Crypto the tool fails instead of producing a weak token. it-tools shuffled a repeated alphabet pool, which is slightly less uniform
+- Options persist in the URL (`length`, `uppercase`, `lowercase`, `numbers`, `symbols`), same as it-tools. The token itself is never persisted
+- Duplicate symbols from the upstream list (`.` and `-`) are removed so no character is favored
 - Letter alphabets include `N`/`n` (upstream it-tools omitted them)
 
 ## Source

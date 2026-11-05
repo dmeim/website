@@ -24,6 +24,8 @@ None — analysis updates as you type.
 - Empty password → entropy 0, charset 0, duration “Instantly”
 - Strength is brute-force only; dictionary attacks are not modelled
 - Lodash from the it-tools source is replaced with plain JS duration formatting
+- Length counts code points, so an emoji is one character (it-tools counts two UTF-16 units)
+- Past about 1024 bits of entropy the number no longer fits a double, so the duration reads “Effectively forever” instead of “Infinity millennia”
 
 ## Source
 Port of [it-tools Password strength analyser](https://it-tools.tech/password-strength-analyser). Local reference: handy-dandy `it-tools` (`/password-strength-analyser`). Catalogue id: `password-strength-analyser`.

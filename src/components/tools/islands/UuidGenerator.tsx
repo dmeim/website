@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { Button, ButtonGroup, CopyButton, Input, Notice, OutputField, Panel, SegmentedControl, ToolFrame } from "@/ui/react";
+import { useStoredState } from "@/components/tools/use-persisted-state";
+import { Button, ButtonGroup, CopyButton, Input, OutputField, Panel, SegmentedControl, ToolFrame } from "@/ui/react";
 import {
   UUID_NAMESPACE_DEFAULT,
   UUID_NAMESPACE_OPTIONS,
@@ -12,6 +13,7 @@ import {
   type UuidVersion,
   clampUuidQuantity,
   generateUuids,
+  isUuidVersion,
   isValidUuidNamespace,
   normalizeUuidVersion,
 } from "@/lib/tools/uuid-generator";
@@ -19,8 +21,9 @@ import {
 const CUSTOM_NAMESPACE = "__custom__";
 
 export default function UuidGenerator() {
-  const [version, setVersion] = useState<UuidVersion>(UUID_VERSION_DEFAULT);
-  const [quantity, setQuantity] = useState(UUID_QUANTITY_DEFAULT);
+  const [version, setVersion] = useStoredState<UuidVersion>("uuid-generator:version", UUID_VERSION_DEFAULT, isUuidVersion);
+  const [quantity, setQuantity] = useStoredState("uuid-generator:quantity", UUID_QUANTITY_DEFAULT);
+  const [quantityDraft, setQuantityDraft] = useState<string | null>(null);
   const [namespace, setNamespace] = useState<string>(UUID_NAMESPACE_DEFAULT);
   const [name, setName] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
@@ -67,8 +70,12 @@ export default function UuidGenerator() {
           min={UUID_QUANTITY_MIN}
           max={UUID_QUANTITY_MAX}
           step={1}
-          value={safeQuantity}
-          onChange={(event) => setQuantity(clampUuidQuantity(event.target.value))}
+          value={quantityDraft ?? safeQuantity}
+          onChange={(event) => {
+            setQuantityDraft(event.target.value);
+            setQuantity(clampUuidQuantity(event.target.value));
+          }}
+          onBlur={() => setQuantityDraft(null)}
         />
 
         {needsNameArgs ? (
@@ -89,7 +96,7 @@ export default function UuidGenerator() {
               placeholder="Namespace UUID"
               spellCheck={false}
               autoComplete="off"
-              error={namespaceValid ? undefined : "Invalid UUID namespace."}
+              error={namespaceValid ? undefined : "Enter a valid namespace UUID, like 6ba7b811-9dad-11d1-80b4-00c04fd430c8."}
               onChange={(event) => setNamespace(event.target.value)}
             />
 
@@ -114,10 +121,6 @@ export default function UuidGenerator() {
           value={uuids}
           placeholder="Your UUIDs"
         />
-
-        {!uuids && needsNameArgs && !namespaceValid ? (
-          <Notice tone="danger">Enter a valid namespace UUID before copying.</Notice>
-        ) : null}
 
         <ButtonGroup>
           <CopyButton value={uuids} disabled={!uuids} variant="primary" />

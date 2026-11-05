@@ -89,6 +89,14 @@ export default function Bip39Generator() {
         const hex = mnemonicToEntropyHex(mnemonic, safeLanguage);
         setEntropy(hex);
         setMnemonic(entropyHexToMnemonic(hex, lang));
+        return;
+      }
+
+      // A mnemonic pasted before picking its language becomes valid only now.
+      if (isValidMnemonic(mnemonic, lang)) {
+        const hex = mnemonicToEntropyHex(mnemonic, lang);
+        setEntropy(hex);
+        setStrength(normalizeBip39Strength(hex.length * 4));
       }
     },
     [entropy, mnemonic, safeLanguage],
@@ -111,6 +119,9 @@ export default function Bip39Generator() {
 
       if (isValidEntropyHex(value)) {
         setMnemonic(entropyHexToMnemonic(value, safeLanguage));
+        setStrength(normalizeBip39Strength(value.trim().length * 4));
+      } else {
+        setMnemonic("");
       }
     },
     [safeLanguage],
@@ -121,7 +132,11 @@ export default function Bip39Generator() {
       setMnemonic(value);
 
       if (isValidMnemonic(value, safeLanguage)) {
-        setEntropy(mnemonicToEntropyHex(value, safeLanguage));
+        const hex = mnemonicToEntropyHex(value, safeLanguage);
+        setEntropy(hex);
+        setStrength(normalizeBip39Strength(hex.length * 4));
+      } else {
+        setEntropy("");
       }
     },
     [safeLanguage],

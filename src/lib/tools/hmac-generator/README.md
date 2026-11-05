@@ -4,10 +4,10 @@
 HMAC generator (`hmac-generator`)
 
 ## Description
-Compute a hash-based message authentication code (HMAC) from a plaintext message and a secret key. Choose the hashing function (MD5, SHA1, SHA256, SHA224, SHA512, SHA384, SHA3, or RIPEMD160) and how the digest is encoded (binary, hex, Base64, or Base64url). All HMAC work runs in the browser.
+Compute a hash-based message authentication code (HMAC) from a plaintext message and a secret key. Choose the hashing function (MD5, SHA1, SHA256, SHA224, SHA512, SHA384, SHA3, RIPEMD160, or Keccak512) and how the digest is encoded (binary, hex, Base64, or Base64url). All HMAC work runs in the browser.
 
 ## Toggles and Settings
-- **Hashing function** — MD5, SHA1, SHA256, SHA224, SHA512, SHA384, SHA3, or RIPEMD160 (default SHA256)
+- **Hashing function** — MD5, SHA1, SHA256, SHA224, SHA512, SHA384, SHA3, RIPEMD160, or Keccak512 (default SHA256)
 - **Output encoding** — Binary (base 2), Hexadecimal (base 16), Base64, or Base64url (default Hex)
 
 ## Inputs
@@ -20,7 +20,7 @@ Compute a hash-based message authentication code (HMAC) from a plaintext message
 
 ## Notes
 - Empty message and/or empty secret still produce valid HMACs (same as it-tools)
-- SHA3 here matches crypto-js / it-tools (Keccak-style SHA3), not a separate Web Crypto API
+- **SHA3 is HMAC over FIPS 202 SHA3-512**, matching `node:crypto` and OpenSSL. it-tools labels crypto-js's pre-standard Keccak-512 HMAC as SHA3; that result stays available as **Keccak512**
 - Reuses algorithm and encoding constants from `@/lib/tools/hash-text`; does **not** reuse `hashText` / `hashAll` (plain digests)
 - Encoding `Bin` is derived from the hex digest via `convertHexToBin`
 

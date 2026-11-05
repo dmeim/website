@@ -22,9 +22,10 @@ Generate Universally Unique Identifiers (UUIDs): NIL, time-based v1, name-based 
 
 ## Notes
 - Invalid v3/v5 namespaces throw inside `uuid`; the service catches and returns an empty string (it-tools `withDefaultOnError` parity)
-- Batch v1 uses `clockseq: index` (plus random nsecs/node) so consecutive IDs in one batch stay unique
+- Batch v1 uses `clockseq: index` (plus nsecs and node from `crypto.getRandomValues`, with the multicast bit set on the node per RFC 9562) so consecutive IDs in one batch stay unique
 - RFC namespaces: DNS `6ba7b810-…`, URL `6ba7b811-…`, OID `6ba7b812-…`, X500 `6ba7b814-…`
-- Version / quantity localStorage persistence is intentionally omitted
+- Version and quantity persist in localStorage (`uuid-generator:version`, `uuid-generator:quantity`), same as it-tools. Namespace and name do not
+- A namespace with stray whitespace is reported as invalid rather than producing empty output silently
 
 ## Source
 Port of [it-tools UUID generator](https://it-tools.tech/uuid-generator). Local reference: handy-dandy `it-tools` (`/uuid-generator`). Catalogue id: `uuid-generator`.

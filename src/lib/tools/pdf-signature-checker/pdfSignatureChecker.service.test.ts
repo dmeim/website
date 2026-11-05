@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   NO_SIGNATURES_MESSAGE,
+  UNREADABLE_SIGNATURE_MESSAGE,
+  UNSUPPORTED_SIGNATURE_MESSAGE,
   formatCertDate,
   formatFileBytes,
   normalizeVerifyResult,
@@ -33,10 +35,16 @@ describe("pdf-signature-checker", () => {
       ]);
     });
 
-    it("throws the library message on soft-fail without signatures", () => {
-      expect(() =>
-        normalizeVerifyResult({ verified: false, message: "cannot find subfilter" }),
-      ).toThrow("cannot find subfilter");
+    it("translates library errors into friendly messages", () => {
+      const cases = [
+        ["cannot find subfilter", NO_SIGNATURES_MESSAGE],
+        ["Failed to locate ByteRange.", NO_SIGNATURES_MESSAGE],
+        ["subFilter adbe.x509.rsa_sha1 not supported", UNSUPPORTED_SIGNATURE_MESSAGE],
+        ["Wrong authenticated attributes", UNREADABLE_SIGNATURE_MESSAGE],
+      ] as const;
+      for (const [message, expected] of cases) {
+        expect(() => normalizeVerifyResult({ verified: false, message })).toThrow(expected);
+      }
     });
 
     it("throws the default message when signatures are empty", () => {

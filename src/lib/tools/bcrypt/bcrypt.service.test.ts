@@ -13,7 +13,9 @@ import {
 
 describe("bcrypt", () => {
   describe("clampSaltRounds", () => {
-    it("clamps to the it-tools 0–100 range", () => {
+    it("clamps to the 4–31 range bcrypt supports", () => {
+      expect(BCRYPT_ROUNDS_MIN).toBe(4);
+      expect(BCRYPT_ROUNDS_MAX).toBe(31);
       expect(clampSaltRounds(10)).toBe(10);
       expect(clampSaltRounds(0)).toBe(BCRYPT_ROUNDS_MIN);
       expect(clampSaltRounds(100)).toBe(BCRYPT_ROUNDS_MAX);
@@ -38,6 +40,8 @@ describe("bcrypt", () => {
       expect(isBcryptHash("")).toBe(false);
       expect(isBcryptHash("not-a-hash")).toBe(false);
       expect(isBcryptHash("$2b$10$too-short")).toBe(false);
+      expect(isBcryptHash(`$2b$99$${"a".repeat(53)}`)).toBe(false);
+      expect(isBcryptHash(`$2b$03$${"a".repeat(53)}`)).toBe(false);
       expect(isBcryptHash("$2x$10$eImiTXuWVxfM37uY4JANjQ.Exm.5b8n8j8j8j8j8j8j8j8j8j8j8j8")).toBe(
         false,
       );
@@ -69,8 +73,7 @@ describe("bcrypt", () => {
     it("embeds the clamped cost in the hash prefix", async () => {
       const hash = await hashPassword("rounds-check", 4);
       expect(hash).toMatch(/^\$2[aby]\$04\$/);
-      // Clamping is covered by clampSaltRounds; avoid hashing at cost 100 in tests.
-      expect(clampSaltRounds(250)).toBe(BCRYPT_ROUNDS_MAX);
+      expect(await hashPassword("rounds-check", 0)).toMatch(/^\$2[aby]\$04\$/);
     });
   });
 
@@ -79,6 +82,23 @@ describe("bcrypt", () => {
       expect(passwordTruncates("short")).toBe(false);
       expect(passwordTruncates("x".repeat(72))).toBe(false);
       expect(passwordTruncates("x".repeat(73))).toBe(true);
+    });
+  });
+
+  describe("independent vectors", () => {
+    it("verifies the jBCrypt empty-string vector", async () => {
+      expect(await comparePassword("", "$2a$06$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1s.")).toBe(true);
+    });
+
+    it("verifies hashes produced by Apache htpasswd", async () => {
+      const ascii = "$2y$06$N59e2V1VbQJ/1Gy.23FaHuOS6gr1pd.vGCRRzTFyXjTS5QlGUzZhi";
+      expect(await comparePassword("correct horse", ascii)).toBe(true);
+      expect(await comparePassword("correct horse!", ascii)).toBe(false);
+      expect(await comparePassword("pässwörd😀", "$2y$04$JcckjViAcv7F0wgcwwVOyO8Lrlpi57bjlUa.B4q69gfUFQc4U5m3y")).toBe(true);
+    });
+
+    it("treats hash surrounding whitespace as a paste artifact", async () => {
+      expect(await comparePassword("correct horse", " $2y$06$N59e2V1VbQJ/1Gy.23FaHuOS6gr1pd.vGCRRzTFyXjTS5QlGUzZhi\n")).toBe(true);
     });
   });
 });

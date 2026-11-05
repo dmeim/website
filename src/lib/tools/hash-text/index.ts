@@ -8,6 +8,8 @@ export {
   convertHexToBin,
   hashAll,
   hashText,
+  hmacSha3Digest,
   isHashEncoding,
   normalizeHashEncoding,
+  sha3Digest,
 } from "./hashText.service";

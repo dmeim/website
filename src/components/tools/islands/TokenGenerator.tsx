@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
+import { useQueryState } from "@/components/tools/use-persisted-state";
 import { Button, ButtonGroup, CopyButton, FormGrid, OutputField, Panel, Slider, Switch, ToolFrame } from "@/ui/react";
 import {
   TOKEN_LENGTH_DEFAULT,
@@ -10,11 +11,11 @@ import {
 } from "@/lib/tools/token-generator";
 
 export default function TokenGenerator() {
-  const [withUppercase, setWithUppercase] = useState(true);
-  const [withLowercase, setWithLowercase] = useState(true);
-  const [withNumbers, setWithNumbers] = useState(true);
-  const [withSymbols, setWithSymbols] = useState(false);
-  const [length, setLength] = useState(TOKEN_LENGTH_DEFAULT);
+  const [withUppercase, setWithUppercase] = useQueryState<boolean>("uppercase", true);
+  const [withLowercase, setWithLowercase] = useQueryState<boolean>("lowercase", true);
+  const [withNumbers, setWithNumbers] = useQueryState<boolean>("numbers", true);
+  const [withSymbols, setWithSymbols] = useQueryState<boolean>("symbols", false);
+  const [length, setLength] = useQueryState<number>("length", TOKEN_LENGTH_DEFAULT);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const safeLength = clampTokenLength(length);

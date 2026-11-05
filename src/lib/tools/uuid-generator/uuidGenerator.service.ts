@@ -55,35 +55,38 @@ export function clampUuidQuantity(value: unknown, fallback = UUID_QUANTITY_DEFAU
   return Math.min(UUID_QUANTITY_MAX, Math.max(UUID_QUANTITY_MIN, Math.trunc(parsed)));
 }
 
-export function normalizeUuidVersion(value: unknown, fallback: UuidVersion = UUID_VERSION_DEFAULT): UuidVersion {
-  if (typeof value === "string" && (UUID_VERSIONS as readonly string[]).includes(value)) {
-    return value as UuidVersion;
-  }
+export function isUuidVersion(value: unknown): value is UuidVersion {
+  return typeof value === "string" && (UUID_VERSIONS as readonly string[]).includes(value);
+}
 
-  return fallback;
+export function normalizeUuidVersion(value: unknown, fallback: UuidVersion = UUID_VERSION_DEFAULT): UuidVersion {
+  return isUuidVersion(value) ? value : fallback;
 }
 
 /**
  * Accepts NIL or a version 1–5 UUID string (case-insensitive), matching it-tools validation.
  */
 export function isValidUuidNamespace(value: string): boolean {
-  const trimmed = value.trim();
-
-  if (!trimmed) {
-    return false;
-  }
-
-  if (trimmed === nilUuid) {
+  if (value === nilUuid) {
     return true;
   }
 
   return Boolean(
-    trimmed.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i),
+    value.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i),
   );
 }
 
 export function isValidUuid(value: string): boolean {
   return validateUuidLib(value.trim());
+}
+
+/** Random v1 fields per RFC 9562: a random node must set the multicast bit so it cannot collide with a real MAC. */
+function randomV1Fields(): { nsecs: number; node: Uint8Array } {
+  const [nsecsSeed] = crypto.getRandomValues(new Uint32Array(1));
+  const node = crypto.getRandomValues(new Uint8Array(6));
+  node[0]! |= 0x01;
+
+  return { nsecs: nsecsSeed! % 10000, node };
 }
 
 function generateOne(version: UuidVersion, index: number, namespace: string, name: string): string {
@@ -94,8 +97,7 @@ function generateOne(version: UuidVersion, index: number, namespace: string, nam
       return generateUuidV1({
         clockseq: index,
         msecs: Date.now(),
-        nsecs: Math.floor(Math.random() * 10000),
-        node: Array.from({ length: 6 }, () => Math.floor(Math.random() * 256)),
+        ...randomV1Fields(),
       });
     case "v3":
       return generateUuidV3(name, namespace);
@@ -112,7 +114,7 @@ function generateOne(version: UuidVersion, index: number, namespace: string, nam
 
 /**
  * Generate one or more UUIDs as a newline-joined string.
- * Errors (e.g. invalid v3/v5 namespace) yield an empty string — matches it-tools `withDefaultOnError`.
+ * Errors (e.g. invalid v3/v5 namespace) yield an empty string, matching it-tools `withDefaultOnError`.
  */
 export function generateUuids({
   version = UUID_VERSION_DEFAULT,

@@ -1,11 +1,12 @@
 import bcrypt from "bcryptjs";
 
-export const BCRYPT_ROUNDS_MIN = 0;
-export const BCRYPT_ROUNDS_MAX = 100;
+/** The costs bcrypt defines. bcryptjs raises anything lower to 4 and throws above 31. */
+export const BCRYPT_ROUNDS_MIN = 4;
+export const BCRYPT_ROUNDS_MAX = 31;
 export const BCRYPT_ROUNDS_DEFAULT = 10;
 
-/** bcrypt hashes are 60 chars: `$2[aby]$` + 2-digit cost + `$` + 53 salt/hash chars. */
-const BCRYPT_HASH_PATTERN = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
+/** bcrypt hashes are 60 chars: `$2[aby]$` + 2-digit cost (04–31) + `$` + 53 salt/hash chars. */
+const BCRYPT_HASH_PATTERN = /^\$2[aby]\$(?:0[4-9]|[12]\d|3[01])\$[./A-Za-z0-9]{53}$/;
 
 export function clampSaltRounds(value: unknown, fallback = BCRYPT_ROUNDS_DEFAULT): number {
   const parsed = typeof value === "number" ? value : Number.parseInt(String(value), 10);
@@ -24,7 +25,7 @@ export function isBcryptHash(value: string): boolean {
 
 /**
  * Hash `password` with bcrypt using the given salt-round cost.
- * Rounds are clamped to 0–100 (it-tools range).
+ * Rounds are clamped to the 4–31 range bcrypt supports.
  */
 export async function hashPassword(
   password: string,

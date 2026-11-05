@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { useQueryState } from "@/components/tools/use-persisted-state";
 import { OutputField, Panel, Select, Textarea, ToolFrame } from "@/ui/react";
 import {
   HASH_ALGORITHMS,
@@ -7,12 +8,13 @@ import {
   HASH_ENCODING_OPTIONS,
   type HashEncoding,
   hashAll,
+  isHashEncoding,
   normalizeHashEncoding,
 } from "@/lib/tools/hash-text";
 
 export default function HashText() {
   const [clearText, setClearText] = useState("");
-  const [encoding, setEncoding] = useState<HashEncoding>(HASH_ENCODING_DEFAULT);
+  const [encoding, setEncoding] = useQueryState<HashEncoding>("encoding", HASH_ENCODING_DEFAULT, isHashEncoding);
 
   const safeEncoding = normalizeHashEncoding(encoding);
   const digests = useMemo(() => hashAll(clearText, safeEncoding), [clearText, safeEncoding]);

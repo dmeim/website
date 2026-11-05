@@ -136,9 +136,14 @@ export function isValidEntropyHex(hex: string): boolean {
   return HEX_LENGTH_SET.has(normalized.length) && HEX_PATTERN.test(normalized);
 }
 
+/** Collapses runs of whitespace (including line breaks and U+3000), so pasted mnemonics still parse. */
+function normalizeMnemonic(mnemonic: string): string {
+  return mnemonic.trim().split(/\s+/u).join(" ");
+}
+
 /** True when `mnemonic` validates against the language wordlist (checksum + words). */
 export function isValidMnemonic(mnemonic: string, language: Bip39LanguageId): boolean {
-  const trimmed = mnemonic.trim();
+  const trimmed = normalizeMnemonic(mnemonic);
   if (!trimmed) {
     return false;
   }
@@ -171,7 +176,7 @@ export function entropyHexToMnemonic(entropyHex: string, language: Bip39Language
  * Throws when the mnemonic is invalid for the wordlist.
  */
 export function mnemonicToEntropyHex(mnemonic: string, language: Bip39LanguageId): string {
-  const trimmed = mnemonic.trim();
+  const trimmed = normalizeMnemonic(mnemonic);
 
   if (!isValidMnemonic(trimmed, language)) {
     throw new Error("Invalid BIP39 mnemonic");

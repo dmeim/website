@@ -5,7 +5,7 @@ export const TOKEN_LENGTH_DEFAULT = 64;
 export const UPPERCASE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 export const LOWERCASE_ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 export const NUMBER_ALPHABET = "0123456789";
-export const SYMBOL_ALPHABET = ".,;:!?./-\"'#{([-|\\@)]=}*+";
+export const SYMBOL_ALPHABET = ".,;:!?/-\"'#{([|\\@)]=}*+";
 
 export interface CreateTokenOptions {
   withUppercase?: boolean;
@@ -51,7 +51,7 @@ export function buildTokenAlphabet({
 
 /**
  * Generate a random token from the selected character classes (or a custom alphabet).
- * Matches it-tools token-generator behavior: shuffle a repeated alphabet pool, then truncate.
+ * Each character is drawn independently and uniformly, so every token is equally likely.
  */
 export function createToken({
   withUppercase = true,
@@ -74,43 +74,24 @@ export function createToken({
     return "";
   }
 
-  return shuffleString(allAlphabet.repeat(safeLength)).substring(0, safeLength);
+  return Array.from({ length: safeLength }, () => allAlphabet.charAt(randomIntBelow(allAlphabet.length))).join("");
 }
 
-function shuffleString(value: string): string {
-  const chars = value.split("");
-
-  for (let i = chars.length - 1; i > 0; i -= 1) {
-    const j = randomIntBelow(i + 1);
-    const current = chars[i]!;
-    chars[i] = chars[j]!;
-    chars[j] = current;
-  }
-
-  return chars.join("");
-}
-
-/** Uniform integer in `[0, maxExclusive)` via Web Crypto when available. */
+/** Uniform integer in `[0, maxExclusive)` from Web Crypto. Tokens are secrets, so there is no weaker fallback. */
 function randomIntBelow(maxExclusive: number): number {
   if (maxExclusive <= 1) {
     return 0;
   }
 
-  const cryptoApi = globalThis.crypto;
+  const limit = 0x100000000;
+  const rejectAbove = limit - (limit % maxExclusive);
+  const buffer = new Uint32Array(1);
 
-  if (cryptoApi?.getRandomValues) {
-    const limit = 0x100000000;
-    const rejectAbove = limit - (limit % maxExclusive);
-    const buffer = new Uint32Array(1);
-
-    for (;;) {
-      cryptoApi.getRandomValues(buffer);
-      const value = buffer[0]!;
-      if (value < rejectAbove) {
-        return value % maxExclusive;
-      }
+  for (;;) {
+    crypto.getRandomValues(buffer);
+    const value = buffer[0]!;
+    if (value < rejectAbove) {
+      return value % maxExclusive;
     }
   }
-
-  return Math.floor(Math.random() * maxExclusive);
 }

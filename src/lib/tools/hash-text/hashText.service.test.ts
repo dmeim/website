@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -66,6 +68,40 @@ describe("hash-text", () => {
         expect(all[algo]).toBe(hashText(algo, "test", "Hex"));
         expect(all[algo].length).toBeGreaterThan(0);
       }
+    });
+  });
+
+  describe("matches node:crypto", () => {
+    const NODE_NAMES = {
+      MD5: "md5",
+      SHA1: "sha1",
+      SHA256: "sha256",
+      SHA224: "sha224",
+      SHA512: "sha512",
+      SHA384: "sha384",
+      SHA3: "sha3-512",
+      RIPEMD160: "ripemd160",
+    } as const;
+
+    // 71, 72, and 73 bytes straddle the SHA3-512 block boundary, where padding is easiest to get wrong.
+    const INPUTS = ["", "hello", "héllo wörld 😀", "a".repeat(71), "a".repeat(72), "a".repeat(73), "a".repeat(1000)];
+
+    for (const [algo, nodeName] of Object.entries(NODE_NAMES)) {
+      it(`${algo} agrees across inputs and encodings`, () => {
+        for (const input of INPUTS) {
+          const expected = createHash(nodeName).update(input, "utf8").digest();
+          const name = algo as keyof typeof NODE_NAMES;
+          expect(hashText(name, input, "Hex")).toBe(expected.toString("hex"));
+          expect(hashText(name, input, "Base64")).toBe(expected.toString("base64"));
+          expect(hashText(name, input, "Base64url")).toBe(expected.toString("base64url"));
+        }
+      });
+    }
+
+    it("keeps the pre-standard Keccak-512 digest it-tools labels SHA3", () => {
+      expect(hashText("Keccak512", "")).toBe(
+        "0eab42de4c3ceb9235fc91acffe746b29c29a8c366b7c60e4e67c466f36a4304c00fa9caf9d87976ba469bcbe06713b435f091ef2769fb160cdab33d3670680e",
+      );
     });
   });
 });

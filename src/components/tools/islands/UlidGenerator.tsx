@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { Button, ButtonGroup, CopyButton, Input, OutputField, Panel, SegmentedControl, ToolFrame } from "@/ui/react";
 import {
   ULID_FORMAT_DEFAULT,
@@ -10,6 +11,7 @@ import {
   type UlidFormat,
   clampUlidQuantity,
   generateUlids,
+  isUlidFormat,
   normalizeUlidFormat,
 } from "@/lib/tools/ulid-generator";
 
@@ -19,8 +21,9 @@ const FORMAT_LABELS: Record<UlidFormat, string> = {
 };
 
 export default function UlidGenerator() {
-  const [quantity, setQuantity] = useState(ULID_QUANTITY_DEFAULT);
-  const [format, setFormat] = useState<UlidFormat>(ULID_FORMAT_DEFAULT);
+  const [quantity, setQuantity] = useStoredState("ulid-generator-amount", ULID_QUANTITY_DEFAULT);
+  const [quantityDraft, setQuantityDraft] = useState<string | null>(null);
+  const [format, setFormat] = useStoredState<UlidFormat>("ulid-generator-format", ULID_FORMAT_DEFAULT, isUlidFormat);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const safeQuantity = clampUlidQuantity(quantity);
@@ -57,8 +60,12 @@ export default function UlidGenerator() {
           min={ULID_QUANTITY_MIN}
           max={ULID_QUANTITY_MAX}
           step={1}
-          value={safeQuantity}
-          onChange={(event) => setQuantity(clampUlidQuantity(event.target.value))}
+          value={quantityDraft ?? safeQuantity}
+          onChange={(event) => {
+            setQuantityDraft(event.target.value);
+            setQuantity(clampUlidQuantity(event.target.value));
+          }}
+          onBlur={() => setQuantityDraft(null)}
         />
 
         <SegmentedControl

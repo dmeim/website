@@ -1,3 +1,5 @@
+import { createHmac } from "node:crypto";
+
 import { describe, expect, it } from "vitest";
 
 import { convertHexToBin } from "@/lib/tools/hash-text";
@@ -60,6 +62,46 @@ describe("hmac-generator", () => {
       const a = hmacText("SHA256", "message", "key-a");
       const b = hmacText("SHA256", "message", "key-b");
       expect(a).not.toBe(b);
+    });
+  });
+
+  describe("matches node:crypto", () => {
+    const NODE_NAMES = {
+      MD5: "md5",
+      SHA1: "sha1",
+      SHA256: "sha256",
+      SHA224: "sha224",
+      SHA512: "sha512",
+      SHA384: "sha384",
+      SHA3: "sha3-512",
+      RIPEMD160: "ripemd160",
+    } as const;
+
+    // The long key exercises the hash-the-key path; 72 bytes is the SHA3-512 block size.
+    const CASES = [
+      ["", ""],
+      ["hello", "secret"],
+      ["héllo 😀", "clé 🔑"],
+      ["message", "k".repeat(72)],
+      ["message", "k".repeat(200)],
+    ] as const;
+
+    for (const [algo, nodeName] of Object.entries(NODE_NAMES)) {
+      it(`${algo} agrees across keys and encodings`, () => {
+        for (const [message, key] of CASES) {
+          const expected = createHmac(nodeName, key).update(message, "utf8").digest();
+          const name = algo as keyof typeof NODE_NAMES;
+          expect(hmacText(name, message, key, "Hex")).toBe(expected.toString("hex"));
+          expect(hmacText(name, message, key, "Base64")).toBe(expected.toString("base64"));
+          expect(hmacText(name, message, key, "Base64url")).toBe(expected.toString("base64url"));
+        }
+      });
+    }
+
+    it("matches the RFC 4231 HMAC-SHA-256 test case 2", () => {
+      expect(hmacText("SHA256", "what do ya want for nothing?", "Jefe")).toBe(
+        "5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843",
+      );
     });
   });
 });

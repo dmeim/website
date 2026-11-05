@@ -29,6 +29,8 @@ Builds friendly word + number codes from bundled JSON word categories. Useful fo
 ## Notes
 - Category load failures surface as status/error messages and block generation until data loads
 - Length filter clamps as the known word pool changes
+- Random draws use `crypto.getRandomValues` only, with no `Math.random` fallback
+- Word case, digit position, and output format apply to the current codes immediately; every other setting applies on the next Generate
 - Behavior lives in `wordCode.service.ts`; the React island is presentation only
 
 ## Source

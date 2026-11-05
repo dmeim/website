@@ -30,12 +30,12 @@ export function clampUlidQuantity(value: unknown, fallback = ULID_QUANTITY_DEFAU
   return Math.min(ULID_QUANTITY_MAX, Math.max(ULID_QUANTITY_MIN, Math.trunc(parsed)));
 }
 
-export function normalizeUlidFormat(value: unknown, fallback: UlidFormat = ULID_FORMAT_DEFAULT): UlidFormat {
-  if (typeof value === "string" && (ULID_FORMATS as readonly string[]).includes(value)) {
-    return value as UlidFormat;
-  }
+export function isUlidFormat(value: unknown): value is UlidFormat {
+  return typeof value === "string" && (ULID_FORMATS as readonly string[]).includes(value);
+}
 
-  return fallback;
+export function normalizeUlidFormat(value: unknown, fallback: UlidFormat = ULID_FORMAT_DEFAULT): UlidFormat {
+  return isUlidFormat(value) ? value : fallback;
 }
 
 function encodeTime(now: number, length = 10): string {

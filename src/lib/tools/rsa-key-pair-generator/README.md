@@ -22,7 +22,8 @@ Generate a new random RSA public/private key pair and display both as PEM. All c
 - Private PEM is PKCS#8 (`BEGIN PRIVATE KEY`). it-tools used node-forge PKCS#1 (`BEGIN RSA PRIVATE KEY`). Both are widely supported; OpenSSH/`ssh-keygen` and most modern tooling accept PKCS#8.
 - Keys ≥4096 bits (especially ≥8192) can take a long time in the browser. Auto-regen runs when bits change only for sizes ≤4096; larger sizes need an explicit Refresh.
 - Bits changes are debounced (~300ms). Stale in-flight generations are cancelled when bits change or Refresh fires again.
-- Very small moduli (e.g. 256) may be rejected by some SubtleCrypto implementations even though the UI validates the it-tools range.
+- Very small moduli (e.g. 256) may be rejected by some SubtleCrypto implementations even though the UI validates the it-tools range. A rejection shows a friendly message and logs the cause to the console
+- Keys are hidden while generating and while the bit size is invalid, so an old key cannot be copied by mistake
 
 ## Source
 Port of [it-tools RSA key pair generator](https://it-tools.tech/rsa-key-pair-generator). Local reference: handy-dandy `it-tools` (`/rsa-key-pair-generator`). Catalogue id: `rsa-key-pair-generator`. Crypto backend deliberately differs (Web Crypto vs node-forge).

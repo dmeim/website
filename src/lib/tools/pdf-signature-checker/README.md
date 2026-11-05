@@ -21,6 +21,7 @@ None — choose a PDF and the checker runs automatically.
 - Node `tls` is aliased to a stub (`rootCertificates: undefined`) so the library falls back to its bundled root CA list.
 - No global Buffer polyfill; the library vendors Buffer under `packages/buffer`.
 - Bundle impact is non-trivial (~node-forge + root CA JSON); kept client-only with `client:only="react"`.
+- Library errors are never shown as is: they map to "no signatures," "unsupported format," "could not be read," or "could not load" messages in the service.
 
 ## Source
 Port of [it-tools PDF signature checker](https://it-tools.tech/pdf-signature-checker). Local reference: handy-dandy `it-tools` (`/pdf-signature-checker`). Catalogue id: `pdf-signature-checker`.

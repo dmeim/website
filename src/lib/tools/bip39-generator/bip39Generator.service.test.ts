@@ -156,4 +156,31 @@ describe("bip39-generator", () => {
       ).toBe(false);
     });
   });
+
+  describe("BIP39 reference vectors (trezor/python-mnemonic)", () => {
+    const VECTORS = [
+      ["00000000000000000000000000000000", `${"abandon ".repeat(11)}about`],
+      ["7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f", "legal winner thank year wave sausage worth useful legal winner thank yellow"],
+      ["80808080808080808080808080808080", "letter advice cage absurd amount doctor acoustic avoid letter advice cage above"],
+      ["ffffffffffffffffffffffffffffffff", `${"zoo ".repeat(11)}wrong`],
+      ["0000000000000000000000000000000000000000000000000000000000000000", `${"abandon ".repeat(23)}art`],
+      ["ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", `${"zoo ".repeat(23)}vote`],
+    ] as const;
+
+    for (const [entropy, mnemonic] of VECTORS) {
+      it(`converts ${entropy.slice(0, 8)}… (${entropy.length * 4} bits) both ways`, () => {
+        expect(entropyHexToMnemonic(entropy, "english")).toBe(mnemonic);
+        expect(mnemonicToEntropyHex(mnemonic, "english")).toBe(entropy);
+      });
+    }
+
+    it("rejects a mnemonic with a bad checksum", () => {
+      expect(isValidMnemonic(`${"abandon ".repeat(11)}abandon`, "english")).toBe(false);
+    });
+
+    it("accepts pasted mnemonics with extra spaces and line breaks", () => {
+      const pasted = `  ${"abandon  ".repeat(6)}\n${"abandon ".repeat(5)}about\n`;
+      expect(mnemonicToEntropyHex(pasted, "english")).toBe("0".repeat(32));
+    });
+  });
 });

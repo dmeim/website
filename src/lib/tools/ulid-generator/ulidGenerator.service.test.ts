@@ -103,4 +103,19 @@ describe("ulid-generator", () => {
       );
     });
   });
+
+  describe("spec vector", () => {
+    it("encodes the ULID README timestamp", () => {
+      expect(generateUlid(1469918176385).slice(0, 10)).toBe("01ARYZ6S41");
+    });
+
+    it("encodes the largest timestamp the spec allows", () => {
+      expect(generateUlid(2 ** 48 - 1).slice(0, 10)).toBe("7ZZZZZZZZZ");
+    });
+
+    it("gives each id in a batch fresh randomness", () => {
+      const ids = generateUlids({ quantity: ULID_QUANTITY_MAX, time: 1469918176385 }).split("\n");
+      expect(new Set(ids).size).toBe(ULID_QUANTITY_MAX);
+    });
+  });
 });

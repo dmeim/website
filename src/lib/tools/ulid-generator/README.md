@@ -20,7 +20,7 @@ Generate Universally Unique Lexicographically Sortable Identifiers (ULIDs): 128-
 
 ## Notes
 - Time component is wall-clock ms encoded with Crockford Base32; randomness uses unbiased `byte % 32` (256 divisible by 32)
-- Quantity / format localStorage persistence is intentionally omitted (matches other dmeim tool ports)
+- Quantity and format persist in localStorage (`ulid-generator-amount`, `ulid-generator-format`), same as it-tools
 - Not monotonic across rapid calls in the same millisecond (parity with it-tools default `ulid()`)
 
 ## Source

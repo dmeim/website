@@ -109,4 +109,31 @@ describe("encryption", () => {
       }
     });
   });
+
+  describe("OpenSSL interop (openssl enc -aes-256-cbc -md md5 -a -salt)", () => {
+    it("decrypts OpenSSL output, including non-ASCII text", () => {
+      expect(decryptText("AES", "U2FsdGVkX19GPAgEDh5n2iwJConuoAUIkKu5Ih1OTswXFQmKi/wwIhQIaJttLhwc", "hunter2")).toBe(
+        "Lorem ipsum, señor 😀",
+      );
+    });
+
+    it("decrypts line-wrapped OpenSSL output and pasted trailing newlines", () => {
+      const wrapped =
+        "U2FsdGVkX19Bak9oiN151xsAwmPhA4GLIMiMYDg+45FCuvO6rCQHyNNyloTaunCq\nEGRZUJrny3AVfmfK1iKfrwC/jb4UZ909Ra3ta7uKFj3KeCfetL1hbmmZ4xm5DTTA\nVg5ykNL4ODP8L678Dxh7qg==\n";
+      expect(tryDecrypt("AES", wrapped, "hunter2")).toEqual({ ok: true, text: "x".repeat(80) });
+    });
+  });
+
+  describe("empty plaintext", () => {
+    it("round-trips for every algorithm rather than reporting a failure", () => {
+      for (const algo of ENCRYPTION_ALGORITHMS) {
+        expect(tryDecrypt(algo, encryptText(algo, "", "key"), "key")).toEqual({ ok: true, text: "" });
+      }
+    });
+
+    it("treats empty ciphertext as an empty state", () => {
+      expect(tryDecrypt("AES", "", "key")).toEqual({ ok: true, text: "" });
+      expect(tryDecrypt("AES", "  \n", "key")).toEqual({ ok: true, text: "" });
+    });
+  });
 });

@@ -18,5 +18,6 @@ export {
   generateUuids,
   isValidUuid,
   isValidUuidNamespace,
+  isUuidVersion,
   normalizeUuidVersion,
 } from "./uuidGenerator.service";

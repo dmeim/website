@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   NIL_UUID,
@@ -146,6 +146,35 @@ describe("uuid-generator", () => {
       expect(generateUuids({ version: "NIL", quantity: 0 }).split("\n")).toHaveLength(
         UUID_QUANTITY_MIN,
       );
+    });
+  });
+
+  describe("published vectors and structure", () => {
+    it("matches the Python docs v3 and v5 vectors for python.org", () => {
+      const namespace = UUID_NAMESPACE_PRESETS.DNS;
+      expect(generateUuids({ version: "v3", namespace, name: "python.org" })).toBe("6fa459ea-ee8a-3ca4-894e-db77e160355e");
+      expect(generateUuids({ version: "v5", namespace, name: "python.org" })).toBe("886313e1-3b8a-5372-9b90-0c9aee199e5d");
+    });
+
+    it("generates structurally valid v1 and v4 with the RFC variant", () => {
+      for (const [version, digit] of [["v1", "1"], ["v4", "4"]] as const) {
+        for (const id of generateUuids({ version, quantity: 20 }).split("\n")) {
+          expect(id).toMatch(new RegExp(`^[0-9a-f]{8}-[0-9a-f]{4}-${digit}[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`));
+        }
+      }
+    });
+
+    it("builds v1 from Web Crypto and marks the random node with the multicast bit", () => {
+      const spy = vi.spyOn(Math, "random");
+      const id = generateUuids({ version: "v1" });
+      expect(spy).not.toHaveBeenCalled();
+      spy.mockRestore();
+      expect(Number.parseInt(id.slice(24, 26), 16) & 1).toBe(1);
+    });
+
+    it("rejects a namespace with stray whitespace instead of generating nothing silently", () => {
+      expect(isValidUuidNamespace(` ${UUID_NAMESPACE_PRESETS.DNS}`)).toBe(false);
+      expect(generateUuids({ version: "v5", namespace: ` ${UUID_NAMESPACE_PRESETS.DNS}`, name: "x" })).toBe("");
     });
   });
 });

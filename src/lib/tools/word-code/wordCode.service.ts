@@ -14,7 +14,7 @@ export async function loadWordCategories(): Promise<LoadedWordCategories> {
   const entries = Object.entries(categoryModules).sort(([a], [b]) => a.localeCompare(b));
 
   if (!entries.length) {
-    throw new Error("No .json Category Files Were Found In data/categories/.");
+    throw new Error("No category files were found in data/categories/.");
   }
 
   const loaded = await Promise.allSettled(
@@ -43,7 +43,7 @@ export async function loadWordCategories(): Promise<LoadedWordCategories> {
   const sortedCategories = categories.sort((a, b) => a.name.localeCompare(b.name));
 
   if (!sortedCategories.length) {
-    throw new Error("No Valid Categories Were Found In data/categories/.");
+    throw new Error("No valid categories were found in data/categories/.");
   }
 
   return {
@@ -55,7 +55,7 @@ export async function loadWordCategories(): Promise<LoadedWordCategories> {
 
 export function normalizeCategory(item: unknown, path: string, index: number): WordCategory {
   if (!item || typeof item !== "object") {
-    throw new Error("Category JSON Must Be An Object Or Array Of Objects.");
+    throw new Error("Category JSON must be an object or an array of objects.");
   }
 
   const record = item as Record<string, unknown>;
@@ -64,7 +64,7 @@ export function normalizeCategory(item: unknown, path: string, index: number): W
   const words = uniqueWords(Array.isArray(record.words) ? record.words : []);
 
   if (!words.length) {
-    throw new Error("Category Has No Words.");
+    throw new Error("Category has no words.");
   }
 
   const wordKeys = new Set(words.map((word) => word.toLowerCase()));
@@ -226,22 +226,22 @@ export function getLengthLabel({
   const hasMax = max < boundsMax;
 
   if (!hasMin && !hasMax) {
-    return "No Limits";
+    return "no limits";
   }
 
   if (hasMin && !hasMax) {
-    return `${min}+ Letters`;
+    return `${min}+ letters`;
   }
 
   if (!hasMin && hasMax) {
-    return `Up To ${max} Letters`;
+    return `up to ${max} ${max === 1 ? "letter" : "letters"}`;
   }
 
   if (min === max) {
-    return `${min} Letters`;
+    return `${min} ${min === 1 ? "letter" : "letters"}`;
   }
 
-  return `${min}-${max} Letters`;
+  return `${min}–${max} letters`;
 }
 
 export function clampNumber(value: unknown, min: number, max: number, fallback: number): number {
@@ -263,19 +263,15 @@ export function randomInt(max: number): number {
     return 0;
   }
 
-  if (globalThis.crypto?.getRandomValues) {
-    const maxUint32 = 0xffffffff;
-    const limit = maxUint32 - (maxUint32 % max);
-    const buffer = new Uint32Array(1);
+  const maxUint32 = 0xffffffff;
+  const limit = maxUint32 - (maxUint32 % max);
+  const buffer = new Uint32Array(1);
 
-    do {
-      globalThis.crypto.getRandomValues(buffer);
-    } while (buffer[0] >= limit);
+  do {
+    crypto.getRandomValues(buffer);
+  } while (buffer[0] >= limit);
 
-    return buffer[0] % max;
-  }
-
-  return Math.floor(Math.random() * max);
+  return buffer[0] % max;
 }
 
 export function shuffle<T>(items: T[]): T[] {
