@@ -18,6 +18,11 @@ npm run build
 npm run deploy   # requires Wrangler auth
 ```
 
+```bash
+npm test               # unit tests
+npm run test:browser   # production build plus browser tests, see tests/browser/README.md
+```
+
 ## Routes
 
 | Path | Page |

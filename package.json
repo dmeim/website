@@ -12,6 +12,7 @@
     "preview": "astro preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:browser": "astro build && playwright test",
     "deploy": "astro build && wrangler deploy",
     "cf-typegen": "wrangler types",
     "icons": "node scripts/build-icons.mjs"
@@ -65,6 +66,7 @@
   "devDependencies": {
     "@astrojs/react": "^6.0.1",
     "@phosphor-icons/react": "^2.1.10",
+    "@playwright/test": "1.64.1",
     "@types/crypto-js": "^4.2.2",
     "@types/figlet": "^1.7.0",
     "@types/markdown-it": "^13.0.9",

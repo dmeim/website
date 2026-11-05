@@ -16,7 +16,7 @@ The site ships 86 browser tools at `/tools/<slug>`. 85 are ports of [it-tools](h
 2. Match that behavior unless it is wrong (see "Deliberate differences" below). Port its test vectors.
 3. Take expected values from a published spec or an independent source such as `node:crypto`, `openssl`, or `python3`, never from the tool's own output.
 4. Check the tool in a browser: typical input, invalid input, empty state, every option, copy and download, and 375px wide.
-5. **Check it on a production build too.** See the next section for why dev mode is not enough.
+5. **Check it on a production build too.** Add scenarios to `tests/browser/scenarios/` and run `npm run test:browser`. See "Production differs from dev" for why dev mode is not enough, and [the browser test guide](../../tests/browser/README.md) for setup.
 6. Update the tool's README if behavior changed.
 
 ## Production differs from dev
