@@ -19,17 +19,35 @@
   text-align: center;
   white-space: normal;
   pointer-events: none;
+  /* display, not visibility: a hidden bubble near the screen edge must not widen the page. */
+  display: none;
   opacity: 0;
-  visibility: hidden;
   transition:
     opacity var(--ui-dur-fast) var(--ui-ease-out),
-    visibility 0s linear var(--ui-dur-fast);
+    display var(--ui-dur-fast) allow-discrete;
 }
 
-.ui-tooltip:is(:hover, :has(:focus-visible)):not([data-dismissed]) > .ui-tooltip__bubble {
+.ui-tooltip:has(:focus-visible):not([data-dismissed]) > .ui-tooltip__bubble {
+  display: block;
   opacity: 1;
-  visibility: visible;
   transition-delay: var(--ui-tooltip-delay, var(--ui-dur-slow));
+
+  @starting-style {
+    opacity: 0;
+  }
+}
+
+/* Touch keeps :hover after a tap, which would leave the bubble stuck open. */
+@media (hover: hover) {
+  .ui-tooltip:hover:not([data-dismissed]) > .ui-tooltip__bubble {
+    display: block;
+    opacity: 1;
+    transition-delay: var(--ui-tooltip-delay, var(--ui-dur-slow));
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
 }
 
 .ui-tooltip[data-placement="top"] > .ui-tooltip__bubble {

@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import { useMemo, type SVGProps } from "react";
 import { islandGlyphs } from "./glyphs-island";
 import type { IconWeight, IslandIconName } from "./registry";
 
@@ -33,6 +33,8 @@ export function Icon({
   className,
   ...rest
 }: IconProps) {
+  // React 19 rewrites innerHTML whenever this object changes, which can swallow a click on a path.
+  const glyph = useMemo(() => ({ __html: islandGlyphs[name][weight] }), [name, weight]);
   const classes = className ? `ui-icon ${className}` : "ui-icon";
   const a11y = label
     ? { role: "img", "aria-label": label }
@@ -51,7 +53,7 @@ export function Icon({
       data-icon={name}
       {...a11y}
       {...rest}
-      dangerouslySetInnerHTML={{ __html: islandGlyphs[name][weight] }}
+      dangerouslySetInnerHTML={glyph}
     />
   );
 }
