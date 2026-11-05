@@ -18,7 +18,7 @@ Lowercase, Uppercase, Camelcase, Capitalcase, Constantcase, Dotcase, Headercase,
 
 ## Notes
 - Word splitting matches change-case@4 (`fooBar` / `XMLHttpRequest` boundaries)
-- Separator stripping uses it-tools’ custom regexp: keep `A–Z a–z` and Latin accented letters (`À–Ö Ø–ö ø–ÿ`); everything else becomes a word break
+- Letters, combining marks, and digits in any script are kept; everything else separates words. For Latin text the results match `change-case@4`. it-tools kept only Latin letters, which deleted digits and all text in scripts like Cyrillic.
 - Lowercase / Uppercase use `toLocaleLowerCase` / `toLocaleUpperCase` (parity with it-tools)
 - Mockingcase alternates character case by index (`index % 2`) and does not strip punctuation
 - Empty results show an en dash and have no copy control

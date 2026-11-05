@@ -1,14 +1,17 @@
 /**
  * Transform a string into common case formats.
- * Native port of change-case@4 algorithms with it-tools stripRegexp.
+ * Native port of change-case@4 algorithms, extended to every script.
  */
 
-/** Matches it-tools: keep Latin letters (incl. accented); strip everything else as separators. */
-export const CASE_STRIP_REGEXP = /[^A-Za-zÀ-ÖØ-öø-ÿ]+/gi;
+/**
+ * Letters, combining marks, and digits in any script stay; everything else separates words.
+ * it-tools kept only Latin letters here, which deleted digits and all text in scripts like Cyrillic.
+ */
+export const CASE_STRIP_REGEXP = /[^\p{L}\p{M}\p{N}]+/gu;
 
 const DEFAULT_SPLIT_REGEXP = [
-  /([a-z0-9])([A-Z])/g,
-  /([A-Z])([A-Z][a-z])/g,
+  /([\p{Ll}\p{N}])(\p{Lu})/gu,
+  /(\p{Lu})(\p{Lu}\p{Ll})/gu,
 ];
 
 export type CaseFormatId =
