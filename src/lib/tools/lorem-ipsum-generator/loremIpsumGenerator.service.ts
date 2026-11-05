@@ -210,14 +210,14 @@ export function randFromArray<T>(array: readonly T[]): T {
 }
 
 /**
- * Uniform integer in `[min, max)` — parity with it-tools `randIntFromInterval`.
- * When `min === max`, returns `min`.
+ * Uniform integer in `[min, max]`. it-tools uses `[min, max)`, which means the
+ * top of a slider range such as 3 to 8 could never come up.
  */
 export function randIntFromInterval(min: number, max: number): number {
   if (max <= min) {
     return min;
   }
-  return Math.floor(Math.random() * (max - min) + min);
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 export function clampParagraphCount(value: number): number {

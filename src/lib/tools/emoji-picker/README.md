@@ -20,6 +20,8 @@ Copy and paste emojis easily and get the unicode and code points value of each e
 ## Notes
 - Data from `unicode-emoji-json` + keywords from `emojilib` (same as it-tools)
 - Search via `fuse.js` with it-tools options (name weight 3, threshold 0.3, extended search)
+- The catalog lists base emoji, including ZWJ sequences; like it-tools, it has no skin tone variants or selector
+- Copy feedback stays on screen while scrolled, and the grid is memoized so typing in search does not re-render every card
 - Catalogue id: `emoji-picker`
 
 ## Source

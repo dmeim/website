@@ -13,14 +13,16 @@ None.
 - Text (multiline textarea), e.g. `Your text...`
 
 ## Outputs
-- Character count (`text.length`)
-- Word count (whitespace-split tokens; `0` when empty)
+- Character count (user-perceived characters, so an emoji or a letter with a combining mark counts as one)
+- Word count (whitespace-split tokens, ignoring surrounding whitespace; `0` when blank)
 - Line count (split on `\r\n` / `\r` / `\n`; `0` when empty)
 - Byte size (UTF-8 via `TextEncoder`, formatted with `formatBytes`)
 
 ## Notes
-- Pure string / `TextEncoder` logic; no npm dependencies
-- Word and line counts match it-tools template quirks (empty → 0; trailing whitespace can inflate word count)
+- Pure string / `TextEncoder` / `Intl.Segmenter` logic; no npm dependencies
+- `splitGraphemes` is also used by the numeronym generator and string obfuscator
+- it-tools counts UTF-16 units and lets trailing whitespace add a word; both are deliberately fixed here
+- Very large pastes full of emoji are slow because of Chromium's text shaping in the textarea, not the counting
 - Catalogue id: `text-statistics`
 
 ## Source

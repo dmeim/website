@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { FormGrid, Input, Notice, OutputField, Panel, Select, Textarea, ToolFrame } from "@/ui/react";
 import {
   ASCII_FONTS,
   DEFAULT_FONT,
   DEFAULT_INPUT,
   DEFAULT_WIDTH,
+  FONT_STORAGE_KEY,
   WIDTH_MAX,
   WIDTH_MIN,
+  WIDTH_STORAGE_KEY,
   clampWidth,
   configureBrowserFigletFonts,
+  isKnownFont,
   normalizeFont,
   tryRenderAsciiText,
 } from "@/lib/tools/ascii-text-drawer";
@@ -18,8 +22,8 @@ import "./AsciiTextDrawer.css";
 
 export default function AsciiTextDrawer() {
   const [input, setInput] = useState(DEFAULT_INPUT);
-  const [font, setFont] = useState(DEFAULT_FONT);
-  const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const [font, setFont] = useStoredState<string>(FONT_STORAGE_KEY, DEFAULT_FONT, isKnownFont);
+  const [width, setWidth] = useStoredState<number>(WIDTH_STORAGE_KEY, DEFAULT_WIDTH, Number.isFinite);
   const [output, setOutput] = useState("");
   const [processing, setProcessing] = useState(true);
   const [errored, setErrored] = useState(false);
@@ -109,11 +113,11 @@ export default function AsciiTextDrawer() {
 
         {errored && !processing ? (
           <Notice tone="danger" live="assertive">
-            Current settings resulted in error.
+            Could not draw this text. Check your connection, since fonts load on demand, or try another font.
           </Notice>
         ) : null}
 
-        {!processing && !errored ? (
+        {!errored && (!processing || output) ? (
           <OutputField
             id="ascii-drawer-output"
             label="ASCII art text"

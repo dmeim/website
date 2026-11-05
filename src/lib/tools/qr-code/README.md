@@ -12,8 +12,8 @@ Generate QR codes locally from text or structured presets (website, social, cont
 - **Foreground / background colors**
 - **Transparent background for exports**
 - **Error correction level** (L/M/Q/H)
-- **Quiet-zone margin** (0–10)
-- **PNG size** (128–2048)
+- **Quiet-zone margin** (0–10, default 4)
+- **PNG size** (128–2048, default 1024)
 
 ## Inputs
 - Free text, or structured form values for the selected preset
@@ -28,7 +28,10 @@ Generate QR codes locally from text or structured presets (website, social, cont
 
 ## Notes
 - Invalid presets clear the preview and show the first validation error
-- WiFi payloads support WPA2-EAP extras (EAP method, phase 2, identity/anonymous)
+- Replaces both it-tools QR tools. WiFi covers no password, WPA, WEP, and WPA2-EAP, hidden networks, all 17 it-tools EAP methods, phase 2, and identity or anonymous
+- WiFi payloads end in `;;` per the ZXing format even when hidden, where it-tools emits a single `;`, and open networks keep `H:true`
+- WiFi download names use the SSID only, so the password never lands in a file name; contact, email, phone, SMS, and location downloads use the preset name
+- Colors and Export options sit in collapsed sections; open them to reach those fields
 - Rendering uses the `qrcode` package via `qrCode.service.ts`
 
 ## Source

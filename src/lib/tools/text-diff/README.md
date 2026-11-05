@@ -21,6 +21,9 @@ Compare two texts and see the differences between them.
 ## Notes
 - it-tools uses Monaco DiffEditor; this port keeps the same dual-pane editable UX and defaults without shipping Monaco
 - Line diffs via the `diff` package (`diffLines` / `diffChars`)
+- Line numbers on unchanged rows follow each side, so they stay correct after an insert or removal
+- A missing final newline on one side shows as a blank line, not a change to the last line
+- Large input limits: line diff gives up after 500 ms and shows the texts as replaced, character highlighting has a 300 ms budget and skips very long lines, and only the first 2,000 rows render (the unified diff copy has all of them)
 - Catalogue id: `text-diff`
 
 ## Source

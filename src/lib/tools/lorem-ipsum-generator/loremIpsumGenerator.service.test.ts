@@ -93,12 +93,12 @@ describe("lorem-ipsum-generator", () => {
       expect(randIntFromInterval(8, 3)).toBe(8);
     });
 
-    it("stays in the half-open [min, max) range (it-tools parity)", () => {
-      for (let i = 0; i < 40; i += 1) {
-        const value = randIntFromInterval(3, 8);
-        expect(value).toBeGreaterThanOrEqual(3);
-        expect(value).toBeLessThan(8);
+    it("covers the whole inclusive [min, max] range", () => {
+      const seen = new Set<number>();
+      for (let i = 0; i < 2000; i += 1) {
+        seen.add(randIntFromInterval(3, 8));
       }
+      expect([...seen].sort()).toEqual([3, 4, 5, 6, 7, 8]);
     });
   });
 

@@ -19,6 +19,9 @@ import { downloadTextFile } from "@/lib/tools/download";
 import {
   buildSvgDataUri,
   buildSvgPlaceholder,
+  clampSvgFontSize,
+  clampSvgHeight,
+  clampSvgWidth,
   getSvgPlaceholderFilename,
 } from "@/lib/tools/svg-placeholder/svgPlaceholder.service";
 
@@ -88,6 +91,7 @@ export default function SvgPlaceholderGenerator() {
               step={1}
               value={width}
               onChange={(event) => setWidth(Number(event.target.value))}
+              onBlur={() => setWidth(clampSvgWidth(width))}
             />
             <Input
               label="Height"
@@ -98,6 +102,7 @@ export default function SvgPlaceholderGenerator() {
               step={1}
               value={height}
               onChange={(event) => setHeight(Number(event.target.value))}
+              onBlur={() => setHeight(clampSvgHeight(height))}
             />
             <ColorInput
               label="Background"
@@ -120,6 +125,7 @@ export default function SvgPlaceholderGenerator() {
               step={1}
               value={fontSize}
               onChange={(event) => setFontSize(Number(event.target.value))}
+              onBlur={() => setFontSize(clampSvgFontSize(fontSize))}
             />
             <Checkbox
               id="sp-exact-size"

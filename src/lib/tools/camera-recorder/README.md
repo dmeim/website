@@ -10,7 +10,7 @@ Capture still photos and record video from the local webcam/camera. Preview, mir
 - **Video input** device
 - **Resolution** (default / 480p–4K ideals)
 - **Aspect ratio** (native / 16:9 / 4:3 / 1:1 / 9:16)
-- **Include microphone audio in videos** (+ audio input when enabled)
+- **Include microphone audio in videos** (default on, like it-tools; + audio input when enabled)
 - **Mirror / Flip** orientation for preview, photos, and (when supported) recorded video
 - **Start / Apply / Stop camera**, refresh devices
 - **Take photo**, start/pause/resume/stop recording
@@ -27,7 +27,10 @@ Capture still photos and record video from the local webcam/camera. Preview, mir
 ## Notes
 - Requires HTTPS or localhost; unsupported browsers show a clear unavailable state
 - Resolution/aspect are best-effort constraints — use Apply settings while the camera is on
+- With no mirror or flip, the raw stream is recorded, so recording continues in a background tab
 - Mirror/flip for recording uses a canvas capture stream when available; otherwise raw feed is recorded with a status note
+- If no microphone is found, the camera still starts without audio and says so
+- The camera is released on Stop, on leaving the tool (even during the permission prompt), and a disconnected camera is reported
 - Filenames come from `cameraRecorder.service.ts`
 
 ## Source

@@ -17,7 +17,8 @@ None.
 
 ## Notes
 - Pure string logic; no npm dependencies
-- Words with length ≤ 3 are returned unchanged
+- Words of 3 characters or fewer are returned unchanged
+- Surrounding whitespace is ignored, and emoji or combined letters count as one character
 - Catalogue id: `numeronym-generator`
 
 ## Source

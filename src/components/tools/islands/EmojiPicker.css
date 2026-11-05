@@ -1,5 +1,12 @@
 /* Emoji picker: dense grid of flat tiles; keeps the large DOM cheap (no per-tile components). */
 
+/* Sticky so copy feedback is visible after scrolling far down the list. */
+.emoji-picker-status {
+  position: sticky;
+  top: var(--ui-space-sm);
+  z-index: 1;
+}
+
 .emoji-picker-groups {
   display: grid;
   gap: var(--ui-space-xl);

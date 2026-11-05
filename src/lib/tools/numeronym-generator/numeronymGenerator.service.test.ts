@@ -17,6 +17,19 @@ describe("numeronym-generator", () => {
       expect(generateNumeronym("")).toBe("");
     });
 
+    it("counts emoji and combining characters as one letter", () => {
+      expect(generateNumeronym("😀bcd😀")).toBe("😀3😀");
+      expect(generateNumeronym("a😀😀b")).toBe("a2b");
+      expect(generateNumeronym("😀😀😀")).toBe("😀😀😀");
+      expect(generateNumeronym("e\u0301abce\u0301")).toBe("e\u03013e\u0301");
+      expect(generateNumeronym("👨‍👩‍👧‍👦abc👍🏽")).toBe("👨‍👩‍👧‍👦3👍🏽");
+    });
+
+    it("ignores surrounding whitespace", () => {
+      expect(generateNumeronym("  internationalization ")).toBe("i18n");
+      expect(generateNumeronym("   ")).toBe("");
+    });
+
     it("handles a four-letter word", () => {
       expect(generateNumeronym("test")).toBe("t2t");
     });

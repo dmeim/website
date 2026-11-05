@@ -17,6 +17,9 @@ export interface QrCodeGeneratorSettings {
   margin: number;
 }
 
+export const QR_DEFAULT_SIZE = 1024;
+export const QR_DEFAULT_MARGIN = 4;
+
 export const QR_CONTENT_TYPES = [
   { value: "text", label: "Plain text" },
   { value: "website", label: "Website" },
@@ -151,7 +154,7 @@ export function buildQrPayload(input: QrContentFormState): QrPayloadResult {
       return buildEmailPayload(input);
     case "phone":
       return resultFromPayload(
-        input.phoneNumber.trim() ? `tel:${compactPhoneLike(input.phoneNumber)}` : "",
+        compactPhoneLike(input.phoneNumber) ? `tel:${compactPhoneLike(input.phoneNumber)}` : "",
         "Phone URI",
         "Phone number is required.",
       );
@@ -172,11 +175,11 @@ export function getQrBackgroundColor(
 }
 
 export function clampQrSize(value: unknown): number {
-  return clampInteger(value, 128, 2048, 768);
+  return clampInteger(value, 128, 2048, QR_DEFAULT_SIZE);
 }
 
 export function clampQrMargin(value: unknown): number {
-  return clampInteger(value, 0, 10, 2);
+  return clampInteger(value, 0, 10, QR_DEFAULT_MARGIN);
 }
 
 export function getQrExportBaseName(text: string): string {
@@ -189,6 +192,31 @@ export function getQrExportBaseName(text: string): string {
     .slice(0, 40);
 
   return slug ? `qr-code-${slug}` : "qr-code";
+}
+
+/**
+ * File name for a download. Only presets whose payload is meant to be public get a
+ * slug from it: a WiFi payload would put the password in the file name.
+ */
+export function getQrExportBaseNameForContent(content: QrContentFormState, payload: string): string {
+  if (content.type === "wifi") {
+    return getQrExportBaseName(`wifi ${content.wifiSsid}`);
+  }
+
+  if (content.type === "text" || content.type === "website" || content.type === "social") {
+    return getQrExportBaseName(payload);
+  }
+
+  return getQrExportBaseName(content.type);
+}
+
+/** Friendly wording for a failed render, since qrcode only throws technical messages. */
+export function describeQrRenderError(error: unknown): string {
+  if (error instanceof Error && /too big/i.test(error.message)) {
+    return "This content is too long for a QR code. Shorten it or lower the error resistance.";
+  }
+
+  return "Could not render this QR code. Check the content and colors, then try again.";
 }
 
 export function normalizeWebsiteUrl(value: string): string {
@@ -282,20 +310,16 @@ function buildEmailPayload(input: QrContentFormState): QrPayloadResult {
     return invalidResult("Email address is required.");
   }
 
-  const params = new URLSearchParams();
+  // encodeURIComponent, not URLSearchParams: mail apps show a form-encoded "+" literally (RFC 6068).
+  const params = [
+    ["subject", input.emailSubject.trim()],
+    ["body", input.emailBody.trim()],
+  ]
+    .filter(([, value]) => value)
+    .map(([key, value]) => `${key}=${encodeURIComponent(value!)}`)
+    .join("&");
 
-  if (input.emailSubject.trim()) {
-    params.set("subject", input.emailSubject.trim());
-  }
-
-  if (input.emailBody.trim()) {
-    params.set("body", input.emailBody.trim());
-  }
-
-  return validResult(
-    `mailto:${email}${params.toString() ? `?${params.toString()}` : ""}`,
-    "Email URI",
-  );
+  return validResult(`mailto:${email}${params ? `?${params}` : ""}`, "Email URI");
 }
 
 function buildSmsPayload(input: QrContentFormState): QrPayloadResult {
@@ -316,10 +340,22 @@ function buildLocationPayload(input: QrContentFormState): QrPayloadResult {
     return invalidResult("Latitude and longitude are required.");
   }
 
+  if (!isCoordinate(lat, 90)) {
+    return invalidResult("Latitude must be a number between -90 and 90.");
+  }
+
+  if (!isCoordinate(lon, 180)) {
+    return invalidResult("Longitude must be a number between -180 and 180.");
+  }
+
   const label = input.locationLabel.trim();
   const query = label ? `?q=${encodeURIComponent(`${lat},${lon} (${label})`)}` : "";
 
   return validResult(`geo:${lat},${lon}${query}`, "Geo URI");
+}
+
+function isCoordinate(value: string, limit: number): boolean {
+  return /^[+-]?\d+(\.\d+)?$/.test(value) && Math.abs(Number(value)) <= limit;
 }
 
 function resultFromPayload(payload: string, label: string, emptyMessage: string): QrPayloadResult {

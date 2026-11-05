@@ -54,7 +54,8 @@
 }
 
 .text-diff-gutter {
-  flex: 0 0 1.25rem;
+  flex: 0 0 auto;
+  min-width: 1.25rem;
   text-align: right;
   color: var(--ui-text-subtle);
   user-select: none;

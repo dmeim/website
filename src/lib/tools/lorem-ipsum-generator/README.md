@@ -8,8 +8,8 @@ Lorem ipsum is a placeholder text commonly used to demonstrate the visual form o
 
 ## Toggles and Settings
 - Paragraphs (1–20, default `1`) — number of paragraphs to generate
-- Sentences per paragraph (dual range 1–50, default `3–8`) — random sentence count per paragraph drawn from `[min, max)` (it-tools `randIntFromInterval` parity)
-- Words per sentence (dual range 1–50, default `8–15`) — random word count per sentence from `[min, max)`
+- Sentences per paragraph (dual range 1–50, default `3–8`) — random sentence count per paragraph drawn from the inclusive `[min, max]`
+- Words per sentence (dual range 1–50, default `8–15`) — random word count per sentence from the inclusive `[min, max]`
 - Start with lorem ipsum (toggle, default on) — force the classic first sentence
 - As HTML (toggle, default off) — wrap each paragraph in `<p>…</p>`
 
@@ -21,7 +21,7 @@ Lorem ipsum is a placeholder text commonly used to demonstrate the visual form o
 
 ## Notes
 - Pure string logic; no npm dependencies
-- Vocabulary and assembly match it-tools; sentence/word range sampling is half-open `[min, max)` like upstream
+- Vocabulary and assembly match it-tools. Range sampling is inclusive, unlike upstream's `[min, max)`, so the top of a slider range can come up
 - Refresh re-rolls sentence/word counts within the selected ranges and reshuffles vocabulary
 - Catalogue id: `lorem-ipsum-generator`
 

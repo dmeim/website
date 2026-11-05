@@ -6,6 +6,7 @@ import {
   buildDiffRows,
   diffTextSegments,
   formatUnifiedDiff,
+  numberDiffRows,
   splitDiffValue,
   textsAreEqual,
 } from "./textDiff.service";
@@ -110,6 +111,57 @@ describe("text-diff", () => {
       expect(DEFAULT_ORIGINAL).toBe("original text");
       expect(DEFAULT_MODIFIED).toBe("modified text");
       expect(textsAreEqual(DEFAULT_ORIGINAL, DEFAULT_MODIFIED)).toBe(false);
+    });
+  });
+
+  describe("line endings and numbering", () => {
+    it("does not report a shared last line as changed", () => {
+      expect(formatUnifiedDiff("a\nb", "a\nb\nc")).toBe(" a\n b\n+c");
+    });
+
+    it("shows a trailing newline difference as a blank line", () => {
+      expect(buildDiffRows("a", "a\n")).toEqual([
+        { type: "unchanged", left: "a", right: "a" },
+        { type: "added", left: null, right: "" },
+      ]);
+    });
+
+    it("numbers each side independently", () => {
+      const rows = buildDiffRows("keep\nold\nend", "new1\nkeep\nold\nend");
+      const numbers = numberDiffRows(rows);
+      const endIndex = rows.findIndex((row) => row.left === "end");
+      expect(numbers[endIndex]).toEqual({ left: 3, right: 4 });
+    });
+  });
+
+  describe("large inputs", () => {
+    it("treats unrelated huge inputs as replaced instead of hanging", () => {
+      const lines = (seed: string) =>
+        Array.from({ length: 30000 }, (_, index) => `${seed}-${index}-${index * 31}`).join("\n");
+      const started = Date.now();
+      const rows = buildDiffRows(lines("a"), lines("b"));
+      expect(Date.now() - started).toBeLessThan(15000);
+      expect(rows).toHaveLength(30000);
+    }, 30000);
+
+    it("skips character highlighting on very long lines", () => {
+      const rows = buildDiffRows("a".repeat(20000), "b".repeat(20000));
+      expect(rows[0]).toMatchObject({
+        type: "modified",
+        leftParts: [{ kind: "removed", value: "a".repeat(20000) }],
+        rightParts: [{ kind: "added", value: "b".repeat(20000) }],
+      });
+    });
+
+    it("keeps emoji whole in character highlighting", () => {
+      const [row] = buildDiffRows("a😀b", "a😁b");
+      expect(row).toMatchObject({
+        leftParts: [
+          { kind: "unchanged", value: "a" },
+          { kind: "removed", value: "😀" },
+          { kind: "unchanged", value: "b" },
+        ],
+      });
     });
   });
 });

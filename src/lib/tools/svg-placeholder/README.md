@@ -25,7 +25,8 @@ Build simple SVG placeholder images with configurable size, colors, font size, a
 
 ## Notes
 - Custom text and colors are escaped before insertion into SVG
-- Default colors follow Midnight Concert Hall (elevated night + champagne)
+- Default colors match it-tools: `#cccccc` background and `#333333` text
+- Out-of-range numbers are clamped, and the field shows the clamped value when you leave it
 
 ## Source
 Inspired by [it-tools SVG placeholder generator](https://it-tools.tech/svg-placeholder-generator). Local path reference: handy-dandy `it-tools` (`/svg-placeholder-generator`). Catalogue id: `svg-placeholder-generator`.

@@ -4,6 +4,7 @@ export {
   buildDiffRows,
   diffTextSegments,
   formatUnifiedDiff,
+  numberDiffRows,
   splitDiffValue,
   textsAreEqual,
   type CharPart,

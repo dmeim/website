@@ -32,6 +32,13 @@ describe("string-obfuscator", () => {
       );
     });
 
+    it("masks emoji and combining characters as one character", () => {
+      expect(obfuscateString("😀😀😀😀", { keepFirst: 1, keepLast: 1 })).toBe("😀**😀");
+      expect(obfuscateString("👨‍👩‍👧‍👦abc", { keepFirst: 1 })).toBe("👨‍👩‍👧‍👦***");
+      expect(obfuscateString("e\u0301e\u0301", { keepFirst: 1 })).toBe("e\u0301*");
+      expect(obfuscateString("😀😀", { keepFirst: 0 })).not.toMatch(/[\ud800-\udfff]/);
+    });
+
     it("returns empty input unchanged", () => {
       expect(obfuscateString("")).toBe("");
     });

@@ -21,6 +21,7 @@ Obfuscate a string (like a secret, an IBAN, or a token) to make it shareable and
 - Pure string logic; no npm dependencies
 - Replacement character is fixed to `*` in the UI (service accepts `replacementChar` for parity/tests)
 - Overlapping keep-first / keep-last ranges leave the whole string visible
+- Emoji and combined letters are masked as one character; a blank or negative keep count means 0
 - Catalogue id: `string-obfuscator`
 
 ## Source

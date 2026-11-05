@@ -1,13 +1,16 @@
+import { splitGraphemes } from "../text-statistics/textStatistics.service";
+
 /**
  * Build a numeronym: first letter + count of letters between first and last + last letter.
  * Words of length 3 or fewer are returned unchanged (same as it-tools).
  */
 export function generateNumeronym(word: string): string {
-  const wordLength = word.length;
+  const trimmed = word.trim();
+  const letters = splitGraphemes(trimmed);
 
-  if (wordLength <= 3) {
-    return word;
+  if (letters.length <= 3) {
+    return trimmed;
   }
 
-  return `${word.at(0)}${wordLength - 2}${word.at(-1)}`;
+  return `${letters[0]}${letters.length - 2}${letters[letters.length - 1]}`;
 }

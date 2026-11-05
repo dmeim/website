@@ -3,12 +3,9 @@ import { useMemo, useState } from "react";
 import { FormGrid, Input, Panel, Switch, ToolFrame, TransformPanel } from "@/ui/react";
 import { obfuscateString } from "@/lib/tools/string-obfuscator";
 
-function parseNonNegativeInt(raw: string, fallback: number): number {
+function parseKeepCount(raw: string): number {
   const parsed = Number.parseInt(raw, 10);
-  if (!Number.isFinite(parsed) || parsed < 0) {
-    return fallback;
-  }
-  return parsed;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
 export default function StringObfuscator() {
@@ -17,8 +14,8 @@ export default function StringObfuscator() {
   const [keepLastRaw, setKeepLastRaw] = useState("4");
   const [keepSpace, setKeepSpace] = useState(true);
 
-  const keepFirst = parseNonNegativeInt(keepFirstRaw, 4);
-  const keepLast = parseNonNegativeInt(keepLastRaw, 4);
+  const keepFirst = parseKeepCount(keepFirstRaw);
+  const keepLast = parseKeepCount(keepLastRaw);
 
   const obfuscated = useMemo(
     () => obfuscateString(text, { keepFirst, keepLast, keepSpace }),

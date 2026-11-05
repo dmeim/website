@@ -8,6 +8,7 @@ import {
   getCaptureFilename,
   getDeviceLabel,
   getPermissionErrorMessage,
+  shouldRetryWithoutAudio,
 } from "./cameraRecorder.service";
 
 describe("cameraRecorder.service", () => {
@@ -64,5 +65,14 @@ describe("cameraRecorder.service", () => {
       /Permission was denied/i,
     );
     expect(getPermissionErrorMessage(new Error("boom"))).toBe("boom");
+    expect(getPermissionErrorMessage(new DOMException("x", "NotFoundError"))).toMatch(/No camera or microphone/);
+    expect(getPermissionErrorMessage(new DOMException("x", "NotReadableError"))).toMatch(/other app/);
+    expect(getPermissionErrorMessage(new DOMException("x", "OverconstrainedError"))).toMatch(/settings/);
+  });
+
+  it("retries without audio only when the device is missing", () => {
+    expect(shouldRetryWithoutAudio(new DOMException("x", "NotFoundError"), true)).toBe(true);
+    expect(shouldRetryWithoutAudio(new DOMException("x", "NotFoundError"), false)).toBe(false);
+    expect(shouldRetryWithoutAudio(new DOMException("x", "NotAllowedError"), true)).toBe(false);
   });
 });

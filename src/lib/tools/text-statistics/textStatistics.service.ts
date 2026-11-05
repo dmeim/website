@@ -3,6 +3,18 @@
  * (parity with it-tools text-statistics).
  */
 
+const graphemeSegmenter =
+  typeof Intl.Segmenter === "function"
+    ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
+    : null;
+
+/** Split into user-perceived characters so emoji and combining marks stay whole. */
+export function splitGraphemes(text: string): string[] {
+  return graphemeSegmenter
+    ? Array.from(graphemeSegmenter.segment(text), ({ segment }) => segment)
+    : Array.from(text);
+}
+
 export function getStringSizeInBytes(text: string): number {
   return new TextEncoder().encode(text).buffer.byteLength;
 }
@@ -11,6 +23,10 @@ export function getStringSizeInBytes(text: string): number {
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) {
     return "0 Bytes";
+  }
+
+  if (bytes === 1) {
+    return "1 Byte";
   }
 
   const k = 1024;
@@ -28,13 +44,14 @@ export type TextStatistics = {
   byteSizeFormatted: string;
 };
 
-/** Compute live text stats matching it-tools template logic. */
+/** Live text stats. Unlike it-tools, characters are graphemes and surrounding whitespace adds no words. */
 export function getTextStatistics(text: string): TextStatistics {
   const byteSize = getStringSizeInBytes(text);
+  const trimmed = text.trim();
 
   return {
-    characterCount: text.length,
-    wordCount: text === "" ? 0 : text.split(/\s+/).length,
+    characterCount: splitGraphemes(text).length,
+    wordCount: trimmed === "" ? 0 : trimmed.split(/\s+/).length,
     lineCount: text === "" ? 0 : text.split(/\r\n|\r|\n/).length,
     byteSize,
     byteSizeFormatted: formatBytes(byteSize),

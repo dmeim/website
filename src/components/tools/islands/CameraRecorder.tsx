@@ -25,6 +25,7 @@ import {
   getCaptureFilename,
   getDeviceLabel,
   getPermissionErrorMessage,
+  shouldRetryWithoutAudio,
 } from "@/lib/tools/camera-recorder/cameraRecorder.service";
 import { useMediaRecorder } from "@/lib/tools/camera-recorder/useMediaRecorder";
 
@@ -49,6 +50,7 @@ export default function CameraRecorder() {
   const recordingAnimationFrameRef = useRef(0);
   const transformedRecordingVideoTrackRef = useRef<MediaStreamTrack | null>(null);
   const pendingStartRecordingRef = useRef(false);
+  const isMountedRef = useRef(true);
 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [recordingStream, setRecordingStream] = useState<MediaStream | null>(null);
@@ -58,7 +60,7 @@ export default function CameraRecorder() {
   const [selectedMicrophoneId, setSelectedMicrophoneId] = useState("");
   const [selectedResolution, setSelectedResolution] = useState<CameraResolutionId>("default");
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<CameraAspectRatioId>("native");
-  const [includeAudio, setIncludeAudio] = useState(false);
+  const [includeAudio, setIncludeAudio] = useState(true);
   const [isMirrored, setIsMirrored] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [captures, setCaptures] = useState<CaptureItem[]>([]);
@@ -116,9 +118,16 @@ export default function CameraRecorder() {
   }, []);
 
   const handleRecordingAvailable = useCallback(
-    ({ url, mimeType }: { url: string; mimeType: string }) => {
-      addCapture({ type: "video", url, mimeType, revokeOnDelete: true });
+    (video: { url: string; mimeType: string } | null) => {
       cleanupRecordingStream();
+
+      if (!video) {
+        setStatusMessage("The recording was empty, so nothing was saved. Try recording for longer.");
+        setStatusType("error");
+        return;
+      }
+
+      addCapture({ type: "video", url: video.url, mimeType: video.mimeType, revokeOnDelete: true });
       setStatusMessage("Video recording saved locally in the gallery.");
       setStatusType("success");
     },
@@ -161,6 +170,9 @@ export default function CameraRecorder() {
     [recordingState, stopRecording, stream],
   );
 
+  const stopCameraRef = useRef(stopCamera);
+  stopCameraRef.current = stopCamera;
+
   const refreshDevices = useCallback(async () => {
     if (!navigator.mediaDevices?.enumerateDevices) {
       return;
@@ -185,14 +197,14 @@ export default function CameraRecorder() {
     );
   }, []);
 
-  const buildConstraints = useCallback((): MediaStreamConstraints => {
+  const buildConstraints = useCallback((withAudio: boolean): MediaStreamConstraints => {
     const videoConstraint = buildCameraVideoConstraints({
       deviceId: selectedCameraId,
       resolution: selectedResolution,
       aspectRatio: selectedAspectRatio,
     });
 
-    const audioConstraint: boolean | MediaTrackConstraints = includeAudio
+    const audioConstraint: boolean | MediaTrackConstraints = withAudio
       ? selectedMicrophoneId
         ? { deviceId: { exact: selectedMicrophoneId } }
         : true
@@ -203,7 +215,6 @@ export default function CameraRecorder() {
       video: videoConstraint,
     };
   }, [
-    includeAudio,
     selectedAspectRatio,
     selectedCameraId,
     selectedMicrophoneId,
@@ -238,9 +249,31 @@ export default function CameraRecorder() {
     stopCamera({ silent: true });
 
     try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia(buildConstraints());
+      let mediaStream: MediaStream;
+      let audioMissing = false;
+
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia(buildConstraints(includeAudio));
+      } catch (error) {
+        if (!shouldRetryWithoutAudio(error, includeAudio)) {
+          throw error;
+        }
+        mediaStream = await navigator.mediaDevices.getUserMedia(buildConstraints(false));
+        audioMissing = true;
+      }
+
+      // The tool may have closed while the permission prompt was open.
+      if (!isMountedRef.current) {
+        mediaStream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
       setStream(mediaStream);
-      setStatusMessage("Camera is active. Captures stay local until you download them.");
+      setStatusMessage(
+        audioMissing
+          ? "Camera is active, but no microphone was found, so videos will have no sound."
+          : "Camera is active. Captures stay local until you download them.",
+      );
       setStatusType("success");
       await refreshDevices();
       syncSelectedDevicesFromStream(mediaStream);
@@ -252,6 +285,7 @@ export default function CameraRecorder() {
     }
   }, [
     buildConstraints,
+    includeAudio,
     isSupported,
     refreshDevices,
     stopCamera,
@@ -284,7 +318,8 @@ export default function CameraRecorder() {
   const prepareRecordingStream = useCallback((): boolean => {
     cleanupRecordingStream();
 
-    if (!videoRef.current || !stream) {
+    // The raw stream keeps recording in a background tab, where a canvas loop would freeze.
+    if (!videoRef.current || !stream || !hasCameraTransform) {
       setRecordingStream(stream);
       return Boolean(stream);
     }
@@ -406,9 +441,33 @@ export default function CameraRecorder() {
   }, [cleanupRecordingStream, refreshDevices]);
 
   useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
     return () => {
       stream?.getTracks().forEach((track) => track.stop());
     };
+  }, [stream]);
+
+  // An unplugged camera or a revoked permission ends the track without any other signal.
+  useEffect(() => {
+    const videoTrack = stream?.getVideoTracks()[0];
+    if (!videoTrack) {
+      return;
+    }
+
+    const handleEnded = () => {
+      stopCameraRef.current({ silent: true });
+      setStatusMessage("The camera was disconnected or its permission was removed. Start it again to continue.");
+      setStatusType("error");
+    };
+
+    videoTrack.addEventListener("ended", handleEnded);
+    return () => videoTrack.removeEventListener("ended", handleEnded);
   }, [stream]);
 
   const capturesRef = useRef(captures);
@@ -448,24 +507,25 @@ export default function CameraRecorder() {
     });
   }
 
-  if (!isSupported) {
-    return (
-      <ToolFrame>
-        <Panel title="Camera capture is unavailable" animate={false} aria-live="polite">
-          <Notice tone="danger">
-            Your browser does not expose the camera APIs needed for this tool.
-          </Notice>
-        </Panel>
-      </ToolFrame>
-    );
-  }
-
+  // Checked first because browsers hide navigator.mediaDevices on insecure pages.
   if (needsSecureContext) {
     return (
       <ToolFrame>
         <Panel title="Secure context required" animate={false} aria-live="polite">
           <Notice tone="danger">
             Camera APIs require HTTPS or localhost. Open this page over a secure origin.
+          </Notice>
+        </Panel>
+      </ToolFrame>
+    );
+  }
+
+  if (!isSupported) {
+    return (
+      <ToolFrame>
+        <Panel title="Camera capture is unavailable" animate={false} aria-live="polite">
+          <Notice tone="danger">
+            Your browser does not expose the camera APIs needed for this tool.
           </Notice>
         </Panel>
       </ToolFrame>
@@ -574,8 +634,8 @@ export default function CameraRecorder() {
 
           <p className="camera-hint">
             Device labels usually appear after permission is granted. Resolution and aspect ratio
-            are best-effort browser constraints; use Apply settings after changing them while the
-            camera is on.
+            are best-effort browser constraints. Use Apply settings after changing a device, the
+            microphone, or these options while the camera is on.
           </p>
         </Panel>
 

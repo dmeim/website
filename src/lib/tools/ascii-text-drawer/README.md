@@ -22,6 +22,8 @@ Create ASCII art text with many FIGlet fonts and a configurable wrap width.
 - Uses the `figlet` npm package (same engine as it-tools)
 - Browser islands fetch FIGfonts from the unpkg CDN (`figlet@1.11.3/fonts/`); Node/tests load fonts from the local package
 - Font list matches it-tools (deduped); unknown fonts fall back to `Standard`
+- Font and width are remembered in this browser (`tools:ascii-text-drawer:font`, `tools:ascii-text-drawer:width`), like it-tools
+- Blank input gives empty output rather than rows of spaces
 - Catalogue id: `ascii-text-drawer`
 
 ## Source

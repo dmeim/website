@@ -9,6 +9,8 @@ export const DEFAULT_FONT = "Standard";
 export const DEFAULT_WIDTH = 80;
 export const WIDTH_MIN = 0;
 export const WIDTH_MAX = 10000;
+export const FONT_STORAGE_KEY = "ascii-text-drawer:font";
+export const WIDTH_STORAGE_KEY = "ascii-text-drawer:width";
 
 /** CDN used by the browser build to fetch FIGfonts (parity with it-tools). */
 export const FIGLET_FONT_PATH = "https://unpkg.com/figlet@1.11.3/fonts";
@@ -334,6 +336,10 @@ export function clampWidth(width: number): number {
   return Math.min(WIDTH_MAX, Math.max(WIDTH_MIN, Math.trunc(width)));
 }
 
+export function isKnownFont(font: string): boolean {
+  return FONT_SET.has(font);
+}
+
 export function normalizeFont(font: string): AsciiFont {
   if (FONT_SET.has(font)) {
     return font as AsciiFont;
@@ -359,7 +365,8 @@ export async function renderAsciiText(
     whitespaceBreak: true,
   });
 
-  return text ?? "";
+  // Blank input still renders as empty rows, which should read as no output.
+  return text?.trim() ? text : "";
 }
 
 /** Like `renderAsciiText` but returns a result object instead of throwing. */

@@ -46,24 +46,75 @@ export type DiffRow =
 export const DEFAULT_ORIGINAL = "original text";
 export const DEFAULT_MODIFIED = "modified text";
 
+/** Longest a line pair may be for character highlighting; the rest show as whole-line changes. */
+const CHAR_DIFF_MAX_LENGTH = 20000;
+const CHAR_DIFF_TIMEOUT_MS = 50;
+/** Total highlighting time per comparison, so many long lines cannot add up to a freeze. */
+const CHAR_DIFF_BUDGET_MS = 300;
+const LINE_DIFF_TIMEOUT_MS = 500;
+
 export function textsAreEqual(original: string, modified: string): boolean {
   return original === modified;
 }
 
+let lastDiff: { original: string; modified: string; segments: DiffSegment[] } | null = null;
+
+/** Rows and the unified diff need the same segments, so keep the last result. */
 export function diffTextSegments(
   original: string,
   modified: string,
 ): DiffSegment[] {
-  return diffLines(original, modified).map((part) => ({
+  if (lastDiff?.original === original && lastDiff.modified === modified) {
+    return lastDiff.segments;
+  }
+
+  const segments = computeSegments(original, modified);
+  lastDiff = { original, modified, segments };
+  return segments;
+}
+
+function computeSegments(original: string, modified: string): DiffSegment[] {
+  // Without a shared final newline, jsdiff reports "b" and "b\n" as different lines.
+  const suffix = needsFinalNewline(original, modified) ? "\n" : "";
+  const parts = diffLines(original && original + suffix, modified && modified + suffix, {
+    timeout: LINE_DIFF_TIMEOUT_MS,
+  });
+
+  // Unrelated huge inputs would freeze the page, so give up and show them as fully replaced.
+  if (!parts) {
+    return [
+      { kind: "removed", value: original, count: countLines(original) },
+      { kind: "added", value: modified, count: countLines(modified) },
+    ];
+  }
+
+  return parts.map((part) => ({
     kind: part.added ? "added" : part.removed ? "removed" : "unchanged",
     value: part.value,
     count: part.count ?? countLines(part.value),
   }));
 }
 
+function needsFinalNewline(original: string, modified: string): boolean {
+  return Boolean(original && modified) && !(original.endsWith("\n") && modified.endsWith("\n"));
+}
+
+/** Real line numbers per side, since added and removed rows only advance one side. */
+export function numberDiffRows(rows: DiffRow[]): Array<{ left: number; right: number }> {
+  let left = 0;
+  let right = 0;
+
+  return rows.map((row) => {
+    if (row.left !== null) left += 1;
+    if (row.right !== null) right += 1;
+    return { left, right };
+  });
+}
+
 export function buildDiffRows(original: string, modified: string): DiffRow[] {
   const segments = diffTextSegments(original, modified);
   const rows: DiffRow[] = [];
+  const highlightDeadline = Date.now() + CHAR_DIFF_BUDGET_MS;
 
   for (let i = 0; i < segments.length; i += 1) {
     const segment = segments[i]!;
@@ -94,8 +145,7 @@ export function buildDiffRows(original: string, modified: string): DiffRow[] {
             type: "modified",
             left,
             right,
-            leftParts: charPartsForSide(left, right, "left"),
-            rightParts: charPartsForSide(left, right, "right"),
+            ...charPartsForLine(left, right, highlightDeadline),
           });
         }
       }
@@ -139,26 +189,32 @@ export function formatUnifiedDiff(original: string, modified: string): string {
     .join("\n");
 }
 
-function charPartsForSide(
+function charPartsForLine(
   left: string,
   right: string,
-  side: "left" | "right",
-): CharPart[] {
-  return diffChars(left, right)
-    .filter((part) => {
-      if (side === "left") {
-        return !part.added;
-      }
-      return !part.removed;
-    })
-    .map((part) => ({
-      kind: part.added
-        ? "added"
-        : part.removed
-          ? "removed"
-          : "unchanged",
-      value: part.value,
-    }));
+  deadline: number,
+): { leftParts: CharPart[]; rightParts: CharPart[] } {
+  const parts =
+    left.length + right.length <= CHAR_DIFF_MAX_LENGTH && Date.now() < deadline
+      ? diffChars(left, right, { timeout: CHAR_DIFF_TIMEOUT_MS })
+      : undefined;
+
+  if (!parts) {
+    return {
+      leftParts: [{ kind: "removed", value: left }],
+      rightParts: [{ kind: "added", value: right }],
+    };
+  }
+
+  const toPart = (part: (typeof parts)[number]): CharPart => ({
+    kind: part.added ? "added" : part.removed ? "removed" : "unchanged",
+    value: part.value,
+  });
+
+  return {
+    leftParts: parts.filter((part) => !part.added).map(toPart),
+    rightParts: parts.filter((part) => !part.removed).map(toPart),
+  };
 }
 
 /** Split a jsdiff chunk into display lines (strip trailing newline sentinel). */

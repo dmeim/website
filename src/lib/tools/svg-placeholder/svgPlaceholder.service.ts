@@ -9,9 +9,9 @@ export interface SvgPlaceholderOptions {
 }
 
 export function buildSvgPlaceholder(options: SvgPlaceholderOptions): string {
-  const width = clampDimension(options.width, 1, 10000, 600);
-  const height = clampDimension(options.height, 1, 10000, 350);
-  const fontSize = clampDimension(options.fontSize, 1, 1000, 26);
+  const width = clampSvgWidth(options.width);
+  const height = clampSvgHeight(options.height);
+  const fontSize = clampSvgFontSize(options.fontSize);
   const text = options.customText.trim() || `${width}x${height}`;
   const sizeAttributes = options.useExactSize ? ` width="${width}" height="${height}"` : "";
 
@@ -23,15 +23,24 @@ export function buildSvgPlaceholder(options: SvgPlaceholderOptions): string {
   ].join("\n");
 }
 
+export function clampSvgWidth(value: unknown): number {
+  return clampDimension(value, 1, 10000, 600);
+}
+
+export function clampSvgHeight(value: unknown): number {
+  return clampDimension(value, 1, 10000, 350);
+}
+
+export function clampSvgFontSize(value: unknown): number {
+  return clampDimension(value, 1, 1000, 26);
+}
+
 export function buildSvgDataUri(svg: string): string {
   return `data:image/svg+xml;base64,${textToBase64(svg)}`;
 }
 
 export function getSvgPlaceholderFilename(width: number, height: number): string {
-  const safeWidth = clampDimension(width, 1, 10000, 600);
-  const safeHeight = clampDimension(height, 1, 10000, 350);
-
-  return `placeholder-${safeWidth}x${safeHeight}.svg`;
+  return `placeholder-${clampSvgWidth(width)}x${clampSvgHeight(height)}.svg`;
 }
 
 export function escapeSvgText(value: string): string {

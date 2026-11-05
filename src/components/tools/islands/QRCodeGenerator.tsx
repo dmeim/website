@@ -27,6 +27,8 @@ import {
 } from "@/lib/tools/qr-code/qrCode.service";
 import {
   QR_CONTENT_TYPES,
+  QR_DEFAULT_MARGIN,
+  QR_DEFAULT_SIZE,
   SOCIAL_PLATFORMS,
   type QrContentFormState,
   type QrContentType,
@@ -34,8 +36,9 @@ import {
   clampQrMargin,
   clampQrSize,
   createDefaultQrContentFormState,
+  describeQrRenderError,
   getQrBackgroundColor,
-  getQrExportBaseName,
+  getQrExportBaseNameForContent,
   isQrContentType,
 } from "@/lib/tools/qr-code/qrCodeGenerator.service";
 import {
@@ -85,13 +88,13 @@ export default function QRCodeGenerator() {
   const [content, setContent] = useState<QrContentFormState>(() =>
     createDefaultQrContentFormState({ type: readTypeFromUrl() ?? "text" }),
   );
-  const [foregroundColor, setForegroundColor] = useState("#0c0e12");
+  const [foregroundColor, setForegroundColor] = useState("#000000");
   const [backgroundColor, setBackgroundColor] = useState("#ffffff");
   const [transparentBackground, setTransparentBackground] = useState(false);
   const [errorCorrectionLevel, setErrorCorrectionLevel] =
     useState<QrErrorCorrectionLevel>("M");
-  const [size, setSize] = useState(768);
-  const [margin, setMargin] = useState(2);
+  const [size, setSize] = useState(QR_DEFAULT_SIZE);
+  const [margin, setMargin] = useState(QR_DEFAULT_MARGIN);
   const [qrPng, setQrPng] = useState("");
   const [qrSvg, setQrSvg] = useState("");
   const [previewStatus, setPreviewStatus] = useState("");
@@ -114,7 +117,7 @@ export default function QRCodeGenerator() {
     transparentBackground,
   });
   const canExport = Boolean(qrPng && qrSvg && payloadResult.isValid);
-  const exportBaseName = getQrExportBaseName(payloadText);
+  const exportBaseName = getQrExportBaseNameForContent(content, payloadText);
   const showPayloadAsGenerated = content.type !== "text";
 
   const updateContent = useCallback(
@@ -154,7 +157,7 @@ export default function QRCodeGenerator() {
         payloadResult.errors[0] ||
           "Complete the selected preset to generate a QR code.",
       );
-      setPreviewStatusType(payloadResult.errors.length ? "error" : "");
+      setPreviewStatusType("");
       return;
     }
 
@@ -190,11 +193,7 @@ export default function QRCodeGenerator() {
 
         setQrPng("");
         setQrSvg("");
-        setPreviewStatus(
-          error instanceof Error
-            ? error.message
-            : "Could not render this QR code.",
-        );
+        setPreviewStatus(describeQrRenderError(error));
         setPreviewStatusType("error");
       });
   }, [
@@ -708,6 +707,7 @@ export default function QRCodeGenerator() {
                 step={1}
                 value={margin}
                 onChange={(event) => setMargin(Number(event.target.value))}
+                onBlur={() => setMargin(normalizedMargin)}
               />
               <Input
                 id="qr-size"
@@ -718,6 +718,7 @@ export default function QRCodeGenerator() {
                 step={64}
                 value={size}
                 onChange={(event) => setSize(Number(event.target.value))}
+                onBlur={() => setSize(normalizedSize)}
               />
             </FormGrid>
           </Disclosure>

@@ -8,6 +8,7 @@ import {
   WIDTH_MAX,
   WIDTH_MIN,
   clampWidth,
+  isKnownFont,
   normalizeFont,
   renderAsciiText,
   tryRenderAsciiText,
@@ -80,6 +81,18 @@ describe("ascii-text-drawer", () => {
       if (result.ok) {
         expect(result.text.length).toBeGreaterThan(0);
       }
+    });
+  });
+
+  describe("blank input and stored fonts", () => {
+    it("renders blank input as empty output", async () => {
+      expect(await renderAsciiText("")).toBe("");
+      expect(await renderAsciiText("   \n ")).toBe("");
+    });
+
+    it("recognizes only listed fonts", () => {
+      expect(isKnownFont("Slant")).toBe(true);
+      expect(isKnownFont("Nope")).toBe(false);
     });
   });
 });

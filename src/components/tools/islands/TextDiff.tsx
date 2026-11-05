@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
 
 import { Button, ButtonGroup, CopyButton, FormGrid, Notice, Panel, Textarea, ToolFrame } from "@/ui/react";
 import {
@@ -6,6 +6,7 @@ import {
   DEFAULT_ORIGINAL,
   buildDiffRows,
   formatUnifiedDiff,
+  numberDiffRows,
   textsAreEqual,
   type CharPart,
   type DiffRow,
@@ -13,19 +14,28 @@ import {
 
 import "./TextDiff.css";
 
+/** Rendering every row of a huge diff would freeze the page. */
+const MAX_VISIBLE_ROWS = 2000;
+
 export default function TextDiff() {
   const [original, setOriginal] = useState(DEFAULT_ORIGINAL);
   const [modified, setModified] = useState(DEFAULT_MODIFIED);
   const [actionStatus, setActionStatus] = useState("");
 
-  const equal = textsAreEqual(original, modified);
+  // Deferred so typing stays smooth when a large diff takes a moment to compute.
+  const deferredOriginal = useDeferredValue(original);
+  const deferredModified = useDeferredValue(modified);
+
+  const equal = textsAreEqual(deferredOriginal, deferredModified);
   const rows = useMemo(
-    () => buildDiffRows(original, modified),
-    [original, modified],
+    () => buildDiffRows(deferredOriginal, deferredModified),
+    [deferredOriginal, deferredModified],
   );
+  const lineNumbers = useMemo(() => numberDiffRows(rows), [rows]);
+  const shownRows = rows.slice(0, MAX_VISIBLE_ROWS);
   const unified = useMemo(
-    () => formatUnifiedDiff(original, modified),
-    [original, modified],
+    () => formatUnifiedDiff(deferredOriginal, deferredModified),
+    [deferredOriginal, deferredModified],
   );
 
   const swap = useCallback(() => {
@@ -55,7 +65,10 @@ export default function TextDiff() {
             rows={12}
             value={original}
             placeholder="Original text"
-            onChange={(event) => setOriginal(event.target.value)}
+            onChange={(event) => {
+              setOriginal(event.target.value);
+              setActionStatus("");
+            }}
             autoFocus
             spellCheck={false}
           />
@@ -66,7 +79,10 @@ export default function TextDiff() {
             rows={12}
             value={modified}
             placeholder="Modified text"
-            onChange={(event) => setModified(event.target.value)}
+            onChange={(event) => {
+              setModified(event.target.value);
+              setActionStatus("");
+            }}
             spellCheck={false}
           />
         </FormGrid>
@@ -90,18 +106,27 @@ export default function TextDiff() {
         }
       >
         {equal ? (
-          <Notice tone="neutral">The two texts are identical.</Notice>
+          <Notice tone="neutral">
+            {deferredOriginal ? "The two texts are identical." : "Enter text in either pane to compare."}
+          </Notice>
         ) : (
           <div className="text-diff-viewer" data-testid="text-diff-result" role="table" aria-label="Side-by-side text differences">
             <div className="text-diff-viewer__header" role="row">
               <span role="columnheader">Original</span>
               <span role="columnheader">Modified</span>
             </div>
-            {rows.map((row, index) => (
-              <DiffRowView key={`${row.type}-${index}`} row={row} index={index} />
+            {shownRows.map((row, index) => (
+              <DiffRowView key={`${row.type}-${index}`} row={row} lines={lineNumbers[index]!} />
             ))}
           </div>
         )}
+
+        {!equal && rows.length > MAX_VISIBLE_ROWS ? (
+          <Notice tone="neutral">
+            Showing the first {MAX_VISIBLE_ROWS.toLocaleString()} of {rows.length.toLocaleString()} rows. Copy the
+            unified diff to get all of them.
+          </Notice>
+        ) : null}
 
         {actionStatus ? <Notice tone="success">{actionStatus}</Notice> : null}
       </Panel>
@@ -109,21 +134,19 @@ export default function TextDiff() {
   );
 }
 
-function DiffRowView({ row, index }: { row: DiffRow; index: number }) {
-  const lineNo = index + 1;
-
+function DiffRowView({ row, lines }: { row: DiffRow; lines: { left: number; right: number } }) {
   if (row.type === "unchanged") {
     return (
       <div className="text-diff-row text-diff-row--unchanged" role="row">
         <div className="text-diff-cell" role="cell">
           <span className="text-diff-gutter" aria-hidden="true">
-            {lineNo}
+            {lines.left}
           </span>
           <code>{row.left}</code>
         </div>
         <div className="text-diff-cell" role="cell">
           <span className="text-diff-gutter" aria-hidden="true">
-            {lineNo}
+            {lines.right}
           </span>
           <code>{row.right}</code>
         </div>

@@ -20,7 +20,8 @@ describe("text-statistics", () => {
   describe("formatBytes", () => {
     it("formats zero and small sizes", () => {
       expect(formatBytes(0)).toBe("0 Bytes");
-      expect(formatBytes(1)).toBe("1 Bytes");
+      expect(formatBytes(1)).toBe("1 Byte");
+      expect(formatBytes(2)).toBe("2 Bytes");
       expect(formatBytes(1024)).toBe("1 KB");
     });
   });
@@ -45,13 +46,25 @@ describe("text-statistics", () => {
       expect(stats.byteSizeFormatted).toBe("20 Bytes");
     });
 
-    it("counts emoji by UTF-16 length and UTF-8 bytes", () => {
+    it("counts emoji and combining characters as one character", () => {
+      expect(getTextStatistics("e\u0301").characterCount).toBe(1);
+      expect(getTextStatistics("👨‍👩‍👧‍👦").characterCount).toBe(1);
+      expect(getTextStatistics("👍🏽a").characterCount).toBe(2);
+      expect(getTextStatistics("🇫🇷").characterCount).toBe(1);
+
       const stats = getTextStatistics("😀");
-      expect(stats.characterCount).toBe(2);
+      expect(stats.characterCount).toBe(1);
       expect(stats.wordCount).toBe(1);
       expect(stats.lineCount).toBe(1);
       expect(stats.byteSize).toBe(4);
       expect(stats.byteSizeFormatted).toBe("4 Bytes");
+    });
+
+    it("ignores surrounding whitespace when counting words", () => {
+      expect(getTextStatistics("   ").wordCount).toBe(0);
+      expect(getTextStatistics("\n\n").wordCount).toBe(0);
+      expect(getTextStatistics("hello ").wordCount).toBe(1);
+      expect(getTextStatistics("  hello   world\n").wordCount).toBe(2);
     });
 
     it("handles CRLF and lone CR line breaks", () => {

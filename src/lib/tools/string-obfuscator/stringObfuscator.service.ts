@@ -1,3 +1,5 @@
+import { splitGraphemes } from "../text-statistics/textStatistics.service";
+
 /**
  * Mask a string by replacing middle characters while optionally keeping
  * leading/trailing characters and spaces (parity with it-tools string-obfuscator).
@@ -19,8 +21,7 @@ export function obfuscateString(
     keepSpace = true,
   }: ObfuscateStringOptions = {},
 ): string {
-  return str
-    .split("")
+  return splitGraphemes(str)
     .map((char, index, array) => {
       if (keepSpace && char === " ") {
         return char;

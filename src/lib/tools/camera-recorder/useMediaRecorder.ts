@@ -22,7 +22,7 @@ export function getSupportedVideoMimeType(): string {
 
 export function useMediaRecorder(
   stream: MediaStream | null,
-  onRecordingAvailable?: (video: RecordedVideo) => void,
+  onRecordingAvailable?: (video: RecordedVideo | null) => void,
 ) {
   const [recordingState, setRecordingState] = useState<RecordingState>("inactive");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -73,6 +73,8 @@ export function useMediaRecorder(
       if (blob.size > 0) {
         const url = URL.createObjectURL(blob);
         onRecordingAvailableRef.current?.({ url, mimeType: blob.type || mimeType });
+      } else {
+        onRecordingAvailableRef.current?.(null);
       }
     };
 

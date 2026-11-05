@@ -121,15 +121,32 @@ export function formatCaptureTime(date: Date): string {
 export function getPermissionErrorMessage(error: unknown): string {
   if (error instanceof DOMException) {
     if (error.name === "NotAllowedError") {
-      return "Permission was denied. Use the browser site-permissions menu to allow camera access.";
+      return "Permission was denied. Allow camera access in your browser settings, usually the lock icon in the address bar, then try again.";
     }
 
     if (error.name === "NotFoundError") {
-      return "No camera or microphone matching the selected options was found.";
+      return "No camera or microphone matching the selected options was found. Connect one or pick another device, then try again.";
+    }
+
+    if (error.name === "NotReadableError" || error.name === "AbortError") {
+      return "The camera could not be started. Close any other app using it, then try again.";
+    }
+
+    if (error.name === "OverconstrainedError") {
+      return "The selected device does not support these settings. Try Camera default, or refresh the device list.";
     }
   }
 
   return error instanceof Error ? error.message : "The browser blocked camera access.";
+}
+
+/** Whether to retry without audio: the camera can still work when only the microphone is missing. */
+export function shouldRetryWithoutAudio(error: unknown, requestedAudio: boolean): boolean {
+  return (
+    requestedAudio &&
+    error instanceof DOMException &&
+    (error.name === "NotFoundError" || error.name === "OverconstrainedError")
+  );
 }
 
 function formatTimestamp(date: Date): string {

@@ -1,7 +1,25 @@
 export const WIFI_ENCRYPTIONS = ["nopass", "WPA", "WEP", "WPA2-EAP"] as const;
 export type WifiEncryption = (typeof WIFI_ENCRYPTIONS)[number];
 
-export const EAP_METHODS = ["PEAP", "TLS", "TTLS", "PWD", "FAST", "SIM", "AKA"] as const;
+export const EAP_METHODS = [
+  "MD5",
+  "POTP",
+  "GTC",
+  "TLS",
+  "IKEv2",
+  "SIM",
+  "AKA",
+  "AKA'",
+  "TTLS",
+  "PWD",
+  "LEAP",
+  "PSK",
+  "FAST",
+  "TEAP",
+  "EKE",
+  "NOOB",
+  "PEAP",
+] as const;
 export type EapMethod = (typeof EAP_METHODS)[number];
 
 export const EAP_PHASE_2_METHODS = ["None", "MSCHAPV2", "GTC", "PAP"] as const;
@@ -29,11 +47,12 @@ export function escapeWifiField(value: string): string {
 }
 
 export function buildWifiQrPayload(input: WifiQrCodeInput): WifiQrPayloadResult {
-  const ssid = input.ssid.trim();
+  // Spaces can be part of a real network name, so only validate on the trimmed value.
+  const ssid = input.ssid;
   const password = input.password;
   const errors: string[] = [];
 
-  if (!ssid) {
+  if (!ssid.trim()) {
     errors.push("SSID is required.");
   }
 
