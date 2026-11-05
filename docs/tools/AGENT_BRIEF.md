@@ -53,6 +53,7 @@ These are fixes, so don't change them back to match the original.
 | Regex tester | Runs in a worker and stops a pattern after 1.5 seconds | Runs on the page and can freeze the tab |
 | Temperature | Rounds to two decimals | Floors, so 0 °C shows as 31.99 °F |
 | Percentage | Negative starts use the absolute value; float noise removed | Sign flips on negative starts |
+| IPv4 address converter | Hex is 8 digits, binary is 32 bits, and short IPv6 is canonical (`::ffff:a00:1`) | Unpadded, and short IPv6 keeps leading zeros |
 | Safelink decoder | Checks the link's real host | Matches the text anywhere in the link |
 
 ## Known limits

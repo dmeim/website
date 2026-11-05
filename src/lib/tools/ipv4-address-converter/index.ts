@@ -5,6 +5,7 @@ export {
   getConversionSections,
   ipv4ToInt,
   ipv4ToIpv6,
+  ipv4ToIpv6Short,
   isValidIpv4,
   type ConversionSection,
   type ConversionSectionKey,

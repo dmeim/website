@@ -14,10 +14,10 @@ None.
 
 ## Outputs
 - Decimal (32-bit unsigned integer as decimal string)
-- Hexadecimal (uppercase)
-- Binary
+- Hexadecimal (uppercase, always 8 digits)
+- Binary (always 32 bits)
 - IPv6 (`0000:0000:0000:0000:0000:ffff:xxxx:xxxx`)
-- IPv6 (short) (`::ffff:xxxx:xxxx`)
+- IPv6 (short), canonical per RFC 5952 (`::ffff:c0a8:101`)
 
 ## Notes
 - Invalid input shows a validation error; output fields are cleared with a placeholder. An empty field shows only the placeholder

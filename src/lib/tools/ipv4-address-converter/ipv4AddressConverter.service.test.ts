@@ -4,6 +4,7 @@ import {
   getConversionSections,
   ipv4ToInt,
   ipv4ToIpv6,
+  ipv4ToIpv6Short,
   isValidIpv4,
 } from "./ipv4AddressConverter.service";
 
@@ -82,7 +83,7 @@ describe("ipv4-address-converter", () => {
         "0000:0000:0000:0000:0000:ffff:c0a8:0101",
       );
       expect(sections.find((s) => s.key === "ipv6Short")?.value).toBe(
-        "::ffff:c0a8:0101",
+        "::ffff:c0a8:101",
       );
     });
 
@@ -92,15 +93,33 @@ describe("ipv4-address-converter", () => {
     });
   });
 
+  describe("fixed width and canonical forms (expected values from python3 ipaddress)", () => {
+    it("keeps hex at 8 digits and binary at 32 bits", () => {
+      const sections = getConversionSections("10.0.0.1");
+      expect(sections.find((s) => s.key === "hexadecimal")?.value).toBe("0A000001");
+      expect(sections.find((s) => s.key === "binary")?.value).toBe(
+        "00001010000000000000000000000001",
+      );
+    });
+
+    it("drops leading zeros from the short IPv6 form", () => {
+      expect(ipv4ToIpv6Short({ ip: "192.168.1.1" })).toBe("::ffff:c0a8:101");
+      expect(ipv4ToIpv6Short({ ip: "10.0.0.1" })).toBe("::ffff:a00:1");
+      expect(ipv4ToIpv6Short({ ip: "127.0.0.1" })).toBe("::ffff:7f00:1");
+      expect(ipv4ToIpv6Short({ ip: "0.0.0.0" })).toBe("::ffff:0:0");
+      expect(ipv4ToIpv6Short({ ip: "bad" })).toBe("");
+    });
+  });
+
   describe("edges", () => {
     it("converts 0.0.0.0 and 255.255.255.255", () => {
       const zero = getConversionSections("0.0.0.0");
       expect(zero.map((s) => s.value)).toEqual([
         "0",
-        "0",
-        "0",
+        "00000000",
+        "0".repeat(32),
         "0000:0000:0000:0000:0000:ffff:0000:0000",
-        "::ffff:0000:0000",
+        "::ffff:0:0",
       ]);
       const top = getConversionSections("255.255.255.255");
       expect(top.map((s) => s.value)).toEqual([
