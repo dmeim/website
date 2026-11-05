@@ -204,16 +204,16 @@ export default [
   { slug: "mac-address-generator", name: "defaults, separators, case", async run(t) {
     await t.open();
     t.assert.match(await val(t, "macgen-output"), /^64:16:7F:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}$/);
-    await t.main().getByRole("radio", { name: "-", exact: true }).check({ force: true });
+    await t.main().getByRole("radio", { name: "-", exact: true }).check();
     await t.page.waitForTimeout(80);
     t.assert.match(await val(t, "macgen-output"), /^64-16-7F-[0-9A-F]{2}-[0-9A-F]{2}-[0-9A-F]{2}$/);
-    await t.main().getByRole("radio", { name: ".", exact: true }).check({ force: true });
+    await t.main().getByRole("radio", { name: ".", exact: true }).check();
     await t.page.waitForTimeout(80);
     t.assert.match(await val(t, "macgen-output"), /^64\.16\.7F\.[0-9A-F]{2}\.[0-9A-F]{2}\.[0-9A-F]{2}$/);
-    await t.main().getByRole("radio", { name: "None", exact: true }).check({ force: true });
+    await t.main().getByRole("radio", { name: "None", exact: true }).check();
     await t.page.waitForTimeout(80);
     t.assert.match(await val(t, "macgen-output"), /^64167F[0-9A-F]{6}$/);
-    await t.main().getByRole("radio", { name: "Lowercase", exact: true }).check({ force: true });
+    await t.main().getByRole("radio", { name: "Lowercase", exact: true }).check();
     await t.page.waitForTimeout(80);
     t.assert.match(await val(t, "macgen-output"), /^64167f[0-9a-f]{6}$/);
   } },
@@ -259,7 +259,7 @@ export default [
     await t.open();
     await t.fill("Quantity", "3");
     await t.fill("MAC address prefix", "AA:BB");
-    await t.main().getByRole("radio", { name: "-", exact: true }).check({ force: true });
+    await t.main().getByRole("radio", { name: "-", exact: true }).check();
     await t.page.waitForTimeout(100);
     await reload(t);
     t.assert.equal(await t.value("Quantity"), "3");

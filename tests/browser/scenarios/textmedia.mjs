@@ -81,20 +81,20 @@ export default [
     await t.open();
     await setRange(t.page, "#lorem-paragraphs", 3);
     t.assert.equal((await t.value("Lorem ipsum", { exact: true })).split("\n\n").length, 3);
-    await t.main().getByLabel("As HTML").check({ force: true });
+    await t.main().getByLabel("As HTML").check();
     await t.page.waitForTimeout(80);
     const html = await t.value("Lorem ipsum", { exact: true });
     t.assert.match(html, /^<p>[\s\S]*<\/p>$/);
     t.assert.equal(html.split("</p>\n\n<p>").length, 3);
-    await t.main().getByLabel("As HTML").uncheck({ force: true });
-    await t.main().getByLabel("Start with lorem ipsum").uncheck({ force: true });
+    await t.main().getByLabel("As HTML").uncheck();
+    await t.main().getByLabel("Start with lorem ipsum").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.ok(!(await t.value("Lorem ipsum", { exact: true })).startsWith(LOREM_FIRST));
   } },
   { slug: "lorem-ipsum-generator", name: "range sliders set exact counts, top of range is reachable", async run(t) {
     await t.open();
     const out = () => t.value("Lorem ipsum", { exact: true });
-    await t.main().getByLabel("Start with lorem ipsum").uncheck({ force: true });
+    await t.main().getByLabel("Start with lorem ipsum").uncheck();
     const setBound = async (label, value) => {
       await t.main().getByLabel(label).evaluate((el, v) => {
         Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(el, String(v));
@@ -284,7 +284,7 @@ export default [
     await t.fill("Keep first", "4");
     await t.fill("Keep last", "0");
     t.assert.equal(await t.value("Obfuscated string"), "1234* *****");
-    await t.main().getByLabel("Keep spaces").uncheck({ force: true });
+    await t.main().getByLabel("Keep spaces").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.equal(await t.value("Obfuscated string"), "1234*******");
   } },
@@ -541,7 +541,7 @@ export default [
   { slug: "qrcode-generator", name: "transparent background is really transparent and scans", async run(t) {
     await t.open();
     await t.main().getByText("Colors", { exact: true }).click();
-    await t.main().getByLabel("Transparent background for exports").check({ force: true });
+    await t.main().getByLabel("Transparent background for exports").check();
     t.assert.equal(await previewPayload(t), "https://dmeim.com");
     const alpha = await t.page.evaluate(async () => {
       const i = new Image(); i.src = document.querySelector(".qr-preview img").src; await i.decode();
@@ -611,15 +611,15 @@ export default [
     await t.has("Password is required");
     await t.fill("Password", "secret");
     t.assert.equal(await previewPayload(t), "WIFI:S:Cafe;T:WPA;P:secret;;");
-    await t.main().getByLabel("Hidden SSID").check({ force: true });
+    await t.main().getByLabel("Hidden SSID").check();
     t.assert.equal(await previewPayload(t), "WIFI:S:Cafe;T:WPA;P:secret;H:true;;");
-    await t.main().getByLabel("Hidden SSID").uncheck({ force: true });
+    await t.main().getByLabel("Hidden SSID").uncheck();
     await t.main().getByLabel("Encryption").selectOption("WEP");
     t.assert.equal(await previewPayload(t), "WIFI:S:Cafe;T:WEP;P:secret;;");
     await t.main().getByLabel("Encryption").selectOption("nopass");
     t.assert.equal(await t.main().getByLabel("Password").count(), 0);
     t.assert.equal(await previewPayload(t), "WIFI:S:Cafe;;");
-    await t.main().getByLabel("Hidden SSID").check({ force: true });
+    await t.main().getByLabel("Hidden SSID").check();
     t.assert.equal(await previewPayload(t), "WIFI:S:Cafe;H:true;;");
   } },
   { slug: "qrcode-generator", name: "wifi: escaping survives a real decode", async run(t) {
@@ -642,10 +642,10 @@ export default [
     t.assert.equal(await previewPayload(t), "WIFI:S:Corp;T:WPA2-EAP;P:pw;E:AKA';PH2:MSCHAPV2;I:alice;;");
     await t.main().getByLabel("Phase 2 method").selectOption("None");
     t.assert.equal(await previewPayload(t), "WIFI:S:Corp;T:WPA2-EAP;P:pw;E:AKA';I:alice;;");
-    await t.main().getByLabel("Use anonymous identity").check({ force: true });
+    await t.main().getByLabel("Use anonymous identity").check();
     t.assert.equal(await previewPayload(t), "WIFI:S:Corp;T:WPA2-EAP;P:pw;E:AKA';A:anon;;");
     t.assert.ok(await t.main().getByLabel("Identity", { exact: true }).isDisabled());
-    await t.main().getByLabel("Hidden SSID").check({ force: true });
+    await t.main().getByLabel("Hidden SSID").check();
     t.assert.equal(await previewPayload(t), "WIFI:S:Corp;T:WPA2-EAP;P:pw;E:AKA';A:anon;H:true;;");
   } },
   { slug: "qrcode-generator", name: "wifi: password stays out of the file name and URL", async run(t) {
@@ -711,7 +711,7 @@ export default [
     t.assert.ok(svg.includes('font-size="12px" fill="#00ff00">Hi &lt;you&gt; &amp; 😀</text>'));
     const uri = await t.value("SVG data URI");
     t.assert.equal(Buffer.from(uri.split(",")[1], "base64").toString("utf8"), svg);
-    await t.main().getByLabel("Add exact width/height").uncheck({ force: true });
+    await t.main().getByLabel("Add exact width/height").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.ok((await t.value("SVG markup")).includes('viewBox="0 0 200 100">'));
     const parsed = await t.page.evaluate((s) => new DOMParser().parseFromString(s, "image/svg+xml").querySelector("parsererror") === null, await t.value("SVG markup"));
@@ -818,7 +818,7 @@ export default [
     await startCamera(t);
     const info = await t.page.evaluate(() => ({ audio: window.__streams[0].getAudioTracks().length, video: window.__streams[0].getVideoTracks().length }));
     t.assert.deepEqual(info, { audio: 1, video: 1 });
-    await t.main().getByLabel("Include microphone audio in videos").uncheck({ force: true });
+    await t.main().getByLabel("Include microphone audio in videos").uncheck();
     await t.click("Apply settings");
     await t.page.waitForFunction(() => window.__streams.length === 2 && window.__streams[1].getAudioTracks().length === 0, null, { timeout: 10000 });
     t.assert.equal(await t.page.evaluate(() => window.__streams[0].getTracks().every((tr) => tr.readyState === "ended")), true);

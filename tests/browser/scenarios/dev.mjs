@@ -49,17 +49,17 @@ export default [
     await t.open();
     const desc = () => t.main().getByTestId("cron-description").innerText();
     t.assert.equal(await desc(), "At 40 minutes past the hour, every hour, every day");
-    await t.page.getByLabel("Verbose").uncheck({ force: true });
+    await t.page.getByLabel("Verbose").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.equal(await desc(), "At 40 minutes past the hour");
-    await t.page.getByLabel("Verbose").check({ force: true });
+    await t.page.getByLabel("Verbose").check();
     await fillId(t, "#cg-expression", "0 14 * * 1");
     t.assert.ok((await desc()).startsWith("At 14:00"));
     t.assert.ok((await desc()).includes("Monday"));
-    await t.page.getByLabel("Use 24 hour time format").uncheck({ force: true });
+    await t.page.getByLabel("Use 24 hour time format").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.ok((await desc()).startsWith("At 02:00 PM"));
-    await t.page.getByLabel("Days start at 0").uncheck({ force: true });
+    await t.page.getByLabel("Days start at 0").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.ok((await desc()).includes("Sunday"));
     await fillId(t, "#cg-expression", "0 14 * * 7");
@@ -67,7 +67,7 @@ export default [
     await fillId(t, "#cg-expression", "0 14 * * 0");
     await t.has("DOW part must be >= 1 and <= 7");
     t.assert.equal((await desc()).trim(), "");
-    await t.page.getByLabel("Days start at 0").check({ force: true });
+    await t.page.getByLabel("Days start at 0").check();
     await t.page.waitForTimeout(80);
     t.assert.ok((await desc()).includes("Sunday"));
     await t.hasNot("This cron is invalid");
@@ -105,7 +105,7 @@ export default [
     const out = () => t.value("Prettified version of your JSON");
     t.assert.equal(await out(), '{\n   "foo": "bar",\n   "hello": "world"\n}');
     t.assert.equal(await copyIn(t, "Prettified version of your JSON"), '{\n   "foo": "bar",\n   "hello": "world"\n}');
-    await t.page.getByLabel("Sort keys").uncheck({ force: true });
+    await t.page.getByLabel("Sort keys").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.equal(await out(), '{\n   "hello": "world",\n   "foo": "bar"\n}');
     await t.fill("Indent size", "1");
@@ -141,7 +141,7 @@ export default [
   } },
   { slug: "json-prettify", name: "persists settings but not the JSON", async run(t) {
     await t.open();
-    await t.page.getByLabel("Sort keys").uncheck({ force: true });
+    await t.page.getByLabel("Sort keys").uncheck();
     await t.fill("Indent size", "5");
     await t.fill("Your raw JSON", '{"secret": 1}');
     await t.page.waitForTimeout(100);
@@ -265,7 +265,7 @@ export default [
       const groups = ["owner", "group", "public"];
       for (const [g, group] of groups.entries()) {
         const digit = Number(mode[g]);
-        for (const [scope, value] of [[R, 4], [W, 2], [X, 1]]) await bit(scope, group).setChecked((digit & value) !== 0, { force: true });
+        for (const [scope, value] of [[R, 4], [W, 2], [X, 1]]) await bit(scope, group).setChecked((digit & value) !== 0);
       }
       await t.page.waitForTimeout(60);
     };
@@ -346,7 +346,7 @@ export default [
     t.assert.equal(await out(), "<foo>\n  <bar>baz</bar>\n  <bar>baz</bar>\n</foo>");
     t.assert.equal(await copyIn(t, "Formatted XML from your XML"), "<foo>\n  <bar>baz</bar>\n  <bar>baz</bar>\n</foo>");
     await t.fill("Indent size", "4");
-    await t.page.getByLabel("Collapse content").uncheck({ force: true });
+    await t.page.getByLabel("Collapse content").uncheck();
     await t.page.waitForTimeout(80);
     await t.fill("Your XML", "<hello><world>foo</world><world>bar</world></hello>");
     t.assert.equal(await out(), "<hello>\n    <world>\n        foo\n    </world>\n    <world>\n        bar\n    </world>\n</hello>");
@@ -368,7 +368,7 @@ export default [
   } },
   { slug: "xml-formatter", name: "persists settings", async run(t) {
     await t.open();
-    await t.page.getByLabel("Collapse content").uncheck({ force: true });
+    await t.page.getByLabel("Collapse content").uncheck();
     await t.fill("Indent size", "1");
     await t.page.waitForTimeout(100);
     await t.open();
@@ -386,7 +386,7 @@ export default [
     await t.fill("Your raw YAML", "z:   1\na:\n    b:   [1,  2]");
     t.assert.equal(await out(), "z: 1\na:\n  b:\n    - 1\n    - 2\n");
     t.assert.equal(await copyIn(t, "Prettified version of your YAML"), "z: 1\na:\n  b:\n    - 1\n    - 2\n");
-    await t.page.getByLabel("Sort keys").check({ force: true });
+    await t.page.getByLabel("Sort keys").check();
     await t.page.waitForTimeout(80);
     t.assert.equal(await out(), "a:\n  b:\n    - 1\n    - 2\nz: 1\n");
     await t.fill("Indent size", "4");
@@ -411,7 +411,7 @@ export default [
   } },
   { slug: "yaml-prettify", name: "persists settings but not the YAML", async run(t) {
     await t.open();
-    await t.page.getByLabel("Sort keys").check({ force: true });
+    await t.page.getByLabel("Sort keys").check();
     await t.fill("Indent size", "6");
     await t.fill("Your raw YAML", "secret: 1");
     await t.page.waitForTimeout(100);
@@ -464,51 +464,51 @@ export default [
     await t.fill("Regex to test", "a");
     await t.fill("Text to match", "aAa");
     await rows(2);
-    await flag("i").check({ force: true });
+    await flag("i").check();
     await rows(3);
-    await flag("g").uncheck({ force: true });
+    await flag("g").uncheck();
     await rows(1);
-    await flag("g").check({ force: true });
-    await flag("i").uncheck({ force: true });
+    await flag("g").check();
+    await flag("i").uncheck();
     // multiline
     await t.fill("Regex to test", "^b");
     await t.fill("Text to match", "a\nb\nb");
     await t.has("No match");
-    await flag("m").check({ force: true });
+    await flag("m").check();
     await rows(2);
-    await flag("m").uncheck({ force: true });
+    await flag("m").uncheck();
     // dotAll, on by default
     await t.fill("Regex to test", "a.b");
     await t.fill("Text to match", "a\nb");
     await rows(1);
-    await flag("s").uncheck({ force: true });
+    await flag("s").uncheck();
     await t.page.waitForTimeout(300);
     await t.has("No match");
-    await flag("s").check({ force: true });
+    await flag("s").check();
     // unicode, on by default: one match per code point
     await t.fill("Regex to test", "^.$");
     await t.fill("Text to match", "😀");
     await rows(1);
-    await flag("u").uncheck({ force: true });
+    await flag("u").uncheck();
     await t.page.waitForTimeout(300);
     await t.has("No match");
     // unicode sets
-    await flag("v").check({ force: true });
+    await flag("v").check();
     await t.fill("Regex to test", "[\\p{L}--[a-z]]");
     await t.fill("Text to match", "aB");
     t.assert.deepEqual((await rows(1))[0].includes("B"), true);
-    await flag("u").check({ force: true });
+    await flag("u").check();
     t.assert.equal(await flag("v").isChecked(), false);
     await t.has("Invalid regex");
-    await flag("v").check({ force: true });
+    await flag("v").check();
     t.assert.equal(await flag("u").isChecked(), false);
     await t.hasNot("Invalid regex");
-    await flag("u").check({ force: true });
+    await flag("u").check();
     // sticky
     await t.fill("Regex to test", "a");
     await t.fill("Text to match", "aab a");
     await rows(3);
-    await flag("y").check({ force: true });
+    await flag("y").check();
     const sticky = await rows(2);
     t.assert.ok(sticky[0].startsWith("0") && sticky[1].startsWith("1"), sticky.join("|"));
     await t.fill("Text to match", "baa");
@@ -527,7 +527,7 @@ export default [
     await t.page.waitForFunction(() => document.querySelector(".rt-highlight__mark")?.innerText === "aaa", null, { timeout: 15000 });
     await t.fill("Regex to test", "\\-");
     await t.has("Invalid regex");
-    await t.page.locator("#rt-flag-u").uncheck({ force: true });
+    await t.page.locator("#rt-flag-u").uncheck();
     await t.page.waitForTimeout(80);
     await t.hasNot("Invalid regex");
     await t.fill("Text to match", "x-y");

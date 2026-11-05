@@ -30,17 +30,17 @@ export default [
   } },
   { slug: "token-generator", name: "token each option changes the alphabet", async run(t) {
     await t.open();
-    await t.field("Uppercase").uncheck({ force: true });
+    await t.field("Uppercase").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.match(await t.page.locator("#tg-token").inputValue(), /^[a-z0-9]+$/);
-    await t.field("Lowercase").uncheck({ force: true });
+    await t.field("Lowercase").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.match(await t.page.locator("#tg-token").inputValue(), /^[0-9]+$/);
-    await t.field("Symbols").check({ force: true });
-    await t.field("Numbers").uncheck({ force: true });
+    await t.field("Symbols").check();
+    await t.field("Numbers").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.match(await t.page.locator("#tg-token").inputValue(), /^[^A-Za-z0-9]+$/);
-    await t.field("Symbols").uncheck({ force: true });
+    await t.field("Symbols").uncheck();
     await t.page.waitForTimeout(80);
     t.assert.equal(await t.page.locator("#tg-token").inputValue(), "");
     await t.has("Length");
@@ -193,27 +193,27 @@ export default [
     const v4s = (await t.value("UUIDs")).split("\n");
     t.assert.equal(v4s.length, 7);
     t.assert.equal(new Set(v4s).size, 7);
-    await t.main().getByRole("radio", { name: "NIL" }).check({ force: true });
+    await t.main().getByRole("radio", { name: "NIL" }).check();
     await t.page.waitForTimeout(60);
     t.assert.equal(await t.value("UUIDs"), Array(7).fill("00000000-0000-0000-0000-000000000000").join("\n"));
-    await t.main().getByRole("radio", { name: "v1" }).check({ force: true });
+    await t.main().getByRole("radio", { name: "v1" }).check();
     await t.page.waitForTimeout(60);
     const v1s = (await t.value("UUIDs")).split("\n");
     t.assert.equal(new Set(v1s).size, 7);
     for (const id of v1s) t.assert.match(id, /^[0-9a-f]{8}-[0-9a-f]{4}-1[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
     await t.page.locator("#ug-quantity").fill("1");
-    await t.main().getByRole("radio", { name: "v3" }).check({ force: true });
-    await t.main().getByRole("radio", { name: "DNS" }).check({ force: true });
+    await t.main().getByRole("radio", { name: "v3" }).check();
+    await t.main().getByRole("radio", { name: "DNS" }).check();
     await t.page.locator("#ug-name").fill("python.org");
     await t.page.waitForTimeout(60);
     t.assert.equal(await t.value("UUIDs"), "6fa459ea-ee8a-3ca4-894e-db77e160355e");
-    await t.main().getByRole("radio", { name: "v5" }).check({ force: true });
+    await t.main().getByRole("radio", { name: "v5" }).check();
     await t.page.waitForTimeout(60);
     t.assert.equal(await t.value("UUIDs"), "886313e1-3b8a-5372-9b90-0c9aee199e5d");
   } },
   { slug: "uuid-generator", name: "uuid invalid namespace shows a message and no output", async run(t) {
     await t.open();
-    await t.main().getByRole("radio", { name: "v5" }).check({ force: true });
+    await t.main().getByRole("radio", { name: "v5" }).check();
     await t.page.locator("#ug-namespace").fill("not-a-uuid");
     await t.page.waitForTimeout(80);
     t.assert.equal(await t.value("UUIDs"), "");
@@ -243,7 +243,7 @@ export default [
     await qty.blur();
     await t.page.waitForTimeout(60);
     t.assert.equal(await qty.inputValue(), "50");
-    await t.main().getByRole("radio", { name: "v1" }).check({ force: true });
+    await t.main().getByRole("radio", { name: "v1" }).check();
     await t.page.waitForTimeout(60);
     await reload(t);
     t.assert.equal(await t.page.locator("#ug-quantity").inputValue(), "50");
@@ -253,7 +253,7 @@ export default [
     t.assert.equal((await t.value("UUIDs")).split("\n").length, 1);
     t.assert.equal((await t.value("UUIDs"))[14], "4");
   } },
-  { slug: "uuid-generator", name: "uuid mobile layout", viewport: mobile, async run(t) { await t.open(); await t.main().getByRole("radio", { name: "v5" }).check({ force: true }); await t.page.waitForTimeout(60); await t.noOverflow(); } },
+  { slug: "uuid-generator", name: "uuid mobile layout", viewport: mobile, async run(t) { await t.open(); await t.main().getByRole("radio", { name: "v5" }).check(); await t.page.waitForTimeout(60); await t.noOverflow(); } },
 
   // ---- ulid
   { slug: "ulid-generator", name: "ulid defaults, refresh, copy", async run(t) {
@@ -273,7 +273,7 @@ export default [
     await t.page.locator("#ulid-quantity").fill("5");
     await t.page.waitForTimeout(60);
     t.assert.equal((await t.value("ULIDs")).split("\n").length, 5);
-    await t.main().getByRole("radio", { name: "JSON" }).check({ force: true });
+    await t.main().getByRole("radio", { name: "JSON" }).check();
     await t.page.waitForTimeout(60);
     const parsed = JSON.parse(await t.value("ULIDs"));
     t.assert.equal(parsed.length, 5);
@@ -618,18 +618,18 @@ export default [
     await t.page.waitForTimeout(300);
     await t.page.locator("#wc-results").fill("3");
     await t.click("Generate");
-    await t.main().getByRole("radio", { name: "Separated line" }).check({ force: true });
+    await t.main().getByRole("radio", { name: "Separated line" }).check();
     await t.page.waitForTimeout(60);
     const out = () => t.page.locator("#wc-output").inputValue();
     t.assert.equal((await out()).split(",").length, 3);
-    await t.main().getByRole("checkbox", { name: "Spaces after separators" }).check({ force: true });
+    await t.main().getByRole("checkbox", { name: "Spaces after separators" }).check();
     await t.page.waitForTimeout(60);
     t.assert.equal((await out()).split(", ").length, 3);
     await t.page.locator("#wc-sep").selectOption("custom");
     await t.page.locator("#wc-custom-sep").fill("|");
     await t.page.waitForTimeout(60);
     t.assert.equal((await out()).split("| ").length, 3);
-    await t.main().getByRole("radio", { name: "One per line" }).check({ force: true });
+    await t.main().getByRole("radio", { name: "One per line" }).check();
     await t.page.waitForTimeout(60);
     t.assert.equal((await out()).split("\n").length, 3);
   } },
@@ -644,7 +644,7 @@ export default [
     t.assert.equal(await t.page.locator("#wc-output").count(), 0);
     await t.page.locator("#wc-extra-words").fill("sunflower, moonbeam\nsunflower");
     await t.page.locator("#wc-results").fill("2");
-    await t.main().getByRole("checkbox", { name: "Allow words to repeat" }).uncheck({ force: true });
+    await t.main().getByRole("checkbox", { name: "Allow words to repeat" }).uncheck();
     await t.click("Generate");
     const words = (await t.page.locator("#wc-output").inputValue()).split("\n").map((l) => l.replace(/\d+$/, "")).sort();
     t.assert.deepEqual(words, ["moonbeam", "sunflower"]);
@@ -653,7 +653,7 @@ export default [
     await t.has("requested count exceeds");
     t.assert.equal(await t.page.locator("#wc-output").count(), 0);
     await t.page.locator("#wc-results").fill("5000");
-    await t.main().getByRole("checkbox", { name: "Allow words to repeat" }).check({ force: true });
+    await t.main().getByRole("checkbox", { name: "Allow words to repeat" }).check();
     await t.click("Generate");
     t.assert.equal(await t.page.locator("#wc-results").inputValue(), "1000");
     t.assert.equal((await t.page.locator("#wc-output").inputValue()).split("\n").length, 1000);
@@ -677,5 +677,5 @@ export default [
     await t.click("Reset word length");
     await t.hasNot("up to 4 letters");
   } },
-  { slug: "word-code-generator", name: "word code mobile layout", viewport: mobile, async run(t) { await t.open(); await t.page.waitForTimeout(300); await t.click("Generate"); await t.noOverflow(); await t.main().getByRole("radio", { name: "Separated line" }).check({ force: true }); await t.page.waitForTimeout(60); await t.noOverflow(); } },
+  { slug: "word-code-generator", name: "word code mobile layout", viewport: mobile, async run(t) { await t.open(); await t.page.waitForTimeout(300); await t.click("Generate"); await t.noOverflow(); await t.main().getByRole("radio", { name: "Separated line" }).check(); await t.page.waitForTimeout(60); await t.noOverflow(); } },
 ];

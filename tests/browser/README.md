@@ -52,6 +52,7 @@ export default [
 
 - **Options:** a scenario can also set `viewport`, `colorScheme`, or `allowConsoleErrors`. Any uncaught page error or console error fails the scenario unless `allowConsoleErrors` is set.
 - **Helpers:** `t` provides `open`, `field`, `fill`, `value`, `text`, `has`, `hasNot`, `click`, `clipboard`, `download`, and `noOverflow`, plus the raw `page` and `assert`.
+- **Clicks:** don't use `force: true`. It skips the check that an element has stopped moving, so clicks can miss and fail at random. A normal click also proves a person could reach the control.
 - **Expected values:** take them from a published spec or an independent source such as `node:crypto`, `openssl`, or `python3`, never from the tool's own output.
 
 ## Suites
