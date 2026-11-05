@@ -10,7 +10,7 @@ Detect and parse Browser, Engine, OS, CPU, and Device type/model from a user-age
 None. Live parse as you type. On first load the input is primed with the current browser’s `navigator.userAgent`.
 
 ## Inputs
-- User-agent string (multiline textarea)
+- User-agent string (multiline textarea with a clear button)
 
 ## Outputs
 - **Browser** — name, version

@@ -1,4 +1,5 @@
 export {
+  displayKeyName,
   buildKeycodeFields,
   formatModifiers,
   snapshotFromKeyboardEvent,

@@ -16,7 +16,8 @@ const SECTIONS = [
 export default function JwtParser() {
   const [rawJwt, setRawJwt] = useState(DEFAULT_JWT);
 
-  const valid = isValidJwt(rawJwt);
+  const empty = rawJwt.trim() === "";
+  const valid = !empty && isValidJwt(rawJwt);
   const decoded = useMemo(
     () => (valid ? decodeJwt({ jwt: rawJwt }) : undefined),
     [rawJwt, valid],
@@ -39,12 +40,12 @@ export default function JwtParser() {
           spellCheck={false}
           autoFocus
           onChange={(event) => setRawJwt(event.target.value)}
-          aria-invalid={!valid || undefined}
+          aria-invalid={(!empty && !valid) || undefined}
         />
 
-        {!valid ? (
+        {!empty && !valid ? (
           <Notice tone="danger" live="polite">
-            Invalid JWT
+            This is not a valid JWT. A token has dot-separated Base64URL parts: a JSON header, a JSON payload, and a signature.
           </Notice>
         ) : null}
 
@@ -79,9 +80,10 @@ function claimItem(row: JwtClaimRow): KeyValueItem {
   const hint = [row.claimDescription, row.friendlyValue].filter(Boolean).join(" · ");
   return {
     label: row.claim,
-    value: String(row.value),
+    value: row.value || "–",
     mono: true,
-    copy: true,
+    tone: row.value ? "default" : "muted",
+    copy: row.value ? row.value : false,
     hint: hint || undefined,
   };
 }

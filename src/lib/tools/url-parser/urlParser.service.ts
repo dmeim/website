@@ -13,7 +13,8 @@ export type UrlPropertyKey =
   | "hostname"
   | "port"
   | "pathname"
-  | "search";
+  | "search"
+  | "hash";
 
 export type UrlProperty = {
   title: string;
@@ -38,7 +39,7 @@ export type ParsedUrl = {
   href: string;
   origin: string;
   properties: UrlProperty[];
-  /** Deduped by key (last value wins), matching it-tools Object.fromEntries. */
+  /** Every parameter in URL order, so a repeated key keeps all of its values. */
   searchParams: UrlSearchParam[];
 };
 
@@ -50,6 +51,7 @@ const PROPERTY_DEFS: { title: string; key: UrlPropertyKey }[] = [
   { title: "Port", key: "port" },
   { title: "Path", key: "pathname" },
   { title: "Params", key: "search" },
+  { title: "Hash", key: "hash" },
 ];
 
 /** True when `new URL(value)` succeeds. */
@@ -66,9 +68,10 @@ export function isValidUrl(value: string): boolean {
 export function parseUrl(value: string): ParsedUrl | undefined {
   try {
     const url = new URL(value);
-    const searchParams = Object.entries(
-      Object.fromEntries(url.searchParams.entries()),
-    ).map(([key, paramValue]) => ({ key, value: paramValue }));
+    const searchParams = [...url.searchParams.entries()].map(([key, paramValue]) => ({
+      key,
+      value: paramValue,
+    }));
 
     const parts = {
       protocol: url.protocol,

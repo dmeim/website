@@ -3,6 +3,8 @@
  * Parity with it-tools http-status-codes (static table + search).
  */
 
+import Fuse from "fuse.js";
+
 import {
   codesByCategories,
   type HttpStatusCategory,
@@ -48,6 +50,17 @@ function matchesQuery(entry: HttpStatusCodeWithCategory, query: string): boolean
   return haystacks.some((value) => value.toLowerCase().includes(query));
 }
 
+function fuzzyMatches(
+  entries: HttpStatusCodeWithCategory[],
+  query: string,
+): HttpStatusCodeWithCategory[] {
+  const fuse = new Fuse(entries, {
+    keys: [{ name: "name", weight: 2 }, "description"],
+    threshold: 0.3,
+  });
+  return fuse.search(query).map(({ item }) => item);
+}
+
 /**
  * Filter codes by query. Empty / whitespace query returns the full
  * category list; otherwise a single "Search results" group (it-tools parity).
@@ -59,9 +72,10 @@ export function filterHttpStatusCategories(query: string): HttpStatusCategory[] 
   }
 
   const needle = trimmed.toLowerCase();
-  const matches = flattenHttpStatusCodes().filter((entry) =>
-    matchesQuery(entry, needle),
-  );
+  const all = flattenHttpStatusCodes();
+  const exact = all.filter((entry) => matchesQuery(entry, needle));
+  // Fuzzy matching only as a fallback, so "503" does not also list 500, 502, and 505.
+  const matches = exact.length > 0 ? exact : fuzzyMatches(all, trimmed);
 
   return [{ category: SEARCH_RESULT_CATEGORY, codes: matches }];
 }

@@ -25,6 +25,7 @@ import {
   generateTokenWindow,
   getCounterFromTime,
   isValidBase32Secret,
+  normalizeBase32Secret,
 } from "@/lib/tools/otp-generator";
 import { renderQrPngDataUrl } from "@/lib/tools/qr-code/qrCode.service";
 
@@ -33,9 +34,10 @@ import "./OtpGenerator.css";
 export default function OtpGenerator() {
   const [secret, setSecret] = useState(() => generateSecret());
   const [now, setNow] = useState(() => Date.now());
-  const [qrDataUrl, setQrDataUrl] = useState("");
+  const [qr, setQr] = useState({ url: "", failed: false });
 
   const secretValid = isValidBase32Secret(secret);
+  const normalizedSecret = useMemo(() => normalizeBase32Secret(secret), [secret]);
 
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 250);
@@ -46,17 +48,17 @@ export default function OtpGenerator() {
     if (!secretValid) {
       return { previous: "–––", current: "–––", next: "–––" };
     }
-    return generateTokenWindow({ key: secret, now });
-  }, [secret, secretValid, now]);
+    return generateTokenWindow({ key: normalizedSecret, now });
+  }, [normalizedSecret, secretValid, now]);
 
   const keyUri = useMemo(
-    () => (secretValid ? buildKeyUri({ secret }) : ""),
-    [secret, secretValid],
+    () => (secretValid ? buildKeyUri({ secret: normalizedSecret }) : ""),
+    [normalizedSecret, secretValid],
   );
 
   const secretHex = useMemo(
-    () => (secretValid ? base32toHex(secret) : ""),
-    [secret, secretValid],
+    () => (secretValid ? base32toHex(normalizedSecret) : ""),
+    [normalizedSecret, secretValid],
   );
 
   const epochSeconds = Math.floor(now / 1000);
@@ -72,7 +74,7 @@ export default function OtpGenerator() {
     let cancelled = false;
 
     if (!keyUri) {
-      setQrDataUrl("");
+      setQr({ url: "", failed: false });
       return;
     }
 
@@ -83,9 +85,15 @@ export default function OtpGenerator() {
       errorCorrectionLevel: "M",
       size: 210,
       margin: 1,
-    }).then((url: string) => {
-      if (!cancelled) setQrDataUrl(url);
-    });
+    }).then(
+      (url: string) => {
+        if (!cancelled) setQr({ url, failed: false });
+      },
+      () => {
+        // The key URI can outgrow what a QR code holds when the secret is very long.
+        if (!cancelled) setQr({ url: "", failed: true });
+      },
+    );
 
     return () => {
       cancelled = true;
@@ -113,8 +121,8 @@ export default function OtpGenerator() {
           spellCheck={false}
           value={secret}
           placeholder="Paste your TOTP secret…"
-          onChange={(event) => setSecret(event.target.value.trim())}
-          error={secret.length > 0 && !secretValid ? "Secret should be a Base32 string (A–Z, 2–7)." : undefined}
+          onChange={(event) => setSecret(event.target.value)}
+          error={normalizedSecret.length > 0 && !secretValid ? "The secret should be a Base32 string, using only the letters A to Z and the digits 2 to 7." : undefined}
           trailing={
             <IconButton icon="arrows-clockwise" label="Generate a new random secret" size="sm" onClick={refreshSecret} />
           }
@@ -140,10 +148,14 @@ export default function OtpGenerator() {
           label={`Next in ${String(secondsLeft).padStart(2, "0")}s`}
         />
 
-        {qrDataUrl ? (
-          <Figure className="otp-qr" src={qrDataUrl} alt="QR code for otpauth key URI" frame priority />
+        {qr.url ? (
+          <Figure className="otp-qr" src={qr.url} alt="QR code for otpauth key URI" frame priority />
         ) : (
-          <Notice tone="neutral">QR appears for a valid secret.</Notice>
+          <Notice tone="neutral">
+            {qr.failed
+              ? "This secret is too long to fit in a QR code. You can still copy the key URI."
+              : "A QR code appears here once you enter a valid secret."}
+          </Notice>
         )}
 
         <ButtonGroup>
@@ -172,7 +184,7 @@ export default function OtpGenerator() {
           placeholder="Secret in hex will appear here"
         />
         <FormGrid columns={2}>
-          <OutputField id="otp-epoch" label="Epoch (seconds)" value={String(epochSeconds)} copy={false} />
+          <OutputField id="otp-epoch" label="Epoch (seconds)" value={String(epochSeconds)} />
           <OutputField id="otp-counter" label="Iteration count" value={String(counter)} />
         </FormGrid>
         <OutputField id="otp-counter-hex" label="Padded hex counter" value={counterHex} />

@@ -23,6 +23,7 @@ Compare two JSON objects (JSON5-tolerant) and show a nested structural diff: add
 - Parsing uses `json5` (same as it-tools)
 - Diff algorithm ports it-tools `json-diff.models` without lodash (`areDeepEqual` replaces `_.isEqual`)
 - Results appear only when both sides parse successfully
+- `0` and `-0` compare equal; JSON5's `NaN` and `Infinity` are displayed as written
 - Empty input is treated as “not ready” (no result), matching it-tools
 
 ## Source

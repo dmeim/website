@@ -144,7 +144,12 @@ const MENU_ITEMS: MenuItem[] = [
 
 function MenuBar({ editor }: { editor: Editor }) {
   return (
-    <Toolbar label="Formatting" className="wysiwyg-toolbar">
+    <Toolbar
+      label="Formatting"
+      className="wysiwyg-toolbar"
+      // Keep focus and the text selection in the editor; blurring it would also re-render the icons mid-click.
+      onMouseDown={(event) => event.preventDefault()}
+    >
       {MENU_ITEMS.map((item, index) => {
         if (item.type === "divider") {
           return <span key={`divider-${index}`} className="wysiwyg-toolbar__divider" aria-hidden="true" />;

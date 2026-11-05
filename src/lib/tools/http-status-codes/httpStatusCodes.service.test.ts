@@ -87,6 +87,12 @@ describe("http-status-codes", () => {
       );
     });
 
+    it("falls back to fuzzy matching for typos", () => {
+      const codes = (query: string) => filterHttpStatusCategories(query)[0]?.codes.map((entry) => entry.code);
+      expect(codes("forbiden")).toContain(403);
+      expect(codes("teapott")).toContain(418);
+    });
+
     it("returns an empty Search results group when nothing matches", () => {
       const result = filterHttpStatusCategories("zzzz-no-such-status");
       expect(result).toEqual([{ category: "Search results", codes: [] }]);

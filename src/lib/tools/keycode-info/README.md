@@ -23,6 +23,7 @@ Each field is copyable.
 
 ## Notes
 - `keyCode` is deprecated in the DOM spec but still exposed for parity with it-tools / legacy code
+- The space bar reports `" "`, so it is displayed as "Space" while its copy button copies the real value
 - Browser shortcuts (e.g. Cmd+T) may still fire; this tool does not call `preventDefault`
 - Runs client-side only; SSR shows the idle prompt until hydration
 

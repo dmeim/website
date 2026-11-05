@@ -28,6 +28,8 @@ export default function BasicAuthGenerator() {
             id="basicauth-username"
             label="Username"
             autoComplete="username"
+            clearable
+            error={username.includes(":") ? "A Basic auth username can't contain a colon, because the colon separates it from the password." : undefined}
             value={username}
             placeholder="Your username…"
             onChange={(event) => setUsername(event.target.value)}
@@ -38,6 +40,7 @@ export default function BasicAuthGenerator() {
             label="Password"
             type="password"
             revealable
+            clearable
             autoComplete="current-password"
             value={password}
             placeholder="Your password…"

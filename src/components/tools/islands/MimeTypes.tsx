@@ -1,12 +1,13 @@
 import { useMemo, useState, type ReactNode } from "react";
 
-import { Badge, Panel, ReferenceList, Select, Table, ToolFrame } from "@/ui/react";
+import { Badge, Input, Panel, ReferenceList, Table, ToolFrame } from "@/ui/react";
 import {
   getExtensionsForMime,
   getMimeForExtension,
   listExtensions,
   listMimeInfos,
   listMimeTypes,
+  normalizeExtension,
 } from "@/lib/tools/mime-types";
 import "./MimeTypes.css";
 
@@ -29,6 +30,9 @@ export default function MimeTypes() {
     [selectedExtension],
   );
 
+  const mimeUnknown = selectedMimeType.trim() !== "" && extensionsFound.length === 0;
+  const extensionUnknown = selectedExtension.trim() !== "" && !mimeTypeFound;
+
   const filteredInfos = useMemo(() => {
     const query = tableFilter.trim().toLowerCase();
     if (!query) return MIME_INFOS;
@@ -47,23 +51,27 @@ export default function MimeTypes() {
           titleId="mime-to-ext-heading"
           description="Know which file extensions are associated with a MIME type."
         >
-          <Select
+          <Input
             id="mime-select-type"
             label="MIME type"
+            list="mime-type-options"
+            autoComplete="off"
+            spellCheck={false}
+            clearable
             value={selectedMimeType}
+            placeholder="Search your MIME type… (ex: application/pdf)"
+            error={mimeUnknown ? "No extensions are known for this MIME type. Pick one from the list." : undefined}
             onChange={(event) => setSelectedMimeType(event.target.value)}
-          >
-            <option value="">Select your MIME type… (ex: application/pdf)</option>
+          />
+          <datalist id="mime-type-options">
             {MIME_OPTIONS.map((mimeType) => (
-              <option key={mimeType} value={mimeType}>
-                {mimeType}
-              </option>
+              <option key={mimeType} value={mimeType} />
             ))}
-          </Select>
+          </datalist>
 
           {extensionsFound.length > 0 ? (
             <ResultTags
-              intro={<>Extensions of files with the <code>{selectedMimeType}</code> MIME type:</>}
+              intro={<>Extensions of files with the <code>{selectedMimeType.trim()}</code> MIME type:</>}
               tags={extensionsFound.map((extension) => `.${extension}`)}
             />
           ) : null}
@@ -74,23 +82,27 @@ export default function MimeTypes() {
           titleId="ext-to-mime-heading"
           description="Know which MIME type is associated with a file extension."
         >
-          <Select
+          <Input
             id="mime-select-extension"
             label="File extension"
+            list="mime-extension-options"
+            autoComplete="off"
+            spellCheck={false}
+            clearable
             value={selectedExtension}
+            placeholder="Search your extension… (ex: pdf)"
+            error={extensionUnknown ? "This extension is not in the list. Check the spelling, or filter the reference below." : undefined}
             onChange={(event) => setSelectedExtension(event.target.value)}
-          >
-            <option value="">Select your extension… (ex: pdf)</option>
+          />
+          <datalist id="mime-extension-options">
             {EXTENSION_OPTIONS.map((extension) => (
-              <option key={extension} value={extension}>
-                .{extension}
-              </option>
+              <option key={extension} value={`.${extension}`} />
             ))}
-          </Select>
+          </datalist>
 
-          {selectedExtension && mimeTypeFound ? (
+          {mimeTypeFound ? (
             <ResultTags
-              intro={<>MIME type associated with the <code>.{selectedExtension}</code> file extension:</>}
+              intro={<>MIME type associated with the <code>.{normalizeExtension(selectedExtension)}</code> file extension:</>}
               tags={[mimeTypeFound]}
             />
           ) : null}

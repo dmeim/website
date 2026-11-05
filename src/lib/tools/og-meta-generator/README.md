@@ -25,7 +25,8 @@ Generate Open Graph and Twitter/social HTML `<meta>` tags from form fields. Runs
 ## Notes
 - Empty values are omitted from the output
 - Multi-value fields (e.g. video actors) emit one `<meta>` per non-empty entry
-- Content attribute values are not HTML-escaped (parity with it-tools / oggen); avoid raw `"` in values
+- Content attribute values are HTML-escaped, so quotes, ampersands, and angle brackets are safe in any field (it-tools leaves them raw, which breaks the tag)
+- Multi-value entries can be reordered with the move buttons
 - All work stays in the browser
 
 ## Source

@@ -10,8 +10,8 @@ Generate a base64 Basic Authorization header from a username and password. Runs 
 None.
 
 ## Inputs
-- Username (single-line text)
-- Password (single-line password field)
+- Username (single-line text, clearable)
+- Password (single-line password field, clearable and revealable)
 
 ## Outputs
 - Authorization header line: `Authorization: Basic <base64(username:password)>` (live as you type)
@@ -20,6 +20,7 @@ None.
 ## Notes
 - Encoding is UTF-8 via `TextEncoder` then `btoa` (parity with it-tools / js-base64)
 - Empty username and password still produce a header (`Authorization: Basic Og==` for `:`)
+- A colon in the username shows an error, because RFC 7617 does not allow it
 - Colons inside the password are preserved; only the first colon separates user from password in the credential string
 - Credentials never leave the browser
 

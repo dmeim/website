@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildKeycodeFields,
+  displayKeyName,
   formatModifiers,
   snapshotFromKeyboardEvent,
   type KeyEventSnapshot,
@@ -17,6 +18,14 @@ const SAMPLE: KeyEventSnapshot = {
   ctrlKey: false,
   altKey: false,
 };
+
+describe("displayKeyName", () => {
+  it("names the space bar and leaves other keys alone", () => {
+    expect(displayKeyName(" ")).toBe("Space");
+    expect(displayKeyName("a")).toBe("a");
+    expect(displayKeyName("Enter")).toBe("Enter");
+  });
+});
 
 describe("keycode-info", () => {
   describe("formatModifiers", () => {

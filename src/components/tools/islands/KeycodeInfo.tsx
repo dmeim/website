@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { KeyValue, Panel, Stat, ToolFrame } from "@/ui/react";
 import {
   buildKeycodeFields,
+  displayKeyName,
   snapshotFromKeyboardEvent,
   type KeyEventSnapshot,
 } from "@/lib/tools/keycode-info";
@@ -34,10 +35,10 @@ export default function KeycodeInfo() {
           {snapshot ? (
             <Stat
               label="Pressed key"
-              value={snapshot.key}
+              value={displayKeyName(snapshot.key)}
               size="xl"
               mono
-              aria-label={`Pressed key ${snapshot.key}`}
+              aria-label={`Pressed key ${displayKeyName(snapshot.key)}`}
             />
           ) : null}
           <p className="kci-prompt__hint">
@@ -50,7 +51,7 @@ export default function KeycodeInfo() {
             aria-label="Key event fields"
             items={fields.map((field) => ({
               label: field.label,
-              value: field.value || field.placeholder,
+              value: (field.id === "key" ? displayKeyName(field.value) : field.value) || field.placeholder,
               mono: true,
               tone: field.value ? "default" : "muted",
               copy: field.value ? field.value : false,

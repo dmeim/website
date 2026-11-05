@@ -91,6 +91,12 @@ describe("og-meta-generator", () => {
       );
     });
 
+    it("escapes values so they cannot break out of the attribute", () => {
+      expect(generateMeta({ title: 'Tom & "Jerry" <b>' })).toContain(
+        '<meta property="og:title" content="Tom &amp; &quot;Jerry&quot; &lt;b&gt;" />',
+      );
+    });
+
     it("omits empty string values", () => {
       expect(generateMeta({ title: "" })).toBe("");
     });

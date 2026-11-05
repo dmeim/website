@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { FormGrid, Notice, Panel, Switch, Textarea, ToolFrame } from "@/ui/react";
 import { copyTextToClipboard } from "@/lib/tools/clipboard";
@@ -14,6 +14,8 @@ import {
 } from "@/lib/tools/json-diff";
 
 import "./JsonDiff.css";
+
+const INVALID_JSON = "Invalid JSON format. Check for missing quotes, commas, or brackets.";
 
 export default function JsonDiff() {
   const [rawLeft, setRawLeft] = useState("");
@@ -44,6 +46,12 @@ export default function JsonDiff() {
     [showResults, leftJson, rightJson, onlyShowDifferences],
   );
 
+  useEffect(() => {
+    if (!copyStatus) return;
+    const id = window.setTimeout(() => setCopyStatus(""), 2500);
+    return () => window.clearTimeout(id);
+  }, [copyStatus]);
+
   const copyValue = useCallback(async (formatted: string) => {
     try {
       await copyTextToClipboard(formatted);
@@ -71,7 +79,7 @@ export default function JsonDiff() {
             onChange={(event) => setRawLeft(event.target.value)}
             autoFocus
             spellCheck={false}
-            error={leftInvalid ? "Invalid JSON format" : undefined}
+            error={leftInvalid ? INVALID_JSON : undefined}
           />
           <Textarea
             id="jd-right"
@@ -82,7 +90,7 @@ export default function JsonDiff() {
             placeholder="Paste your JSON to compare here…"
             onChange={(event) => setRawRight(event.target.value)}
             spellCheck={false}
-            error={rightInvalid ? "Invalid JSON format" : undefined}
+            error={rightInvalid ? INVALID_JSON : undefined}
           />
         </FormGrid>
       </Panel>

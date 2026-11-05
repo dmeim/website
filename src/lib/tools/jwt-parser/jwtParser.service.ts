@@ -33,7 +33,7 @@ export type DecodedJwt = {
 
 /** True when header + payload decode without throwing. */
 export function isValidJwt(jwt: string): boolean {
-  if (jwt.length === 0) return false;
+  if (jwt.trim().length === 0) return false;
   try {
     decodeJwt({ jwt });
     return true;
@@ -44,7 +44,7 @@ export function isValidJwt(jwt: string): boolean {
 
 /** Decode JWT segments into labeled claim rows + signature. */
 export function decodeJwt({ jwt }: { jwt: string }): DecodedJwt {
-  const parts = jwt.split(".");
+  const parts = jwt.trim().split(".");
   const rawHeaderPart = parts[0];
   const rawPayloadPart = parts[1];
   const signature = parts[2] ?? "";
@@ -107,7 +107,7 @@ function parseClaims({
 }): JwtClaimRow {
   return {
     claim,
-    claimDescription: CLAIM_DESCRIPTIONS[claim],
+    claimDescription: ownValue(CLAIM_DESCRIPTIONS, claim),
     value: formatClaimValue(value),
     friendlyValue: getFriendlyValue({ claim, value }),
   };
@@ -133,7 +133,7 @@ function getFriendlyValue({
   }
 
   if (claim === "alg" && typeof value === "string") {
-    return ALGORITHM_DESCRIPTIONS[value];
+    return ownValue(ALGORITHM_DESCRIPTIONS, value);
   }
 
   return undefined;
@@ -144,6 +144,11 @@ function dateFormatter(value: unknown): string | undefined {
   const date = new Date(Number(value) * 1000);
   if (Number.isNaN(date.getTime())) return undefined;
   return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+}
+
+/** Claim names come from the token, so "constructor" must not resolve to Object.prototype. */
+function ownValue(table: Record<string, string>, key: string): string | undefined {
+  return Object.hasOwn(table, key) ? table[key] : undefined;
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

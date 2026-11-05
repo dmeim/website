@@ -20,7 +20,7 @@ None. Two independent panels (Encode / Decode).
 
 ## Notes
 - Uses native `encodeURIComponent` / `decodeURIComponent` (parity with it-tools)
-- Invalid decode input soft-fails to an empty output and shows a validation hint (“Impossible to parse this string”)
+- Invalid decode input soft-fails to an empty output and shows a validation hint explaining what a valid percent sequence looks like
 - Empty input yields an empty output on that panel
 - Default sample values match it-tools: `Hello world :)` / `Hello%20world%20%3A)`
 

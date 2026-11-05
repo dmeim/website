@@ -6,12 +6,17 @@ export const DEFAULT_HTML =
 export const HTML_WYSIWYG_STORAGE_KEY = "html-wysiwyg-editor--html";
 
 /** Block-level tags TipTap StarterKit commonly emits. */
-const BLOCK_TAG =
-  "h[1-6]|p|ul|ol|li|blockquote|pre|hr|div|table|thead|tbody|tr|th|td";
+const CONTAINER_TAG = "ul|ol|li|blockquote|pre|hr|div|table|thead|tbody|tr|th|td";
+const BLOCK_TAG = `h[1-6]|p|${CONTAINER_TAG}`;
+
+/** Blocks that hold only inline content, so they read best on a single line. */
+const LEAF_BLOCK = /<(h[1-6]|p)(?:\s[^>]*)?>.*?<\/\1>/gi;
+
+const PRE_TOKEN = "\u0000";
 
 /**
  * Lightweight HTML pretty-printer for TipTap/StarterKit output.
- * Avoids pulling Prettier; keeps block tags on their own lines with indent.
+ * Avoids pulling Prettier; puts each block on its own line with indent.
  */
 export function formatHtml(html: string): string {
   const trimmed = html.trim();
@@ -19,14 +24,23 @@ export function formatHtml(html: string): string {
     return "";
   }
 
-  const blockOpenOrClose = new RegExp(
-    `(</?(?:${BLOCK_TAG})(?:\\s[^>]*)?>)`,
+  const containerOpenOrClose = new RegExp(
+    `(</?(?:${CONTAINER_TAG})(?:\\s[^>]*)?>)`,
     "gi",
   );
 
-  const collapsed = trimmed.replace(/\s*\n\s*/g, " ").replace(/\s+/g, " ");
+  // Whitespace inside <pre> is content, so code blocks skip the collapsing and indenting below.
+  const preBlocks: string[] = [];
+  const withoutPre = trimmed.replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi, (block) => {
+    preBlocks.push(block);
+    return `${PRE_TOKEN}${preBlocks.length - 1}${PRE_TOKEN}`;
+  });
+
+  const collapsed = withoutPre.replace(/\s+/g, " ");
   const rough = collapsed
-    .replace(blockOpenOrClose, "\n$1\n")
+    .replace(LEAF_BLOCK, "\n$&\n")
+    .replace(containerOpenOrClose, "\n$1\n")
+    .replace(new RegExp(`${PRE_TOKEN}\\d+${PRE_TOKEN}`, "g"), "\n$&\n")
     .replace(/\n+/g, "\n")
     .trim();
 
@@ -51,7 +65,11 @@ export function formatHtml(html: string): string {
       depth = Math.max(0, depth - 1);
     }
 
-    out.push(`${"  ".repeat(depth)}${line}`);
+    const restored = line.replace(
+      new RegExp(`${PRE_TOKEN}(\\d+)${PRE_TOKEN}`),
+      (_, index: string) => preBlocks[Number(index)] ?? "",
+    );
+    out.push(`${"  ".repeat(depth)}${restored}`);
 
     if (isOpening && !openAndClose) {
       depth += 1;

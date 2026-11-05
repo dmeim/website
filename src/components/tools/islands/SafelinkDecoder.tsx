@@ -7,7 +7,6 @@ export default function SafelinkDecoder() {
   const [input, setInput] = useState("");
 
   const result = useMemo(() => decodeSafeLinksURLSafe(input), [input]);
-  const invalid = !result.ok;
   const output = result.ok ? result.url : "";
 
   return (
@@ -28,7 +27,7 @@ export default function SafelinkDecoder() {
           spellCheck={false}
           autoFocus
           onChange={(event) => setInput(event.target.value)}
-          aria-invalid={invalid || undefined}
+          aria-invalid={!result.ok || undefined}
         />
         {!result.ok ? (
           <Notice tone="danger" variant="inline" live="polite">

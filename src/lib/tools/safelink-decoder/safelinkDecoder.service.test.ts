@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  MISSING_URL_MESSAGE,
+  NOT_A_SAFELINK_MESSAGE,
   decodeSafeLinksURL,
   decodeSafeLinksURLSafe,
   isSafeLinksUrl,
@@ -27,6 +29,11 @@ describe("safelink-decoder", () => {
       expect(isSafeLinksUrl("https://google.com")).toBe(false);
       expect(isSafeLinksUrl("")).toBe(false);
     });
+
+    it("checks the host rather than the text of the link", () => {
+      expect(isSafeLinksUrl("https://evil.example/?x=.safelinks.protection.outlook.com&url=https%3A%2F%2Fx.com")).toBe(false);
+      expect(isSafeLinksUrl("https://nam12.safelinks.protection.outlook.com.evil.example/?url=x")).toBe(false);
+    });
   });
 
   describe("decodeSafeLinksURL", () => {
@@ -42,6 +49,20 @@ describe("safelink-decoder", () => {
       expect(() => decodeSafeLinksURL("https://google.com")).toThrow(
         "Invalid SafeLinks URL provided",
       );
+    });
+
+    it("reads the url param even when it follows an escaped separator", () => {
+      expect(
+        decodeSafeLinksURL(
+          "https://nam12.safelinks.protection.outlook.com/?data=1&amp;url=https%3A%2F%2Fexample.com%2Fa%3Fb%3D1&amp;reserved=0",
+        ),
+      ).toBe("https://example.com/a?b=1");
+    });
+
+    it("accepts a link copied without its protocol", () => {
+      expect(
+        decodeSafeLinksURL("eur03.safelinks.protection.outlook.com/?url=https%3A%2F%2Fexample.org"),
+      ).toBe("https://example.org");
     });
 
     it("returns null when url query param is missing", () => {
@@ -69,8 +90,15 @@ describe("safelink-decoder", () => {
     it("returns error for non-SafeLinks URLs", () => {
       expect(decodeSafeLinksURLSafe("https://google.com")).toEqual({
         ok: false,
-        error: "Invalid SafeLinks URL provided",
+        error: NOT_A_SAFELINK_MESSAGE,
       });
+      expect(decodeSafeLinksURLSafe("not a url at all").ok).toBe(false);
+    });
+
+    it("returns an error when the SafeLink has no destination", () => {
+      expect(
+        decodeSafeLinksURLSafe("https://aus01.safelinks.protection.outlook.com/?data=1&reserved=0"),
+      ).toEqual({ ok: false, error: MISSING_URL_MESSAGE });
     });
   });
 });

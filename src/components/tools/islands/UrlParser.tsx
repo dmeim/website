@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
 
-import { Input, KeyValue, Notice, Panel, SectionHeading, ToolFrame } from "@/ui/react";
+import { CopyButton, Input, KeyValue, Notice, Panel, SectionHeading, Table, ToolFrame } from "@/ui/react";
 import {
   DEFAULT_URL,
   isValidUrl,
   parseUrl,
   type UrlPropertyKey,
 } from "@/lib/tools/url-parser";
+
+import "./UrlParser.css";
 
 const EMPTY_PROPERTIES: { title: string; key: UrlPropertyKey; value: string }[] = [
   { title: "Protocol", key: "protocol", value: "" },
@@ -16,13 +18,23 @@ const EMPTY_PROPERTIES: { title: string; key: UrlPropertyKey; value: string }[] 
   { title: "Port", key: "port", value: "" },
   { title: "Path", key: "pathname", value: "" },
   { title: "Params", key: "search", value: "" },
+  { title: "Hash", key: "hash", value: "" },
 ];
+
+function ParamCell({ text, label }: { text: string; label: string }) {
+  return (
+    <td>
+      <code>{text || "–"}</code>{" "}
+      {text ? <CopyButton appearance="icon" size="sm" value={text} label={label} /> : null}
+    </td>
+  );
+}
 
 export default function UrlParser() {
   const [urlInput, setUrlInput] = useState(DEFAULT_URL);
 
-  const invalid = !isValidUrl(urlInput);
-  const parsed = useMemo(() => (invalid ? undefined : parseUrl(urlInput)), [urlInput, invalid]);
+  const invalid = urlInput.trim() !== "" && !isValidUrl(urlInput);
+  const parsed = useMemo(() => parseUrl(urlInput), [urlInput]);
   const properties = parsed?.properties ?? EMPTY_PROPERTIES;
 
   return (
@@ -46,7 +58,7 @@ export default function UrlParser() {
 
         {invalid ? (
           <Notice tone="danger" live="polite">
-            Invalid URL
+            This is not a valid URL. Enter a full address that includes the protocol, such as https://example.com.
           </Notice>
         ) : null}
 
@@ -63,18 +75,24 @@ export default function UrlParser() {
         />
 
         {parsed && parsed.searchParams.length > 0 ? (
-          <section aria-labelledby="urlp-params-heading">
+          <section className="urlp-params" aria-labelledby="urlp-params-heading">
             <SectionHeading title="Query parameters" titleId="urlp-params-heading" level={3} />
-            <KeyValue
-              aria-label="Query parameters"
-              items={parsed.searchParams.map((param) => ({
-                label: param.key,
-                value: param.value || "–",
-                mono: true,
-                tone: param.value ? "default" : "muted",
-                copy: param.value ? param.value : false,
-              }))}
-            />
+            <Table caption="Query parameters" captionHidden density="compact">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {parsed.searchParams.map((param, index) => (
+                  <tr key={`${param.key}-${index}`}>
+                    <ParamCell text={param.key} label={`Copy parameter name ${param.key}`} />
+                    <ParamCell text={param.value} label={`Copy value of ${param.key}`} />
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
           </section>
         ) : null}
       </Panel>

@@ -6,7 +6,12 @@ import {
   formatDiffValue,
   isValidJsonInput,
   parseJsonInput,
+  type Difference,
 } from "./jsonDiff.service";
+
+function childrenOf(difference: Difference): Difference[] {
+  return difference.type === "value" ? [] : difference.children;
+}
 
 describe("json-diff", () => {
   describe("diff", () => {
@@ -86,7 +91,7 @@ describe("json-diff", () => {
 
     it("marks updated scalar values", () => {
       const result = diff({ a: 1 }, { a: 2 });
-      expect(result.children?.[0]).toMatchObject({
+      expect(childrenOf(result)[0]).toMatchObject({
         key: "a",
         status: "updated",
         oldValue: 1,
@@ -96,7 +101,7 @@ describe("json-diff", () => {
 
     it("marks removed keys", () => {
       const result = diff({ a: 1, b: 2 }, { a: 1 });
-      expect(result.children?.find((c) => c.key === "b")).toMatchObject({
+      expect(childrenOf(result).find((c) => c.key === "b")).toMatchObject({
         status: "removed",
         oldValue: 2,
         value: undefined,
@@ -107,7 +112,7 @@ describe("json-diff", () => {
       const result = diff({ a: 1, b: 2 }, { a: 1, b: 3, c: 4 }, {
         onlyShowDifferences: true,
       });
-      expect(result.children?.map((c) => c.key)).toEqual(["b", "c"]);
+      expect(childrenOf(result).map((c) => c.key)).toEqual(["b", "c"]);
     });
 
     it("returns unchanged for identical roots", () => {
@@ -138,6 +143,16 @@ describe("json-diff", () => {
   });
 
   describe("helpers", () => {
+    it("treats 0 and -0 as equal and NaN as equal to itself", () => {
+      expect(areDeepEqual({ a: 0 }, { a: -0 })).toBe(true);
+      expect(areDeepEqual(NaN, NaN)).toBe(true);
+    });
+
+    it("formats JSON5 non-finite numbers without turning them into null", () => {
+      expect(formatDiffValue(Infinity)).toBe("Infinity");
+      expect(formatDiffValue(NaN)).toBe("NaN");
+    });
+
     it("areDeepEqual compares nested structures", () => {
       expect(areDeepEqual({ a: [1, { b: 2 }] }, { a: [1, { b: 2 }] })).toBe(true);
       expect(areDeepEqual({ a: 1 }, { a: 2 })).toBe(false);

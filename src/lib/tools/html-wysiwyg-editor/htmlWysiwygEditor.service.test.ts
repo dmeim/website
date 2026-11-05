@@ -31,14 +31,7 @@ describe("html-wysiwyg-editor", () => {
 
     it("pretty-prints the default document", () => {
       expect(formatHtml(DEFAULT_HTML)).toBe(
-        [
-          "<h1>",
-          "  Hey!",
-          "</h1>",
-          "<p>",
-          "  Welcome to this html wysiwyg editor",
-          "</p>",
-        ].join("\n"),
+        ["<h1>Hey!</h1>", "<p>Welcome to this html wysiwyg editor</p>"].join("\n"),
       );
     });
 
@@ -48,14 +41,10 @@ describe("html-wysiwyg-editor", () => {
         [
           "<ul>",
           "  <li>",
-          "    <p>",
-          "      One",
-          "    </p>",
+          "    <p>One</p>",
           "  </li>",
           "  <li>",
-          "    <p>",
-          "      Two",
-          "    </p>",
+          "    <p>Two</p>",
           "  </li>",
           "</ul>",
         ].join("\n"),
@@ -64,7 +53,14 @@ describe("html-wysiwyg-editor", () => {
 
     it("keeps inline marks with paragraph text", () => {
       expect(formatHtml("<p>Hello <strong>world</strong></p>")).toBe(
-        ["<p>", "  Hello <strong>world</strong>", "</p>"].join("\n"),
+        "<p>Hello <strong>world</strong></p>",
+      );
+    });
+
+    it("keeps the line breaks and spaces inside code blocks", () => {
+      const pre = "<pre><code>if (a) {\n    b();\n}</code></pre>";
+      expect(formatHtml(`<p>Before</p>${pre}<p>After</p>`)).toBe(
+        `<p>Before</p>\n${pre}\n<p>After</p>`,
       );
     });
 
@@ -73,16 +69,10 @@ describe("html-wysiwyg-editor", () => {
         "<h2>Title</h2><pre><code>const x = 1</code></pre><blockquote><p>Quote</p></blockquote>";
       expect(formatHtml(input)).toBe(
         [
-          "<h2>",
-          "  Title",
-          "</h2>",
-          "<pre>",
-          "  <code>const x = 1</code>",
-          "</pre>",
+          "<h2>Title</h2>",
+          "<pre><code>const x = 1</code></pre>",
           "<blockquote>",
-          "  <p>",
-          "    Quote",
-          "  </p>",
+          "  <p>Quote</p>",
           "</blockquote>",
         ].join("\n"),
       );

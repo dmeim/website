@@ -8,7 +8,8 @@ import {
   encodeUrlSafe,
 } from "@/lib/tools/url-encoder";
 
-const PARSE_ERROR = "Impossible to parse this string";
+const ENCODE_ERROR = "This text has a broken Unicode character, so it can't be encoded. Retype or remove the character.";
+const DECODE_ERROR = "This has a broken percent sequence. Each % must be followed by two hex digits that form valid UTF-8, such as %20.";
 
 export default function UrlEncoder() {
   const [encodeInput, setEncodeInput] = useState("Hello world :)");
@@ -45,7 +46,7 @@ export default function UrlEncoder() {
             placeholder: "The string to encode",
             rows: 3,
           }}
-          error={encodeInvalid ? PARSE_ERROR : undefined}
+          error={encodeInvalid ? ENCODE_ERROR : undefined}
           output={{ label: "Your string encoded", value: encodeOutput, mono: true, rows: 3 }}
         />
       </Panel>
@@ -63,7 +64,7 @@ export default function UrlEncoder() {
             mono: true,
             rows: 3,
           }}
-          error={decodeInvalid ? PARSE_ERROR : undefined}
+          error={decodeInvalid ? DECODE_ERROR : undefined}
           output={{ label: "Your string decoded", value: decodeOutput, rows: 3 }}
         />
       </Panel>

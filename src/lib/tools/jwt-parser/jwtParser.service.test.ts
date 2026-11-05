@@ -7,6 +7,10 @@ import {
   isValidJwt,
 } from "./jwtParser.service";
 
+function encodeSegment(value: unknown): string {
+  return Buffer.from(JSON.stringify(value), "utf8").toString("base64url");
+}
+
 describe("jwt-parser", () => {
   describe("isValidJwt", () => {
     it("accepts the it-tools demo token", () => {
@@ -112,6 +116,35 @@ describe("jwt-parser", () => {
       );
       expect(roles.claimDescription).toBe("Roles");
       expect(address.claimDescription).toBe("Preferred postal address");
+    });
+
+    it("decodes Unicode claims as UTF-8", () => {
+      const jwt = `${encodeSegment({ alg: "none" })}.${encodeSegment({ name: "José 日本語 😀" })}.`;
+      expect(decodeJwt({ jwt }).payload[0]?.value).toBe("José 日本語 😀");
+    });
+
+    it("ignores whitespace around a pasted token", () => {
+      expect(decodeJwt({ jwt: `  ${DEFAULT_JWT}\n` }).signature).toBe(
+        "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+      );
+    });
+
+    it("does not read descriptions from Object.prototype", () => {
+      const jwt = `${encodeSegment({ alg: "constructor" })}.${encodeSegment({ constructor: "x", toString: "y" })}.`;
+      const decoded = decodeJwt({ jwt });
+      expect(decoded.header[0]?.friendlyValue).toBeUndefined();
+      expect(decoded.payload.map((row) => row.claimDescription)).toEqual([undefined, undefined]);
+    });
+
+    it("rejects segments that are not JSON objects or valid base64url", () => {
+      expect(isValidJwt(`${encodeSegment([1, 2])}.${encodeSegment({ a: 1 })}.`)).toBe(false);
+      expect(isValidJwt("@@@.@@@.@@@")).toBe(false);
+      expect(isValidJwt("   ")).toBe(false);
+    });
+
+    it("leaves a non-numeric date claim without a friendly value", () => {
+      const jwt = `${encodeSegment({ alg: "none" })}.${encodeSegment({ exp: "soon" })}.`;
+      expect(decodeJwt({ jwt }).payload[0]?.friendlyValue).toBeUndefined();
     });
 
     it("throws on missing segments", () => {

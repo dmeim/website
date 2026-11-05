@@ -14,12 +14,12 @@ None. Live decode as you type.
 
 ## Outputs
 - Original destination URL (copyable)
-- Validation error when the host is not an Outlook SafeLinks domain, or the string is not a valid absolute URL
+- Validation error when the host is not an Outlook SafeLinks domain, the string is not a URL, or the link has no `url` parameter
 
 ## Notes
-- Requires a host matching `*.safelinks.protection.outlook.com`
-- HTML-encoded query separators (`&amp;`) still work because `url` is the first param
-- Missing `url` query param yields an empty decoded output (parity with it-tools returning `null`)
+- Requires a host matching `*.safelinks.protection.outlook.com`; the host is checked, not the text of the link
+- HTML-encoded query separators (`&amp;`) are unescaped first, so `url` is found in any position
+- A link copied without its protocol is read as `https://`
 - Runs entirely in the browser; no network requests
 
 ## Source

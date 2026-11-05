@@ -39,6 +39,11 @@ export function formatModifiers(snapshot: {
     .join(" + ");
 }
 
+/** The space bar reports " ", which would render as nothing. */
+export function displayKeyName(key: string): string {
+  return key === " " ? "Space" : key;
+}
+
 /** Build the five copyable fields shown by it-tools. Empty when no event yet. */
 export function buildKeycodeFields(
   snapshot: KeyEventSnapshot | null | undefined,

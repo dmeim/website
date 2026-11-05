@@ -3,11 +3,27 @@
  * Parity with it-tools safelink-decoder — native URL API only.
  */
 
-const SAFELINKS_HOST_RE = /\.safelinks\.protection\.outlook\.com/;
+const SAFELINKS_HOST_SUFFIX = ".safelinks.protection.outlook.com";
 
-/** True when the string looks like an Outlook SafeLinks host. */
+export const NOT_A_SAFELINK_MESSAGE =
+  "This is not an Outlook SafeLink. Paste a full link whose address ends in .safelinks.protection.outlook.com.";
+export const MISSING_URL_MESSAGE =
+  "This SafeLink has no url parameter, so there is no destination to decode. Copy the whole link and try again.";
+
+/** Mail clients often hand over the link HTML-escaped, and without a protocol when copied as text. */
+function parseLink(value: string): URL | null {
+  const unescaped = value.trim().replace(/&amp;/g, "&");
+  const candidate = /^[a-z][a-z0-9+.-]*:\/\//i.test(unescaped) ? unescaped : `https://${unescaped}`;
+  try {
+    return new URL(candidate);
+  } catch {
+    return null;
+  }
+}
+
+/** True when the link's host, not just some part of its text, is an Outlook SafeLinks host. */
 export function isSafeLinksUrl(value: string): boolean {
-  return SAFELINKS_HOST_RE.test(value);
+  return parseLink(value)?.hostname.toLowerCase().endsWith(SAFELINKS_HOST_SUFFIX) ?? false;
 }
 
 /**
@@ -16,11 +32,12 @@ export function isSafeLinksUrl(value: string): boolean {
  * Returns `null` when the `url` query param is missing.
  */
 export function decodeSafeLinksURL(safeLinksUrl: string): string | null {
-  if (!isSafeLinksUrl(safeLinksUrl)) {
+  const link = parseLink(safeLinksUrl);
+  if (!link || !isSafeLinksUrl(safeLinksUrl)) {
     throw new Error("Invalid SafeLinks URL provided");
   }
 
-  return new URL(safeLinksUrl).searchParams.get("url");
+  return link.searchParams.get("url");
 }
 
 export type DecodeSafeLinksResult =
@@ -39,10 +56,8 @@ export function decodeSafeLinksURLSafe(safeLinksUrl: string): DecodeSafeLinksRes
 
   try {
     const url = decodeSafeLinksURL(trimmed);
-    return { ok: true, url: url ?? "" };
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Invalid SafeLinks URL provided";
-    return { ok: false, error: message };
+    return url ? { ok: true, url } : { ok: false, error: MISSING_URL_MESSAGE };
+  } catch {
+    return { ok: false, error: NOT_A_SAFELINK_MESSAGE };
   }
 }

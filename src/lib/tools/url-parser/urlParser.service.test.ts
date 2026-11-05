@@ -48,6 +48,7 @@ describe("url-parser", () => {
         "port",
         "pathname",
         "search",
+        "hash",
       ]);
       expect(parsed.properties.map((p) => p.title)).toEqual([
         "Protocol",
@@ -57,13 +58,14 @@ describe("url-parser", () => {
         "Port",
         "Path",
         "Params",
+        "Hash",
       ]);
       expect(parsed.properties.find((p) => p.key === "hostname")!.value).toBe(
         "it-tools.tech",
       );
     });
 
-    it("lists search params (last value wins on duplicate keys)", () => {
+    it("lists search params and keeps every value of a repeated key", () => {
       const parsed = parseUrl(DEFAULT_URL)!;
       expect(parsed.searchParams).toEqual([
         { key: "key1", value: "value" },
@@ -74,8 +76,9 @@ describe("url-parser", () => {
         "https://example.com/?a=1&b=2&a=3",
       )!.searchParams;
       expect(dupes).toEqual([
-        { key: "a", value: "3" },
+        { key: "a", value: "1" },
         { key: "b", value: "2" },
+        { key: "a", value: "3" },
       ]);
     });
 

@@ -86,6 +86,17 @@ export default function OgMetaGenerator() {
     });
   }, []);
 
+  const moveMultiItem = useCallback((key: string, index: number, offset: -1 | 1) => {
+    setMetadata((prev) => {
+      const next = [...asList(prev[key])];
+      const target = index + offset;
+      const [moved] = next.splice(index, 1);
+      if (moved === undefined || target < 0 || target > next.length) return prev;
+      next.splice(target, 0, moved);
+      return { ...prev, [key]: next };
+    });
+  }, []);
+
   const removeMultiItem = useCallback((key: string, index: number) => {
     setMetadata((prev) => {
       const list = asList(prev[key]);
@@ -149,6 +160,19 @@ export default function OgMetaGenerator() {
                 onChange={(event) => updateMultiItem(element.key, index, event.target.value)}
               />
               <IconButton
+                icon="caret-down"
+                className="og-multi__move-up"
+                label={`Move ${element.label} ${index + 1} up`}
+                disabled={index === 0}
+                onClick={() => moveMultiItem(element.key, index, -1)}
+              />
+              <IconButton
+                icon="caret-down"
+                label={`Move ${element.label} ${index + 1} down`}
+                disabled={index === values.length - 1}
+                onClick={() => moveMultiItem(element.key, index, 1)}
+              />
+              <IconButton
                 icon="x"
                 label={`Remove ${element.label} ${index + 1}`}
                 disabled={values.length <= 1}
@@ -171,6 +195,7 @@ export default function OgMetaGenerator() {
         id={fieldId}
         label={element.label}
         span="full"
+        clearable
         value={asString(metadata[element.key])}
         placeholder={element.placeholder}
         onChange={(event) => setField(element.key, event.target.value)}

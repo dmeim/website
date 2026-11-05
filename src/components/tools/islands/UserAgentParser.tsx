@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Badge, Card, Panel, Textarea, ToolFrame } from "@/ui/react";
+import { Badge, Card, IconButton, Panel, Textarea, ToolFrame } from "@/ui/react";
 import {
   buildUserAgentSections,
   parseUserAgent,
@@ -40,6 +40,7 @@ export default function UserAgentParser() {
           spellCheck={false}
           autoFocus
           onChange={(event) => setUa(event.target.value)}
+          trailing={<IconButton icon="x" label="Clear" size="sm" disabled={!ua} onClick={() => setUa("")} />}
         />
       </Panel>
 

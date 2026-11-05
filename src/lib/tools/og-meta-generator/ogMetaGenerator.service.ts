@@ -91,6 +91,15 @@ export function flattenMetadata(
   return acc;
 }
 
+/** Quotes, ampersands, and angle brackets must not end the attribute or the tag early. */
+function escapeAttribute(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 export function buildMetaStrings({
   flatMetadata,
   type,
@@ -99,7 +108,7 @@ export function buildMetaStrings({
   type: "property" | "name" | string;
 }): string[] {
   return flatMetadata.map(
-    ({ key, value }) => `<meta ${type}="${key}" content="${value}" />`,
+    ({ key, value }) => `<meta ${type}="${key}" content="${escapeAttribute(value)}" />`,
   );
 }
 

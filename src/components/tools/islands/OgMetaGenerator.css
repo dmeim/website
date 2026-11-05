@@ -1,6 +1,11 @@
+/* The island icon set has a down caret but no up one. */
+.og-multi__move-up svg {
+  transform: rotate(180deg);
+}
+
 .og-multi__row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
   gap: var(--ui-space-xs);
   align-items: center;
 }

@@ -18,7 +18,7 @@ None — static reference table with a search filter.
 
 ## Notes
 - Data table copied from it-tools `http-status-codes.constants.ts` (no npm dependency)
-- Search uses case-insensitive substring matching over code, name, description, category, and type (Fuse.js not required for this dataset)
+- Search uses case-insensitive substring matching over code, name, description, category, and type, then falls back to Fuse.js over name and description when nothing matches, so typos such as `forbiden` still find a code
 - Empty query restores the five category groups; non-empty query collapses to “Search results”
 
 ## Source

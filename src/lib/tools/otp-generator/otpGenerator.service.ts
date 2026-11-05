@@ -7,7 +7,7 @@ export const OTP_DIGITS_DEFAULT = 6;
 export const OTP_ALGORITHM_DEFAULT = "SHA1";
 export const OTP_SECRET_LENGTH = 16;
 export const OTP_BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-export const OTP_ISSUER_DEFAULT = "IT-Tools";
+export const OTP_ISSUER_DEFAULT = "dmeim.com";
 export const OTP_ACCOUNT_DEFAULT = "demo-user";
 
 export {
@@ -21,6 +21,7 @@ export {
   base32toHex,
   getCounterFromTime,
   isValidBase32Secret,
+  normalizeBase32Secret,
   generateTokenWindow,
 };
 
@@ -44,7 +45,8 @@ function base32toHex(base32: string): string {
     .map((value) => base32Chars.indexOf(value).toString(2).padStart(5, "0"))
     .join("");
 
-  return (bits.match(/.{1,8}/g) ?? [])
+  // Leftover bits are padding (RFC 4648). Keeping them as a byte would disagree with real authenticators.
+  return (bits.match(/.{8}/g) ?? [])
     .map((chunk) => Number.parseInt(chunk, 2).toString(16).padStart(2, "0"))
     .join("");
 }
@@ -168,8 +170,13 @@ function generateSecret(): string {
   });
 }
 
+/** Services display secrets grouped, lowercase, or padded; authenticators want none of that. */
+function normalizeBase32Secret(value: string): string {
+  return value.replace(/\s+/g, "").replace(/=+$/, "").toUpperCase();
+}
+
 function isValidBase32Secret(value: string): boolean {
-  return value.length > 0 && /^[A-Z234567]+$/i.test(value);
+  return /^[A-Z234567]+$/.test(normalizeBase32Secret(value));
 }
 
 function generateTokenWindow({

@@ -11,6 +11,7 @@ import {
   generateTokenWindow,
   hexToBytes,
   isValidBase32Secret,
+  normalizeBase32Secret,
   verifyHOTP,
   verifyTOTP,
 } from "./otpGenerator.service";
@@ -31,8 +32,8 @@ describe("otp-generator service", () => {
 
   describe("base32toHex", () => {
     it("converts base32 to a hex string", () => {
-      expect(base32toHex("ABCDEF")).toEqual("00443205");
-      expect(base32toHex("7777")).toEqual("ffff0f");
+      expect(base32toHex("ABCDEF")).toEqual("004432");
+      expect(base32toHex("7777")).toEqual("ffff");
       expect(base32toHex("JBSWY3DPEHPK3PXP")).toEqual("48656c6c6f21deadbeef");
     });
 
@@ -117,7 +118,7 @@ describe("otp-generator service", () => {
   describe("buildKeyUri", () => {
     it("builds a key URI string", () => {
       expect(buildKeyUri({ secret: "JBSWY3DPEHPK3PXP" })).toEqual(
-        "otpauth://totp/IT-Tools:demo-user?issuer=IT-Tools&secret=JBSWY3DPEHPK3PXP&algorithm=SHA1&digits=6&period=30",
+        "otpauth://totp/dmeim.com:demo-user?issuer=dmeim.com&secret=JBSWY3DPEHPK3PXP&algorithm=SHA1&digits=6&period=30",
       );
 
       expect(
@@ -143,6 +144,57 @@ describe("otp-generator service", () => {
         true,
       );
       expect(isValidBase32Secret(secret)).toBe(true);
+    });
+  });
+
+  describe("published vectors", () => {
+    // ASCII "12345678901234567890", the key shared by RFC 4226 Appendix D and RFC 6238 Appendix B.
+    const RFC_KEY = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ";
+
+    it("matches RFC 4226 Appendix D HOTP values", () => {
+      const expected = ["755224", "287082", "359152", "969429", "338314", "254676", "287922", "162583", "399871", "520489"];
+      for (const [counter, code] of expected.entries()) {
+        expect(generateHOTP({ key: RFC_KEY, counter })).toEqual(code);
+      }
+    });
+
+    it("matches RFC 6238 Appendix B SHA-1 values, truncated to 6 digits", () => {
+      const expected: [number, string][] = [
+        [59, "287082"],
+        [1111111109, "081804"],
+        [1111111111, "050471"],
+        [1234567890, "005924"],
+        [2000000000, "279037"],
+        [20000000000, "353130"],
+      ];
+      for (const [seconds, code] of expected) {
+        expect(generateTOTP({ key: RFC_KEY, now: seconds * 1000 })).toEqual(code);
+      }
+    });
+
+    it("drops leftover bits like real authenticators do", () => {
+      expect(base32toHex("ITTOOLS")).toEqual("44e6e72e");
+      expect(generateTokenWindow({ key: "ITTOOLS", now: 1609477200000 })).toEqual({
+        previous: "918365",
+        current: "885809",
+        next: "556793",
+      });
+    });
+
+    it("decodes a 26-character secret to its 16 bytes", () => {
+      expect(base32toHex("GEZDGNBVGY3TQOJQGEZDGNBVGY")).toEqual("31323334353637383930313233343536");
+      expect(generateTOTP({ key: "GEZDGNBVGY3TQOJQGEZDGNBVGY", now: 1609477200000 })).toEqual("337300");
+    });
+  });
+
+  describe("normalizeBase32Secret", () => {
+    it("strips grouping spaces and padding and uppercases", () => {
+      expect(normalizeBase32Secret("jbsw y3dp ehpk 3pxp")).toEqual("JBSWY3DPEHPK3PXP");
+      expect(normalizeBase32Secret("MZXW6===")).toEqual("MZXW6");
+      expect(isValidBase32Secret("jbsw y3dp")).toBe(true);
+      expect(isValidBase32Secret("MZXW6===")).toBe(true);
+      expect(isValidBase32Secret("   ")).toBe(false);
+      expect(isValidBase32Secret("MZ=XW")).toBe(false);
     });
   });
 

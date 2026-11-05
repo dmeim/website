@@ -1,0 +1,8 @@
+/* Long parameter values wrap instead of widening the page. */
+.urlp-params {
+  min-width: 0;
+}
+
+.urlp-params code {
+  overflow-wrap: anywhere;
+}

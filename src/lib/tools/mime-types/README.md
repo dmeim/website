@@ -10,8 +10,8 @@ Convert MIME types to associated file extensions and file extensions back to MIM
 None — pure lookup from the static MIME database.
 
 ## Inputs
-- MIME type selection (e.g. `application/pdf`)
-- File extension selection (e.g. `pdf` / `.pdf`)
+- Searchable MIME type field with suggestions (e.g. `application/pdf`)
+- Searchable file extension field with suggestions (e.g. `pdf` / `.pdf`)
 - Optional filter text for the reference table
 
 ## Outputs
@@ -23,6 +23,7 @@ None — pure lookup from the static MIME database.
 - Builds extension ↔ MIME maps from `mime-db` with mime-types 2.x source preference (same dataset as it-tools; browser-safe, no Node `path`)
 - Extension keys are stored without a leading dot; the UI accepts `.pdf` or `pdf`
 - Only MIME types that declare extensions in mime-db appear in the maps
+- A value that is not in the maps shows a message instead of a result
 
 ## Source
 Port of [it-tools MIME types](https://it-tools.tech/mime-types). Local reference: handy-dandy `it-tools` (`src/tools/mime-types/`). Catalogue id: `mime-types`.

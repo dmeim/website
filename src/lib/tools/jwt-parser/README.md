@@ -23,6 +23,9 @@ None. Live decode as you type.
 - Claim and algorithm descriptions match it-tools (RFC 7518 + IANA JWT claims)
 - Nested objects/arrays are pretty-printed with indent 3
 - Signature is shown but never verified
+- Surrounding whitespace is ignored and empty input shows no error
+- A segment must be Base64URL-encoded JSON whose top level is an object, otherwise the token is reported as invalid
+- Claims with an empty or null value show an en dash
 
 ## Source
 Port of [it-tools JWT parser](https://it-tools.tech/jwt-parser). Local reference: handy-dandy `it-tools` (`src/tools/jwt-parser/`). Catalogue id: `jwt-parser`.

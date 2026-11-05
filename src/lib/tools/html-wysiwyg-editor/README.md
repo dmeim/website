@@ -23,7 +23,7 @@ Content is persisted in `localStorage` under `html-wysiwyg-editor--html`.
 
 ## Notes
 - Uses `@tiptap/react` + `@tiptap/starter-kit` for parity with it-tools (which uses TipTap Vue)
-- HTML pretty-print is a lightweight local helper (no Prettier dependency)
+- HTML pretty-print is a lightweight local helper (no Prettier dependency): headings and paragraphs stay on one line, containers are indented, and `<pre>` content is left untouched
 - Empty TipTap docs (`<p></p>`) show as an empty source pane
 - Catalogue id: `html-wysiwyg-editor`
 

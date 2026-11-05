@@ -15,6 +15,7 @@ export {
   getCounterFromTime,
   hexToBytes,
   isValidBase32Secret,
+  normalizeBase32Secret,
   verifyHOTP,
   verifyTOTP,
 } from "./otpGenerator.service";

@@ -34,7 +34,8 @@ export function parseJsonInput(value: string): unknown | undefined {
 }
 
 export function areDeepEqual(a: unknown, b: unknown): boolean {
-  if (Object.is(a, b)) return true;
+  // === so 0 and -0 compare equal; Object.is so NaN equals itself (JSON5 allows both).
+  if (a === b || Object.is(a, b)) return true;
   if (typeof a !== typeof b) return false;
   if (a === null || b === null) return a === b;
 
@@ -63,6 +64,8 @@ export function areDeepEqual(a: unknown, b: unknown): boolean {
 
 export function formatDiffValue(value: unknown): string {
   if (value === null) return "null";
+  // JSON.stringify would print JSON5's NaN and Infinity as null.
+  if (typeof value === "number" && !Number.isFinite(value)) return String(value);
   return JSON.stringify(value);
 }
 
