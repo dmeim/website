@@ -55,18 +55,72 @@ describe("docker-run-to-docker-compose-converter", () => {
       expect(result.errors).toEqual([]);
     });
 
-    it("still returns a compose shell for empty input", () => {
+    it("returns nothing for empty input", () => {
       const result = convertDockerRunToCompose("");
-      expect(result.yaml).toContain("version: '3.9'");
-      expect(result.yaml).toContain("services:");
+      expect(result.yaml).toBe("");
       expect(result.notImplemented).toEqual([]);
       expect(result.notTranslatable).toEqual([]);
       expect(result.errors).toEqual([]);
     });
 
     it("handles whitespace-only input like empty after trim", () => {
-      const result = convertDockerRunToCompose("   \n\t  ");
-      expect(result.yaml).toBe(convertDockerRunToCompose("").yaml);
+      expect(convertDockerRunToCompose("   \n\t  ")).toEqual(convertDockerRunToCompose(""));
+    });
+
+    it("rejects commands that are not docker run or docker create", () => {
+      for (const command of ["ls -la", "docker ps", "docker", "podman run nginx"]) {
+        const result = convertDockerRunToCompose(command);
+        expect(result.yaml, command).toBe("");
+        expect(result.errors, command).toEqual(["Enter a command that starts with docker run or docker create."]);
+      }
+    });
+
+    it("reports a missing image instead of an unnamed service", () => {
+      for (const command of ["docker run", "docker run -p nginx"]) {
+        const result = convertDockerRunToCompose(command);
+        expect(result.yaml, command).toBe("");
+        expect(result.errors.join(), command).toContain("No image name found");
+      }
+    });
+
+    it("reports an unclosed quote", () => {
+      const result = convertDockerRunToCompose('docker run -e "A=b nginx');
+      expect(result.yaml).toBe("");
+      expect(result.errors).toEqual(["This command has an unclosed quote. Close it and try again."]);
+    });
+
+    it("accepts the forms people paste", () => {
+      const expected = convertDockerRunToCompose("docker run nginx").yaml;
+      expect(expected).toContain("image: nginx");
+      for (const command of [
+        "sudo docker run nginx",
+        "$ docker run nginx",
+        "docker   run   nginx",
+        "docker container run nginx",
+        "docker run \\\n  nginx",
+        "docker run \\\r\n  nginx",
+      ]) {
+        expect(convertDockerRunToCompose(command).yaml, command).toBe(expected);
+      }
+      expect(convertDockerRunToCompose("docker create nginx").yaml).toBe(expected);
+    });
+
+    it("keeps quoted values with their option", () => {
+      const result = convertDockerRunToCompose(
+        `docker run -e X="y" -e 'A=b c' --name="web" -v "$(pwd)":/app nginx sh -c 'echo hi'`,
+      );
+      expect(result.errors).toEqual([]);
+      expect(result.yaml).toContain("image: nginx");
+      expect(result.yaml).toContain("- X=y");
+      expect(result.yaml).toContain("'A=b c'");
+      expect(result.yaml).toContain("container_name: web");
+      expect(result.yaml).toContain("$(pwd):/app");
+    });
+
+    it("keeps the output and lists an unknown option as an error", () => {
+      const result = convertDockerRunToCompose("docker run --bogus-flag nginx");
+      expect(result.yaml).toContain("image: nginx");
+      expect(result.errors).toEqual(["Unknown option: bogus-flag"]);
     });
   });
 

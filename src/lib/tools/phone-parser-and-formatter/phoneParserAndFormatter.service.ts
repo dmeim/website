@@ -6,6 +6,7 @@
 import {
   getCountries,
   getCountryCallingCode,
+  ParseError,
   parsePhoneNumberWithError,
   type CountryCode,
   type NumberType,
@@ -44,9 +45,16 @@ const typeToLabel: Record<NonNullable<NumberType>, string> = {
   PAGER: "Pager",
 };
 
-const PHONE_INPUT_PATTERN = /^[0-9 +\-()]+$/;
+const PHONE_INPUT_PATTERN = /^[0-9 +\-().]+$/;
 
-/** True when empty or only digits / spaces / + - ( ). */
+const PARSE_ERROR_MESSAGES: Record<string, string> = {
+  INVALID_COUNTRY: "This country calling code is not recognized. Check the digits after the +.",
+  NOT_A_NUMBER: "This does not look like a phone number. Enter at least a few digits.",
+  TOO_SHORT: "This phone number is too short.",
+  TOO_LONG: "This phone number is too long.",
+};
+
+/** True when empty or only digits / spaces / + - ( ) and dots. */
 export function isValidPhoneInput(value: string): boolean {
   return value === "" || PHONE_INPUT_PATTERN.test(value);
 }
@@ -158,6 +166,27 @@ export function parsePhone(
     };
   } catch {
     return undefined;
+  }
+}
+
+/**
+ * Why a phone number cannot be parsed, or undefined when the input is blank or parses
+ * (a parsed number may still be reported as not valid in the results).
+ */
+export function getPhoneInputError(
+  raw: string,
+  defaultCountryCode: CountryCode = "FR",
+): string | undefined {
+  if (raw.trim() === "") return undefined;
+  if (!isValidPhoneInput(raw)) {
+    return "Invalid phone number. Use only digits, spaces, and the characters + - ( ) .";
+  }
+
+  try {
+    parsePhoneNumberWithError(raw, defaultCountryCode);
+    return undefined;
+  } catch (error) {
+    return (error instanceof ParseError && PARSE_ERROR_MESSAGES[error.message]) || "This phone number could not be read.";
   }
 }
 

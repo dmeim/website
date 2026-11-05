@@ -12,9 +12,10 @@ Test JavaScript regular expressions against sample text. Shows match indices, fu
 - Multiline (`m`) — `^`/`$` next to newlines — default off
 - Singleline / dotAll (`s`) — `.` matches newlines — default on
 - Unicode (`u`) — default on
-- Unicode Sets (`v`) — default off; applied only when Unicode (`u`) is off (it-tools precedence)
+- Unicode Sets (`v`), default off. JavaScript rejects `u` and `v` together, so turning one on turns the other off.
+- Sticky (`y`), default off. Not in it-tools.
 
-The engine always adds the `d` flag so capture/group ranges are available. Sticky (`y`) is not exposed (it-tools does not offer it).
+The engine always adds the `d` flag so capture/group ranges are available.
 
 ## Inputs
 - Regex pattern (multiline text)
@@ -27,10 +28,14 @@ The engine always adds the `d` flag so capture/group ranges are available. Stick
 - Regex railroad diagram (`@regexper/render`, isolated in a shadow root)
 
 ## Notes
-- Invalid patterns surface an error under the regex field; match results fall back to empty (it-tools `try/catch` parity)
+- Patterns are validated against the selected flags, since `\-` is valid alone but a syntax error with `u`. Invalid patterns surface an error under the regex field and show no matches.
+- Matching and sample generation run in a Web Worker (`regexTester.worker.ts`, `use-regex-run.ts`). After 1.5 seconds the worker is terminated and a notice explains catastrophic backtracking, so a pattern like `(a+)+$` cannot freeze the tab. If the worker cannot load, they run on the page instead.
+- At most 1,000 matches are listed, with a notice saying so
+- Zero-length matches are skipped, not listed (it-tools vectors), but the search continues past them, so `a*` finds `aaa` in `baaa`
+- A group that did not take part in a match is listed as “did not match”. it-tools shows no matches at all in that case.
 - Named groups in sample generation are rewritten `(?<name>…)` → `(?:…)` because RandExp does not support them
-- Query-param / localStorage persistence from it-tools is not ported
-- Link to Regex cheatsheet (`regex-memo`) omitted until that tool is available
+- The regex is kept in the `?regex=` URL parameter so a configured tester can be linked to or reloaded. it-tools also mirrors it to `localStorage`, which is not ported.
+- Links to the Regex cheatsheet (`regex-memo`)
 
 ## Source
 Port of [it-tools Regex Tester](https://it-tools.tech/regex-tester). Local reference: handy-dandy `it-tools` (`src/tools/regex-tester`). Catalogue id: `regex-tester`.

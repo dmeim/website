@@ -4,6 +4,7 @@ import {
   DEFAULT_INDENT_SIZE,
   clampIndentSize,
   formatYaml,
+  getYamlError,
   isValidYaml,
 } from "./yamlPrettify.service";
 
@@ -59,13 +60,42 @@ describe("yaml-prettify", () => {
       ).toBe("hello: world\nfoo: bar\n");
     });
 
-    it("stringifies empty input as null (yaml / it-tools parity)", () => {
-      expect(formatYaml({ rawYaml: "" })).toBe("null\n");
+    it("returns nothing for blank or comment-only input", () => {
+      expect(formatYaml({ rawYaml: "" })).toBe("");
+      expect(formatYaml({ rawYaml: "  \n" })).toBe("");
+      expect(formatYaml({ rawYaml: "# only a comment" })).toBe("");
+    });
+
+    it("keeps multiple documents apart", () => {
+      expect(formatYaml({ rawYaml: "b: 1\na: 2\n---\n- x\n", sortKeys: true })).toBe("a: 2\nb: 1\n---\n- x\n");
+    });
+
+    it("sorts nested maps and leaves sequence order alone", () => {
+      expect(formatYaml({ rawYaml: "z:\n  b: 1\n  a: [2, 1]\na: 0", sortKeys: true })).toBe(
+        "a: 0\nz:\n  a:\n    - 2\n    - 1\n  b: 1\n",
+      );
+    });
+
+    it("keeps unicode", () => {
+      expect(formatYaml({ rawYaml: "é: 😀" })).toBe("é: 😀\n");
     });
 
     it("returns empty string for invalid input", () => {
       expect(formatYaml({ rawYaml: ":\nbad" })).toBe("");
       expect(formatYaml({ rawYaml: "not: [unterminated" })).toBe("");
+    });
+  });
+
+  describe("getYamlError", () => {
+    it("returns null for blank and valid input", () => {
+      expect(getYamlError("")).toBeNull();
+      expect(getYamlError("a: 1\n---\nb: 2")).toBeNull();
+    });
+
+    it("explains syntax errors with their position", () => {
+      expect(getYamlError("a: 1\na: 2")).toBe(
+        "Provided YAML is not valid: Map keys must be unique at line 2, column 1.",
+      );
     });
   });
 

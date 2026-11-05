@@ -41,25 +41,25 @@ export const CRON_HELPERS: readonly CronHelper[] = [
   {
     symbol: "*",
     meaning: "Any value",
-    example: "* * * *",
+    example: "* * * * *",
     equivalent: "Every minute",
   },
   {
     symbol: "-",
     meaning: "Range of values",
-    example: "1-10 * * *",
+    example: "1-10 * * * *",
     equivalent: "Minutes 1 through 10",
   },
   {
     symbol: ",",
     meaning: "List of values",
-    example: "1,10 * * *",
+    example: "1,10 * * * *",
     equivalent: "At minutes 1 and 10",
   },
   {
     symbol: "/",
     meaning: "Step values",
-    example: "*/10 * * *",
+    example: "*/10 * * * *",
     equivalent: "Every 10 minutes",
   },
   {
@@ -122,13 +122,34 @@ export const CRON_FORMAT_DIAGRAM = `┌──────────── [opt
 | | | | | |
 * * * * * * command`;
 
-/** True when the expression is a valid cron (5 or 6 fields with it-tools options). */
-export function isCronValid(expression: string): boolean {
-  return isValidCron(expression, CRON_VALIDATOR_OPTIONS);
+const REBOOT_MACRO = "@reboot";
+const REBOOT_DESCRIPTION = "Run at startup";
+const GENERIC_INVALID_MESSAGE = "This cron is invalid";
+
+/** The five-field equivalent of an `@` shortcut from the helpers table, or the input unchanged. */
+function expandCronMacro(expression: string): string {
+  const trimmed = expression.trim();
+  const macro = CRON_HELPERS.find((row) => row.symbol === trimmed && row.symbol.startsWith("@"));
+  return macro?.equivalent || trimmed;
 }
 
 /**
- * Human-readable description of a cron expression.
+ * True when the expression is a valid cron: 5 or 6 fields (it-tools options) or an `@` shortcut.
+ * With days starting at 1, day of week runs 1 through 7, so 7 has to pass here too.
+ */
+export function isCronValid(
+  expression: string,
+  { dayOfWeekStartIndexZero = true }: Partial<Pick<CronDescribeOptions, "dayOfWeekStartIndexZero">> = {},
+): boolean {
+  if (expression.trim() === REBOOT_MACRO) return true;
+  return isValidCron(expandCronMacro(expression), {
+    ...CRON_VALIDATOR_OPTIONS,
+    allowSevenAsSunday: !dayOfWeekStartIndexZero,
+  });
+}
+
+/**
+ * Human-readable description of a cron expression or `@` shortcut.
  * Returns `null` when invalid or when cronstrue cannot parse with the given options
  * (e.g. DOW `0` while `dayOfWeekStartIndexZero` is false).
  */
@@ -136,12 +157,16 @@ export function describeCron(
   expression: string,
   options: CronDescribeOptions = DEFAULT_CRON_DESCRIBE_OPTIONS,
 ): string | null {
-  if (!isCronValid(expression)) {
+  if (!isCronValid(expression, options)) {
     return null;
   }
 
+  if (expression.trim() === REBOOT_MACRO) {
+    return REBOOT_DESCRIPTION;
+  }
+
   try {
-    return cronstrue.toString(expression, {
+    return cronstrue.toString(expandCronMacro(expression), {
       verbose: options.verbose,
       dayOfWeekStartIndexZero: options.dayOfWeekStartIndexZero,
       use24HourTimeFormat: options.use24HourTimeFormat,
@@ -152,7 +177,26 @@ export function describeCron(
   }
 }
 
-/** Validation message matching it-tools. */
-export function cronValidationMessage(expression: string): string | null {
-  return isCronValid(expression) ? null : "This cron is invalid";
+/**
+ * Why the expression cannot be described, or null when it can. Blank input is the empty state, not an error.
+ * Uses cronstrue's field-level reason ("minutes part must be >= 0 and <= 59") when it has one.
+ */
+export function cronValidationMessage(
+  expression: string,
+  options: CronDescribeOptions = DEFAULT_CRON_DESCRIBE_OPTIONS,
+): string | null {
+  if (expression.trim() === "" || describeCron(expression, options) !== null) {
+    return null;
+  }
+
+  try {
+    cronstrue.toString(expandCronMacro(expression), {
+      dayOfWeekStartIndexZero: options.dayOfWeekStartIndexZero,
+      throwExceptionOnParseError: true,
+    });
+    return `${GENERIC_INVALID_MESSAGE}. Use 5 or 6 fields of values, ranges, lists, and steps.`;
+  } catch (error) {
+    // cronstrue throws both Error objects and plain "Error: ..." strings.
+    return `${GENERIC_INVALID_MESSAGE}: ${String(error).replace(/^Error: /, "")}`;
+  }
 }

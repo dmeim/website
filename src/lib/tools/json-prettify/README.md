@@ -21,11 +21,11 @@ Prettify a JSON string into a friendly, human-readable format. Parses with JSON5
 ## Notes
 - Parse: `JSON5.parse` (matches it-tools)
 - Serialize: `JSON.stringify(..., null, indentSize)`
-- Invalid JSON clears the output and shows “Provided JSON is not valid.”
-- Empty input is treated as valid and yields empty output
+- Invalid JSON clears the output and shows “Provided JSON is not valid:” with the parser's reason and position
+- Blank input is treated as valid and yields empty output
 - Default sample input matches it-tools: `{"hello": "world", "foo": "bar"}`
 - Shared dep: `json5` (already used by sibling JSON converters)
-- Persistence (`localStorage`) from it-tools is not ported; defaults reset on reload
+- Sort keys and indent size are remembered in `localStorage`. The pasted JSON is not, unlike it-tools, because it may be private.
 
 ## Source
 Port of [it-tools JSON prettify](https://it-tools.tech/json-prettify). Local reference: handy-dandy `it-tools` (`src/tools/json-viewer`, path `/json-prettify`, redirect from `/json-viewer`). Catalogue id: `json-prettify`.

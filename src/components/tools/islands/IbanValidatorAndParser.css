@@ -4,7 +4,7 @@
 
 .iban-examples {
   display: grid;
-  gap: var(--ui-space-2);
+  gap: var(--ui-space-xs);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -13,7 +13,7 @@
 .iban-examples__item {
   display: flex;
   align-items: center;
-  gap: var(--ui-space-2);
+  gap: var(--ui-space-xs);
   min-width: 0;
 }
 

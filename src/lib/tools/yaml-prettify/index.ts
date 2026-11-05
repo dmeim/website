@@ -6,5 +6,6 @@ export {
   MIN_INDENT_SIZE,
   clampIndentSize,
   formatYaml,
+  getYamlError,
   isValidYaml,
 } from "./yamlPrettify.service";

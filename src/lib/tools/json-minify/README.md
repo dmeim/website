@@ -20,8 +20,8 @@ None — live minify with no options.
 ## Notes
 - Parse: `JSON5.parse` (matches it-tools)
 - Serialize: `JSON.stringify(..., null, 0)`
-- Invalid JSON clears the output and shows “Provided JSON is not valid.”
-- Empty input is treated as valid and yields empty output
+- Invalid JSON clears the output and shows “Provided JSON is not valid:” with the parser's reason and position
+- Blank input is treated as valid and yields empty output
 - Default sample input matches it-tools: pretty-printed `{"hello":["world"]}`
 - Shared dep: `json5` (already used by sibling JSON converters)
 - Persistence (`localStorage`) from it-tools is not ported; defaults reset on reload

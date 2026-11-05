@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { FormGrid, Input, Panel, Switch, ToolFrame, TransformPanel } from "@/ui/react";
 import {
   DEFAULT_INDENT_SIZE,
@@ -9,15 +10,22 @@ import {
   MIN_INDENT_SIZE,
   clampIndentSize,
   formatYaml,
-  isValidYaml,
+  getYamlError,
 } from "@/lib/tools/yaml-prettify";
 
 export default function YamlPrettify() {
   const [rawYaml, setRawYaml] = useState(DEFAULT_RAW_YAML);
-  const [sortKeys, setSortKeys] = useState(DEFAULT_SORT_KEYS);
-  const [indentSize, setIndentSize] = useState(DEFAULT_INDENT_SIZE);
+  const [sortKeys, setSortKeys] = useStoredState("yaml-prettify:sort-keys", DEFAULT_SORT_KEYS);
+  const [indentSize, setIndentSize] = useStoredState(
+    "yaml-prettify:indent-size",
+    DEFAULT_INDENT_SIZE,
+    (value) => clampIndentSize(value) === value,
+  );
+  // The field can be empty mid-edit while the last valid size keeps formatting.
+  const [indentDraft, setIndentDraft] = useState(String(indentSize));
 
-  const inputInvalid = rawYaml !== "" && !isValidYaml(rawYaml);
+  const inputError = getYamlError(rawYaml);
+  const inputInvalid = inputError !== null;
 
   const output = useMemo(
     () => (inputInvalid ? "" : formatYaml({ rawYaml, sortKeys, indentSize })),
@@ -40,7 +48,7 @@ export default function YamlPrettify() {
             rows: 12,
           }}
           output={{ label: "Prettified version of your YAML", value: output, mono: true, rows: 12 }}
-          error={inputInvalid ? "Provided YAML is not valid." : undefined}
+          error={inputError ?? undefined}
           options={
             <FormGrid columns={2}>
               <Switch
@@ -56,13 +64,13 @@ export default function YamlPrettify() {
                 min={MIN_INDENT_SIZE}
                 max={MAX_INDENT_SIZE}
                 step={1}
-                value={indentSize}
+                value={indentDraft}
                 onChange={(event) => {
+                  setIndentDraft(event.target.value);
                   const next = event.target.valueAsNumber;
-                  setIndentSize(
-                    Number.isNaN(next) ? DEFAULT_INDENT_SIZE : clampIndentSize(next),
-                  );
+                  if (!Number.isNaN(next)) setIndentSize(clampIndentSize(next));
                 }}
+                onBlur={() => setIndentDraft(String(indentSize))}
               />
             </FormGrid>
           }

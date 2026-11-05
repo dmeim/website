@@ -19,13 +19,13 @@ Prettify a YAML string into a friendly, human-readable format. Parses with the `
 - Validation error when the YAML is invalid
 
 ## Notes
-- Parse / serialize: `yaml` npm package (`parse` + `stringify`) — matches it-tools
+- Parse / serialize: `yaml` npm package (`parseAllDocuments` + `stringify`). Multiple documents stay separated by `---`, where it-tools reports them as invalid.
 - Options: `sortMapEntries`, `indent`
-- Invalid YAML clears the output and shows “Provided YAML is not valid.”
-- Empty input is treated as valid; `yaml.parse('')` is `null`, so output is `"null\n"` (it-tools / package parity)
+- Invalid YAML clears the output and shows “Provided YAML is not valid:” with the parser's reason and position
+- Blank or comment-only input is treated as valid and yields empty output (it-tools shows `null`)
 - Default raw input is empty (matches it-tools `useStorage` default)
 - Shared dep: `yaml` (already used by YAML converters)
-- Persistence (`localStorage`) from it-tools is not ported; defaults reset on reload
+- Sort keys and indent size are remembered in `localStorage`. The pasted YAML is not, unlike it-tools, because it may be private.
 
 ## Source
 Port of [it-tools YAML prettify](https://it-tools.tech/yaml-prettify). Local reference: handy-dandy `it-tools` (`src/tools/yaml-viewer`, path `/yaml-prettify`). Catalogue id: `yaml-prettify`.

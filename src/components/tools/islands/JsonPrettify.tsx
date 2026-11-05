@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { FormGrid, Input, Panel, Switch, ToolFrame, TransformPanel } from "@/ui/react";
 import {
   DEFAULT_INDENT_SIZE,
@@ -9,15 +10,22 @@ import {
   MIN_INDENT_SIZE,
   clampIndentSize,
   formatJson,
-  isValidJson,
+  getJsonError,
 } from "@/lib/tools/json-prettify";
 
 export default function JsonPrettify() {
   const [rawJson, setRawJson] = useState(DEFAULT_RAW_JSON);
-  const [sortKeys, setSortKeys] = useState(DEFAULT_SORT_KEYS);
-  const [indentSize, setIndentSize] = useState(DEFAULT_INDENT_SIZE);
+  const [sortKeys, setSortKeys] = useStoredState("json-prettify:sort-keys", DEFAULT_SORT_KEYS);
+  const [indentSize, setIndentSize] = useStoredState(
+    "json-prettify:indent-size",
+    DEFAULT_INDENT_SIZE,
+    (value) => clampIndentSize(value) === value,
+  );
+  // The field can be empty mid-edit while the last valid size keeps formatting.
+  const [indentDraft, setIndentDraft] = useState(String(indentSize));
 
-  const inputInvalid = rawJson !== "" && !isValidJson(rawJson);
+  const inputError = getJsonError(rawJson);
+  const inputInvalid = inputError !== null;
 
   const output = useMemo(
     () => (inputInvalid ? "" : formatJson({ rawJson, sortKeys, indentSize })),
@@ -40,7 +48,7 @@ export default function JsonPrettify() {
             rows: 12,
           }}
           output={{ label: "Prettified version of your JSON", value: output, mono: true, rows: 12 }}
-          error={inputInvalid ? "Provided JSON is not valid." : undefined}
+          error={inputError ?? undefined}
           options={
             <FormGrid columns={2}>
               <Switch
@@ -56,13 +64,13 @@ export default function JsonPrettify() {
                 min={MIN_INDENT_SIZE}
                 max={MAX_INDENT_SIZE}
                 step={1}
-                value={indentSize}
+                value={indentDraft}
                 onChange={(event) => {
+                  setIndentDraft(event.target.value);
                   const next = event.target.valueAsNumber;
-                  setIndentSize(
-                    Number.isNaN(next) ? DEFAULT_INDENT_SIZE : clampIndentSize(next),
-                  );
+                  if (!Number.isNaN(next)) setIndentSize(clampIndentSize(next));
                 }}
+                onBlur={() => setIndentDraft(String(indentSize))}
               />
             </FormGrid>
           }

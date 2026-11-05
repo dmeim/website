@@ -6,7 +6,7 @@ import {
   booleanToHumanReadable,
   getCountryOptions,
   getDefaultCountryCode,
-  isValidPhoneInput,
+  getPhoneInputError,
   parsePhone,
   type PhoneParseResult,
 } from "@/lib/tools/phone-parser-and-formatter";
@@ -93,13 +93,8 @@ export default function PhoneParserAndFormatter() {
 
   const countryOptions = useMemo(() => getCountryOptions(), []);
 
-  const inputValid = isValidPhoneInput(rawPhone);
-  const info = useMemo(() => {
-    if (!inputValid) {
-      return undefined;
-    }
-    return parsePhone(rawPhone, defaultCountry);
-  }, [rawPhone, defaultCountry, inputValid]);
+  const inputError = useMemo(() => getPhoneInputError(rawPhone, defaultCountry), [rawPhone, defaultCountry]);
+  const info = useMemo(() => parsePhone(rawPhone, defaultCountry), [rawPhone, defaultCountry]);
 
   const rows = useMemo(() => (info ? buildRows(info) : []), [info]);
 
@@ -128,7 +123,7 @@ export default function PhoneParserAndFormatter() {
           autoFocus
           autoComplete="tel"
           inputMode="tel"
-          error={rawPhone !== "" && !inputValid ? "Invalid phone number" : undefined}
+          error={inputError}
           onChange={(event) => setRawPhone(event.target.value)}
         />
 

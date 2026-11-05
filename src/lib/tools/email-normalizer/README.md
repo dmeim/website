@@ -19,7 +19,7 @@ None.
 
 ## Notes
 - Uses the `email-normalizer` npm package (same as it-tools)
-- Empty input yields empty output
+- Empty input yields empty output, and blank lines stay blank so a trailing newline is not reported as a bad address
 - Invalid lines become `Unable to parse email: <raw line>` (it-tools `withDefaultOnError` parity)
 - Provider rules: Gmail/Googlemail (remove dots, strip plus; Googlemail → gmail.com); Hotmail/Outlook (strip plus); Live (remove dots, strip plus); other domains: trim + lowercase only
 - Persistence from it-tools is not applicable (no storage in source)

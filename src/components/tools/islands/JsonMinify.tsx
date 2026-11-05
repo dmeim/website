@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 
 import { Panel, ToolFrame, TransformPanel } from "@/ui/react";
-import { DEFAULT_RAW_JSON, isValidJson, minifyJson } from "@/lib/tools/json-minify";
+import { DEFAULT_RAW_JSON, getJsonError, minifyJson } from "@/lib/tools/json-minify";
 
 export default function JsonMinify() {
   const [rawJson, setRawJson] = useState(DEFAULT_RAW_JSON);
 
-  const inputInvalid = rawJson !== "" && !isValidJson(rawJson);
+  const inputError = getJsonError(rawJson);
+  const inputInvalid = inputError !== null;
 
   const output = useMemo(
     () => (inputInvalid ? "" : minifyJson(rawJson)),
@@ -26,7 +27,7 @@ export default function JsonMinify() {
             rows: 12,
           }}
           output={{ label: "Minified version of your JSON", value: output, mono: true, rows: 8 }}
-          error={inputInvalid ? "Provided JSON is not valid." : undefined}
+          error={inputError ?? undefined}
         />
       </Panel>
     </ToolFrame>

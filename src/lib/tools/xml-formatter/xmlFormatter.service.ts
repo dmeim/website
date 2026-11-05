@@ -20,13 +20,16 @@ function cleanRawXml(rawXml: string): string {
   return rawXml.trim();
 }
 
-/** Empty input is valid (matches it-tools validation). */
+/**
+ * Empty input is valid (matches it-tools validation).
+ * Strict mode so broken markup like `<a><b></a>` is reported, not silently rewritten into different XML.
+ */
 export function isValidXml(rawXml: string): boolean {
   const cleaned = cleanRawXml(rawXml);
   if (cleaned === "") return true;
 
   try {
-    xmlFormat(cleaned);
+    xmlFormat(cleaned, { strictMode: true });
     return true;
   } catch {
     return false;
@@ -56,6 +59,7 @@ export function formatXml({
         indentation: " ".repeat(indent),
         collapseContent,
         lineSeparator: "\n",
+        strictMode: true,
       }) ?? ""
     );
   } catch {

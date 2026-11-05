@@ -21,9 +21,10 @@ None — live convert with no options.
 - Parse: `JSON5.parse` (matches it-tools)
 - Headers: union of all object keys in first-seen order (`Set` insertion order)
 - Null → the string `null`; missing/undefined → empty cell
-- Commas wrap the cell in double quotes; `"` → `\"`; newlines/CR → `\n` / `\r` literals
-- Invalid JSON or non-array input clears the output; invalid JSON also shows “Provided JSON is not valid.”
-- Empty input is treated as valid and yields empty output
+- Cells and headers follow RFC 4180, so CSV parsers and spreadsheets read them back: a cell with a comma, quote, or line break is wrapped in double quotes and `"` becomes `""`. it-tools wrote `\"` and literal `\n` instead, which those parsers misread.
+- Nested objects and arrays are written as JSON (it-tools wrote `[object Object]`)
+- Invalid JSON and anything other than an array of objects clear the output and show a message saying which it was
+- Blank input is treated as valid and yields empty output
 - Default sample input is empty (matches it-tools)
 - Shared dep: `json5` (already used by sibling JSON converters)
 - Persistence (`localStorage`) from it-tools is not ported; defaults reset on reload

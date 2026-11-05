@@ -63,10 +63,14 @@ describe("email-normalizer", () => {
       ).toBe("johndoe@gmail.com\nab@gmail.com\nuser@example.com");
     });
 
-    it("preserves line count including invalid and blank lines", () => {
+    it("preserves line count and leaves blank lines blank", () => {
       expect(normalizeEmails("ok@example.com\n\nbad")).toBe(
-        `ok@example.com\n${PARSE_ERROR_PREFIX}\n${PARSE_ERROR_PREFIX}bad`,
+        `ok@example.com\n\n${PARSE_ERROR_PREFIX}bad`,
       );
+    });
+
+    it("does not report a trailing newline or Windows line ending as a bad address", () => {
+      expect(normalizeEmails("a.b@gmail.com\r\nc@example.com\n")).toBe("ab@gmail.com\nc@example.com\n");
     });
   });
 });

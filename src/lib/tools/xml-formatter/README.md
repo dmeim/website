@@ -19,12 +19,12 @@ Prettify an XML string into a friendly, human-readable format. Trims input, vali
 - Validation error when the XML is invalid
 
 ## Notes
-- Format: `xml-formatter` npm package (matches it-tools)
+- Format: `xml-formatter` npm package (matches it-tools), in strict mode, so broken markup like `<a><b></a>` is reported instead of being silently rewritten into different XML
 - Options: `indentation` (spaces), `collapseContent`, `lineSeparator: '\n'`
-- Invalid XML clears the output and shows “Provided XML is not valid.”
+- Invalid XML clears the output and shows “Provided XML is not valid.” with what to check
 - Empty / whitespace-only input is treated as valid and yields empty output
 - Default sample input matches it-tools: `<hello><world>foo</world><world>bar</world></hello>`
-- Persistence (`localStorage`) from it-tools is not ported; defaults reset on reload
+- Collapse content and indent size are remembered in `localStorage`
 
 ## Source
 Port of [it-tools XML formatter](https://it-tools.tech/xml-formatter). Local reference: handy-dandy `it-tools` (`src/tools/xml-formatter`). Catalogue id: `xml-formatter`.

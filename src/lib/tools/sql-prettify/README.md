@@ -25,10 +25,10 @@ Hidden defaults (match it-tools, not exposed in UI):
 
 ## Notes
 - Formatter: `sql-formatter` `format()` (same package as it-tools, `^13`)
-- Invalid / unparseable SQL clears the output and shows the formatter error
+- Invalid / unparseable SQL clears the output and shows the formatter error, with a hint to check the syntax or dialect
 - Empty input yields empty output
 - Default sample matches it-tools: `select field1,field2,field3 from my_table where my_condition;`
-- Persistence (`localStorage`) from it-tools is not ported; defaults reset on reload
+- it-tools does not persist these options either; they reset on reload
 
 ## Source
 Port of [it-tools SQL prettify](https://it-tools.tech/sql-prettify). Local reference: handy-dandy `it-tools` (`src/tools/sql-prettify`). Catalogue id: `sql-prettify`.

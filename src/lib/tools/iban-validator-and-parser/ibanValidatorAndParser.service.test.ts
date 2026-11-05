@@ -79,6 +79,30 @@ describe("iban-validator-and-parser", () => {
       expect(info?.friendlyFormat).toBe("DE89 3704 0044 0532 0130 00");
     });
 
+    it("flags a wrong checksum digit", () => {
+      expect(parseIban("DE88 3704 0044 0532 0130 00")).toMatchObject({
+        isValid: false,
+        errors: ["Wrong IBAN checksum"],
+        countryCode: undefined,
+        bban: undefined,
+      });
+    });
+
+    it("recognizes a QR-IBAN", () => {
+      expect(parseIban("CH44 3199 9123 0008 8901 2")).toMatchObject({
+        isValid: true,
+        isQrIban: true,
+        countryCode: "CH",
+      });
+    });
+
+    it("handles text that is nothing like an IBAN without throwing", () => {
+      for (const value of ["hello", "!!!", "12", "ÉÉ", "XX00123"]) {
+        expect(parseIban(value)?.isValid, value).toBe(false);
+        expect(parseIban(value)?.errors.length, value).toBeGreaterThan(0);
+      }
+    });
+
     it("parses all example IBANs as valid", () => {
       for (const example of IBAN_EXAMPLES) {
         const info = parseIban(example);

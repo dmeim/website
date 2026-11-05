@@ -2,7 +2,7 @@
  * YAML prettify / format.
  * Parity with it-tools yaml-viewer (`/yaml-prettify`): yaml.parse + yaml.stringify with sortMapEntries / indent.
  */
-import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
+import { parseAllDocuments, stringify as stringifyYaml, type Document } from "yaml";
 
 export const DEFAULT_RAW_YAML = "";
 export const DEFAULT_INDENT_SIZE = 2;
@@ -15,21 +15,35 @@ export function clampIndentSize(value: number): number {
   return Math.min(MAX_INDENT_SIZE, Math.max(MIN_INDENT_SIZE, Math.trunc(value)));
 }
 
-/** Empty input is valid (matches it-tools validation). */
+/** All documents in the stream, throwing the first syntax error. Blank or comment-only input has none. */
+function parseDocuments(value: string): Document[] {
+  const documents = parseAllDocuments(value);
+  if (!Array.isArray(documents)) return [];
+
+  const firstError = documents.flatMap((document) => document.errors)[0];
+  if (firstError) throw firstError;
+  return documents;
+}
+
+/** Blank input is the empty state, so it is valid. */
 export function isValidYaml(value: string): boolean {
-  if (value === "") return true;
+  return getYamlError(value) === null;
+}
+
+/** A message with the parser's reason and position, or null when the input is blank or valid. */
+export function getYamlError(value: string): string | null {
   try {
-    parseYaml(value);
-    return true;
-  } catch {
-    return false;
+    parseDocuments(value);
+    return null;
+  } catch (error) {
+    const detail = error instanceof Error ? error.message.split("\n")[0]?.replace(/:$/, "") : "";
+    return detail ? `Provided YAML is not valid: ${detail}.` : "Provided YAML is not valid.";
   }
 }
 
 /**
- * Parse YAML and stringify with optional key sorting and indent.
- * Returns "" on parse/stringify failure (matches it-tools `withDefaultOnError`).
- * Empty input parses as null and stringifies to `"null\n"` (yaml package / it-tools parity).
+ * Parse YAML and stringify with optional key sorting and indent. Multiple documents stay separated by `---`.
+ * Returns "" for blank input and on parse/stringify failure (matches it-tools `withDefaultOnError`).
  */
 export function formatYaml({
   rawYaml,
@@ -41,12 +55,10 @@ export function formatYaml({
   indentSize?: number;
 }): string {
   try {
-    const parsed = parseYaml(rawYaml);
     const indent = clampIndentSize(indentSize);
-    return stringifyYaml(parsed, {
-      sortMapEntries: sortKeys,
-      indent,
-    });
+    return parseDocuments(rawYaml)
+      .map((document) => stringifyYaml(document.toJS(), { sortMapEntries: sortKeys, indent }))
+      .join("---\n");
   } catch {
     return "";
   }

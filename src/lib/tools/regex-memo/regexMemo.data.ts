@@ -181,7 +181,7 @@ export const regexMemoSections: RegexMemoSection[] = [
     title: "Matching",
     entries: [
       {
-        expression: "foo\\|bar",
+        expression: "foo|bar",
         description: "match either foo or bar",
       },
       {

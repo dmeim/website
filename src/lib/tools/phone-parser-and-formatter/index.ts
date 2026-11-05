@@ -5,6 +5,7 @@ export {
   getDefaultCountryCode,
   getFullCountryName,
   isValidPhoneInput,
+  getPhoneInputError,
   parsePhone,
   type PhoneCountryOption,
   type PhoneParseResult,

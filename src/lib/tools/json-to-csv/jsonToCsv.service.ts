@@ -1,6 +1,7 @@
 /**
  * JSON to CSV.
- * Parity with it-tools json-to-csv: JSON5.parse + header union + serializeValue rules.
+ * Parity with it-tools json-to-csv (JSON5.parse + header union), except cells follow RFC 4180 quoting
+ * and nested values stay readable as JSON, so spreadsheets and CSV parsers read the output back correctly.
  */
 import JSON5 from "json5";
 
@@ -18,6 +19,10 @@ export function getHeaders({
   return Array.from(headers);
 }
 
+function quoteCell(cell: string): string {
+  return /[",\r\n]/.test(cell) ? `"${cell.replace(/"/g, '""')}"` : cell;
+}
+
 function serializeValue(value: unknown): string {
   if (value === null) {
     return "null";
@@ -27,16 +32,7 @@ function serializeValue(value: unknown): string {
     return "";
   }
 
-  const valueAsString = String(value)
-    .replace(/\n/g, "\\n")
-    .replace(/\r/g, "\\r")
-    .replace(/"/g, '\\"');
-
-  if (valueAsString.includes(",")) {
-    return `"${valueAsString}"`;
-  }
-
-  return valueAsString;
+  return quoteCell(typeof value === "object" ? JSON.stringify(value) : String(value));
 }
 
 export function convertArrayToCsv({
@@ -46,21 +42,42 @@ export function convertArrayToCsv({
 }): string {
   const headers = getHeaders({ array });
 
+  // Own keys only, so a "constructor" column stays empty on rows that lack it.
   const rows = array.map((item) =>
-    headers.map((header) => serializeValue(item[header])),
+    headers.map((header) => serializeValue(Object.hasOwn(item, header) ? item[header] : undefined)),
   );
 
-  return [headers.join(","), ...rows].join("\n");
+  return [headers.map(quoteCell), ...rows].join("\n");
 }
 
-/** Empty input is valid (matches it-tools validation). */
+function isArrayOfObjects(value: unknown): value is Record<string, unknown>[] {
+  return (
+    Array.isArray(value) &&
+    value.every((item) => typeof item === "object" && item !== null && !Array.isArray(item))
+  );
+}
+
+/** Blank input is the empty state, so it is valid. */
 export function isValidJson(value: string): boolean {
-  if (value === "") return true;
+  if (value.trim() === "") return true;
   try {
     JSON5.parse(value);
     return true;
   } catch {
     return false;
+  }
+}
+
+/** A message for input that is not JSON or not an array of objects, or null when it can be converted. */
+export function getJsonError(value: string): string | null {
+  if (value.trim() === "") return null;
+  try {
+    return isArrayOfObjects(JSON5.parse(value))
+      ? null
+      : 'Provided JSON must be an array of objects, like [{"name": "Ada"}].';
+  } catch (error) {
+    const detail = error instanceof Error ? error.message.replace(/^JSON5: /, "") : "";
+    return detail ? `Provided JSON is not valid: ${detail}.` : "Provided JSON is not valid.";
   }
 }
 
@@ -70,10 +87,11 @@ export function isValidJson(value: string): boolean {
  */
 export function jsonToCsv(rawJson: string): string {
   try {
-    if (rawJson === "") {
+    if (rawJson.trim() === "") {
       return "";
     }
-    return convertArrayToCsv({ array: JSON5.parse(rawJson) });
+    const parsed: unknown = JSON5.parse(rawJson);
+    return isArrayOfObjects(parsed) ? convertArrayToCsv({ array: parsed }) : "";
   } catch {
     return "";
   }

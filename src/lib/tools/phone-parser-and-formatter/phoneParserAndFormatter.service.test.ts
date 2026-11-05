@@ -6,6 +6,7 @@ import {
   getCountryOptions,
   getDefaultCountryCode,
   getFullCountryName,
+  getPhoneInputError,
   isValidPhoneInput,
   parsePhone,
 } from "./phoneParserAndFormatter.service";
@@ -19,6 +20,10 @@ describe("phone-parser-and-formatter", () => {
     it("accepts digits, spaces, and phone punctuation", () => {
       expect(isValidPhoneInput("+33 6 12-34(56)78")).toBe(true);
       expect(isValidPhoneInput("0612345678")).toBe(true);
+    });
+
+    it("accepts dots as separators", () => {
+      expect(isValidPhoneInput("212.555.1212")).toBe(true);
     });
 
     it("rejects letters and other characters", () => {
@@ -112,15 +117,40 @@ describe("phone-parser-and-formatter", () => {
       expect(info?.isPossible).toBe(true);
     });
 
+    it("formats a spaced US number per the North American format", () => {
+      expect(parsePhone(" (212) 555-1212 ", "US")).toMatchObject({
+        countryCode: "US",
+        isValid: true,
+        international: "+1 212 555 1212",
+        national: "(212) 555-1212",
+        e164: "+12125551212",
+        rfc3966: "tel:+12125551212",
+      });
+    });
+
+    it("reports a parseable number with no such area code as not valid", () => {
+      expect(parsePhone("+1 123 555 1212", "FR")).toMatchObject({ isValid: false, e164: "+11235551212" });
+    });
+
     it("reports invalid but possible numbers when parseable", () => {
-      // Too short for FR mobile but may still parse as a partial national number
-      const info = parsePhone("061234", "FR");
-      // Either undefined (parse fail) or a result with isValid false
-      if (info) {
-        expect(info.isValid).toBe(false);
-      } else {
-        expect(info).toBeUndefined();
-      }
+      expect(parsePhone("061234", "FR")).toMatchObject({ isValid: false, isPossible: false });
+    });
+  });
+
+  describe("getPhoneInputError", () => {
+    it("is quiet for blank and parseable input", () => {
+      expect(getPhoneInputError("", "US")).toBeUndefined();
+      expect(getPhoneInputError("   ", "US")).toBeUndefined();
+      expect(getPhoneInputError("(212) 555-1212", "US")).toBeUndefined();
+      expect(getPhoneInputError("212.555.1212", "US")).toBeUndefined();
+    });
+
+    it("explains why a number cannot be read", () => {
+      expect(getPhoneInputError("abc", "US")).toMatch(/^Invalid phone number/);
+      expect(getPhoneInputError("1", "US")).toBe("This phone number is too short.");
+      expect(getPhoneInputError("+", "US")).toMatch(/does not look like a phone number/);
+      expect(getPhoneInputError("+999 123 456", "US")).toMatch(/calling code is not recognized/);
+      expect(getPhoneInputError("1".repeat(30), "US")).toBe("This phone number is too long.");
     });
   });
 

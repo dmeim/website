@@ -4,11 +4,12 @@
  */
 import RandExp from "randexp";
 
+/** A group that did not take part in the match (`(a)|(b)` on "b") has null value and offsets. */
 export type GroupCapture = {
   name: string;
-  value: string;
-  start: number;
-  end: number;
+  value: string | null;
+  start: number | null;
+  end: number | null;
 };
 
 export type RegexMatch = {
@@ -25,6 +26,7 @@ export type RegexFlagOptions = {
   dotAll: boolean;
   unicode: boolean;
   unicodeSets: boolean;
+  sticky: boolean;
 };
 
 /** Defaults match it-tools checkbox initial state. */
@@ -35,22 +37,16 @@ export const DEFAULT_FLAG_OPTIONS: RegexFlagOptions = {
   dotAll: true,
   unicode: true,
   unicodeSets: false,
+  sticky: false,
 };
+
+/** Rows beyond this would freeze the page, and nobody reads them. */
+export const MAX_MATCHES = 1000;
 
 export const DEFAULT_REGEX = "";
 export const DEFAULT_TEXT = "";
 
-interface RegExpGroupIndices {
-  [name: string]: [number, number];
-}
-
-interface RegExpIndices extends Array<[number, number]> {
-  groups: RegExpGroupIndices;
-}
-
-interface RegExpExecArrayWithIndices extends RegExpExecArray {
-  indices: RegExpIndices;
-}
+type RegExpExecArrayWithIndices = RegExpExecArray & { indices: RegExpIndicesArray };
 
 /**
  * Compose JS RegExp flags. Always includes `d` (indices) for capture ranges.
@@ -67,73 +63,71 @@ export function buildRegexFlags(options: RegexFlagOptions): string {
   } else if (options.unicodeSets) {
     flags += "v";
   }
+  if (options.sticky) flags += "y";
   return flags;
 }
 
-/** Return an error message when `pattern` is not a valid RegExp source; else null. */
-export function getRegexValidationError(pattern: string): string | null {
+/**
+ * Return an error message when `pattern` is not valid with `flags`; else null.
+ * The flags matter: `\\-` is fine on its own but a syntax error with `u`.
+ */
+export function getRegexValidationError(pattern: string, flags = ""): string | null {
   try {
-    void new RegExp(pattern);
+    void new RegExp(pattern, flags);
     return null;
   } catch (error) {
     return error instanceof Error ? error.message : String(error);
   }
 }
 
-export function isValidRegex(pattern: string): boolean {
-  return getRegexValidationError(pattern) === null;
+export function isValidRegex(pattern: string, flags = ""): boolean {
+  return getRegexValidationError(pattern, flags) === null;
+}
+
+function toGroupCapture(name: string, value: string | undefined, range: [number, number] | undefined): GroupCapture {
+  return { name, value: value ?? null, start: range?.[0] ?? null, end: range?.[1] ?? null };
+}
+
+/** Next search position after a zero-length match, stepping over a whole code point in unicode mode. */
+function advancePastEmptyMatch(re: RegExp, text: string): number {
+  const index = re.lastIndex;
+  const isWide = (re.unicode || re.unicodeSets) && (text.codePointAt(index) ?? 0) > 0xffff;
+  return index + (isWide ? 2 : 1);
 }
 
 /**
- * Find all matches (honoring `g`) with numeric captures and named groups.
+ * Find all matches (honoring `g`) with numeric captures and named groups, up to `limit`.
  * Requires the `d` flag for indices (callers should use `buildRegexFlags`).
- * Stops on empty matches / stuck `lastIndex` to avoid infinite loops.
+ * Zero-length matches are skipped, not listed, and the search moves past them, so `a*` still finds "aaa" in "baaa".
  */
 export function matchRegex(
   regex: string,
   text: string,
   flags: string,
+  limit = Number.POSITIVE_INFINITY,
 ): RegexMatch[] {
-  let lastIndex = -1;
   const re = new RegExp(regex, flags);
   const results: RegexMatch[] = [];
   let match = re.exec(text) as RegExpExecArrayWithIndices | null;
 
-  while (match !== null) {
-    if (re.lastIndex === lastIndex || match[0] === "") {
-      break;
-    }
-
-    const indices = match.indices;
-    const captures: GroupCapture[] = [];
-    Object.entries(match).forEach(([captureName, captureValue]) => {
-      if (captureName !== "0" && captureName.match(/\d+/)) {
-        captures.push({
-          name: captureName,
-          value: captureValue as string,
-          start: indices[Number(captureName)][0],
-          end: indices[Number(captureName)][1],
-        });
-      }
-    });
-
-    const groups: GroupCapture[] = [];
-    Object.entries(match.groups || {}).forEach(([groupName, groupValue]) => {
-      groups.push({
-        name: groupName,
-        value: groupValue as string,
-        start: indices.groups[groupName][0],
-        end: indices.groups[groupName][1],
+  while (match !== null && results.length < limit) {
+    if (match[0] === "") {
+      if (!re.global) break;
+      re.lastIndex = advancePastEmptyMatch(re, text);
+    } else {
+      const { indices } = match;
+      results.push({
+        index: match.index,
+        value: match[0],
+        captures: match
+          .slice(1)
+          .map((value, offset) => toGroupCapture(String(offset + 1), value, indices[offset + 1])),
+        groups: Object.entries(match.groups ?? {}).map(([name, value]) =>
+          toGroupCapture(name, value, indices.groups?.[name]),
+        ),
       });
-    });
-
-    results.push({
-      index: match.index,
-      value: match[0],
-      captures,
-      groups,
-    });
-    lastIndex = re.lastIndex;
+      if (!re.global) break;
+    }
     match = re.exec(text) as RegExpExecArrayWithIndices | null;
   }
 
@@ -159,14 +153,38 @@ export function safeMatchRegex(
 /**
  * Generate a sample string that matches `pattern` (RandExp).
  * Named capture groups `(?<name>…)` are rewritten to non-capturing `(?:…)`
- * because RandExp does not support them (it-tools parity).
+ * because RandExp does not support them (it-tools parity). Lookbehinds `(?<=…)` and `(?<!…)` are left alone.
  */
 export function generateSample(pattern: string): string {
   try {
-    const sanitized = pattern.replace(/\(\?<[^>]*>/g, "(?:");
+    const sanitized = pattern.replace(/\(\?<(?![=!])[^>]*>/g, "(?:");
     const randexp = new RandExp(new RegExp(sanitized));
     return randexp.gen();
   } catch {
     return "";
   }
+}
+
+export type RegexRunRequest = {
+  regex: string;
+  text: string;
+  flags: string;
+};
+
+export type RegexRunResult = {
+  matches: RegexMatch[];
+  sample: string;
+};
+
+export const EMPTY_REGEX_RUN: RegexRunResult = { matches: [], sample: "" };
+
+/** Everything that can run away on a hostile pattern, so the page can do it off the main thread. */
+export function runRegex({ regex, text, flags }: RegexRunRequest): RegexRunResult {
+  let matches: RegexMatch[] = [];
+  try {
+    matches = matchRegex(regex, text, flags, MAX_MATCHES);
+  } catch {
+    // The page reports invalid patterns itself; here it only means no matches.
+  }
+  return { matches, sample: generateSample(regex) };
 }

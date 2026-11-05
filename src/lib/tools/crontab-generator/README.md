@@ -13,17 +13,17 @@ Validate a cron expression and show a human-readable English description of the 
 
 ## Inputs
 - Cron expression string (default `40 * * * *`)
-- Supports 5-field and 6-field (with seconds) expressions; month/weekday aliases (`jan`, `mon`) and `?` blank day when valid
+- Supports 5-field and 6-field (with seconds) expressions; month/weekday aliases (`jan`, `mon`), `?` blank day, and the `@` shortcuts from the helpers table
 
 ## Outputs
-- Human-readable schedule description (or invalid state when the expression fails validation / cannot be described)
+- Human-readable schedule description, or a message naming the field at fault when the expression is invalid. Blank input shows neither.
 - Copy of the current expression
 - Static field diagram + helpers reference table
 
 ## Notes
-- Validation uses `cron-validator` with `{ allowBlankDay: true, alias: true, seconds: true }` (same as it-tools). `alias` means month/weekday names, not `@daily`-style macros — those macros are documented in the helpers table but fail the 5-field validator (parity with it-tools).
-- Description uses `cronstrue` with `throwExceptionOnParseError: true`; parse failures (e.g. DOW `0` while “Days start at 0” is off) surface as invalid rather than throwing in the UI.
-- `@reboot` is documentation-only (no equivalent expression).
+- Validation uses `cron-validator` with `{ allowBlankDay: true, alias: true, seconds: true }` (same as it-tools). `@` shortcuts are expanded to their five-field equivalent first, which it-tools does not do even though its table lists them. `L`, `W`, and `#` are rejected (it-tools parity).
+- Description uses `cronstrue` with `throwExceptionOnParseError: true`. With “Days start at 0” off, day of week runs 1 through 7: `7` is accepted and `0` reports why it is not.
+- `@reboot` has no equivalent expression, so it is described as “Run at startup”.
 
 ## Source
 Port of [it-tools crontab generator](https://it-tools.tech/crontab-generator). Local reference: handy-dandy `it-tools` (`/crontab-generator`). Catalogue id: `crontab-generator`.

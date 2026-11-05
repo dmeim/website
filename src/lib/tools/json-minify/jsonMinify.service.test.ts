@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_RAW_JSON, isValidJson, minifyJson } from "./jsonMinify.service";
+import { DEFAULT_RAW_JSON, getJsonError, isValidJson, minifyJson } from "./jsonMinify.service";
 
 describe("json-minify", () => {
   describe("minifyJson", () => {
@@ -30,6 +30,18 @@ describe("json-minify", () => {
       expect(minifyJson("")).toBe("");
       expect(minifyJson("{unterminated")).toBe("");
       expect(minifyJson("not json")).toBe("");
+    });
+  });
+
+  describe("getJsonError", () => {
+    it("returns null for blank and valid input", () => {
+      expect(getJsonError("")).toBeNull();
+      expect(getJsonError("  \n")).toBeNull();
+      expect(getJsonError("0")).toBeNull();
+    });
+
+    it("explains syntax errors with their position", () => {
+      expect(getJsonError("[1, 2")).toBe("Provided JSON is not valid: invalid end of input at 1:6.");
     });
   });
 

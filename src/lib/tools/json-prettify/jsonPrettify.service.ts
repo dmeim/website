@@ -32,18 +32,25 @@ export function sortObjectKeys<T>(obj: T): T {
         sortedObj[key] = sortObjectKeys((obj as Record<string, unknown>)[key]);
         return sortedObj;
       },
-      {} as Record<string, unknown>,
+      // A plain object would treat a "__proto__" key as its prototype and drop it from the output.
+      Object.create(null) as Record<string, unknown>,
     ) as T;
 }
 
-/** Empty input is valid (matches it-tools validation). */
+/** Blank input is the empty state, so it is valid. */
 export function isValidJson(value: string): boolean {
-  if (value === "") return true;
+  return getJsonError(value) === null;
+}
+
+/** A message with the parser's reason and position, or null when the input is blank or valid. */
+export function getJsonError(value: string): string | null {
+  if (value.trim() === "") return null;
   try {
     JSON5.parse(value);
-    return true;
-  } catch {
-    return false;
+    return null;
+  } catch (error) {
+    const detail = error instanceof Error ? error.message.replace(/^JSON5: /, "") : "";
+    return detail ? `Provided JSON is not valid: ${detail}.` : "Provided JSON is not valid.";
   }
 }
 

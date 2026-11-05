@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { useStoredState } from "@/components/tools/use-persisted-state";
 import { FormGrid, Input, Panel, Switch, ToolFrame, TransformPanel } from "@/ui/react";
 import {
   DEFAULT_COLLAPSE_CONTENT,
@@ -14,8 +15,17 @@ import {
 
 export default function XmlFormatter() {
   const [rawXml, setRawXml] = useState(DEFAULT_RAW_XML);
-  const [collapseContent, setCollapseContent] = useState(DEFAULT_COLLAPSE_CONTENT);
-  const [indentSize, setIndentSize] = useState(DEFAULT_INDENT_SIZE);
+  const [collapseContent, setCollapseContent] = useStoredState(
+    "xml-formatter:collapse-content",
+    DEFAULT_COLLAPSE_CONTENT,
+  );
+  const [indentSize, setIndentSize] = useStoredState(
+    "xml-formatter:indent-size",
+    DEFAULT_INDENT_SIZE,
+    (value) => clampIndentSize(value) === value,
+  );
+  // The field can be empty mid-edit while the last valid size keeps formatting.
+  const [indentDraft, setIndentDraft] = useState(String(indentSize));
 
   const inputInvalid = rawXml.trim() !== "" && !isValidXml(rawXml);
 
@@ -40,7 +50,7 @@ export default function XmlFormatter() {
             rows: 12,
           }}
           output={{ label: "Formatted XML from your XML", value: output, mono: true, rows: 12 }}
-          error={inputInvalid ? "Provided XML is not valid." : undefined}
+          error={inputInvalid ? "Provided XML is not valid. Check for unclosed tags, mismatched tags, or more than one root element." : undefined}
           options={
             <FormGrid columns={2}>
               <Switch
@@ -56,13 +66,13 @@ export default function XmlFormatter() {
                 min={MIN_INDENT_SIZE}
                 max={MAX_INDENT_SIZE}
                 step={1}
-                value={indentSize}
+                value={indentDraft}
                 onChange={(event) => {
+                  setIndentDraft(event.target.value);
                   const next = event.target.valueAsNumber;
-                  setIndentSize(
-                    Number.isNaN(next) ? DEFAULT_INDENT_SIZE : clampIndentSize(next),
-                  );
+                  if (!Number.isNaN(next)) setIndentSize(clampIndentSize(next));
                 }}
+                onBlur={() => setIndentDraft(String(indentSize))}
               />
             </FormGrid>
           }

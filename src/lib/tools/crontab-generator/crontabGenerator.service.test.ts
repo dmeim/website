@@ -34,13 +34,35 @@ describe("crontab-generator", () => {
       expect(isCronValid("0 0 ? * mon")).toBe(true);
     });
 
-    it("rejects malformed expressions and @ shortcuts (validator needs 5+ fields)", () => {
+    it("rejects malformed expressions and out-of-range fields", () => {
       expect(isCronValid("invalid")).toBe(false);
       expect(isCronValid("")).toBe(false);
       expect(isCronValid("* * *")).toBe(false);
-      expect(isCronValid("@daily")).toBe(false);
-      expect(isCronValid("@hourly")).toBe(false);
-      expect(isCronValid("@reboot")).toBe(false);
+      expect(isCronValid("60 * * * *")).toBe(false);
+      expect(isCronValid("* 24 * * *")).toBe(false);
+      expect(isCronValid("* * 32 * *")).toBe(false);
+      expect(isCronValid("* * * 13 *")).toBe(false);
+      expect(isCronValid("* * * * 8")).toBe(false);
+      expect(isCronValid("*/0 * * * *")).toBe(false);
+      expect(isCronValid("5-1 * * * *")).toBe(false);
+      expect(isCronValid("@nope")).toBe(false);
+    });
+
+    it("accepts the @ shortcuts listed in the helpers table", () => {
+      for (const row of CRON_HELPERS.filter((helper) => helper.symbol.startsWith("@"))) {
+        expect(isCronValid(row.symbol), row.symbol).toBe(true);
+      }
+    });
+
+    it("accepts every example in the helpers table", () => {
+      for (const row of CRON_HELPERS.filter((helper) => helper.example)) {
+        expect(isCronValid(row.example), row.example).toBe(true);
+      }
+    });
+
+    it("takes 7 as a day of week only when days start at 1", () => {
+      expect(isCronValid("0 14 * * 7")).toBe(false);
+      expect(isCronValid("0 14 * * 7", { dayOfWeekStartIndexZero: false })).toBe(true);
     });
   });
 
@@ -53,7 +75,21 @@ describe("crontab-generator", () => {
 
     it("returns null for invalid expressions", () => {
       expect(describeCron("not a cron")).toBeNull();
-      expect(describeCron("@daily")).toBeNull();
+      expect(describeCron("")).toBeNull();
+    });
+
+    it("describes @ shortcuts", () => {
+      expect(describeCron("@daily")).toBe("At 00:00, every day");
+      expect(describeCron("@hourly")).toBe(describeCron("0 * * * *"));
+      expect(describeCron("@weekly")).toBe(describeCron("0 0 * * 0"));
+      expect(describeCron("@reboot")).toBe("Run at startup");
+    });
+
+    it("counts day of week from 1 when days do not start at 0", () => {
+      const fromOne = { ...DEFAULT_CRON_DESCRIBE_OPTIONS, dayOfWeekStartIndexZero: false };
+      expect(describeCron("0 14 * * 1", fromOne)).toContain("Sunday");
+      expect(describeCron("0 14 * * 7", fromOne)).toContain("Saturday");
+      expect(describeCron("0 14 * * 1")).toContain("Monday");
     });
 
     it("honors use24HourTimeFormat", () => {
@@ -103,9 +139,30 @@ describe("crontab-generator", () => {
   });
 
   describe("cronValidationMessage", () => {
-    it("returns null for valid cron and the it-tools message otherwise", () => {
+    it("returns null for valid cron and blank input", () => {
       expect(cronValidationMessage(DEFAULT_CRON_EXPRESSION)).toBeNull();
-      expect(cronValidationMessage("bad")).toBe("This cron is invalid");
+      expect(cronValidationMessage("@daily")).toBeNull();
+      expect(cronValidationMessage("")).toBeNull();
+      expect(cronValidationMessage("   ")).toBeNull();
+    });
+
+    it("names the field at fault when it can", () => {
+      expect(cronValidationMessage("60 * * * *")).toBe(
+        "This cron is invalid: minutes part must be >= 0 and <= 59",
+      );
+      expect(cronValidationMessage("bad")).toMatch(/^This cron is invalid: .*5 parts/);
+    });
+
+    it("explains syntax the validator rejects even though the describer can read it", () => {
+      expect(cronValidationMessage("0 0 L * *")).toBe(
+        "This cron is invalid. Use 5 or 6 fields of values, ranges, lists, and steps.",
+      );
+    });
+
+    it("explains day 0 when days do not start at 0", () => {
+      expect(
+        cronValidationMessage("0 14 * * 0", { ...DEFAULT_CRON_DESCRIBE_OPTIONS, dayOfWeekStartIndexZero: false }),
+      ).toBe("This cron is invalid: DOW part must be >= 1 and <= 7");
     });
   });
 

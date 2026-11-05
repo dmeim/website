@@ -15,7 +15,7 @@ function MessageList({ title, items, tone }: { title: string; items: string[]; t
   return (
     <Notice tone={tone} title={title} live="polite">
       <ul className="d2c-messages__list">
-        {items.map((item) => (
+        {[...new Set(items)].map((item) => (
           <li key={item}>{item}</li>
         ))}
       </ul>
@@ -61,7 +61,10 @@ export default function DockerRunToDockerComposeConverter() {
           rows={4}
           value={dockerRun}
           placeholder="Your docker run command to convert…"
-          onChange={(event) => setDockerRun(event.target.value)}
+          onChange={(event) => {
+            setDockerRun(event.target.value);
+            setActionStatus("");
+          }}
           autoFocus
         />
 

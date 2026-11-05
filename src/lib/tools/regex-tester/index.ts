@@ -2,6 +2,7 @@ export {
   DEFAULT_FLAG_OPTIONS,
   DEFAULT_REGEX,
   DEFAULT_TEXT,
+  MAX_MATCHES,
   buildRegexFlags,
   generateSample,
   getRegexValidationError,

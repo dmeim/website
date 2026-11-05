@@ -4,6 +4,7 @@ import {
   DEFAULT_INDENT_SIZE,
   clampIndentSize,
   formatJson,
+  getJsonError,
   isValidJson,
   sortObjectKeys,
 } from "./jsonPrettify.service";
@@ -82,10 +83,37 @@ describe("json-prettify", () => {
       ).toBe('{"a":1,"b":2}');
     });
 
+    it("keeps a __proto__ key when sorting", () => {
+      expect(formatJson({ rawJson: '{"b":1,"__proto__":{"x":1}}', indentSize: 0 })).toBe(
+        '{"__proto__":{"x":1},"b":1}',
+      );
+    });
+
+    it("keeps unicode and top-level primitives", () => {
+      expect(formatJson({ rawJson: '{"é":"😀"}', indentSize: 0 })).toBe('{"é":"😀"}');
+      expect(formatJson({ rawJson: "0" })).toBe("0");
+      expect(formatJson({ rawJson: "null" })).toBe("null");
+    });
+
     it("returns empty string for empty or invalid input", () => {
       expect(formatJson({ rawJson: "" })).toBe("");
+      expect(formatJson({ rawJson: "  \n" })).toBe("");
       expect(formatJson({ rawJson: "{unterminated" })).toBe("");
       expect(formatJson({ rawJson: "not json" })).toBe("");
+    });
+  });
+
+  describe("getJsonError", () => {
+    it("returns null for blank and valid input", () => {
+      expect(getJsonError("")).toBeNull();
+      expect(getJsonError("  \n")).toBeNull();
+      expect(getJsonError("{a: 1,}")).toBeNull();
+      expect(getJsonError("false")).toBeNull();
+    });
+
+    it("explains syntax errors with their position", () => {
+      expect(getJsonError('{"a": }')).toBe("Provided JSON is not valid: invalid character '}' at 1:7.");
+      expect(getJsonError("[1, 2")).toBe("Provided JSON is not valid: invalid end of input at 1:6.");
     });
   });
 

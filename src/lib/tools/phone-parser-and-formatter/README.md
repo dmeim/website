@@ -10,7 +10,7 @@ Parse, validate, and format phone numbers. Show country, calling code, validity,
 - Default country code (select; used when the number has no country prefix)
 
 ## Inputs
-- Phone number string (digits, spaces, `+`, `-`, `(`, `)` only)
+- Phone number string (digits, spaces, `+`, `-`, `(`, `)`, and `.` only)
 
 ## Outputs
 - Country code
@@ -24,7 +24,7 @@ Parse, validate, and format phone numbers. Show country, calling code, validity,
 - Uses `libphonenumber-js/max` (same engine family as it-tools; max metadata for number type)
 - Country display names via `Intl.DisplayNames` (native; it-tools used `country-code-lookup`)
 - Default country is inferred from the browser locale region, falling back to `FR`
-- Empty or character-invalid input shows no result rows
+- Empty input shows no result rows and no error. Input that cannot be parsed (bad characters, too short, too long, unknown calling code) shows no result rows and a message saying why. it-tools shows nothing for the parse failures.
 - Catalogue id: `phone-parser-and-formatter`
 
 ## Source

@@ -6,6 +6,7 @@ export {
   MIN_INDENT_SIZE,
   clampIndentSize,
   formatJson,
+  getJsonError,
   isValidJson,
   sortObjectKeys,
 } from "./jsonPrettify.service";

@@ -20,12 +20,16 @@ export function normalizeEmailLine(email: string): string {
 /**
  * Normalize newline-separated emails.
  * Empty input returns "" (matches it-tools early return).
- * Invalid lines become `Unable to parse email: <raw line>`.
+ * Invalid lines become `Unable to parse email: <raw line>`. Blank lines stay blank, so a
+ * trailing newline in a pasted list does not read as a bad address.
  */
 export function normalizeEmails(rawEmails: string): string {
   if (!rawEmails) {
     return "";
   }
 
-  return rawEmails.split("\n").map(normalizeEmailLine).join("\n");
+  return rawEmails
+    .split(/\r?\n/)
+    .map((line) => (line.trim() === "" ? "" : normalizeEmailLine(line)))
+    .join("\n");
 }

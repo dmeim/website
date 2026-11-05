@@ -28,9 +28,9 @@ export default function CrontabGenerator() {
 
   const description = useMemo(() => describeCron(expression, options), [expression, options]);
 
-  const invalidMessage = useMemo(() => cronValidationMessage(expression), [expression]);
+  const invalidMessage = useMemo(() => cronValidationMessage(expression, options), [expression, options]);
 
-  const showInvalid = invalidMessage !== null || description === null;
+  const showInvalid = invalidMessage !== null;
 
   return (
     <ToolFrame layout="split" stagger>
@@ -56,7 +56,7 @@ export default function CrontabGenerator() {
 
         {showInvalid ? (
           <Notice tone="danger" live="polite">
-            {invalidMessage ?? "This cron is invalid"}
+            {invalidMessage}
           </Notice>
         ) : null}
 
@@ -66,7 +66,7 @@ export default function CrontabGenerator() {
           aria-live="polite"
           data-testid="cron-description"
         >
-          {showInvalid ? " " : description}
+          {description ?? " "}
         </p>
 
         <FormGrid columns={1} gap="sm">
@@ -94,7 +94,7 @@ export default function CrontabGenerator() {
       <Panel
         title="Cron format"
         titleId="cg-ref-heading"
-        description="Field order and common symbols. Shortcuts like @daily are shown for reference only. Expand them to a five-field expression to validate here."
+        description="Field order, common symbols, and the @ shortcuts you can enter above."
       >
         <CodeBlock code={CRON_FORMAT_DIAGRAM} label="Cron field diagram" copy={false} aria-label="Cron field diagram" />
 

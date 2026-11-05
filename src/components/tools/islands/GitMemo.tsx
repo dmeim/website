@@ -45,7 +45,7 @@ export default function GitMemo() {
                       <ListRow
                         key={entryId}
                         title={<span id={entryId}>{entry.description}</span>}
-                        description={<CodeBlock code={entry.command} label={entry.description} wrap />}
+                        description={<CodeBlock code={entry.command} aria-label={entry.description} wrap />}
                       />
                     );
                   })}

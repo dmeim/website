@@ -1,41 +1,50 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Checkbox, CodeBlock, EmptyState, FormGrid, Panel, Table, Textarea, ToolFrame } from "@/ui/react";
+import { useQueryState } from "@/components/tools/use-persisted-state";
+import { Checkbox, CodeBlock, EmptyState, FormGrid, Link, Notice, Panel, Table, Textarea, ToolFrame } from "@/ui/react";
 import {
   DEFAULT_FLAG_OPTIONS,
   DEFAULT_REGEX,
   DEFAULT_TEXT,
+  MAX_MATCHES,
   buildRegexFlags,
-  generateSample,
   getRegexValidationError,
-  safeMatchRegex,
+  type GroupCapture,
   type RegexFlagOptions,
   type RegexMatch,
 } from "@/lib/tools/regex-tester";
+import { useRegexRun } from "@/lib/tools/regex-tester/use-regex-run";
 
 import "./RegexTester.css";
 
+function formatCapture({ name, value, start, end }: GroupCapture): string {
+  return value === null ? `"${name}" did not match` : `"${name}" = ${value} [${start} - ${end}]`;
+}
+
 export default function RegexTester() {
-  const [regex, setRegex] = useState(DEFAULT_REGEX);
+  const [regex, setRegex] = useQueryState<string>("regex", DEFAULT_REGEX);
   const [text, setText] = useState(DEFAULT_TEXT);
   const [flags, setFlags] = useState<RegexFlagOptions>(DEFAULT_FLAG_OPTIONS);
 
-  const validationError = useMemo(() => getRegexValidationError(regex), [regex]);
   const flagString = useMemo(() => buildRegexFlags(flags), [flags]);
+  const validationError = useMemo(() => getRegexValidationError(regex, flagString), [regex, flagString]);
 
-  const results = useMemo(
-    () =>
-      validationError ? [] : safeMatchRegex(regex, text, flagString),
+  const request = useMemo(
+    () => (validationError || regex === "" ? null : { regex, text, flags: flagString }),
     [regex, text, flagString, validationError],
   );
-
-  const sample = useMemo(
-    () => (validationError ? "" : generateSample(regex)),
-    [regex, validationError],
-  );
+  const { result, timedOut } = useRegexRun(request);
+  const results = result.matches;
+  const sample = result.sample;
 
   const setFlag = (key: keyof RegexFlagOptions, value: boolean) => {
-    setFlags((current) => ({ ...current, [key]: value }));
+    setFlags((current) => ({
+      ...current,
+      [key]: value,
+      // JavaScript rejects u and v together, so turning one on turns the other off.
+      ...(key === "unicode" && value ? { unicodeSets: false } : {}),
+      ...(key === "unicodeSets" && value ? { unicode: false } : {}),
+    }));
   };
 
   return (
@@ -43,7 +52,12 @@ export default function RegexTester() {
       <Panel
         title="Regex"
         titleId="rt-heading"
-        description="Enter a JavaScript regular expression and text to match. Toggle flags below; matches update live."
+        description={
+          <>
+            Enter a JavaScript regular expression and text to match. Toggle flags below; matches update live. See the{" "}
+            <Link href="/tools/regex-memo">Regular Expression Cheatsheet</Link>.
+          </>
+        }
       >
 
         <Textarea
@@ -129,6 +143,17 @@ export default function RegexTester() {
             checked={flags.unicodeSets}
             onChange={(event) => setFlag("unicodeSets", event.target.checked)}
           />
+          <Checkbox
+            id="rt-flag-y"
+            label={
+              <>
+                Sticky (<code>y</code>)
+              </>
+            }
+            title="Matches only at the position right after the previous match, starting from the beginning of the text."
+            checked={flags.sticky}
+            onChange={(event) => setFlag("sticky", event.target.checked)}
+          />
         </FormGrid>
 
         <Textarea
@@ -151,6 +176,17 @@ export default function RegexTester() {
       </Panel>
 
       <Panel title="Matches" titleId="rt-matches-heading">
+        {timedOut ? (
+          <Notice tone="warning" live="polite">
+            This pattern took too long and was stopped. Nested quantifiers like <code>(a+)+</code> can backtrack
+            endlessly, so try simplifying it or shortening the text.
+          </Notice>
+        ) : null}
+        {results.length >= MAX_MATCHES ? (
+          <Notice tone="info" live="polite">
+            Showing the first {MAX_MATCHES.toLocaleString("en-US")} matches.
+          </Notice>
+        ) : null}
         {results.length > 0 ? (
           <Table caption="Regex matches" captionHidden density="compact" className="rt-table">
             <thead>
@@ -171,12 +207,12 @@ export default function RegexTester() {
                       <ul className="rt-capture-list">
                         {match.captures.map((capture) => (
                           <li key={capture.name}>
-                            &quot;{capture.name}&quot; = {capture.value} [{capture.start} - {capture.end}]
+                            {formatCapture(capture)}
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <span className="rt-muted">—</span>
+                      <span className="rt-muted">–</span>
                     )}
                   </td>
                   <td>
@@ -184,19 +220,19 @@ export default function RegexTester() {
                       <ul className="rt-capture-list">
                         {match.groups.map((group) => (
                           <li key={group.name}>
-                            &quot;{group.name}&quot; = {group.value} [{group.start} - {group.end}]
+                            {formatCapture(group)}
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <span className="rt-muted">—</span>
+                      <span className="rt-muted">–</span>
                     )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </Table>
-        ) : (
+        ) : timedOut ? null : (
           <EmptyState size="sm" icon="magnifying-glass" title="No match" />
         )}
       </Panel>

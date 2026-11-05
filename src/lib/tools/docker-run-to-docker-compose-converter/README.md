@@ -24,7 +24,8 @@ None — live conversion as you type.
 ## Notes
 - Conversion engine: `composerize-ts` `composerize()` (same package/version family as it-tools, `^0.6.2`)
 - Input is trimmed before conversion
-- Thrown errors fall back to empty YAML and empty message lists (it-tools `withDefaultOnError` parity)
+- Blank input yields no YAML. Input that is not `docker run` or `docker create`, has no image, or has an unclosed quote yields no YAML and an error. it-tools turns these into a compose file with a wrong image, like `image: ls`.
+- The command is tokenized first, so `sudo`, `docker container run`, extra spaces, line continuations, and quotes inside a value (`-e A="b"`) all work. The parser mishandles the last one on its own.
 - Download uses a Blob/`application/yaml` file (equivalent to it-tools base64 data-URL download)
 - No compose-version toggle in the UI (library default, Compose 3.9)
 

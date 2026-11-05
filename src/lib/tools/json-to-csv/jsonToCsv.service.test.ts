@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   convertArrayToCsv,
   getHeaders,
+  getJsonError,
   isValidJson,
   jsonToCsv,
 } from "./jsonToCsv.service";
@@ -57,16 +58,36 @@ describe("json-to-csv", () => {
       expect(convertArrayToCsv({ array })).toBe('a,b\n"hello, world",2');
     });
 
-    it("when a value contains a double quote, it is escaped with a backslash", () => {
+    it("when a value contains a double quote, it is escaped with another double quote (RFC 4180)", () => {
       const array = [{ a: 'hello "world"', b: 2 }];
 
-      expect(convertArrayToCsv({ array })).toBe('a,b\nhello \\"world\\",2');
+      expect(convertArrayToCsv({ array })).toBe('a,b\n"hello ""world""",2');
     });
 
-    it("escapes newlines and carriage returns as literal escape sequences", () => {
+    it("keeps newlines and carriage returns inside a quoted cell (RFC 4180)", () => {
       const array = [{ a: "line1\nline2\rrest", b: 2 }];
 
-      expect(convertArrayToCsv({ array })).toBe("a,b\nline1\\nline2\\rrest,2");
+      expect(convertArrayToCsv({ array })).toBe('a,b\n"line1\nline2\rrest",2');
+    });
+
+    it("quotes headers that need it", () => {
+      expect(convertArrayToCsv({ array: [{ "last, first": 1, 'say "hi"': 2 }] })).toBe(
+        '"last, first","say ""hi"""\n1,2',
+      );
+    });
+
+    it("writes nested values as JSON", () => {
+      expect(convertArrayToCsv({ array: [{ a: { x: 1, y: "z" }, b: [1, 2], c: [] }] })).toBe(
+        'a,b,c\n"{""x"":1,""y"":""z""}","[1,2]",[]',
+      );
+    });
+
+    it("leaves cells empty for missing keys, even ones named like object built-ins", () => {
+      expect(convertArrayToCsv({ array: [{ constructor: "x" }, { a: 1 }] })).toBe("constructor,a\nx,\n,1");
+    });
+
+    it("keeps unicode and booleans as they are", () => {
+      expect(convertArrayToCsv({ array: [{ a: "é😀", b: true, c: 0 }] })).toBe("a,b,c\né😀,true,0");
     });
   });
 
@@ -90,6 +111,26 @@ describe("json-to-csv", () => {
       expect(jsonToCsv("not json")).toBe("");
       expect(jsonToCsv('{"a":1}')).toBe("");
       expect(jsonToCsv("42")).toBe("");
+    });
+  });
+
+  describe("getJsonError", () => {
+    it("accepts blank input and arrays of objects", () => {
+      expect(getJsonError("")).toBeNull();
+      expect(getJsonError("  \n")).toBeNull();
+      expect(getJsonError("[]")).toBeNull();
+      expect(getJsonError("[{a: 1}]")).toBeNull();
+    });
+
+    it("explains syntax errors with their position", () => {
+      expect(getJsonError("[{a: }]")).toBe("Provided JSON is not valid: invalid character '}' at 1:6.");
+    });
+
+    it("explains values that are valid JSON but not convertible", () => {
+      for (const value of ['{"a":1}', "42", "[1, 2, 3]", "[null]", "[[1]]", '[{"a":1}, 2]']) {
+        expect(getJsonError(value), value).toMatch(/must be an array of objects/);
+        expect(jsonToCsv(value), value).toBe("");
+      }
     });
   });
 

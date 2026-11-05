@@ -64,7 +64,7 @@ export const gitMemoSections: GitMemoSection[] = [
         command: "git reset HEAD~1",
       },
       {
-        description: "Undo the `N` most recent commit and keep changes",
+        description: "Undo the N most recent commits and keep changes",
         command: "git reset HEAD~N",
       },
       {

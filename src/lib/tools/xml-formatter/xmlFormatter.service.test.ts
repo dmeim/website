@@ -82,14 +82,27 @@ describe("xml-formatter", () => {
       expect(formatXml({ rawXml: "hello world" })).toBe("");
     });
 
-    it("auto-closes unclosed tags (xml-formatter library behavior)", () => {
+    it("does not rewrite broken markup into different XML", () => {
+      for (const rawXml of ["<unclosed>", "<a><b></a>", "<a></b>", "<a"]) {
+        expect(formatXml({ rawXml }), rawXml).toBe("");
+      }
+    });
+
+    it("keeps declarations, comments, CDATA, namespaces, entities, and unicode", () => {
       expect(
         formatXml({
-          rawXml: "<unclosed>",
+          rawXml: `<?xml version="1.0"?><!DOCTYPE r><r xmlns:x="u"><!-- c --><x:a b="1">é😀 &amp; more</x:a><c><![CDATA[1<2]]></c><d/></r>`,
           indentSize: 2,
           collapseContent: true,
         }),
-      ).toBe("<unclosed></unclosed>");
+      ).toBe(`<?xml version="1.0"?>
+<!DOCTYPE r>
+<r xmlns:x="u">
+  <!-- c -->
+  <x:a b="1">é😀 &amp; more</x:a>
+  <c><![CDATA[1<2]]></c>
+  <d/>
+</r>`);
     });
   });
 
@@ -99,12 +112,13 @@ describe("xml-formatter", () => {
       expect(isValidXml("   ")).toBe(true);
       expect(isValidXml("<a/>")).toBe(true);
       expect(isValidXml("<hello><world>foo</world></hello>")).toBe(true);
-      // Library auto-closes / repairs some malformed markup
-      expect(isValidXml("<unclosed>")).toBe(true);
     });
 
-    it("rejects non-XML text", () => {
+    it("rejects non-XML text, broken markup, and multiple roots", () => {
       expect(isValidXml("hello world")).toBe(false);
+      expect(isValidXml("<unclosed>")).toBe(false);
+      expect(isValidXml("<a><b></a>")).toBe(false);
+      expect(isValidXml("<a/><b/>")).toBe(false);
     });
   });
 });

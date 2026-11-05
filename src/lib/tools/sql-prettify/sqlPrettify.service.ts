@@ -126,7 +126,7 @@ export function tryFormatSql({
     return { ok: true, sql };
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Could not format SQL.";
-    return { ok: false, error: message };
+      error instanceof Error ? error.message : "Could not format SQL";
+    return { ok: false, error: `${message}. Check the syntax, or pick the dialect this query was written for.` };
   }
 }
